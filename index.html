@@ -7,11 +7,30 @@
   <title>ХИЩЕНИЕ — THEFT | Официальный сайт фильма</title>
   <meta name="description" content="Официальный сайт фильма «ХИЩЕНИЕ / THEFT» — антиутопической драмы о мире 2045 года.">
   <meta name="theme-color" content="#07090a">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://cryo-zero.github.io/hishchenie-film/">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="ХИЩЕНИЕ — THEFT">
-  <meta property="og:description" content="Официальный сайт фильма «ХИЩЕНИЕ / THEFT». Фильм в разработке.">
-  <meta property="og:image" content="https://cryo-zero.github.io/hishchenie-film/gallery-1.jpg">
+  <meta property="og:description" content="В мире, где человек должен доказать свою пользу системе, взросление становится борьбой за право самому выбирать своё будущее.">
+  <meta property="og:image" content="https://cryo-zero.github.io/hishchenie-film/material-01.jpg">
+  <meta property="og:url" content="https://cryo-zero.github.io/hishchenie-film/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Movie",
+    "name": "ХИЩЕНИЕ",
+    "alternateName": "THEFT",
+    "description": "Антиутопическая драма о мире 2045 года, в котором каждый человек должен доказать свою пользу системе.",
+    "genre": ["Антиутопия", "Драма", "Боевик", "Приключения", "Фантастика"],
+    "director": {
+      "@type": "Person",
+      "name": "Арман О. А."
+    },
+    "image": "https://cryo-zero.github.io/hishchenie-film/material-01.jpg"
+  }
+  </script>
 
   <style>
     :root {
@@ -26,6 +45,7 @@
       --accent: #9bc4c7;
       --header-h: 70px;
       --max: 1180px;
+      --hero-max: 1360px;
     }
 
     * {
@@ -96,10 +116,10 @@
 
     .nav {
       min-height: var(--header-h);
-      display: flex;
+      display: grid;
+      grid-template-columns: auto minmax(190px, 1fr) auto;
       align-items: center;
-      justify-content: space-between;
-      gap: 24px;
+      gap: 28px;
     }
 
     .brand {
@@ -115,6 +135,24 @@
       font-weight: 500;
     }
 
+    .header-slogan {
+      justify-self: center;
+      color: var(--accent);
+      opacity: 0.72;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2.8px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .header-slogan::before,
+    .header-slogan::after {
+      content: "—";
+      margin: 0 9px;
+      color: #4d6669;
+    }
+
     .nav-links {
       display: flex;
       align-items: center;
@@ -128,11 +166,29 @@
     }
 
     .nav-links a {
+      position: relative;
       transition: color 0.2s ease;
     }
 
-    .nav-links a:hover {
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 100%;
+      bottom: -7px;
+      height: 1px;
+      background: var(--accent);
+      transition: right 0.2s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
       color: #fff;
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      right: 0;
     }
 
     /* ---------- Первый экран ---------- */
@@ -146,29 +202,48 @@
       padding: 0;
       border-bottom: 1px solid var(--line-soft);
       background:
-        linear-gradient(110deg, rgba(9, 13, 14, 0.35), rgba(9, 13, 14, 0.88)),
-        radial-gradient(circle at 76% 45%, rgba(80, 121, 125, 0.14), transparent 29%);
+        linear-gradient(110deg, rgba(8, 12, 13, 0.22), rgba(8, 12, 13, 0.9)),
+        var(--bg);
+      isolation: isolate;
     }
 
     .hero::before {
       content: "";
       position: absolute;
+      z-index: -2;
+      inset: -7% -5% -7% 38%;
+      background: url("material-01.jpg") center / cover no-repeat;
+      filter: blur(26px) saturate(0.7) brightness(0.72);
+      transform: scale(1.08);
+      opacity: 0.28;
+      mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.72) 28%, black 100%);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
       inset: 0;
-      opacity: 0.34;
       pointer-events: none;
-      background-image:
-        linear-gradient(rgba(155, 196, 199, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(155, 196, 199, 0.04) 1px, transparent 1px);
-      background-size: 58px 58px;
-      mask-image: linear-gradient(to right, transparent 0%, black 48%, black 100%);
+      background:
+        linear-gradient(90deg, rgba(7, 9, 10, 0.98) 0%, rgba(7, 9, 10, 0.9) 34%, rgba(7, 9, 10, 0.44) 70%, rgba(7, 9, 10, 0.24) 100%),
+        linear-gradient(rgba(155, 196, 199, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(155, 196, 199, 0.035) 1px, transparent 1px);
+      background-size: auto, 58px 58px, 58px 58px;
     }
 
     .hero-inner {
-      position: relative;
-      z-index: 2;
-      width: min(var(--max), calc(100% - 48px));
+      width: min(var(--hero-max), calc(100% - 48px));
       margin: 0 auto;
-      padding: clamp(58px, 8vh, 92px) 0;
+      padding: clamp(44px, 6vh, 72px) 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(350px, 0.82fr);
+      gap: clamp(38px, 5vw, 76px);
+      align-items: center;
+    }
+
+    .hero-copy-column {
+      min-width: 0;
     }
 
     .eyebrow,
@@ -183,36 +258,46 @@
       margin-bottom: 24px;
     }
 
+    .mobile-slogan {
+      display: none;
+      margin-bottom: 15px;
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+    }
+
     h1 {
-      max-width: 1000px;
-      font-size: clamp(68px, 12vw, 170px);
+      max-width: 720px;
+      font-size: clamp(62px, 5.8vw, 106px);
       font-weight: 900;
-      letter-spacing: -0.065em;
-      line-height: 0.78;
+      letter-spacing: -0.058em;
+      line-height: 0.82;
     }
 
     .english-title {
       display: block;
-      margin-top: 30px;
+      margin-top: 28px;
       color: #b8c9ca;
-      font-size: clamp(18px, 2vw, 26px);
+      font-size: clamp(17px, 1.8vw, 24px);
       font-weight: 600;
       letter-spacing: 0.68em;
       line-height: 1;
     }
 
     .hero-copy {
-      max-width: 650px;
-      margin-top: 46px;
+      max-width: 630px;
+      margin-top: 42px;
       color: #d0d6d7;
-      font-size: clamp(17px, 2vw, 20px);
+      font-size: clamp(17px, 1.55vw, 20px);
     }
 
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      margin-top: 38px;
+      margin-top: 36px;
     }
 
     .button {
@@ -227,12 +312,13 @@
       font-weight: 800;
       letter-spacing: 2px;
       text-transform: uppercase;
-      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
     }
 
     .button:hover {
       background: #f1f4f4;
       color: #071011;
+      transform: translateY(-1px);
     }
 
     .button.secondary {
@@ -243,6 +329,33 @@
     .button.secondary:hover {
       border-color: #f1f4f4;
       color: #071011;
+    }
+
+    .hero-poster-frame {
+      position: relative;
+      justify-self: end;
+      width: min(100%, 520px);
+      padding: 9px;
+      border: 1px solid rgba(155, 196, 199, 0.24);
+      background: rgba(8, 12, 13, 0.74);
+      box-shadow: 0 26px 90px rgba(0, 0, 0, 0.46);
+    }
+
+    .hero-poster-frame::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      pointer-events: none;
+      box-shadow: inset 0 0 46px rgba(155, 196, 199, 0.055);
+    }
+
+    .hero-poster {
+      width: 100%;
+      height: auto;
+      max-height: calc(100svh - var(--header-h) - 58px);
+      display: block;
+      object-fit: contain;
+      background: #050708;
     }
 
     /* ---------- Разделы ---------- */
@@ -315,7 +428,7 @@
     .gallery {
       display: grid;
       grid-auto-flow: column;
-      grid-auto-columns: minmax(280px, 31.5%);
+      grid-auto-columns: minmax(235px, 23.6%);
       gap: 16px;
       overflow-x: auto;
       overscroll-behavior-inline: contain;
@@ -331,11 +444,11 @@
 
     .gallery-card {
       position: relative;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 2 / 3;
       overflow: hidden;
       scroll-snap-align: start;
       border: 1px solid var(--line);
-      background: #0b0f10;
+      background: #080b0c;
       cursor: zoom-in;
     }
 
@@ -344,8 +457,14 @@
       height: 100%;
       display: block;
       object-fit: cover;
-      filter: saturate(0.9) contrast(1.04);
+      object-position: center;
+      filter: saturate(0.92) contrast(1.035);
       transition: transform 0.5s ease, filter 0.4s ease;
+    }
+
+    .gallery-card.is-cover img {
+      object-fit: cover;
+      object-position: center;
     }
 
     .gallery-card:hover img {
@@ -540,6 +659,16 @@
       box-shadow: 0 24px 90px rgba(0, 0, 0, 0.55);
     }
 
+    .lightbox-counter {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      color: #9fb0b2;
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+
     .lightbox-button {
       position: absolute;
       z-index: 2;
@@ -584,10 +713,29 @@
 
     /* ---------- Адаптивность ---------- */
 
+    @media (max-width: 1280px) {
+      .nav {
+        grid-template-columns: auto 1fr;
+      }
+
+      .header-slogan {
+        display: none;
+      }
+
+      .nav-links {
+        justify-self: end;
+      }
+    }
+
     @media (max-width: 1100px) {
       .nav-links {
         gap: 16px;
         font-size: 10px;
+      }
+
+      .hero-inner {
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 0.72fr);
+        gap: 34px;
       }
 
       .info-grid,
@@ -596,7 +744,7 @@
       }
 
       .gallery {
-        grid-auto-columns: minmax(280px, 46%);
+        grid-auto-columns: minmax(250px, 31%);
       }
 
       .gallery-button.prev {
@@ -608,7 +756,7 @@
       }
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 820px) {
       :root {
         --header-h: 62px;
       }
@@ -630,12 +778,43 @@
         min-height: calc(100svh - var(--header-h));
       }
 
+      .hero::before {
+        inset: -5%;
+        background-position: center;
+        opacity: 0.16;
+        mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,0.45) 54%, transparent 100%);
+      }
+
+      .hero::after {
+        background:
+          linear-gradient(180deg, rgba(7, 9, 10, 0.36) 0%, rgba(7, 9, 10, 0.92) 62%, rgba(7, 9, 10, 1) 100%),
+          linear-gradient(rgba(155, 196, 199, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(155, 196, 199, 0.03) 1px, transparent 1px);
+        background-size: auto, 46px 46px, 46px 46px;
+      }
+
       .hero-inner {
-        padding: 68px 0 64px;
+        grid-template-columns: 1fr;
+        gap: 36px;
+        padding: 30px 0 58px;
+      }
+
+      .hero-poster-frame {
+        order: -1;
+        justify-self: center;
+        width: min(100%, 470px);
+      }
+
+      .hero-poster {
+        max-height: min(56svh, 520px);
+      }
+
+      .mobile-slogan {
+        display: block;
       }
 
       h1 {
-        font-size: clamp(62px, 21vw, 104px);
+        font-size: clamp(58px, 17vw, 94px);
       }
 
       .english-title {
@@ -644,7 +823,7 @@
       }
 
       .hero-copy {
-        margin-top: 34px;
+        margin-top: 32px;
         font-size: 16px;
       }
 
@@ -668,7 +847,7 @@
       }
 
       .gallery {
-        grid-auto-columns: 84%;
+        grid-auto-columns: 64%;
         gap: 12px;
       }
 
@@ -702,11 +881,11 @@
       }
 
       .lightbox {
-        padding: 62px 14px 22px;
+        padding: 62px 14px 70px;
       }
 
       .lightbox-image {
-        max-height: calc(100svh - 84px);
+        max-height: calc(100svh - 132px);
       }
 
       .lightbox-prev,
@@ -719,11 +898,15 @@
       }
 
       .lightbox-prev {
-        left: calc(50% - 54px);
+        left: calc(50% - 66px);
       }
 
       .lightbox-next {
-        right: calc(50% - 54px);
+        right: calc(50% - 66px);
+      }
+
+      .lightbox-counter {
+        bottom: 31px;
       }
     }
 
@@ -738,13 +921,17 @@
       }
 
       .gallery {
-        grid-auto-columns: 90%;
+        grid-auto-columns: 78%;
       }
     }
 
-    @media (max-height: 820px) and (min-width: 761px) {
+    @media (max-height: 820px) and (min-width: 821px) {
       .hero-inner {
-        padding: 48px 0;
+        padding: 30px 0;
+      }
+
+      .hero-poster-frame {
+        width: min(100%, 445px);
       }
 
       .eyebrow {
@@ -756,11 +943,11 @@
       }
 
       .hero-copy {
-        margin-top: 30px;
+        margin-top: 28px;
       }
 
       .hero-actions {
-        margin-top: 28px;
+        margin-top: 26px;
       }
 
       .trailer-section {
@@ -794,6 +981,8 @@
     <div class="shell nav">
       <a class="brand" href="#top">ХИЩЕНИЕ <span>/ THEFT</span></a>
 
+      <div class="header-slogan">В системе нет безопасности</div>
+
       <nav class="nav-links" aria-label="Основная навигация">
         <a href="#about">О фильме</a>
         <a href="#materials">Материалы</a>
@@ -808,21 +997,28 @@
   <main>
     <section class="hero" id="top">
       <div class="hero-inner">
-        <div class="eyebrow">Фильм в разработке · 2045</div>
+        <div class="hero-copy-column">
+          <div class="eyebrow">Фильм в разработке · 2045</div>
+          <div class="mobile-slogan">В системе нет безопасности</div>
 
-        <h1>
-          ХИЩЕНИЕ
-          <span class="english-title">THEFT</span>
-        </h1>
+          <h1>
+            ХИЩЕНИЕ
+            <span class="english-title">THEFT</span>
+          </h1>
 
-        <p class="hero-copy">
-          В мире, где человек должен доказать свою пользу системе,
-          взросление становится борьбой за право самому выбирать своё будущее.
-        </p>
+          <p class="hero-copy">
+            В мире, где человек должен доказать свою пользу системе,
+            взросление становится борьбой за право самому выбирать своё будущее.
+          </p>
 
-        <div class="hero-actions">
-          <a class="button" href="#trailer">Смотреть трейлер</a>
-          <a class="button secondary" href="#about">О фильме</a>
+          <div class="hero-actions">
+            <a class="button" href="#trailer">Смотреть трейлер</a>
+            <a class="button secondary" href="#about">О фильме</a>
+          </div>
+        </div>
+
+        <div class="hero-poster-frame">
+          <img class="hero-poster" src="material-01.jpg" alt="Официальная обложка фильма Хищение">
         </div>
       </div>
     </section>
@@ -891,29 +1087,38 @@
           <button class="gallery-button prev" id="galleryPrev" type="button" aria-label="Предыдущее изображение">←</button>
 
           <div class="gallery" id="gallery" tabindex="0" aria-label="Галерея материалов фильма">
-            <figure class="gallery-card" tabindex="0" data-index="0">
-              <img src="gallery-1.jpg" alt="Визуальный материал фильма Хищение 1" loading="lazy">
+            <figure class="gallery-card is-cover" tabindex="0" data-index="0">
+              <img src="material-01.jpg" alt="Обложка фильма Хищение" loading="lazy">
             </figure>
             <figure class="gallery-card" tabindex="0" data-index="1">
-              <img src="gallery-2.jpg" alt="Визуальный материал фильма Хищение 2" loading="lazy">
+              <img src="material-02.jpg" alt="Постер фильма Хищение — пианино" loading="lazy">
             </figure>
             <figure class="gallery-card" tabindex="0" data-index="2">
-              <img src="gallery-3.jpg" alt="Визуальный материал фильма Хищение 3" loading="lazy">
+              <img src="material-03.jpg" alt="Постер фильма Хищение — дедушка и ребёнок" loading="lazy">
             </figure>
             <figure class="gallery-card" tabindex="0" data-index="3">
-              <img src="gallery-4.jpg" alt="Визуальный материал фильма Хищение 4" loading="lazy">
+              <img src="material-04.jpg" alt="Постер фильма Хищение — человек в капюшоне" loading="lazy">
             </figure>
             <figure class="gallery-card" tabindex="0" data-index="4">
-              <img src="gallery-5.jpg" alt="Визуальный материал фильма Хищение 5" loading="lazy">
+              <img src="material-05.jpg" alt="Постер фильма Хищение" loading="lazy">
             </figure>
             <figure class="gallery-card" tabindex="0" data-index="5">
-              <img src="gallery-6.jpg" alt="Визуальный материал фильма Хищение 6" loading="lazy">
+              <img src="material-06.jpg" alt="Постер фильма Хищение — герой в разрушенном городе" loading="lazy">
             </figure>
             <figure class="gallery-card" tabindex="0" data-index="6">
-              <img src="gallery-7.jpg" alt="Визуальный материал фильма Хищение 7" loading="lazy">
+              <img src="material-07.jpg" alt="Постер фильма Хищение — ведущая" loading="lazy">
             </figure>
             <figure class="gallery-card" tabindex="0" data-index="7">
-              <img src="gallery-8.jpg" alt="Визуальный материал фильма Хищение 8" loading="lazy">
+              <img src="material-08.jpg" alt="Постер фильма Хищение — город" loading="lazy">
+            </figure>
+            <figure class="gallery-card" tabindex="0" data-index="8">
+              <img src="material-09.jpg" alt="Постер фильма Хищение — Гор" loading="lazy">
+            </figure>
+            <figure class="gallery-card" tabindex="0" data-index="9">
+              <img src="material-10.jpg" alt="Кадры из фильма Хищение" loading="lazy">
+            </figure>
+            <figure class="gallery-card" tabindex="0" data-index="10">
+              <img src="material-11.jpg" alt="Постер фильма Хищение — визуальный материал" loading="lazy">
             </figure>
           </div>
 
@@ -1002,6 +1207,7 @@
     <button class="lightbox-button lightbox-prev" id="lightboxPrev" type="button" aria-label="Предыдущее изображение">←</button>
 
     <img class="lightbox-image" id="lightboxImage" src="" alt="">
+    <div class="lightbox-counter" id="lightboxCounter" aria-live="polite"></div>
 
     <button class="lightbox-button lightbox-next" id="lightboxNext" type="button" aria-label="Следующее изображение">→</button>
   </div>
@@ -1030,6 +1236,7 @@
     /* Просмотр изображений */
     const lightbox = document.getElementById('lightbox');
     const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxCounter = document.getElementById('lightboxCounter');
     const lightboxClose = document.getElementById('lightboxClose');
     const lightboxPrev = document.getElementById('lightboxPrev');
     const lightboxNext = document.getElementById('lightboxNext');
@@ -1046,6 +1253,7 @@
       currentImageIndex = (index + galleryImages.length) % galleryImages.length;
       lightboxImage.src = galleryImages[currentImageIndex].src;
       lightboxImage.alt = galleryImages[currentImageIndex].alt;
+      lightboxCounter.textContent = `${currentImageIndex + 1} / ${galleryImages.length}`;
     }
 
     function openLightbox(index) {
@@ -1104,7 +1312,7 @@
     const siteHeader = document.querySelector('.site-header');
 
     function fitTrailerToViewport() {
-      if (window.innerWidth <= 760) {
+      if (window.innerWidth <= 820) {
         videoShell.style.width = '100%';
         return;
       }
@@ -1120,6 +1328,29 @@
 
     fitTrailerToViewport();
     window.addEventListener('resize', fitTrailerToViewport);
+
+    /* Подсвечиваем текущий раздел в меню */
+    const navAnchors = Array.from(document.querySelectorAll('.nav-links a'));
+    const observedSections = navAnchors
+      .map(link => document.querySelector(link.getAttribute('href')))
+      .filter(Boolean);
+
+    const sectionObserver = new IntersectionObserver(entries => {
+      const visible = entries
+        .filter(entry => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+      if (!visible) return;
+
+      navAnchors.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === `#${visible.target.id}`);
+      });
+    }, {
+      rootMargin: `-${siteHeader.offsetHeight + 10}px 0px -55% 0px`,
+      threshold: [0.1, 0.25, 0.5]
+    });
+
+    observedSections.forEach(section => sectionObserver.observe(section));
   </script>
 </body>
 </html>
