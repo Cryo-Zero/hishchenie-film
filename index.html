@@ -253,6 +253,54 @@
       }
     }
   </style>
+  /* Улучшенный первый экран */
+
+.hero {
+  text-align: left;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.42) 48%,
+      rgba(0, 0, 0, 0.10) 100%
+    ),
+    url("hero-bg.jpg") center / cover no-repeat;
+}
+
+.hero-content {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.hero .tagline {
+  margin: 40px 0 0;
+  max-width: 600px;
+}
+
+.hero .buttons {
+  justify-content: flex-start;
+}
+
+
+/* Нормальный размер трейлера */
+
+.trailer-box {
+  min-height: 0;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.trailer-box video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #000;
+}
+  
 </head>
 
 <body>
@@ -354,9 +402,9 @@
     <h2>Трейлер</h2>
 
     <div class="trailer-box">
-  <video controls preload="metadata" poster="poster.jpg">
-    <source src="trailer.mp4" type="video/mp4">
-    Ваш браузер не поддерживает воспроизведение видео.
+  <video controls preload="metadata" poster="hero-bg.jpg">
+  <source src="trailer-web.mp4" type="video/mp4">
+    
   </video>
 </div>
 
