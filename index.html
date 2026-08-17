@@ -1,26 +1,32 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>ХИЩЕНИЕ — THEFT | Официальный сайт фильма</title>
+  <meta name="description" content="Официальный сайт фильма «ХИЩЕНИЕ / THEFT» — антиутопической драмы о мире 2045 года.">
+  <meta name="theme-color" content="#07090a">
 
-  <meta
-    name="description"
-    content="Официальный сайт фильма «ХИЩЕНИЕ / THEFT». Антиутопическая драма о мире 2045 года."
-  >
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ХИЩЕНИЕ — THEFT">
+  <meta property="og:description" content="Официальный сайт фильма «ХИЩЕНИЕ / THEFT». Фильм в разработке.">
+  <meta property="og:image" content="https://cryo-zero.github.io/hishchenie-film/gallery-1.jpg">
 
   <style>
-
-    /* =========================
-       ОСНОВНЫЕ НАСТРОЙКИ
-       ========================= */
+    :root {
+      --bg: #07090a;
+      --bg-soft: #0b1011;
+      --panel: #0d1213;
+      --panel-2: #111819;
+      --line: #273133;
+      --line-soft: #1b2324;
+      --text: #f2f4f4;
+      --muted: #9aa8a9;
+      --dim: #728284;
+      --accent: #9bc4c7;
+      --max: 1180px;
+    }
 
     * {
       box-sizing: border-box;
@@ -30,14 +36,28 @@
 
     html {
       scroll-behavior: smooth;
+      scroll-padding-top: 78px;
     }
 
     body {
-      background: #07090a;
-      color: #f3f3f3;
+      min-width: 320px;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
       font-family: Arial, Helvetica, sans-serif;
       line-height: 1.6;
-      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 78% 10%, rgba(78, 119, 123, 0.12), transparent 30%),
+        radial-gradient(circle at 15% 40%, rgba(29, 65, 69, 0.08), transparent 28%),
+        var(--bg);
     }
 
     a {
@@ -45,294 +65,391 @@
       text-decoration: none;
     }
 
-    section {
-      width: 100%;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 110px 28px;
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
     }
 
+    img,
+    video {
+      max-width: 100%;
+    }
 
-    /* =========================
-       ПЕРВЫЙ ЭКРАН
-       ========================= */
+    .shell {
+      width: min(var(--max), calc(100% - 48px));
+      margin: 0 auto;
+    }
 
-    .hero {
-      min-height: 100vh;
-      min-height: 100svh;
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(39, 49, 51, 0.82);
+      background: rgba(7, 9, 10, 0.86);
+      backdrop-filter: blur(14px);
+    }
 
+    .nav {
+      min-height: 70px;
       display: flex;
       align-items: center;
-
-      padding: 60px max(28px, calc((100vw - 1150px) / 2));
-
-      background:
-        linear-gradient(
-          90deg,
-          rgba(4, 6, 7, 0.94) 0%,
-          rgba(4, 6, 7, 0.78) 36%,
-          rgba(4, 6, 7, 0.35) 67%,
-          rgba(4, 6, 7, 0.18) 100%
-        ),
-        url("hero-bg.jpg") center center / cover no-repeat;
-
-      border-bottom: 1px solid #202728;
+      justify-content: space-between;
+      gap: 24px;
     }
 
-    .hero-content {
-      width: 100%;
-      max-width: 760px;
+    .brand {
+      flex: 0 0 auto;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
     }
 
-    .status {
-      margin-bottom: 26px;
+    .brand span {
+      color: var(--dim);
+      font-weight: 500;
+    }
 
-      color: #9bb2b4;
-
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 24px;
+      color: #b9c4c5;
       font-size: 12px;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+
+    .nav-links a {
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .hero {
+      position: relative;
+      min-height: calc(100svh - 70px);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line-soft);
+      background:
+        linear-gradient(110deg, rgba(9, 13, 14, 0.35), rgba(9, 13, 14, 0.88)),
+        radial-gradient(circle at 76% 45%, rgba(80, 121, 125, 0.14), transparent 29%);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.34;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(155, 196, 199, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(155, 196, 199, 0.04) 1px, transparent 1px);
+      background-size: 58px 58px;
+      mask-image: linear-gradient(to right, transparent 0%, black 48%, black 100%);
+    }
+
+    .hero::after {
+      content: "SYSTEM / 2045 / ACTIVE";
+      position: absolute;
+      right: 5vw;
+      bottom: 34px;
+      color: rgba(155, 196, 199, 0.28);
+      font-size: 10px;
+      letter-spacing: 4px;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      width: min(var(--max), calc(100% - 48px));
+      margin: 0 auto;
+      padding: 100px 0 110px;
+    }
+
+    .eyebrow,
+    .section-label {
+      color: var(--accent);
+      font-size: 11px;
       letter-spacing: 5px;
       text-transform: uppercase;
     }
 
+    .eyebrow {
+      margin-bottom: 24px;
+    }
+
     h1 {
-      font-size: clamp(58px, 9vw, 118px);
-      line-height: 0.85;
-      letter-spacing: -4px;
+      max-width: 1000px;
+      font-size: clamp(68px, 12vw, 170px);
       font-weight: 900;
+      letter-spacing: -0.065em;
+      line-height: 0.78;
     }
 
     .english-title {
       display: block;
-
-      margin-top: 24px;
-
-      color: #b2c1c2;
-
-      font-size: clamp(17px, 2vw, 23px);
-      letter-spacing: 13px;
+      margin-top: 30px;
+      color: #b8c9ca;
+      font-size: clamp(18px, 2vw, 26px);
+      font-weight: 600;
+      letter-spacing: 0.68em;
+      line-height: 1;
     }
 
-    .tagline {
-      max-width: 620px;
-
-      margin-top: 42px;
-
-      color: #d0d5d5;
-
-      font-size: 18px;
+    .hero-copy {
+      max-width: 650px;
+      margin-top: 46px;
+      color: #d0d6d7;
+      font-size: clamp(17px, 2vw, 20px);
     }
 
-    .buttons {
+    .hero-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 14px;
-
-      margin-top: 42px;
+      gap: 12px;
+      margin-top: 38px;
     }
 
     .button {
+      min-height: 50px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-
-      min-height: 52px;
-
-      padding: 14px 28px;
-
-      border: 1px solid #e8eeee;
-
-      color: #f5f7f7;
-
-      font-size: 12px;
-      font-weight: 700;
+      padding: 13px 24px;
+      border: 1px solid #dbe1e1;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
       letter-spacing: 2px;
       text-transform: uppercase;
-
-      transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     }
 
     .button:hover {
-      background: #f4f6f6;
-      color: #080a0b;
+      background: #f1f4f4;
+      color: #071011;
     }
 
-    .button-secondary {
-      border-color: #536062;
-      color: #b3c0c1;
+    .button.secondary {
+      border-color: #4a5a5c;
+      color: #b5c3c4;
     }
 
+    .button.secondary:hover {
+      border-color: #f1f4f4;
+      color: #071011;
+    }
 
-    /* =========================
-       ЗАГОЛОВКИ РАЗДЕЛОВ
-       ========================= */
+    section {
+      padding: 110px 0;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 44px;
+    }
 
     .section-label {
-      margin-bottom: 16px;
-
-      color: #81999b;
-
-      font-size: 11px;
-      letter-spacing: 5px;
-      text-transform: uppercase;
+      margin-bottom: 14px;
     }
 
     h2 {
-      margin-bottom: 38px;
-
-      color: #f1f3f3;
-
-      font-size: clamp(38px, 6vw, 62px);
-      line-height: 1.05;
+      font-size: clamp(40px, 5vw, 68px);
+      line-height: 1;
+      letter-spacing: -0.035em;
     }
 
-
-    /* =========================
-       О ФИЛЬМЕ
-       ========================= */
+    .section-description {
+      max-width: 480px;
+      color: var(--muted);
+      font-size: 15px;
+    }
 
     .story {
-      max-width: 830px;
-
-      color: #c9d0d0;
-
-      font-size: 19px;
+      max-width: 860px;
+      color: #cbd2d3;
+      font-size: clamp(17px, 2vw, 20px);
     }
 
     .story p + p {
-      margin-top: 24px;
+      margin-top: 22px;
     }
 
     .info-grid {
       display: grid;
-      grid-template-columns: repeat(
-        auto-fit,
-        minmax(210px, 1fr)
-      );
-
-      gap: 14px;
-
-      margin-top: 55px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 52px;
     }
 
     .info-card {
-      min-height: 145px;
-
-      padding: 26px;
-
-      background: #0e1314;
-      border: 1px solid #252d2e;
+      min-height: 150px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, #0e1415, #0a0e0f);
     }
 
     .info-card small {
       display: block;
-
       margin-bottom: 10px;
-
-      color: #7f9294;
-
-      font-size: 11px;
-      letter-spacing: 3px;
+      color: var(--dim);
+      font-size: 10px;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
     }
 
+    .gallery-wrap {
+      position: relative;
+    }
 
-    /* =========================
-       ТРЕЙЛЕР
-       ========================= */
+    .gallery {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(300px, 42%);
+      gap: 16px;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scroll-snap-type: inline mandatory;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      padding-bottom: 8px;
+    }
+
+    .gallery::-webkit-scrollbar {
+      display: none;
+    }
+
+    .gallery-card {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      scroll-snap-align: start;
+      border: 1px solid var(--line);
+      background: #0b0f10;
+    }
+
+    .gallery-card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      filter: saturate(0.9) contrast(1.04);
+      transition: transform 0.5s ease, filter 0.4s ease;
+    }
+
+    .gallery-card:hover img {
+      transform: scale(1.025);
+      filter: saturate(1) contrast(1.06);
+    }
+
+    .gallery-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 35%;
+      pointer-events: none;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.42), transparent);
+    }
+
+    .gallery-controls {
+      display: flex;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .gallery-button {
+      width: 44px;
+      height: 44px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: #0c1112;
+      color: #d9e0e0;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .gallery-button:hover {
+      background: #151d1e;
+      border-color: #526164;
+    }
+
+    .gallery-hint {
+      margin-top: 14px;
+      color: var(--dim);
+      font-size: 12px;
+      letter-spacing: 0.6px;
+    }
 
     .trailer-section {
-      max-width: 1200px;
+      padding-top: 100px;
+      padding-bottom: 100px;
     }
 
-    .trailer-stage {
+    .video-shell {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      background: #000;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    .video-shell video {
       width: 100%;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 32px;
-
-      background:
-        radial-gradient(
-          circle at center,
-          #172022 0%,
-          #0b0f10 55%,
-          #07090a 100%
-        );
-
-      border: 1px solid #293233;
-    }
-
-    .trailer-stage video {
+      aspect-ratio: 16 / 9;
       display: block;
-
-      width: auto;
-      height: auto;
-
-      max-width: 100%;
-      max-height: 78vh;
-
+      object-fit: contain;
       background: #000;
     }
 
     .trailer-note {
-      margin-top: 16px;
-
-      color: #6e7e80;
-
-      font-size: 13px;
+      margin-top: 14px;
+      color: var(--dim);
+      font-size: 12px;
       text-align: center;
     }
 
-
-    /* =========================
-       АКТЁРЫ
-       ========================= */
-
     .cast {
       display: grid;
-      grid-template-columns: repeat(
-        auto-fit,
-        minmax(220px, 1fr)
-      );
-
-      gap: 1px;
-
-      background: #252d2e;
-      border: 1px solid #252d2e;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
     }
 
     .cast-member {
-      min-height: 110px;
+      min-height: 112px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: #0b1011;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
 
-      padding: 25px;
-
-      background: #0c1011;
+    .cast-member:hover {
+      transform: translateY(-2px);
+      border-color: #425153;
     }
 
     .cast-member strong {
       display: block;
-
-      margin-bottom: 5px;
-
-      color: #eef1f1;
-
+      margin-bottom: 6px;
       font-size: 17px;
     }
 
     .cast-member span {
-      color: #788b8d;
+      color: #779092;
       font-size: 14px;
     }
-
-
-    /* =========================
-       ГДЕ ПОСМОТРЕТЬ
-       ========================= */
 
     .watch-list {
       display: flex;
@@ -341,430 +458,404 @@
     }
 
     .platform {
-      padding: 16px 23px;
-
-      background: #101516;
-      border: 1px solid #293233;
-
-      color: #aab8b9;
+      padding: 16px 22px;
+      border: 1px solid var(--line);
+      background: #0d1213;
+      color: #aebbbc;
     }
 
-
-    /* =========================
-       КОНТАКТЫ
-       ========================= */
+    .contact-box {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+      align-items: end;
+    }
 
     .contact-link {
-      display: inline-block;
-
-      margin-top: 5px;
-
-      color: #e9eeee;
-
-      font-size: 19px;
-
-      border-bottom: 1px solid #526062;
-
-      transition: border-color 0.2s ease;
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      min-height: 50px;
+      padding: 12px 20px;
+      border: 1px solid var(--line);
+      color: #e4ebeb;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
 
     .contact-link:hover {
-      border-color: #f1f5f5;
+      background: #111819;
+      border-color: #536365;
     }
 
-
-    /* =========================
-       ПОДВАЛ
-       ========================= */
-
     footer {
-      padding: 60px 25px;
-
-      border-top: 1px solid #202728;
-
-      color: #6f7d7e;
-
-      font-size: 13px;
+      padding: 52px 24px;
+      color: #718083;
       text-align: center;
+      font-size: 12px;
     }
 
     footer strong {
-      color: #dfe4e4;
+      color: #dfe5e5;
     }
 
+    @media (max-width: 980px) {
+      .info-grid,
+      .cast {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
 
-    /* =========================
-       МОБИЛЬНАЯ ВЕРСИЯ
-       ========================= */
+      .gallery {
+        grid-auto-columns: minmax(280px, 68%);
+      }
 
-    @media (max-width: 700px) {
+      .contact-box {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .contact-link {
+        justify-self: start;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell,
+      .hero-inner {
+        width: min(100% - 32px, var(--max));
+      }
+
+      .nav {
+        min-height: 62px;
+      }
+
+      .nav-links a:not(.nav-trailer) {
+        display: none;
+      }
 
       .hero {
-        min-height: 92vh;
+        min-height: calc(92svh - 62px);
+      }
 
-        align-items: flex-end;
+      .hero-inner {
+        padding: 90px 0 74px;
+      }
 
-        padding: 80px 22px 70px;
-
-        background:
-          linear-gradient(
-            0deg,
-            rgba(4, 6, 7, 0.98) 0%,
-            rgba(4, 6, 7, 0.75) 46%,
-            rgba(4, 6, 7, 0.28) 100%
-          ),
-          url("hero-bg.jpg") 68% center / cover no-repeat;
+      .hero::after {
+        display: none;
       }
 
       h1 {
-        letter-spacing: -2px;
+        font-size: clamp(62px, 21vw, 104px);
       }
 
       .english-title {
-        letter-spacing: 8px;
+        margin-top: 22px;
+        letter-spacing: 0.48em;
       }
 
-      .tagline {
+      .hero-copy {
+        margin-top: 34px;
         font-size: 16px;
       }
 
-      section {
-        padding: 80px 20px;
-      }
-
-      .story {
-        font-size: 17px;
-      }
-
-      .trailer-stage {
-        padding: 12px;
-      }
-
-      .trailer-stage video {
-        width: 100%;
-        max-height: none;
+      .hero-actions {
+        flex-direction: column;
       }
 
       .button {
         width: 100%;
       }
 
+      section {
+        padding: 82px 0;
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+        margin-bottom: 32px;
+      }
+
+      .section-description {
+        max-width: 100%;
+      }
+
+      .gallery-controls {
+        display: none;
+      }
+
+      .gallery {
+        grid-auto-columns: 86%;
+        gap: 12px;
+      }
+
+      .video-shell {
+        width: 100%;
+      }
     }
 
+    @media (max-width: 560px) {
+      .info-grid,
+      .cast {
+        grid-template-columns: 1fr;
+      }
+
+      .info-card {
+        min-height: auto;
+      }
+
+      .gallery {
+        grid-auto-columns: 91%;
+      }
+
+      .gallery-card {
+        aspect-ratio: 4 / 3;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
   </style>
 </head>
 
-
 <body>
+  <header class="site-header">
+    <div class="shell nav">
+      <a class="brand" href="#top">ХИЩЕНИЕ <span>/ THEFT</span></a>
 
-
-  <!-- =========================
-       ПЕРВЫЙ ЭКРАН
-       ========================= -->
-
-  <header class="hero">
-
-    <div class="hero-content">
-
-      <div class="status">
-        Фильм в разработке · 2045
-      </div>
-
-      <h1>
-        ХИЩЕНИЕ
-
-        <span class="english-title">
-          THEFT
-        </span>
-      </h1>
-
-      <p class="tagline">
-        В мире, где человек должен доказать свою пользу системе,
-        взросление становится борьбой за право самому выбирать
-        своё будущее.
-      </p>
-
-      <div class="buttons">
-
-        <a
-          href="#trailer"
-          class="button"
-        >
-          Смотреть трейлер
-        </a>
-
-        <a
-          href="#about"
-          class="button button-secondary"
-        >
-          О фильме
-        </a>
-
-      </div>
-
+      <nav class="nav-links" aria-label="Основная навигация">
+        <a href="#about">О фильме</a>
+        <a href="#materials">Материалы</a>
+        <a class="nav-trailer" href="#trailer">Трейлер</a>
+        <a href="#cast">Актёры</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
     </div>
-
   </header>
 
+  <main>
+    <section class="hero" id="top">
+      <div class="hero-inner">
+        <div class="eyebrow">Фильм в разработке · 2045</div>
 
+        <h1>
+          ХИЩЕНИЕ
+          <span class="english-title">THEFT</span>
+        </h1>
 
-  <!-- =========================
-       О ФИЛЬМЕ
-       ========================= -->
+        <p class="hero-copy">
+          В мире, где человек должен доказать свою пользу системе,
+          взросление становится борьбой за право самому выбирать своё будущее.
+        </p>
 
-  <section id="about">
-
-    <div class="section-label">
-      О фильме
-    </div>
-
-    <h2>
-      2045 год.
-    </h2>
-
-    <div class="story">
-
-      <p>
-        Население Земли превысило допустимый предел.
-        Государство создаёт новую систему, в которой каждый
-        человек должен доказать свою пользу обществу.
-      </p>
-
-      <p>
-        Дети с раннего возраста попадают под особый контроль
-        и распределяются по специальным секциям.
-      </p>
-
-      <p>
-        Гор живёт со своим 75-летним дедушкой и пытается
-        приспособиться к новому миру. История показывает
-        взросление Гора, его дружбу с Марком и борьбу
-        за собственное будущее в системе, где человеческая
-        жизнь постепенно превращается в ресурс.
-      </p>
-
-    </div>
-
-
-    <div class="info-grid">
-
-      <div class="info-card">
-        <small>Название</small>
-        ХИЩЕНИЕ / THEFT
+        <div class="hero-actions">
+          <a class="button" href="#trailer">Смотреть трейлер</a>
+          <a class="button secondary" href="#about">О фильме</a>
+        </div>
       </div>
+    </section>
 
-      <div class="info-card">
-        <small>Жанр</small>
-        Антиутопия · Драма · Боевик · Приключения · Фантастика
+    <section id="about">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-label">О фильме</div>
+            <h2>2045 год.</h2>
+          </div>
+        </div>
+
+        <div class="story">
+          <p>
+            Население Земли превысило допустимый предел. Государство создаёт
+            новую систему, в которой каждый человек должен доказать свою пользу обществу.
+          </p>
+
+          <p>
+            Дети с раннего возраста попадают под особый контроль и распределяются
+            по специальным секциям.
+          </p>
+
+          <p>
+            Гор живёт со своим 75-летним дедушкой и пытается приспособиться к новому миру.
+            История показывает взросление Гора, его дружбу с Марком и борьбу за собственное
+            будущее в системе, где человеческая жизнь постепенно превращается в ресурс.
+          </p>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-card">
+            <small>Название</small>
+            ХИЩЕНИЕ / THEFT
+          </div>
+
+          <div class="info-card">
+            <small>Жанр</small>
+            Антиутопия · Драма · Боевик · Приключения · Фантастика
+          </div>
+
+          <div class="info-card">
+            <small>Режиссёр</small>
+            Арман О. А.
+          </div>
+
+          <div class="info-card">
+            <small>Статус</small>
+            В разработке
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="info-card">
-        <small>Режиссёр</small>
-        Арман О. А.
+    <section id="materials">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-label">Materials</div>
+            <h2>Визуальные материалы</h2>
+          </div>
+
+          <div class="gallery-controls" aria-label="Управление галереей">
+            <button class="gallery-button" id="galleryPrev" type="button" aria-label="Предыдущее изображение">←</button>
+            <button class="gallery-button" id="galleryNext" type="button" aria-label="Следующее изображение">→</button>
+          </div>
+        </div>
+
+        <div class="gallery-wrap">
+          <div class="gallery" id="gallery" tabindex="0" aria-label="Галерея материалов фильма">
+            <figure class="gallery-card"><img src="gallery-1.jpg" alt="Визуальный материал фильма Хищение 1" loading="lazy"></figure>
+            <figure class="gallery-card"><img src="gallery-2.jpg" alt="Визуальный материал фильма Хищение 2" loading="lazy"></figure>
+            <figure class="gallery-card"><img src="gallery-3.jpg" alt="Визуальный материал фильма Хищение 3" loading="lazy"></figure>
+            <figure class="gallery-card"><img src="gallery-4.jpg" alt="Визуальный материал фильма Хищение 4" loading="lazy"></figure>
+            <figure class="gallery-card"><img src="gallery-5.jpg" alt="Визуальный материал фильма Хищение 5" loading="lazy"></figure>
+            <figure class="gallery-card"><img src="gallery-6.jpg" alt="Визуальный материал фильма Хищение 6" loading="lazy"></figure>
+            <figure class="gallery-card"><img src="gallery-7.jpg" alt="Визуальный материал фильма Хищение 7" loading="lazy"></figure>
+            <figure class="gallery-card"><img src="gallery-8.jpg" alt="Визуальный материал фильма Хищение 8" loading="lazy"></figure>
+          </div>
+        </div>
+
+        <p class="gallery-hint">На телефоне галерею можно листать пальцем.</p>
       </div>
+    </section>
 
-      <div class="info-card">
-        <small>Статус</small>
-        В разработке
+    <section class="trailer-section" id="trailer">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-label">Trailer</div>
+            <h2>Трейлер</h2>
+          </div>
+
+          <p class="section-description">
+            Горизонтальная версия трейлера, адаптированная для просмотра на компьютере,
+            планшете и телефоне.
+          </p>
+        </div>
+
+        <div class="video-shell">
+          <video controls preload="metadata" poster="trailer-cover.jpg" playsinline>
+            <source src="trailer-16x9-web.mp4" type="video/mp4">
+            Ваш браузер не поддерживает воспроизведение видео.
+          </video>
+        </div>
+
+        <p class="trailer-note">ХИЩЕНИЕ / THEFT · официальный трейлер</p>
       </div>
+    </section>
 
-    </div>
+    <section id="cast">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-label">Cast</div>
+            <h2>Актёрский состав</h2>
+          </div>
+        </div>
 
-  </section>
-
-
-
-  <!-- =========================
-       ТРЕЙЛЕР
-       ========================= -->
-
-  <section
-    id="trailer"
-    class="trailer-section"
-  >
-
-    <div class="section-label">
-      Trailer
-    </div>
-
-    <h2>
-      Трейлер
-    </h2>
-
-
-    <div class="trailer-stage">
-
-      <video
-        controls
-        preload="metadata"
-        poster="poster.jpg"
-        playsinline
-      >
-
-        <source
-          src="trailer.mp4"
-          type="video/mp4"
-        >
-
-        Ваш браузер не поддерживает воспроизведение видео.
-
-      </video>
-
-    </div>
-
-    <p class="trailer-note">
-      Трейлер фильма «ХИЩЕНИЕ / THEFT»
-    </p>
-
-  </section>
-
-
-
-  <!-- =========================
-       АКТЁРСКИЙ СОСТАВ
-       ========================= -->
-
-  <section>
-
-    <div class="section-label">
-      Cast
-    </div>
-
-    <h2>
-      Актёрский состав
-    </h2>
-
-
-    <div class="cast">
-
-      <div class="cast-member">
-        <strong>Арман О.</strong>
-        <span>Гор</span>
+        <div class="cast">
+          <div class="cast-member"><strong>Арман О.</strong><span>Гор</span></div>
+          <div class="cast-member"><strong>Богдан В.</strong><span>Антагонист</span></div>
+          <div class="cast-member"><strong>Левон</strong><span>Марк</span></div>
+          <div class="cast-member"><strong>Юля Ш.</strong><span>Ведущая</span></div>
+          <div class="cast-member"><strong>Арсен О.</strong><span>Музыкант</span></div>
+          <div class="cast-member"><strong>Александр К.</strong><span>Дедушка Гора</span></div>
+          <div class="cast-member"><strong>Белла А.</strong><span>Детектив</span></div>
+        </div>
       </div>
+    </section>
 
-      <div class="cast-member">
-        <strong>Богдан В.</strong>
-        <span>Антагонист</span>
+    <section id="watch">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-label">Watch</div>
+            <h2>Где посмотреть</h2>
+          </div>
+
+          <p class="section-description">
+            Ссылки появятся после публикации фильма на официальных площадках.
+          </p>
+        </div>
+
+        <div class="watch-list">
+          <div class="platform">Кинопоиск · скоро</div>
+          <div class="platform">RuTube · скоро</div>
+          <div class="platform">VK Видео · скоро</div>
+        </div>
       </div>
+    </section>
 
-      <div class="cast-member">
-        <strong>Левон</strong>
-        <span>Марк</span>
+    <section id="contacts">
+      <div class="shell contact-box">
+        <div>
+          <div class="section-label">Contacts</div>
+          <h2>Контакты</h2>
+          <p class="section-description" style="margin-top: 22px;">
+            По вопросам, связанным с фильмом и проектом.
+          </p>
+        </div>
+
+        <a class="contact-link" href="https://www.instagram.com/armanfut/" target="_blank" rel="noopener noreferrer">
+          Instagram · @armanfut ↗
+        </a>
       </div>
-
-      <div class="cast-member">
-        <strong>Юля Ш.</strong>
-        <span>Ведущая</span>
-      </div>
-
-      <div class="cast-member">
-        <strong>Арсен О.</strong>
-        <span>Музыкант</span>
-      </div>
-
-      <div class="cast-member">
-        <strong>Александр К.</strong>
-        <span>Дедушка Гора</span>
-      </div>
-
-      <div class="cast-member">
-        <strong>Белла А.</strong>
-        <span>Детектив</span>
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- =========================
-       ГДЕ ПОСМОТРЕТЬ
-       ========================= -->
-
-  <section>
-
-    <div class="section-label">
-      Watch
-    </div>
-
-    <h2>
-      Где посмотреть
-    </h2>
-
-
-    <div class="watch-list">
-
-      <div class="platform">
-        Кинопоиск · скоро
-      </div>
-
-      <div class="platform">
-        RuTube · скоро
-      </div>
-
-      <div class="platform">
-        VK Видео · скоро
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- =========================
-       КОНТАКТЫ
-       ========================= -->
-
-  <section>
-
-    <div class="section-label">
-      Contacts
-    </div>
-
-    <h2>
-      Контакты
-    </h2>
-
-    <p class="story">
-      По вопросам, связанным с фильмом:
-    </p>
-
-    <a
-      class="contact-link"
-      href="https://www.instagram.com/armanfut/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Instagram · @armanfut
-    </a>
-
-  </section>
-
-
-
-  <!-- =========================
-       ПОДВАЛ
-       ========================= -->
+    </section>
+  </main>
 
   <footer>
-
-    <strong>
-      ХИЩЕНИЕ / THEFT
-    </strong>
-
-    <br><br>
-
-    Официальный сайт фильма.
-
-    <br>
-
-    Фильм находится в разработке.
-
+    <strong>ХИЩЕНИЕ / THEFT</strong><br><br>
+    Официальный сайт фильма · фильм находится в разработке
   </footer>
 
+  <script>
+    const gallery = document.getElementById('gallery');
+    const prev = document.getElementById('galleryPrev');
+    const next = document.getElementById('galleryNext');
 
+    function galleryStep() {
+      const card = gallery.querySelector('.gallery-card');
+      if (!card) return 360;
+      const gap = parseFloat(getComputedStyle(gallery).columnGap) || 16;
+      return card.getBoundingClientRect().width + gap;
+    }
+
+    prev.addEventListener('click', () => {
+      gallery.scrollBy({ left: -galleryStep(), behavior: 'smooth' });
+    });
+
+    next.addEventListener('click', () => {
+      gallery.scrollBy({ left: galleryStep(), behavior: 'smooth' });
+    });
+  </script>
 </body>
-
 </html>
