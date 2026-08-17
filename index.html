@@ -42,8 +42,9 @@
       text-align: center;
       padding: 40px 20px;
       background:
-        linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.95)),
-        radial-gradient(circle at center, #273438 0%, #101516 45%, #050606 100%);
+       background:
+  linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.92)),
+  url("poster.jpg") center / cover no-repeat;
     }
 
     .hero-content {
@@ -193,6 +194,12 @@
       text-align: center;
       padding: 30px;
     }
+    
+    .trailer-box video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
 
     .trailer-box div {
       max-width: 500px;
@@ -347,13 +354,11 @@
     <h2>Трейлер</h2>
 
     <div class="trailer-box">
-      <div>
-        <h3>ХИЩЕНИЕ</h3>
-        <p>
-          Скоро здесь появится официальный трейлер фильма.
-        </p>
-      </div>
-    </div>
+  <video controls preload="metadata" poster="poster.jpg">
+    <source src="trailer.mp4" type="video/mp4">
+    Ваш браузер не поддерживает воспроизведение видео.
+  </video>
+</div>
 
   </section>
 
