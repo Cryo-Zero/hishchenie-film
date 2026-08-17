@@ -18,13 +18,13 @@
       --bg: #07090a;
       --bg-soft: #0b1011;
       --panel: #0d1213;
-      --panel-2: #111819;
       --line: #273133;
       --line-soft: #1b2324;
       --text: #f2f4f4;
       --muted: #9aa8a9;
       --dim: #728284;
       --accent: #9bc4c7;
+      --header-h: 70px;
       --max: 1180px;
     }
 
@@ -36,7 +36,6 @@
 
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: 78px;
     }
 
     body {
@@ -60,15 +59,16 @@
         var(--bg);
     }
 
+    body.lightbox-open {
+      overflow: hidden;
+    }
+
     a {
       color: inherit;
       text-decoration: none;
     }
 
-    button,
-    input,
-    textarea,
-    select {
+    button {
       font: inherit;
     }
 
@@ -82,17 +82,20 @@
       margin: 0 auto;
     }
 
+    /* ---------- Шапка ---------- */
+
     .site-header {
       position: sticky;
       top: 0;
       z-index: 50;
+      min-height: var(--header-h);
       border-bottom: 1px solid rgba(39, 49, 51, 0.82);
-      background: rgba(7, 9, 10, 0.86);
+      background: rgba(7, 9, 10, 0.92);
       backdrop-filter: blur(14px);
     }
 
     .nav {
-      min-height: 70px;
+      min-height: var(--header-h);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -116,11 +119,12 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 24px;
+      gap: 22px;
       color: #b9c4c5;
-      font-size: 12px;
-      letter-spacing: 1.4px;
+      font-size: 11px;
+      letter-spacing: 1.25px;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .nav-links a {
@@ -131,12 +135,15 @@
       color: #fff;
     }
 
+    /* ---------- Первый экран ---------- */
+
     .hero {
       position: relative;
-      min-height: calc(100svh - 70px);
+      min-height: calc(100svh - var(--header-h));
       display: flex;
       align-items: center;
       overflow: hidden;
+      padding: 0;
       border-bottom: 1px solid var(--line-soft);
       background:
         linear-gradient(110deg, rgba(9, 13, 14, 0.35), rgba(9, 13, 14, 0.88)),
@@ -156,22 +163,12 @@
       mask-image: linear-gradient(to right, transparent 0%, black 48%, black 100%);
     }
 
-    .hero::after {
-      content: "SYSTEM / 2045 / ACTIVE";
-      position: absolute;
-      right: 5vw;
-      bottom: 34px;
-      color: rgba(155, 196, 199, 0.28);
-      font-size: 10px;
-      letter-spacing: 4px;
-    }
-
     .hero-inner {
       position: relative;
       z-index: 2;
       width: min(var(--max), calc(100% - 48px));
       margin: 0 auto;
-      padding: 100px 0 110px;
+      padding: clamp(58px, 8vh, 92px) 0;
     }
 
     .eyebrow,
@@ -248,9 +245,14 @@
       color: #071011;
     }
 
-    section {
-      padding: 110px 0;
+    /* ---------- Разделы ---------- */
+
+    main > section:not(.hero) {
+      position: relative;
+      padding: 82px 0;
       border-bottom: 1px solid var(--line-soft);
+      background: var(--bg);
+      scroll-margin-top: var(--header-h);
     }
 
     .section-head {
@@ -258,7 +260,7 @@
       align-items: end;
       justify-content: space-between;
       gap: 24px;
-      margin-bottom: 44px;
+      margin-bottom: 38px;
     }
 
     .section-label {
@@ -269,12 +271,6 @@
       font-size: clamp(40px, 5vw, 68px);
       line-height: 1;
       letter-spacing: -0.035em;
-    }
-
-    .section-description {
-      max-width: 480px;
-      color: var(--muted);
-      font-size: 15px;
     }
 
     .story {
@@ -310,6 +306,8 @@
       text-transform: uppercase;
     }
 
+    /* ---------- Галерея ---------- */
+
     .gallery-wrap {
       position: relative;
     }
@@ -317,14 +315,14 @@
     .gallery {
       display: grid;
       grid-auto-flow: column;
-      grid-auto-columns: minmax(300px, 42%);
+      grid-auto-columns: minmax(280px, 31.5%);
       gap: 16px;
       overflow-x: auto;
       overscroll-behavior-inline: contain;
       scroll-snap-type: inline mandatory;
       scroll-behavior: smooth;
       scrollbar-width: none;
-      padding-bottom: 8px;
+      padding: 1px 0 8px;
     }
 
     .gallery::-webkit-scrollbar {
@@ -338,6 +336,7 @@
       scroll-snap-align: start;
       border: 1px solid var(--line);
       background: #0b0f10;
+      cursor: zoom-in;
     }
 
     .gallery-card img {
@@ -354,52 +353,68 @@
       filter: saturate(1) contrast(1.06);
     }
 
+    .gallery-card:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
     .gallery-card::after {
       content: "";
       position: absolute;
       inset: auto 0 0;
-      height: 35%;
+      height: 28%;
       pointer-events: none;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.42), transparent);
-    }
-
-    .gallery-controls {
-      display: flex;
-      gap: 8px;
-      flex: 0 0 auto;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.38), transparent);
     }
 
     .gallery-button {
-      width: 44px;
-      height: 44px;
-      display: inline-grid;
+      position: absolute;
+      top: 50%;
+      z-index: 6;
+      width: 48px;
+      height: 58px;
+      display: grid;
       place-items: center;
-      border: 1px solid var(--line);
-      background: #0c1112;
-      color: #d9e0e0;
+      transform: translateY(-50%);
+      border: 1px solid #394547;
+      background: rgba(7, 10, 11, 0.92);
+      color: #e6eded;
       cursor: pointer;
-      transition: background 0.2s ease, border-color 0.2s ease;
+      font-size: 22px;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .gallery-button.prev {
+      left: -24px;
+    }
+
+    .gallery-button.next {
+      right: -24px;
     }
 
     .gallery-button:hover {
       background: #151d1e;
-      border-color: #526164;
+      border-color: #607174;
+      transform: translateY(-50%) scale(1.03);
     }
 
-    .gallery-hint {
-      margin-top: 14px;
-      color: var(--dim);
-      font-size: 12px;
-      letter-spacing: 0.6px;
-    }
+    /* ---------- Трейлер ---------- */
 
     .trailer-section {
-      padding-top: 100px;
-      padding-bottom: 100px;
+      min-height: calc(100svh - var(--header-h));
+      display: flex;
+      align-items: center;
+      padding-top: 48px !important;
+      padding-bottom: 48px !important;
+    }
+
+    .trailer-section .section-head {
+      margin-bottom: 28px;
     }
 
     .video-shell {
-      width: min(100%, 1120px);
+      width: min(100%, 1040px);
       margin: 0 auto;
       border: 1px solid var(--line);
       background: #000;
@@ -414,12 +429,22 @@
       background: #000;
     }
 
-    .trailer-note {
-      margin-top: 14px;
-      color: var(--dim);
-      font-size: 12px;
-      text-align: center;
+    /* ---------- Где посмотреть ---------- */
+
+    .watch-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
     }
+
+    .platform {
+      padding: 16px 22px;
+      border: 1px solid var(--line);
+      background: #0d1213;
+      color: #aebbbc;
+    }
+
+    /* ---------- Актёры ---------- */
 
     .cast {
       display: grid;
@@ -451,28 +476,17 @@
       font-size: 14px;
     }
 
-    .watch-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .platform {
-      padding: 16px 22px;
-      border: 1px solid var(--line);
-      background: #0d1213;
-      color: #aebbbc;
-    }
+    /* ---------- Контакты ---------- */
 
     .contact-box {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 20px;
+      display: flex;
       align-items: end;
+      justify-content: space-between;
+      gap: 28px;
     }
 
     .contact-link {
-      justify-self: end;
+      flex: 0 0 auto;
       display: inline-flex;
       align-items: center;
       min-height: 50px;
@@ -498,34 +512,114 @@
       color: #dfe5e5;
     }
 
-    @media (max-width: 980px) {
+    /* ---------- Просмотр изображений ---------- */
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 78px;
+      background: rgba(2, 4, 5, 0.96);
+      backdrop-filter: blur(8px);
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox-image {
+      display: block;
+      max-width: 100%;
+      max-height: calc(100svh - 56px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.55);
+    }
+
+    .lightbox-button {
+      position: absolute;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      border: 1px solid #465456;
+      background: rgba(8, 12, 13, 0.88);
+      color: #f1f5f5;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    .lightbox-close {
+      top: 20px;
+      right: 22px;
+      width: 46px;
+      height: 46px;
+      font-size: 26px;
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+      top: 50%;
+      width: 48px;
+      height: 64px;
+      transform: translateY(-50%);
+      font-size: 26px;
+    }
+
+    .lightbox-prev {
+      left: 18px;
+    }
+
+    .lightbox-next {
+      right: 18px;
+    }
+
+    .lightbox-button:hover {
+      background: #182122;
+      border-color: #718487;
+    }
+
+    /* ---------- Адаптивность ---------- */
+
+    @media (max-width: 1100px) {
+      .nav-links {
+        gap: 16px;
+        font-size: 10px;
+      }
+
       .info-grid,
       .cast {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .gallery {
-        grid-auto-columns: minmax(280px, 68%);
+        grid-auto-columns: minmax(280px, 46%);
       }
 
-      .contact-box {
-        grid-template-columns: 1fr;
-        align-items: start;
+      .gallery-button.prev {
+        left: 8px;
       }
 
-      .contact-link {
-        justify-self: start;
+      .gallery-button.next {
+        right: 8px;
       }
     }
 
     @media (max-width: 760px) {
+      :root {
+        --header-h: 62px;
+      }
+
       .shell,
       .hero-inner {
         width: min(100% - 32px, var(--max));
       }
 
       .nav {
-        min-height: 62px;
+        min-height: var(--header-h);
       }
 
       .nav-links a:not(.nav-trailer) {
@@ -533,15 +627,11 @@
       }
 
       .hero {
-        min-height: calc(92svh - 62px);
+        min-height: calc(100svh - var(--header-h));
       }
 
       .hero-inner {
-        padding: 90px 0 74px;
-      }
-
-      .hero::after {
-        display: none;
+        padding: 68px 0 64px;
       }
 
       h1 {
@@ -566,31 +656,74 @@
         width: 100%;
       }
 
-      section {
-        padding: 82px 0;
+      main > section:not(.hero) {
+        padding: 68px 0;
+        scroll-margin-top: var(--header-h);
       }
 
       .section-head {
         align-items: start;
         flex-direction: column;
-        margin-bottom: 32px;
-      }
-
-      .section-description {
-        max-width: 100%;
-      }
-
-      .gallery-controls {
-        display: none;
+        margin-bottom: 30px;
       }
 
       .gallery {
-        grid-auto-columns: 86%;
+        grid-auto-columns: 84%;
         gap: 12px;
       }
 
+      .gallery-button {
+        width: 42px;
+        height: 54px;
+      }
+
+      .gallery-button.prev {
+        left: 7px;
+      }
+
+      .gallery-button.next {
+        right: 7px;
+      }
+
+      .trailer-section {
+        min-height: auto;
+        padding-top: 56px !important;
+        padding-bottom: 56px !important;
+      }
+
       .video-shell {
-        width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .contact-box {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .lightbox {
+        padding: 62px 14px 22px;
+      }
+
+      .lightbox-image {
+        max-height: calc(100svh - 84px);
+      }
+
+      .lightbox-prev,
+      .lightbox-next {
+        top: auto;
+        bottom: 18px;
+        width: 46px;
+        height: 46px;
+        transform: none;
+      }
+
+      .lightbox-prev {
+        left: calc(50% - 54px);
+      }
+
+      .lightbox-next {
+        right: calc(50% - 54px);
       }
     }
 
@@ -605,11 +738,38 @@
       }
 
       .gallery {
-        grid-auto-columns: 91%;
+        grid-auto-columns: 90%;
+      }
+    }
+
+    @media (max-height: 820px) and (min-width: 761px) {
+      .hero-inner {
+        padding: 48px 0;
       }
 
-      .gallery-card {
-        aspect-ratio: 4 / 3;
+      .eyebrow {
+        margin-bottom: 18px;
+      }
+
+      .english-title {
+        margin-top: 22px;
+      }
+
+      .hero-copy {
+        margin-top: 30px;
+      }
+
+      .hero-actions {
+        margin-top: 28px;
+      }
+
+      .trailer-section {
+        padding-top: 34px !important;
+        padding-bottom: 34px !important;
+      }
+
+      .trailer-section .section-head {
+        margin-bottom: 20px;
       }
     }
 
@@ -638,6 +798,7 @@
         <a href="#about">О фильме</a>
         <a href="#materials">Материалы</a>
         <a class="nav-trailer" href="#trailer">Трейлер</a>
+        <a href="#watch">Где посмотреть</a>
         <a href="#cast">Актёры</a>
         <a href="#contacts">Контакты</a>
       </nav>
@@ -724,27 +885,40 @@
             <div class="section-label">Materials</div>
             <h2>Визуальные материалы</h2>
           </div>
-
-          <div class="gallery-controls" aria-label="Управление галереей">
-            <button class="gallery-button" id="galleryPrev" type="button" aria-label="Предыдущее изображение">←</button>
-            <button class="gallery-button" id="galleryNext" type="button" aria-label="Следующее изображение">→</button>
-          </div>
         </div>
 
         <div class="gallery-wrap">
-          <div class="gallery" id="gallery" tabindex="0" aria-label="Галерея материалов фильма">
-            <figure class="gallery-card"><img src="gallery-1.jpg" alt="Визуальный материал фильма Хищение 1" loading="lazy"></figure>
-            <figure class="gallery-card"><img src="gallery-2.jpg" alt="Визуальный материал фильма Хищение 2" loading="lazy"></figure>
-            <figure class="gallery-card"><img src="gallery-3.jpg" alt="Визуальный материал фильма Хищение 3" loading="lazy"></figure>
-            <figure class="gallery-card"><img src="gallery-4.jpg" alt="Визуальный материал фильма Хищение 4" loading="lazy"></figure>
-            <figure class="gallery-card"><img src="gallery-5.jpg" alt="Визуальный материал фильма Хищение 5" loading="lazy"></figure>
-            <figure class="gallery-card"><img src="gallery-6.jpg" alt="Визуальный материал фильма Хищение 6" loading="lazy"></figure>
-            <figure class="gallery-card"><img src="gallery-7.jpg" alt="Визуальный материал фильма Хищение 7" loading="lazy"></figure>
-            <figure class="gallery-card"><img src="gallery-8.jpg" alt="Визуальный материал фильма Хищение 8" loading="lazy"></figure>
-          </div>
-        </div>
+          <button class="gallery-button prev" id="galleryPrev" type="button" aria-label="Предыдущее изображение">←</button>
 
-        <p class="gallery-hint">На телефоне галерею можно листать пальцем.</p>
+          <div class="gallery" id="gallery" tabindex="0" aria-label="Галерея материалов фильма">
+            <figure class="gallery-card" tabindex="0" data-index="0">
+              <img src="gallery-1.jpg" alt="Визуальный материал фильма Хищение 1" loading="lazy">
+            </figure>
+            <figure class="gallery-card" tabindex="0" data-index="1">
+              <img src="gallery-2.jpg" alt="Визуальный материал фильма Хищение 2" loading="lazy">
+            </figure>
+            <figure class="gallery-card" tabindex="0" data-index="2">
+              <img src="gallery-3.jpg" alt="Визуальный материал фильма Хищение 3" loading="lazy">
+            </figure>
+            <figure class="gallery-card" tabindex="0" data-index="3">
+              <img src="gallery-4.jpg" alt="Визуальный материал фильма Хищение 4" loading="lazy">
+            </figure>
+            <figure class="gallery-card" tabindex="0" data-index="4">
+              <img src="gallery-5.jpg" alt="Визуальный материал фильма Хищение 5" loading="lazy">
+            </figure>
+            <figure class="gallery-card" tabindex="0" data-index="5">
+              <img src="gallery-6.jpg" alt="Визуальный материал фильма Хищение 6" loading="lazy">
+            </figure>
+            <figure class="gallery-card" tabindex="0" data-index="6">
+              <img src="gallery-7.jpg" alt="Визуальный материал фильма Хищение 7" loading="lazy">
+            </figure>
+            <figure class="gallery-card" tabindex="0" data-index="7">
+              <img src="gallery-8.jpg" alt="Визуальный материал фильма Хищение 8" loading="lazy">
+            </figure>
+          </div>
+
+          <button class="gallery-button next" id="galleryNext" type="button" aria-label="Следующее изображение">→</button>
+        </div>
       </div>
     </section>
 
@@ -755,21 +929,31 @@
             <div class="section-label">Trailer</div>
             <h2>Трейлер</h2>
           </div>
-
-          <p class="section-description">
-            Горизонтальная версия трейлера, адаптированная для просмотра на компьютере,
-            планшете и телефоне.
-          </p>
         </div>
 
-        <div class="video-shell">
+        <div class="video-shell" id="videoShell">
           <video controls preload="metadata" poster="trailer-cover.jpg" playsinline>
             <source src="trailer-16x9-web.mp4" type="video/mp4">
             Ваш браузер не поддерживает воспроизведение видео.
           </video>
         </div>
+      </div>
+    </section>
 
-        <p class="trailer-note">ХИЩЕНИЕ / THEFT · официальный трейлер</p>
+    <section id="watch">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-label">Watch</div>
+            <h2>Где посмотреть</h2>
+          </div>
+        </div>
+
+        <div class="watch-list">
+          <div class="platform">Кинопоиск · скоро</div>
+          <div class="platform">RuTube · скоро</div>
+          <div class="platform">VK Видео · скоро</div>
+        </div>
       </div>
     </section>
 
@@ -794,35 +978,11 @@
       </div>
     </section>
 
-    <section id="watch">
-      <div class="shell">
-        <div class="section-head">
-          <div>
-            <div class="section-label">Watch</div>
-            <h2>Где посмотреть</h2>
-          </div>
-
-          <p class="section-description">
-            Ссылки появятся после публикации фильма на официальных площадках.
-          </p>
-        </div>
-
-        <div class="watch-list">
-          <div class="platform">Кинопоиск · скоро</div>
-          <div class="platform">RuTube · скоро</div>
-          <div class="platform">VK Видео · скоро</div>
-        </div>
-      </div>
-    </section>
-
     <section id="contacts">
       <div class="shell contact-box">
         <div>
           <div class="section-label">Contacts</div>
           <h2>Контакты</h2>
-          <p class="section-description" style="margin-top: 22px;">
-            По вопросам, связанным с фильмом и проектом.
-          </p>
         </div>
 
         <a class="contact-link" href="https://www.instagram.com/armanfut/" target="_blank" rel="noopener noreferrer">
@@ -837,10 +997,20 @@
     Официальный сайт фильма · фильм находится в разработке
   </footer>
 
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Просмотр изображения">
+    <button class="lightbox-button lightbox-close" id="lightboxClose" type="button" aria-label="Закрыть">×</button>
+    <button class="lightbox-button lightbox-prev" id="lightboxPrev" type="button" aria-label="Предыдущее изображение">←</button>
+
+    <img class="lightbox-image" id="lightboxImage" src="" alt="">
+
+    <button class="lightbox-button lightbox-next" id="lightboxNext" type="button" aria-label="Следующее изображение">→</button>
+  </div>
+
   <script>
     const gallery = document.getElementById('gallery');
-    const prev = document.getElementById('galleryPrev');
-    const next = document.getElementById('galleryNext');
+    const galleryPrev = document.getElementById('galleryPrev');
+    const galleryNext = document.getElementById('galleryNext');
+    const galleryCards = Array.from(document.querySelectorAll('.gallery-card'));
 
     function galleryStep() {
       const card = gallery.querySelector('.gallery-card');
@@ -849,13 +1019,107 @@
       return card.getBoundingClientRect().width + gap;
     }
 
-    prev.addEventListener('click', () => {
+    galleryPrev.addEventListener('click', () => {
       gallery.scrollBy({ left: -galleryStep(), behavior: 'smooth' });
     });
 
-    next.addEventListener('click', () => {
+    galleryNext.addEventListener('click', () => {
       gallery.scrollBy({ left: galleryStep(), behavior: 'smooth' });
     });
+
+    /* Просмотр изображений */
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+
+    const galleryImages = galleryCards.map(card => {
+      const img = card.querySelector('img');
+      return { src: img.src, alt: img.alt };
+    });
+
+    let currentImageIndex = 0;
+    let lightboxTouchStartX = 0;
+
+    function showLightboxImage(index) {
+      currentImageIndex = (index + galleryImages.length) % galleryImages.length;
+      lightboxImage.src = galleryImages[currentImageIndex].src;
+      lightboxImage.alt = galleryImages[currentImageIndex].alt;
+    }
+
+    function openLightbox(index) {
+      showLightboxImage(index);
+      lightbox.classList.add('open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('lightbox-open');
+      lightboxClose.focus();
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('lightbox-open');
+    }
+
+    galleryCards.forEach((card, index) => {
+      card.addEventListener('click', () => openLightbox(index));
+      card.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openLightbox(index);
+        }
+      });
+    });
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxPrev.addEventListener('click', () => showLightboxImage(currentImageIndex - 1));
+    lightboxNext.addEventListener('click', () => showLightboxImage(currentImageIndex + 1));
+
+    lightbox.addEventListener('click', event => {
+      if (event.target === lightbox) closeLightbox();
+    });
+
+    lightbox.addEventListener('touchstart', event => {
+      lightboxTouchStartX = event.changedTouches[0].clientX;
+    }, { passive: true });
+
+    lightbox.addEventListener('touchend', event => {
+      const delta = event.changedTouches[0].clientX - lightboxTouchStartX;
+      if (Math.abs(delta) < 50) return;
+      if (delta < 0) showLightboxImage(currentImageIndex + 1);
+      else showLightboxImage(currentImageIndex - 1);
+    }, { passive: true });
+
+    document.addEventListener('keydown', event => {
+      if (!lightbox.classList.contains('open')) return;
+
+      if (event.key === 'Escape') closeLightbox();
+      if (event.key === 'ArrowLeft') showLightboxImage(currentImageIndex - 1);
+      if (event.key === 'ArrowRight') showLightboxImage(currentImageIndex + 1);
+    });
+
+    /* Подгоняем трейлер под высоту экрана на компьютере */
+    const videoShell = document.getElementById('videoShell');
+    const siteHeader = document.querySelector('.site-header');
+
+    function fitTrailerToViewport() {
+      if (window.innerWidth <= 760) {
+        videoShell.style.width = '100%';
+        return;
+      }
+
+      const headerHeight = siteHeader.offsetHeight;
+      const reservedHeight = 235;
+      const availableVideoHeight = Math.max(360, window.innerHeight - headerHeight - reservedHeight);
+      const widthByHeight = availableVideoHeight * (16 / 9);
+      const finalWidth = Math.min(1040, widthByHeight);
+
+      videoShell.style.width = `${finalWidth}px`;
+    }
+
+    fitTrailerToViewport();
+    window.addEventListener('resize', fitTrailerToViewport);
   </script>
 </body>
 </html>
