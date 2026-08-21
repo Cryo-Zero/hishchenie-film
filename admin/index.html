@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#040707">
+  <title>THEFT // CONTROL PANEL</title>
+  <link rel="stylesheet" href="../css/site.css?v=14-final">
+</head>
+<body class="admin-page">
+  <main class="admin-shell">
+    <div class="admin-brand">THEFT // CONTROL PANEL // P14</div>
+
+    <section class="admin-login" id="adminLogin">
+      <div class="section-label">ACCESS // RESTRICTED</div>
+      <h1>Вход команды</h1>
+      <div class="admin-field"><label for="adminEmail">Email</label><input id="adminEmail" type="email" autocomplete="username" spellcheck="false"></div>
+      <div class="admin-field"><label for="adminPassword">Пароль</label><input id="adminPassword" type="password" autocomplete="current-password"></div>
+      <button class="button" id="adminLoginButton" type="button">Войти</button>
+      <div class="admin-status" id="adminLoginStatus" role="status" aria-live="polite"></div>
+      <p class="faq-answer">Эта форма не регистрирует посетителей. Доступ получают только аккаунты, заранее добавленные в список администраторов Supabase.</p>
+    </section>
+
+    <section id="adminPanel" hidden>
+      <div class="admin-toolbar">
+        <div><div class="section-label">OFFICIAL // MODERATION</div><h1>PUBLIC RESPONSE</h1></div>
+        <button class="micro-button" id="adminLogout" type="button">Выйти</button>
+      </div>
+      <div class="admin-status" id="adminStatus" role="status" aria-live="polite"></div>
+      <div class="admin-grid" id="adminReviews"></div>
+    </section>
+  </main>
+  <script src="../js/admin.js?v=14-final"></script>
+</body>
+</html>
