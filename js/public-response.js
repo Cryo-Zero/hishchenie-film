@@ -4,33 +4,22 @@
   const SUPABASE_URL = 'https://xltwwvutqkpmtmlavngi.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_0hT3y-7p26Ngnq2zaPK-0w_5vtJX15k';
   const PROJECT_REF = 'xltwwvutqkpmtmlavngi';
-  // P13 deliberately uses a fresh project-owned storage namespace.
-  // Old P7-P12 experiments used Supabase SDK-compatible keys and could leave
-  // rotated/stale refresh tokens behind. Existing production users do not exist yet,
-  // so we reset the test identity once instead of asking visitors to clear cookies.
-  const SESSION_KEY = `theft-${PROJECT_REF}-auth-v3`;
-  const REQUEST_TIMEOUT = 15000;
+  const SESSION_KEY = `theft-${PROJECT_REF}-auth-v4`;
+  const AUTH_LOCK_NAME = `theft-${PROJECT_REF}-auth-lock-v4`;
+  const CLIENT_REVISION = 'P14-theft-world';
+  const REQUEST_TIMEOUT = 18000;
   const AUTH_TIMEOUT = 30000;
   const WRITE_TIMEOUT = 30000;
-  const CLIENT_REVISION = 'P13-stable-auth';
-  const AUTH_LOCK_NAME = `theft-${PROJECT_REF}-auth-lock-v3`;
-
-  let identityPromise = null;
-  let memorySession = null;
-  let refreshPromise = null;
-  let signInPromise = null;
-  let profileMutationBusy = false;
-  let feedRequestSequence = 0;
-
   const I18N = {
     ru: {
       metaTitle: 'ХИЩЕНИЕ — THEFT | Официальный сайт фильма',
       metaDescription: 'Официальный сайт фильма «ХИЩЕНИЕ / THEFT» — антиутопической драмы о мире 2045 года.',
+      reviewsMetaTitle: 'Отзывы — ХИЩЕНИЕ / THEFT', reviewsMetaDescription: 'Отзывы зрителей и оценка фильма «ХИЩЕНИЕ / THEFT». Анонимный профиль без email, телефона и пароля.',
       navAria: 'Основная навигация',
       slogan: 'В системе нет безопасности',
       menu: 'Меню', systemActive: 'Система активна', publicAccess: 'Публичный доступ',
       heroPosterAlt: 'Официальная обложка фильма «Хищение»', heroVideoAria: 'Беззвучный фрагмент трейлера фильма «Хищение»',
-      navAbout: 'О фильме', navMaterials: 'Материалы', navTrailer: 'Трейлер', navWatch: 'Где посмотреть', navCast: 'Актёры', navReviews: 'Отзывы', navContacts: 'Контакты',
+      navAbout: 'О фильме', navMaterials: 'Материалы', navTrailer: 'Трейлер', navWatch: 'Где посмотреть', navCast: 'Актёры', navReviews: 'Отзывы', navFaq: 'FAQ', navContacts: 'Контакты',
       watchIntro: 'Площадки появятся здесь после подтверждения релиза. Пока раздел работает как публичная точка доступа к проекту.',
       heroEyebrow: 'Фильм в разработке · 2045',
       heroCopy: 'В мире, где человек должен доказать свою пользу системе, взросление становится борьбой за право самому выбирать своё будущее.',
@@ -50,7 +39,7 @@
       castLabel: '05 / SUBJECTS', castTitle: 'Актёрский состав',
       nameArman: 'Арман О.', nameBogdan: 'Богдан В.', nameLevon: 'Левон', nameYulia: 'Юля Ш.', nameArsen: 'Арсен О.', nameAlexander: 'Александр К.', nameBella: 'Белла А.',
       roleGor: 'Гор', roleAntagonist: 'Антагонист', roleMark: 'Марк', roleHost: 'Ведущая', roleMusician: 'Музыкант', roleGrandfather: 'Дедушка Гора', roleDetective: 'Детектив',
-      reviewsLabel: '06 / PUBLIC RESPONSE', reviewsTitle: 'Отзывы зрителей', reviewsIntro: 'Оценки зрителей формируют «Свежесть» фильма. 7–10 баллов считаются положительной оценкой.',
+      reviewsLabel: 'R / PUBLIC RESPONSE', reviewsTitle: 'Отзывы зрителей', reviewsIntro: 'Оценки зрителей формируют «Свежесть» фильма. 7–10 баллов считаются положительной оценкой.',
       freshness: 'Свежесть', insufficient: 'Недостаточно оценок', freshnessHint: '7–10 = положительно',
       freshnessCold: 'Холодный приём', freshnessMixed: 'Смешанные отзывы', freshnessFresh: 'Свежий', freshnessVeryFresh: 'Очень свежий', freshnessChoice: 'Выбор зрителей',
       serviceChecking: 'Проверка канала', serviceOnline: 'Отзывы доступны', serviceOffline: 'Отзывы временно недоступны',
@@ -60,17 +49,26 @@
       yourRating: 'Ваша оценка', ratingPrompt: 'Выберите от 0 до 10', ratingScaleAria: 'Оценка от 0 до 10',
       reviewLabel: 'Ваш отзыв', reviewOptional: 'необязательно', reviewPlaceholder: 'Расскажите о впечатлениях от фильма…',
       publish: 'Опубликовать', updateReview: 'Сохранить изменения', deleteReview: 'Удалить отзыв',
-      privacy: 'Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.',
+      privacy: 'Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва, а также ваши реакции и ответы, если вы ими пользуетесь. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.',
       latest: 'Новые', highest: 'С высокой оценкой', lowest: 'С низкой оценкой',
       reviewsEmpty: 'Пока нет отзывов. Ваша оценка может стать первой.', noText: 'Оценка без текстового отзыва.',
       edited: 'изменено', yourBadge: 'ваш отзыв',
       chooseRating: 'Сначала выберите оценку от 0 до 10.', saving: 'Сохраняем…', saved: 'Отзыв опубликован.', updated: 'Изменения сохранены.', deleted: 'Отзыв удалён.',
       authError: 'Не удалось создать анонимный профиль. Попробуйте ещё раз.', loadError: 'Не удалось загрузить отзывы.', saveError: 'Не удалось сохранить отзыв. Попробуйте ещё раз.', deleteError: 'Не удалось удалить отзыв.', profileError: 'Не удалось обновить профиль.',
       confirmDelete: 'Удалить ваш отзыв? Это действие нельзя отменить.',
+      oldSort: 'Старые', popular: 'Популярные', withOfficialResponse: 'С ответом команды', allReviews: 'Все отзывы', useful: 'Полезно', replies: 'Ответы', reply: 'Ответить', replyPlaceholder: 'Короткий ответ на отзыв…', replySave: 'Отправить', replyDelete: 'Удалить ответ', replyEmpty: 'Ответов пока нет.', replySaved: 'Ответ сохранён.', replyError: 'Не удалось сохранить ответ.', pinned: 'закреплено', official: 'КОМАНДА ФИЛЬМА · OFFICIAL',
+      audienceSignal: 'Сигнал аудитории', audienceSignalCopy: 'Оценка зрителей доступна сразу — полный раздел отзывов открыт отдельно.', openReviews: 'Открыть отзывы',
+      faqLabel: '06 / FAQ', faqTitle: 'Часто задаваемые вопросы', faqIntro: 'Короткие ответы о фильме и этом публичном архиве. Факты о релизе обновляются только после подтверждения командой.',
+      faqQ1: 'Когда выйдет фильм?', faqA1: 'Точная дата релиза пока не объявлена. Фильм находится в разработке; подтверждённая дата появится на этом сайте.',
+      faqQ2: 'Где можно будет посмотреть «Хищение»?', faqA2: 'Площадки появятся в разделе «Где посмотреть» после подтверждения релиза. Сейчас они помечены как ожидающие.',
+      faqQ3: 'На каком языке трейлер?', faqA3: 'Оригинальная звуковая дорожка трейлера — на русском. Текст внутри авторских постеров также может оставаться на русском.',
+      faqQ4: 'Будут ли английские субтитры?', faqA4: 'Возможность английских субтитров предусмотрена, но публиковать обещание до согласования с автором мы не будем.',
+      faqQ5: 'Как оставить отзыв?', faqA5: 'Откройте отдельную вкладку «Отзывы», выберите оценку от 0 до 10 и при желании добавьте текст. Email, телефон и обычная регистрация не нужны.',
+      signalLog1: 'Трейлер доступен', signalLog2: 'Публичный архив открыт', signalLog3: 'Релиз ожидает подтверждения', signalNow: 'СЕЙЧАС', signalPending: 'PENDING',
       galleryAlt01: 'Обложка фильма «Хищение»', galleryAlt02: 'Постер фильма «Хищение» — пианино', galleryAlt03: 'Постер фильма «Хищение» — дедушка и ребёнок', galleryAlt04: 'Постер фильма «Хищение» — человек в капюшоне', galleryAlt05: 'Постер фильма «Хищение»', galleryAlt06: 'Постер фильма «Хищение» — герой в разрушенном городе', galleryAlt07: 'Постер фильма «Хищение» — ведущая', galleryAlt08: 'Постер фильма «Хищение» — город', galleryAlt09: 'Постер фильма «Хищение» — Гор', galleryAlt10: 'Кадры из фильма «Хищение»', galleryAlt11: 'Визуальный материал фильма «Хищение»',
       contactsLabel: '07 / CONTACT', contactsTitle: 'Контакты',
       securityTeaser: 'SYS // SECURITY: PRESENT', securityTitle: 'На сайте есть безопасность',
-      securityText: 'Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.',
+      securityText: 'Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва, а также ваши реакции и ответы, если вы ими пользуетесь. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.',
       securityClose: 'Скрыть',
       footer: 'Официальный сайт фильма · фильм находится в разработке',
       close: 'Закрыть', previousImage: 'Предыдущее изображение', nextImage: 'Следующее изображение', openImage: 'Открыть выбранное изображение', galleryAria: 'Галерея материалов фильма', lightboxAria: 'Просмотр изображения',
@@ -80,11 +78,12 @@
     en: {
       metaTitle: 'THEFT — ХИЩЕНИЕ | Official Film Website',
       metaDescription: 'Official website of THEFT / ХИЩЕНИЕ — a dystopian drama set in 2045.',
+      reviewsMetaTitle: 'Reviews — THEFT / ХИЩЕНИЕ', reviewsMetaDescription: 'Audience reviews and ratings for THEFT / ХИЩЕНИЕ. Anonymous profile with no email, phone number or password.',
       navAria: 'Main navigation',
       slogan: 'There is no safety in the system',
       menu: 'Menu', systemActive: 'System active', publicAccess: 'Public access',
       heroPosterAlt: 'Official poster for THEFT / ХИЩЕНИЕ', heroVideoAria: 'Muted trailer excerpt from THEFT / ХИЩЕНИЕ',
-      navAbout: 'About', navMaterials: 'Materials', navTrailer: 'Trailer', navWatch: 'Watch', navCast: 'Cast', navReviews: 'Reviews', navContacts: 'Contacts',
+      navAbout: 'About', navMaterials: 'Materials', navTrailer: 'Trailer', navWatch: 'Watch', navCast: 'Cast', navReviews: 'Reviews', navFaq: 'FAQ', navContacts: 'Contacts',
       watchIntro: 'Platforms will appear here once the release is confirmed. For now, this section serves as a public access point to the project.',
       heroEyebrow: 'Film in development · 2045',
       heroCopy: 'In a world where every person must prove their value to the system, growing up becomes a struggle for the right to choose your own future.',
@@ -104,7 +103,7 @@
       castLabel: '05 / SUBJECTS', castTitle: 'Cast',
       nameArman: 'Arman O.', nameBogdan: 'Bogdan V.', nameLevon: 'Levon', nameYulia: 'Yulia Sh.', nameArsen: 'Arsen O.', nameAlexander: 'Aleksandr K.', nameBella: 'Bella A.',
       roleGor: 'Gor', roleAntagonist: 'Antagonist', roleMark: 'Mark', roleHost: 'News anchor', roleMusician: 'Musician', roleGrandfather: "Gor's grandfather", roleDetective: 'Detective',
-      reviewsLabel: '06 / PUBLIC RESPONSE', reviewsTitle: 'Audience reviews', reviewsIntro: 'Audience scores form the film’s “Freshness” rating. Scores from 7 to 10 count as positive.',
+      reviewsLabel: 'R / PUBLIC RESPONSE', reviewsTitle: 'Audience reviews', reviewsIntro: 'Audience scores form the film’s “Freshness” rating. Scores from 7 to 10 count as positive.',
       freshness: 'Freshness', insufficient: 'Not enough ratings', freshnessHint: '7–10 = positive',
       freshnessCold: 'Cold reception', freshnessMixed: 'Mixed response', freshnessFresh: 'Fresh', freshnessVeryFresh: 'Very fresh', freshnessChoice: 'Audience choice',
       serviceChecking: 'Checking channel', serviceOnline: 'Reviews online', serviceOffline: 'Reviews temporarily unavailable',
@@ -114,17 +113,26 @@
       yourRating: 'Your score', ratingPrompt: 'Choose from 0 to 10', ratingScaleAria: 'Score from 0 to 10',
       reviewLabel: 'Your review', reviewOptional: 'optional', reviewPlaceholder: 'Tell us what you thought about the film…',
       publish: 'Publish', updateReview: 'Save changes', deleteReview: 'Delete review',
-      privacy: 'No email, phone number or password. The site stores only a technical identifier, alias, avatar settings, score and review text. The profile is tied to this browser; clearing browser data may remove access to editing the old review.',
+      privacy: 'No email, phone number or password. The site stores only a technical identifier, alias, avatar settings, score and review text, plus your reactions and replies if you use them. The profile is tied to this browser; clearing browser data may remove access to editing the old review.',
       latest: 'Newest', highest: 'Highest score', lowest: 'Lowest score',
       reviewsEmpty: 'No reviews yet. Your score can be the first.', noText: 'Rating without a written review.',
       edited: 'edited', yourBadge: 'your review',
       chooseRating: 'Choose a score from 0 to 10 first.', saving: 'Saving…', saved: 'Review published.', updated: 'Changes saved.', deleted: 'Review deleted.',
       authError: 'Could not create an anonymous profile. Please try again.', loadError: 'Could not load reviews.', saveError: 'Could not save the review. Please try again.', deleteError: 'Could not delete the review.', profileError: 'Could not update the profile.',
       confirmDelete: 'Delete your review? This cannot be undone.',
+      oldSort: 'Oldest', popular: 'Most liked', withOfficialResponse: 'Team replied', allReviews: 'All reviews', useful: 'Useful', replies: 'Replies', reply: 'Reply', replyPlaceholder: 'Write a short reply…', replySave: 'Send', replyDelete: 'Delete reply', replyEmpty: 'No replies yet.', replySaved: 'Reply saved.', replyError: 'Could not save the reply.', pinned: 'pinned', official: 'FILM TEAM · OFFICIAL',
+      audienceSignal: 'Audience signal', audienceSignalCopy: 'The audience score is visible early; the full community feed lives on a dedicated reviews page.', openReviews: 'Open reviews',
+      faqLabel: '06 / FAQ', faqTitle: 'Frequently asked questions', faqIntro: 'Short answers about the film and this public archive. Release facts are updated only after confirmation by the film team.',
+      faqQ1: 'When will the film be released?', faqA1: 'The exact release date has not been announced. The film is in development; a confirmed date will appear on this website.',
+      faqQ2: 'Where will THEFT be available?', faqA2: 'Platforms will appear in the Watch section after the release is confirmed. For now they are marked as pending.',
+      faqQ3: 'What language is the trailer in?', faqA3: 'The trailer uses its original Russian audio. Text embedded in the original poster artwork may also remain in Russian.',
+      faqQ4: 'Will there be English subtitles?', faqA4: 'English subtitles are technically planned for, but we will not promise them publicly until they are confirmed with the author.',
+      faqQ5: 'How do I leave a review?', faqA5: 'Open the dedicated Reviews tab, choose a score from 0 to 10 and optionally add text. No email, phone number or conventional registration is required.',
+      signalLog1: 'Trailer online', signalLog2: 'Public archive open', signalLog3: 'Release awaiting confirmation', signalNow: 'NOW', signalPending: 'PENDING',
       galleryAlt01: 'THEFT film cover', galleryAlt02: 'THEFT poster — piano scene', galleryAlt03: 'THEFT poster — grandfather and child', galleryAlt04: 'THEFT poster — hooded figure', galleryAlt05: 'THEFT film poster', galleryAlt06: 'THEFT poster — protagonist in a ruined city', galleryAlt07: 'THEFT poster — news anchor', galleryAlt08: 'THEFT poster — city', galleryAlt09: 'THEFT poster — Gor', galleryAlt10: 'Frames from THEFT', galleryAlt11: 'THEFT visual material',
       contactsLabel: '07 / CONTACT', contactsTitle: 'Contacts',
       securityTeaser: 'SYS // SECURITY: PRESENT', securityTitle: 'There is safety on this site',
-      securityText: 'No email, phone number or password. The site stores only a technical identifier, alias, avatar settings, score and review text. The profile is tied to this browser; clearing browser data may remove access to editing the old review.',
+      securityText: 'No email, phone number or password. The site stores only a technical identifier, alias, avatar settings, score and review text, plus your reactions and replies if you use them. The profile is tied to this browser; clearing browser data may remove access to editing the old review.',
       securityClose: 'Hide',
       footer: 'Official film website · the film is in development',
       close: 'Close', previousImage: 'Previous image', nextImage: 'Next image', openImage: 'Open selected image', galleryAria: 'Film materials gallery', lightboxAria: 'Image viewer',
@@ -132,953 +140,419 @@
       scoreWords: ['Critical', 'Very poor', 'Very poor', 'Poor', 'Below average', 'Average', 'Fair', 'Good', 'Very good', 'Excellent', 'Outstanding']
     }
   };
-
-  const NAME_DATA = {
-    ru: {
-      adjectives: ['Тихий','Холодный','Скрытый','Ночной','Серый','Чёрный','Белый','Забытый','Последний','Ложный','Немой','Дальний','Северный','Пустой','Сломанный','Закрытый','Стёртый','Неизвестный','Спящий','Бледный','Красный','Глухой','Теневой','Случайный','Одинокий','Свободный','Нулевой','Запретный','Ускользающий','Потерянный','Внутренний','Чужой','Старый','Новый','Дежурный','Безымянный','Секретный','Резервный','Выживший','Невидимый','Пограничный','Дальний','Незримый','Затерянный','Остывший','Непринятый','Случайный','Третий','Седьмой','Внешний','Зашифрованный','Закатный','Безмолвный','Брошенный','Неподтверждённый','Переходный','Одиночный','Стерильный','Выключенный','Наблюдаемый'],
-      nouns: ['Свидетель','Контур','Сигнал','Кадр','След','Голос','Наблюдатель','Пассажир','Архив','Импульс','Сектор','Протокол','Эфир','Шум','Свет','Маркер','Экран','Код','Профиль','Вектор','Предел','Рубеж','Коридор','Объект','Канал','Узел','Пульс','Фрагмент','Отголосок','Проводник','Беглец','Архивист','Оператор','Куратор','Индекс','Регистр','Резерв','Сканер','Странник','Хранитель','Маяк','Порог','Отбор','Слой','Ключ','Терминал','Переход','Носитель','Дубликат','Эхо','Блок','Модуль','Поток','Сводка','Вход','Выход','Разрыв','Патруль','Режим','Снимок'],
-      roles: ['Наблюдатель','Архивист','Оператор','Свидетель','Куратор','Проводник','Гражданин','Участник','Регистратор','Инспектор','Смотритель','Посредник','Диспетчер','Хранитель','Сканер','Следователь','Пассажир','Беглец','Кандидат','Резидент','Дежурный','Координатор','Контролёр','Сборщик','Носитель','Аналитик','Стажёр','Патрульный','Проверяющий','Посетитель'],
-      worlds: ['Сектор','Архив','Протокол','Контур','Система','Секция','Регистр','Канал','Узел','Индекс','Запись','Маркер','Сигнал','Профиль','Предел','Шлюз','Резерв','Эфир','Периметр','Коридор','Терминал','Модуль','Контроль','Отбор','Поток','Линия','Досье','Порог','Сводка','Режим'],
-      images: ['Тени','Света','Шума','Памяти','Севера','Пепла','Эфира','Сна','Пустоты','Голоса','Дождя','Кадра','Сигнала','Леса','Рубежа','Ночи','Стекла','Бетона','Пульса','Следа','Тишины','Предела','Города','Холода','Сбоя','Записи','Перехода','Пыли','Эха','Окна'],
-      phrases: ['Тот, Кто Ждёт','Лицо Без Архива','Голос Из Сектора','Человек Из Записи','Тень За Экраном','Свидетель Без Номера','Тот, Кто Помнит','Последний В Очереди','За Пределом Секции','Вне Зоны Контроля','Не Внесён В Реестр','Человек Без Индекса','Сигнал Не Принят','Запись Не Найдена','За Закрытой Дверью','До Следующего Сигнала','Из Другого Сектора','Без Права На Архив','Тот, Кто Остался','Никем Не Учтён','Вне Списка','До Конца Сеанса','Тот Самый Шум','Пока Система Спит','Неизвестный В Кадре','За Линией Отбора','Без Метки','Внутри Периметра','После Сигнала','До Нулевого Часа']
-    },
-    en: {
-      adjectives: ['Silent','Cold','Hidden','Night','Grey','Black','White','Forgotten','Last','False','Mute','Distant','Northern','Empty','Broken','Sealed','Erased','Unknown','Sleeping','Pale','Red','Deaf','Shadow','Random','Lone','Free','Zero','Forbidden','Fading','Lost','Inner','Foreign','Old','New','On-Duty','Nameless','Secret','Reserve','Surviving','Invisible','Border','Remote','Unseen','Stranded','Cooling','Rejected','Third','Seventh','Outer','Encoded','Twilight','Wordless','Abandoned','Unconfirmed','Transit','Single','Sterile','Offline','Observed'],
-      nouns: ['Witness','Contour','Signal','Frame','Trace','Voice','Observer','Passenger','Archive','Pulse','Sector','Protocol','Broadcast','Noise','Light','Marker','Screen','Code','Profile','Vector','Limit','Frontier','Corridor','Subject','Channel','Node','Heartbeat','Fragment','Echo','Guide','Runaway','Archivist','Operator','Curator','Index','Register','Reserve','Scanner','Wanderer','Keeper','Beacon','Threshold','Selection','Layer','Key','Terminal','Transit','Carrier','Duplicate','Block','Module','Stream','Briefing','Entry','Exit','Rift','Patrol','Mode','Snapshot'],
-      roles: ['Observer','Archivist','Operator','Witness','Curator','Guide','Citizen','Participant','Registrar','Inspector','Keeper','Mediator','Dispatcher','Custodian','Scanner','Investigator','Passenger','Runaway','Candidate','Resident','Watchkeeper','Coordinator','Controller','Collector','Carrier','Analyst','Trainee','Patrol','Verifier','Visitor'],
-      worlds: ['Sector','Archive','Protocol','Contour','System','Section','Register','Channel','Node','Index','Record','Marker','Signal','Profile','Limit','Gateway','Reserve','Broadcast','Perimeter','Corridor','Terminal','Module','Control','Selection','Stream','Line','Dossier','Threshold','Briefing','Mode'],
-      images: ['of Shadow','of Light','of Noise','of Memory','of the North','of Ash','of Static','of Sleep','of the Void','of Voices','of Rain','of the Frame','of Signal','of the Forest','of the Edge','of Night','of Glass','of Concrete','of Pulse','of Traces','of Silence','of the Limit','of the City','of Cold','of Failure','of the Record','of Transit','of Dust','of Echoes','of the Window'],
-      phrases: ['The One Who Waits','Face Without an Archive','Voice from the Sector','Person from the Record','Shadow Behind the Screen','Witness Without a Number','The One Who Remembers','Last in the Line','Beyond the Section','Outside Control','Not in the Register','Person Without an Index','Signal Not Received','Record Not Found','Behind the Sealed Door','Until the Next Signal','From Another Sector','No Archive Access','The One Who Stayed','Unaccounted For','Outside the List','Until the Session Ends','That Certain Noise','While the System Sleeps','Unknown in Frame','Beyond Selection','Without a Marker','Inside the Perimeter','After the Signal','Before Zero Hour']
-    }
-  };
-
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   const safeStorage = {
-    get(key) { try { return window.localStorage?.getItem(key) ?? null; } catch { return null; } },
-    set(key, value) { try { window.localStorage?.setItem(key, value); } catch {} },
-    del(key) { try { window.localStorage?.removeItem(key); } catch {} }
+    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch {} },
+    del(key) { try { localStorage.removeItem(key); } catch {} }
   };
-  const initialLanguage = safeStorage.get('theft_lang') || (navigator.language?.toLowerCase().startsWith('ru') ? 'ru' : 'en');
-  const t = key => I18N[state.lang]?.[key] ?? I18N.ru[key] ?? key;
 
+  const initialLanguage = safeStorage.get('theft_lang') || (navigator.language?.toLowerCase().startsWith('ru') ? 'ru' : 'en');
   const state = {
-    lang: initialLanguage,
+    lang: I18N[initialLanguage] ? initialLanguage : 'ru',
+    session: null,
     user: null,
     profile: null,
+    pendingProfile: null,
     ownReview: null,
+    ownLikes: new Set(),
+    ownReplies: new Map(),
     selectedRating: null,
     sort: 'new',
-    pendingProfile: null,
-    busy: false,
+    filter: 'all',
     serviceState: 'checking',
-    lastFreshness: null
+    lastStats: { total_ratings:0, average_rating:null, freshness:null },
+    reviews: [],
+    busy: false,
+    feedSeq: 0,
+    openReplies: new Set()
+  };
+  const t = key => I18N[state.lang]?.[key] ?? I18N.ru[key] ?? key;
+
+  // Canonical alias parts are aligned RU/EN. We store only a compact alias_code
+  // plus one number and render the language locally — no AI/translation API needed.
+  const ALIAS = {
+    adjectives: [
+      ['Тихий','Silent'],['Холодный','Cold'],['Скрытый','Hidden'],['Ночной','Night'],['Серый','Grey'],['Забытый','Forgotten'],['Последний','Last'],['Немой','Mute'],['Северный','Northern'],['Пустой','Empty'],['Сломанный','Broken'],['Стёртый','Erased'],['Неизвестный','Unknown'],['Спящий','Sleeping'],['Бледный','Pale'],['Теневой','Shadow'],['Свободный','Free'],['Нулевой','Zero'],['Запретный','Forbidden'],['Потерянный','Lost'],['Безымянный','Nameless'],['Резервный','Reserve'],['Невидимый','Invisible'],['Пограничный','Border'],['Зашифрованный','Encoded'],['Безмолвный','Wordless'],['Брошенный','Abandoned'],['Неподтверждённый','Unconfirmed'],['Переходный','Transit'],['Наблюдаемый','Observed']
+    ],
+    nouns: [
+      ['Свидетель','Witness'],['Контур','Contour'],['Сигнал','Signal'],['Кадр','Frame'],['След','Trace'],['Голос','Voice'],['Наблюдатель','Observer'],['Архив','Archive'],['Импульс','Pulse'],['Сектор','Sector'],['Протокол','Protocol'],['Шум','Noise'],['Маркер','Marker'],['Экран','Screen'],['Код','Code'],['Вектор','Vector'],['Рубеж','Frontier'],['Коридор','Corridor'],['Объект','Subject'],['Канал','Channel'],['Узел','Node'],['Фрагмент','Fragment'],['Проводник','Guide'],['Архивист','Archivist'],['Оператор','Operator'],['Куратор','Curator'],['Регистр','Register'],['Сканер','Scanner'],['Странник','Wanderer'],['Хранитель','Keeper'],['Маяк','Beacon'],['Порог','Threshold'],['Отбор','Selection'],['Ключ','Key'],['Терминал','Terminal'],['Поток','Stream'],['Сводка','Briefing'],['Вход','Entry'],['Выход','Exit'],['Разрыв','Rift']
+    ],
+    roles: [
+      ['Наблюдатель','Observer'],['Архивист','Archivist'],['Оператор','Operator'],['Свидетель','Witness'],['Куратор','Curator'],['Проводник','Guide'],['Гражданин','Citizen'],['Регистратор','Registrar'],['Инспектор','Inspector'],['Диспетчер','Dispatcher'],['Хранитель','Keeper'],['Сканер','Scanner'],['Следователь','Investigator'],['Пассажир','Passenger'],['Беглец','Runaway'],['Кандидат','Candidate'],['Резидент','Resident'],['Координатор','Coordinator'],['Контролёр','Controller'],['Аналитик','Analyst']
+    ],
+    worlds: [
+      ['Сектор','Sector'],['Архив','Archive'],['Протокол','Protocol'],['Контур','Contour'],['Система','System'],['Секция','Section'],['Регистр','Register'],['Канал','Channel'],['Узел','Node'],['Индекс','Index'],['Запись','Record'],['Маркер','Marker'],['Сигнал','Signal'],['Профиль','Profile'],['Предел','Limit'],['Шлюз','Gateway'],['Резерв','Reserve'],['Эфир','Broadcast'],['Периметр','Perimeter'],['Коридор','Corridor']
+    ],
+    images: [
+      ['Тени','of Shadow'],['Света','of Light'],['Шума','of Noise'],['Памяти','of Memory'],['Севера','of the North'],['Пепла','of Ash'],['Эфира','of Static'],['Сна','of Sleep'],['Пустоты','of the Void'],['Голоса','of Voices'],['Дождя','of Rain'],['Кадра','of the Frame'],['Сигнала','of Signal'],['Ночи','of Night'],['Стекла','of Glass'],['Бетона','of Concrete'],['Пульса','of Pulse'],['Следа','of Traces'],['Тишины','of Silence'],['Города','of the City']
+    ],
+    phrases: [
+      ['Тот, Кто Ждёт','The One Who Waits'],['Лицо Без Архива','Face Without an Archive'],['Голос Из Сектора','Voice from the Sector'],['Человек Из Записи','Person from the Record'],['Тень За Экраном','Shadow Behind the Screen'],['Свидетель Без Номера','Witness Without a Number'],['Тот, Кто Помнит','The One Who Remembers'],['Последний В Очереди','Last in the Line'],['За Пределом Секции','Beyond the Section'],['Вне Зоны Контроля','Outside Control'],['Не Внесён В Реестр','Not in the Register'],['Сигнал Не Принят','Signal Not Received'],['Запись Не Найдена','Record Not Found'],['За Закрытой Дверью','Behind the Sealed Door'],['Из Другого Сектора','From Another Sector'],['Тот, Кто Остался','The One Who Stayed'],['Никем Не Учтён','Unaccounted For'],['Вне Списка','Outside the List'],['Пока Система Спит','While the System Sleeps'],['Неизвестный В Кадре','Unknown in Frame']
+    ]
   };
 
-
   class ApiError extends Error {
-    constructor(message, status = 0, payload = null) {
-      super(message);
-      this.name = 'ApiError';
-      this.status = status;
-      this.payload = payload;
+    constructor(message, status = 0, code = 'API_ERROR', payload = null) {
+      super(message); this.name = 'ApiError'; this.status = status; this.code = code; this.payload = payload;
     }
   }
 
-  function normalizeSession(raw) {
-    if (!raw || typeof raw !== 'object') return null;
-    const session = raw.session && raw.session.access_token ? raw.session : raw;
-    if (!session.access_token || !session.refresh_token) return null;
-    if (!session.expires_at && session.expires_in) {
-      session.expires_at = Math.floor(Date.now() / 1000) + Number(session.expires_in);
-    }
-    return session;
-  }
-
-  function loadStoredSession() {
-    if (memorySession?.access_token) return memorySession;
-    const raw = safeStorage.get(SESSION_KEY);
-    if (!raw) return null;
-    try { return normalizeSession(JSON.parse(raw)); }
-    catch { return null; }
-  }
-
-  function storeSession(session) {
-    const normalized = normalizeSession(session);
-    if (!normalized) return null;
-    memorySession = normalized;
-    safeStorage.set(SESSION_KEY, JSON.stringify(normalized));
-    return normalized;
-  }
-
-  function clearSession() {
-    memorySession = null;
-    safeStorage.del(SESSION_KEY);
-    state.user = null;
-  }
-
-  async function withAuthLock(task) {
-    if (navigator.locks?.request) return navigator.locks.request(AUTH_LOCK_NAME, task);
-    return task();
-  }
-
-  function jwtExpiry(token) {
-    try {
-      const payload = token.split('.')[1];
-      if (!payload) return 0;
-      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-      const padded = base64 + '='.repeat((4 - base64.length % 4) % 4);
-      return Number(JSON.parse(atob(padded)).exp || 0);
-    } catch { return 0; }
-  }
-
-  function isSessionFresh(session) {
-    if (!session?.access_token) return false;
-    const exp = Number(session.expires_at || jwtExpiry(session.access_token) || 0);
-    return exp === 0 || exp > Math.floor(Date.now() / 1000) + 90;
-  }
-
-  async function fetchJson(url, options = {}, timeout = REQUEST_TIMEOUT) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeout);
-    try {
-      const response = await fetch(url, { ...options, signal: controller.signal, cache: 'no-store' });
-      const text = await response.text();
-      let payload = null;
-      if (text) {
-        try { payload = JSON.parse(text); }
-        catch { payload = text; }
-      }
-      if (!response.ok) {
-        const message = payload?.message || payload?.msg || payload?.error_description || payload?.error || `HTTP ${response.status}`;
-        throw new ApiError(String(message), response.status, payload);
-      }
-      return payload;
-    } catch (error) {
-      if (error?.name === 'AbortError') throw new ApiError('Request timed out', 408);
-      throw error;
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-
-  async function signInAnonymously() {
-    if (signInPromise) return signInPromise;
-    signInPromise = withAuthLock(async () => {
-      // Another tab may have created the browser identity while this tab waited.
-      const existing = loadStoredSession();
-      if (existing && isSessionFresh(existing)) {
-        state.user = existing.user || state.user;
-        return existing;
-      }
-      const session = await fetchJson(`${SUPABASE_URL}/auth/v1/signup`, {
-        method: 'POST',
-        headers: {
-          apikey: SUPABASE_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ data: {} })
-      }, AUTH_TIMEOUT);
-      const stored = storeSession(session);
-      if (!stored?.user?.id) throw new ApiError('Anonymous session was not returned');
-      state.user = stored.user;
-      return stored;
-    });
-    try { return await signInPromise; }
-    finally { signInPromise = null; }
-  }
-
-  async function refreshAuthSession(session) {
-    if (!session?.refresh_token) throw new ApiError('Refresh token is unavailable', 401);
-    if (refreshPromise) return refreshPromise;
-    refreshPromise = withAuthLock(async () => {
-      const latest = loadStoredSession();
-      // A second tab may already have rotated the token while we were waiting.
-      if (latest && latest.refresh_token !== session.refresh_token && isSessionFresh(latest)) {
-        state.user = latest.user || state.user;
-        return latest;
-      }
-      const source = latest?.refresh_token ? latest : session;
-      const refreshed = await fetchJson(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
-        method: 'POST',
-        headers: {
-          apikey: SUPABASE_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ refresh_token: source.refresh_token })
-      }, AUTH_TIMEOUT);
-      const stored = storeSession(refreshed);
-      if (!stored?.access_token) throw new ApiError('Session refresh failed');
-      state.user = stored.user || source.user || null;
-      return stored;
-    });
-    try { return await refreshPromise; }
-    finally { refreshPromise = null; }
-  }
-
-  async function getAuthSession({ create = false } = {}) {
-    let session = loadStoredSession();
-    if (session && isSessionFresh(session)) {
-      state.user = session.user || state.user;
-      return session;
-    }
-    if (session?.refresh_token) {
-      try {
-        return await refreshAuthSession(session);
-      } catch (error) {
-        // A definitely invalid refresh token cannot recover. Network timeouts are
-        // intentionally not converted into a new identity because that could orphan
-        // a real user's existing review.
-        if (error instanceof ApiError && [400, 401, 403].includes(error.status)) {
-          clearSession();
-          session = null;
-        } else {
-          throw error;
-        }
-      }
-    }
-    if (!create) return null;
-    return signInAnonymously();
-  }
-
-  function restHeaders(token, hasBody = false) {
-    const headers = {
-      apikey: SUPABASE_KEY,
-      Accept: 'application/json'
-    };
-    // New sb_publishable_* keys belong only in `apikey`. Authorization is added
-    // exclusively for a real Supabase Auth user JWT.
-    if (token) headers.Authorization = `Bearer ${token}`;
-    if (hasBody) headers['Content-Type'] = 'application/json';
-    return headers;
-  }
-
-  async function restRequest(resource, { method = 'GET', body = null, authenticated = false } = {}) {
-    let session = null;
-    if (authenticated) {
-      session = await getAuthSession({ create: true });
-      state.user = session.user || state.user;
-    }
-
-    const timeout = authenticated || method !== 'GET' ? WRITE_TIMEOUT : REQUEST_TIMEOUT;
-    const send = token => fetchJson(`${SUPABASE_URL}/rest/v1/${resource}`, {
-      method,
-      headers: restHeaders(token, body !== null),
-      body: body === null ? undefined : JSON.stringify(body)
-    }, timeout);
-
-    try {
-      return await send(authenticated ? session?.access_token : null);
-    } catch (error) {
-      // One safe retry covers the narrow race where a JWT expires between the
-      // freshness check and PostgREST receiving the request.
-      if (!authenticated || !(error instanceof ApiError) || error.status !== 401) throw error;
-      const current = loadStoredSession();
-      if (!current?.refresh_token) throw error;
-      const refreshed = await refreshAuthSession(current);
-      return send(refreshed.access_token);
-    }
-  }
-
-  async function readMyProfile() {
-    if (!state.user?.id) return null;
-    const uid = encodeURIComponent(state.user.id);
-    const rows = await restRequest(`profiles?select=id,display_name,avatar_seed,avatar_style&id=eq.${uid}`, { authenticated: true });
-    return Array.isArray(rows) ? (rows[0] || null) : null;
-  }
-
-  async function readMyReview() {
-    if (!state.user?.id) return null;
-    const uid = encodeURIComponent(state.user.id);
-    const rows = await restRequest(`reviews?select=id,user_id,rating,review_text,created_at,updated_at&user_id=eq.${uid}`, { authenticated: true });
-    return Array.isArray(rows) ? (rows[0] || null) : null;
-  }
-
-  async function createMyProfile(profile) {
-    if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
-    const payload = {
-      id: state.user.id,
-      display_name: profile.display_name,
-      avatar_seed: Number(profile.avatar_seed),
-      avatar_style: Number(profile.avatar_style)
-    };
-    try {
-      await restRequest('profiles', { method: 'POST', body: payload, authenticated: true });
-      return payload;
-    } catch (error) {
-      // A 409 means this identity already has a profile. Read the existing row
-      // instead of racing another INSERT.
-      if (!(error instanceof ApiError) || error.status !== 409) throw error;
-      const stored = await readMyProfile();
-      if (!stored?.id) throw error;
-      return stored;
-    }
-  }
-
-  async function updateMyProfileDirect(patch) {
-    if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
-    const uid = encodeURIComponent(state.user.id);
-    await restRequest(`profiles?id=eq.${uid}`, { method: 'PATCH', body: patch, authenticated: true });
-    // Do not immediately issue a verification GET. On some browser/network paths the
-    // preflight for the follow-up read is the part that stalls even though the write succeeded.
-    return { ...(state.profile || {}), ...patch, id: state.user.id };
-  }
-
-  async function saveMyReviewDirect(rating, reviewText) {
-    if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
-    const uid = encodeURIComponent(state.user.id);
-    const payload = { rating: Number(rating), review_text: reviewText || '' };
-    const existing = state.ownReview;
-
-    // P12 deliberately performs ONE write first. P11 made a redundant authenticated
-    // GET before the write and another one afterwards; on the affected browser that
-    // preflight could stall, so the actual POST/PATCH was never sent.
-    if (existing?.id) {
-      await restRequest(`reviews?user_id=eq.${uid}`, { method: 'PATCH', body: payload, authenticated: true });
-    } else {
-      try {
-        await restRequest('reviews', {
-          method: 'POST',
-          body: { user_id: state.user.id, ...payload },
-          authenticated: true
-        });
-      } catch (error) {
-        // If the browser state is stale and the row already exists, fall back to update.
-        if (!(error instanceof ApiError) || error.status !== 409) throw error;
-        await restRequest(`reviews?user_id=eq.${uid}`, { method: 'PATCH', body: payload, authenticated: true });
-      }
-    }
-
-    const now = new Date().toISOString();
-    return {
-      ...(existing || {}),
-      id: existing?.id || `local-${state.user.id}`,
-      user_id: state.user.id,
-      rating: Number(rating),
-      review_text: reviewText || '',
-      created_at: existing?.created_at || now,
-      updated_at: now
-    };
-  }
-
-  async function deleteMyReviewDirect() {
-    if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
-    const uid = encodeURIComponent(state.user.id);
-    await restRequest(`reviews?user_id=eq.${uid}`, { method: 'DELETE', authenticated: true });
-    return true;
+  const diag = window.__THEFT_DIAG__ = window.__THEFT_DIAG__ || { revision: CLIENT_REVISION, events: [] };
+  function trace(code, detail = '') {
+    diag.events.push({ t: Date.now(), code, detail: String(detail).slice(0,180) });
+    if (diag.events.length > 40) diag.events.shift();
   }
 
   function randomInt(max) {
-    if (window.crypto?.getRandomValues) {
-      const values = new Uint32Array(1);
-      window.crypto.getRandomValues(values);
-      return values[0] % max;
-    }
+    if (crypto?.getRandomValues) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % max; }
     return Math.floor(Math.random() * max);
   }
+  const randomSeed = () => randomInt(2147483647);
+  const pair = (group, i, lang = state.lang) => (ALIAS[group]?.[i]?.[lang === 'ru' ? 0 : 1] || 'Unknown');
 
-  function randomSeed() {
-    return randomInt(2147483647);
+  function renderAlias(profile, lang = state.lang) {
+    if (!profile) return '—';
+    if (profile.is_official || profile.alias_code === 'official_team') return lang === 'ru' ? 'Команда фильма' : 'Film Team';
+    const code = String(profile.alias_code || '');
+    const n = Number(profile.alias_number ?? 0);
+    let m;
+    if ((m = code.match(/^an_(\d+)_(\d+)$/))) return `${pair('adjectives',+m[1],lang)} ${pair('nouns',+m[2],lang)}`;
+    if ((m = code.match(/^role_(\d+)$/))) return `${pair('roles',+m[1],lang)} // ${String(n).padStart(2,'0')}`;
+    if ((m = code.match(/^wi_(\d+)_(\d+)$/))) return `${pair('worlds',+m[1],lang)} ${pair('images',+m[2],lang)}`;
+    if ((m = code.match(/^phrase_(\d+)$/))) return pair('phrases',+m[1],lang);
+    if ((m = code.match(/^ar_(\d+)_(\d+)$/))) return `${pair('adjectives',+m[1],lang)} ${pair('roles',+m[2],lang)}`;
+    if ((m = code.match(/^world_(\d+)$/))) return `${pair('worlds',+m[1],lang)}-${String(n).padStart(3,'0')}`;
+    if ((m = code.match(/^noun_(\d+)$/))) return `${pair('nouns',+m[1],lang)} // ${String(n).padStart(3,'0')}`;
+    if (code === 'record') return lang === 'ru' ? `Запись ${String(Math.floor(n/100)).padStart(2,'0')}-${String(n%100).padStart(2,'0')}` : `Record ${String(Math.floor(n/100)).padStart(2,'0')}-${String(n%100).padStart(2,'0')}`;
+    if ((m = code.match(/^rw_(\d+)_(\d+)$/))) return `${pair('roles',+m[1],lang)} / ${pair('worlds',+m[2],lang)}`;
+    return profile.display_name || (lang === 'ru' ? 'Неизвестный профиль' : 'Unknown profile');
   }
 
-  function pick(array) {
-    return array[randomInt(array.length)];
-  }
-
-  function generateAlias(lang = state.lang) {
-    const d = NAME_DATA[lang] || NAME_DATA.ru;
-    const num2 = () => String(randomInt(99) + 1).padStart(2, '0');
-    const num3 = () => String(randomInt(999) + 1).padStart(3, '0');
-    const build = () => {
-      switch (randomInt(10)) {
-        case 0: return `${pick(d.adjectives)} ${pick(d.nouns)}`;
-        case 1: return `${pick(d.roles)} // ${num2()}`;
-        case 2: return `${pick(d.worlds)} ${pick(d.images)}`;
-        case 3: return pick(d.phrases);
-        case 4: return `${pick(d.adjectives)} ${pick(d.roles)}`;
-        case 5: return `${pick(d.worlds)}-${num3()}`;
-        case 6: return `${pick(d.nouns)} // ${num3()}`;
-        case 7: return lang === 'ru' ? `Запись ${num2()}-${num2()}` : `Record ${num2()}-${num2()}`;
-        case 8: return `${pick(d.roles)} / ${pick(d.worlds)}`;
-        default: return `${pick(d.worlds)}:${num3()}`;
-      }
-    };
-    for (let i = 0; i < 8; i += 1) {
-      const alias = build().replace(/\s+/g, ' ').trim();
-      if (alias.length >= 2 && alias.length <= 40) return alias;
-    }
-    return `${pick(d.nouns)} ${num3()}`.slice(0, 40);
-  }
-
-  function createPendingProfile() {
-    return {
-      display_name: generateAlias(state.lang),
-      avatar_seed: randomSeed(),
-      avatar_style: randomInt(3) + 1
-    };
-  }
-
-  function escapeAttr(value) {
-    return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
+  function generateAliasProfile() {
+    const type = randomInt(9);
+    let alias_code, alias_number = randomInt(1000);
+    if (type === 0) alias_code = `an_${randomInt(ALIAS.adjectives.length)}_${randomInt(ALIAS.nouns.length)}`;
+    else if (type === 1) alias_code = `role_${randomInt(ALIAS.roles.length)}`;
+    else if (type === 2) alias_code = `wi_${randomInt(ALIAS.worlds.length)}_${randomInt(ALIAS.images.length)}`;
+    else if (type === 3) alias_code = `phrase_${randomInt(ALIAS.phrases.length)}`;
+    else if (type === 4) alias_code = `ar_${randomInt(ALIAS.adjectives.length)}_${randomInt(ALIAS.roles.length)}`;
+    else if (type === 5) alias_code = `world_${randomInt(ALIAS.worlds.length)}`;
+    else if (type === 6) alias_code = `noun_${randomInt(ALIAS.nouns.length)}`;
+    else if (type === 7) { alias_code = 'record'; alias_number = randomInt(1000); }
+    else alias_code = `rw_${randomInt(ALIAS.roles.length)}_${randomInt(ALIAS.worlds.length)}`;
+    const p = { alias_code, alias_number, display_name:'', avatar_seed:randomSeed(), avatar_style:randomInt(6)+1, is_official:false };
+    p.display_name = renderAlias(p, state.lang).slice(0,40);
+    return p;
   }
 
   function avatarSvg(seed, style = 1, size = 72) {
     const n = Math.abs(Number(seed) || 1);
-    const accents = ['#9bc4c7','#74999b','#b5cdcf','#708b8d','#a96e69','#8aa8a7','#6f8789','#a3b8b9'];
-    const accent = accents[n % accents.length];
-    const accent2 = accents[(n * 7 + 3) % accents.length];
-    const code = String(n % 1000).padStart(3, '0');
-    const flip = n % 2 ? 1 : -1;
-    const dx = 1 + (n % 5);
-    const headX = 32 + ((n >> 3) % 5) - 2;
-    const headY = 23 + ((n >> 5) % 3) - 1;
-    const scanY = 16 + (n % 29);
-    const ring = 14 + (n % 7);
-    const glyphs = ['+','×','//','○','□','△'];
-    const glyph = glyphs[(n >> 4) % glyphs.length];
-    const bars = Array.from({ length: 7 }, (_, i) => {
-      const y = 8 + i * 8;
-      const width = 18 + ((n >> (i % 8)) % 39);
-      return `<path d="M4 ${y} H${Math.min(60, 4 + width)}" opacity="${0.025 + (i % 3) * 0.018}"/>`;
-    }).join('');
+    const s = Math.max(1, Math.min(6, Number(style) || 1));
+    // P14 uses six locally hosted cinematic portraits. The seed still changes
+    // the crop/scan treatment, so rerolls feel varied without external avatar
+    // services, user uploads or additional personal data.
+    const file = `assets/images/avatars/subject-${String(s).padStart(2,'0')}.webp`;
+    const shiftX = ((n % 9) - 4) * 0.32;
+    const shiftY = (((Math.floor(n / 11)) % 7) - 3) * 0.24;
+    const scale = 1.01 + (n % 5) * 0.008;
+    const scan = 18 + (n % 58);
+    return `<span class="avatar-image-wrap" style="width:${size}px;height:${size}px;--avatar-x:${shiftX}px;--avatar-y:${shiftY}px;--avatar-scale:${scale};--avatar-scan:${scan}%"><img class="avatar-image" src="${file}" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span>`;
+  }
 
-    let art = '';
-    if (Number(style) === 2) {
-      art = `
-        <circle cx="32" cy="32" r="${ring}" fill="none" stroke="${accent}" stroke-width="1" opacity=".58"/>
-        <circle cx="32" cy="32" r="${Math.max(7, ring-8)}" fill="none" stroke="${accent2}" stroke-width="1" opacity=".32"/>
-        <path d="M32 6V17M32 47V58M6 32H17M47 32H58" stroke="${accent}" opacity=".58"/>
-        <path d="M12 ${scanY}H52" stroke="${accent2}" opacity=".32"/>
-        <text x="32" y="35" text-anchor="middle" fill="${accent}" font-size="9" font-family="monospace" font-weight="700">${code}</text>
-        <text x="50" y="14" text-anchor="middle" fill="${accent2}" font-size="7" font-family="monospace" opacity=".7">${glyph}</text>`;
-    } else if (Number(style) === 3) {
-      art = `
-        <g transform="translate(${flip * dx} 0)" opacity=".2" fill="${accent2}">
-          <circle cx="${headX}" cy="${headY}" r="10"/><path d="M15 56c2-14 10-21 17-21s15 7 17 21z"/>
-        </g>
-        <circle cx="${headX}" cy="${headY}" r="10" fill="#111719" stroke="${accent}" stroke-width="1"/>
-        <path d="M15 56c2-14 10-21 17-21s15 7 17 21z" fill="#111719" stroke="${accent}" stroke-width="1"/>
-        <rect x="7" y="${scanY}" width="${22 + n%28}" height="2" fill="${accent}" opacity=".55"/>
-        <rect x="${18+n%12}" y="${Math.min(52,scanY+9)}" width="${20+n%22}" height="2" fill="${accent2}" opacity=".35"/>
-        <text x="9" y="54" fill="${accent}" font-size="6" font-family="monospace" opacity=".6">${code}</text>`;
-    } else {
-      const hood = 17 + (n % 4);
-      art = `
-        <circle cx="${headX}" cy="${headY}" r="9" fill="#0d1314" stroke="${accent}" stroke-width="1" opacity=".96"/>
-        <path d="M${hood} 56c2-15 9-22 15-22 9 0 16 7 18 22z" fill="#0e1415" stroke="${accent}" stroke-width="1"/>
-        <path d="M${headX-11} ${headY-1}c4-10 18-10 22 0-4-4-7-6-11-6-4 0-8 2-11 6z" fill="${accent}" opacity=".12"/>
-        <path d="M10 ${scanY}H54" stroke="${accent2}" opacity=".32"/>
-        <path d="M14 51h36" stroke="${accent2}" opacity=".2"/>
-        <text x="50" y="13" fill="${accent}" font-size="7" font-family="monospace" opacity=".65">${glyph}</text>`;
+
+  function normalizeSession(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const s = raw.session?.access_token ? raw.session : raw;
+    if (!s.access_token || !s.refresh_token) return null;
+    if (!s.expires_at && s.expires_in) s.expires_at = Math.floor(Date.now()/1000)+Number(s.expires_in);
+    return s;
+  }
+  function loadSession() {
+    if (state.session?.access_token) return state.session;
+    const raw=safeStorage.get(SESSION_KEY); if(!raw) return null;
+    try { state.session=normalizeSession(JSON.parse(raw)); return state.session; } catch { return null; }
+  }
+  function storeSession(s) { state.session=normalizeSession(s); if(state.session) safeStorage.set(SESSION_KEY,JSON.stringify(state.session)); return state.session; }
+  function jwtExp(token){ try{const p=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return Number(JSON.parse(atob(p+'='.repeat((4-p.length%4)%4))).exp||0);}catch{return 0;} }
+  function sessionFresh(s){ const exp=Number(s?.expires_at||jwtExp(s?.access_token||'')||0); return !!s?.access_token && (!exp || exp>Math.floor(Date.now()/1000)+90); }
+
+  let authPromise=null, refreshPromise=null, identityPromise=null;
+  const FALLBACK_LOCK_KEY=`${SESSION_KEY}-lease`;
+  const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  async function withAuthLock(fn) {
+    if(navigator.locks?.request) return navigator.locks.request(AUTH_LOCK_NAME,fn);
+    // Cross-tab fallback for browsers without Web Locks. It is a short lease,
+    // re-checked after writing, so a stale/closed tab cannot block Auth forever.
+    const token=`${Date.now()}-${randomInt(1_000_000)}`, deadline=Date.now()+6000;
+    while(Date.now()<deadline){
+      let lease=null;try{lease=JSON.parse(safeStorage.get(FALLBACK_LOCK_KEY)||'null')}catch{}
+      if(!lease||Number(lease.expires||0)<Date.now()){
+        safeStorage.set(FALLBACK_LOCK_KEY,JSON.stringify({token,expires:Date.now()+5000}));
+        let mine=null;try{mine=JSON.parse(safeStorage.get(FALLBACK_LOCK_KEY)||'null')}catch{}
+        if(mine?.token===token){
+          try{return await fn();}
+          finally{let current=null;try{current=JSON.parse(safeStorage.get(FALLBACK_LOCK_KEY)||'null')}catch{}if(current?.token===token)safeStorage.del(FALLBACK_LOCK_KEY);}
+        }
+      }
+      await sleep(45+randomInt(70));
     }
+    return fn();
+  }
 
-    return `<svg class="avatar-svg" width="${size}" height="${size}" viewBox="0 0 64 64" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-      <rect width="64" height="64" rx="9" fill="#080c0d"/>
-      <g stroke="${accent}" fill="none">${bars}</g>
-      <rect x=".5" y=".5" width="63" height="63" rx="8.5" fill="none" stroke="${accent}" opacity=".3"/>
-      ${art}
-      <path d="M5 8h9M5 8v9M59 56h-9M59 56v-9" stroke="${accent}" opacity=".42"/>
-    </svg>`;
+  async function fetchJson(url, options={}, timeout=REQUEST_TIMEOUT, label='HTTP') {
+    const ctl=new AbortController(), started=performance.now(); const timer=setTimeout(()=>ctl.abort(),timeout);
+    trace(`${label}:START`,new URL(url).pathname);
+    try {
+      const res=await fetch(url,{...options,signal:ctl.signal,cache:'no-store',credentials:'omit',mode:'cors'});
+      if(res.status===204){ trace(`${label}:OK`,`${res.status} ${Math.round(performance.now()-started)}ms`); return null; }
+      const text=await res.text(); let data=null;
+      if(text){ try{data=JSON.parse(text);}catch{data=text;} }
+      if(!res.ok){ const msg=data?.message||data?.msg||data?.error_description||data?.error||`HTTP ${res.status}`; throw new ApiError(String(msg),res.status,`${label}_${res.status}`,data); }
+      trace(`${label}:OK`,`${res.status} ${Math.round(performance.now()-started)}ms`); return data;
+    } catch(err) {
+      if(err?.name==='AbortError') err=new ApiError('Request timed out',408,`${label}_TIMEOUT`);
+      trace(`${label}:FAIL`,err.code||err.message); throw err;
+    } finally { clearTimeout(timer); }
+  }
+
+  function authHeaders(token, body=false) { const h={apikey:SUPABASE_KEY,Accept:'application/json'}; if(token) h.Authorization=`Bearer ${token}`; if(body) h['Content-Type']='application/json'; return h; }
+
+  async function signInAnonymous() {
+    if(authPromise) return authPromise;
+    authPromise=withAuthLock(async()=>{
+      const existing=loadSession(); if(existing&&sessionFresh(existing)) return existing;
+      const data=await fetchJson(`${SUPABASE_URL}/auth/v1/signup`,{method:'POST',headers:authHeaders(null,true),body:JSON.stringify({data:{}})},AUTH_TIMEOUT,'AUTH_SIGNUP');
+      const s=storeSession(data); if(!s?.user?.id) throw new ApiError('Anonymous session missing',0,'AUTH_NO_SESSION'); state.user=s.user; return s;
+    });
+    try{return await authPromise;}finally{authPromise=null;}
+  }
+
+  async function refreshSession(s) {
+    if(refreshPromise) return refreshPromise;
+    refreshPromise=withAuthLock(async()=>{
+      const current=loadSession()||s;
+      if(current!==s && sessionFresh(current)) return current;
+      const data=await fetchJson(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:authHeaders(null,true),body:JSON.stringify({refresh_token:current.refresh_token})},AUTH_TIMEOUT,'AUTH_REFRESH');
+      const fresh=storeSession(data); if(!fresh?.access_token) throw new ApiError('Refresh failed',0,'AUTH_REFRESH_EMPTY'); state.user=fresh.user||state.user; return fresh;
+    });
+    try{return await refreshPromise;}finally{refreshPromise=null;}
+  }
+
+  async function getSession(create=false) {
+    let s=loadSession();
+    if(s&&sessionFresh(s)){state.user=s.user||state.user;return s;}
+    if(s?.refresh_token){
+      try{return await refreshSession(s);}
+      catch(err){
+        // A definitively rejected refresh token cannot recover. Clear only on an
+        // explicit Auth rejection; timeouts/offline errors keep the identity so
+        // a temporary VPN/network problem never silently replaces the profile.
+        if(create && (err.status===400 || err.status===401)){
+          safeStorage.del(SESSION_KEY);state.session=null;state.user=null;
+          return signInAnonymous();
+        }
+        throw new ApiError(err.message,err.status||0,'SESSION_REFRESH_FAILED',err.payload);
+      }
+    }
+    return create ? signInAnonymous() : null;
+  }
+
+  async function rpcGet(name, params={}, authenticated=false) {
+    const s=authenticated?await getSession(true):null;
+    const q=new URLSearchParams(); Object.entries(params).forEach(([k,v])=>{if(v!==undefined&&v!==null)q.set(k,String(v));});
+    return fetchJson(`${SUPABASE_URL}/rest/v1/rpc/${name}${q.size?'?'+q:''}`,{method:'GET',headers:authHeaders(s?.access_token,false)},authenticated?WRITE_TIMEOUT:REQUEST_TIMEOUT,`RPC_${name}`);
+  }
+  async function rpcPost(name, body={}, authenticated=true) {
+    let s=authenticated?await getSession(true):null;
+    const send=token=>fetchJson(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{method:'POST',headers:authHeaders(token,true),body:JSON.stringify(body)},WRITE_TIMEOUT,`RPC_${name}`);
+    try{return await send(s?.access_token);}catch(err){
+      if(!authenticated||err.status!==401||!s?.refresh_token) throw err;
+      s=await refreshSession(s); return send(s.access_token);
+    }
+  }
+
+  function setServiceState(next, detail='') {
+    state.serviceState=next;
+    const badge=$('#reviewServiceBadge'); if(!badge) return;
+    badge.classList.remove('is-checking','is-online','is-offline'); badge.classList.add(`is-${next}`);
+    const span=$('span',badge); if(span){ const base=next==='online'?t('serviceOnline'):next==='offline'?t('serviceOffline'):t('serviceChecking'); span.textContent=`${base} · P14`; span.title=detail||CLIENT_REVISION; }
   }
 
   function pluralRatings(count) {
-    if (state.lang === 'en') return count === 1 ? t('ratingOne') : t('ratingMany');
-    const n = Math.abs(count) % 100;
-    const n1 = n % 10;
-    if (n > 10 && n < 20) return t('ratingMany');
-    if (n1 > 1 && n1 < 5) return t('ratingFew');
-    if (n1 === 1) return t('ratingOne');
-    return t('ratingMany');
+    if(state.lang==='en') return count===1?t('ratingOne'):t('ratingMany');
+    const n=Math.abs(count)%100,n1=n%10; if(n>10&&n<20)return t('ratingMany'); if(n1>1&&n1<5)return t('ratingFew'); if(n1===1)return t('ratingOne'); return t('ratingMany');
+  }
+  function freshnessCategory(v){ if(v==null)return t('insufficient'); if(v<40)return t('freshnessCold'); if(v<60)return t('freshnessMixed'); if(v<80)return t('freshnessFresh'); if(v<90)return t('freshnessVeryFresh'); return t('freshnessChoice'); }
+
+  function updateStatsUI(data) {
+    const total=Number(data?.total_ratings||0), avg=data?.average_rating==null?'—':Number(data.average_rating).toFixed(1), freshness=data?.freshness==null?null:Number(data.freshness);
+    state.lastStats={total_ratings:total,average_rating:data?.average_rating,freshness};
+    $$('[data-stat="average"]').forEach(el=>el.textContent=avg);
+    $$('[data-stat="count"]').forEach(el=>el.textContent=`${total} ${pluralRatings(total)}`);
+    $$('[data-stat="freshness"]').forEach(el=>el.textContent=freshness==null?'—':`${freshness}%`);
+    $$('[data-stat="freshness-label"]').forEach(el=>el.textContent=freshnessCategory(freshness));
+    const ring=$('#freshnessRing'); if(ring){ring.style.setProperty('--freshness',freshness??0);ring.classList.toggle('is-pending',freshness==null);}
+    const fv=$('#freshnessValue'); if(fv)fv.textContent=freshness==null?'—':`${freshness}%`;
+    const fs=$('#freshnessState'); if(fs)fs.textContent=freshnessCategory(freshness);
+    const ar=$('#averageRating'); if(ar)ar.textContent=avg;
+    const rc=$('#ratingsCount'); if(rc)rc.textContent=`${total} ${pluralRatings(total)}`;
   }
 
-  function freshnessCategory(value) {
-    if (value == null) return t('insufficient');
-    if (value < 40) return t('freshnessCold');
-    if (value < 60) return t('freshnessMixed');
-    if (value < 80) return t('freshnessFresh');
-    if (value < 90) return t('freshnessVeryFresh');
-    return t('freshnessChoice');
+  async function refreshStats(){ try{const data=await rpcGet('get_public_stats_v2');updateStatsUI(data||{});setServiceState('online');}catch(err){console.error('[P14/stats]',err);setServiceState('offline',err.code);}}
+
+  function applyTranslations(){
+    document.documentElement.lang=state.lang;
+    const communityPage=document.body?.classList.contains('community-page');
+    document.title=t(communityPage?'reviewsMetaTitle':'metaTitle');
+    const md=$('meta[name="description"]'); if(md)md.content=t(communityPage?'reviewsMetaDescription':'metaDescription');
+    $$('[data-i18n]').forEach(el=>{const v=t(el.dataset.i18n); if(v!=null)el.textContent=v;});
+    $$('[data-i18n-placeholder]').forEach(el=>el.setAttribute('placeholder',t(el.dataset.i18nPlaceholder)));
+    $$('[data-i18n-aria]').forEach(el=>el.setAttribute('aria-label',t(el.dataset.i18nAria)));
+    $$('[data-i18n-alt]').forEach(el=>el.setAttribute('alt',t(el.dataset.i18nAlt)));
+    $$('[data-platform-ru]').forEach(el=>{const name=state.lang==='ru'?el.dataset.platformRu:el.dataset.platformEn;el.textContent=`${name} · ${t('soon')}`;});
+    const toggle=$('#langToggle'); if(toggle)toggle.textContent=t('langButton');
+    updateStatsUI(state.lastStats);
+    renderProfile();
+    if($('#reviewsList')) renderReviews(state.reviews);
+    const rating=state.selectedRating; if(rating!=null) updateRatingLabel();
   }
+  function setLanguage(lang){if(!I18N[lang])return;state.lang=lang;safeStorage.set('theft_lang',lang);if(!state.profile&&state.pendingProfile)state.pendingProfile.display_name=renderAlias(state.pendingProfile,lang).slice(0,40);applyTranslations();}
 
-  function setServiceState(next) {
-    state.serviceState = next;
-    const badge = $('#reviewServiceBadge');
-    if (!badge) return;
-    badge.classList.remove('is-checking','is-online','is-offline');
-    badge.classList.add(`is-${next}`);
-    const label = $('span', badge);
-    if (label) {
-      const base = next === 'online' ? t('serviceOnline') : next === 'offline' ? t('serviceOffline') : t('serviceChecking');
-      label.textContent = `${base} · P13`;
-      label.title = CLIENT_REVISION;
-    }
+  function profileForWrite() {
+    const p={...(state.profile||state.pendingProfile||generateAliasProfile())};
+    p.display_name=renderAlias(p,state.lang).slice(0,40); return p;
   }
+  function renderProfile(){ const p=state.profile||state.pendingProfile||(state.pendingProfile=generateAliasProfile()); const av=$('#profileAvatar'),name=$('#profileName'); if(av)av.innerHTML=avatarSvg(p.avatar_seed,p.avatar_style,76); if(name)name.textContent=renderAlias(p,state.lang); }
 
-  function animateFreshness(value) {
-    const el = $('#freshnessValue');
-    if (!el) return;
-    if (value == null) { el.textContent = '—'; return; }
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    const from = Number.isFinite(state.lastFreshness) ? state.lastFreshness : 0;
-    if (reduced || from === value) { el.textContent = `${value}%`; return; }
-    const start = performance.now();
-    const duration = 650;
-    const tick = now => {
-      const p = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = `${Math.round(from + (value - from) * eased)}%`;
-      if (p < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }
-
-  function applyTranslations() {
-    document.documentElement.lang = state.lang;
-    document.title = t('metaTitle');
-    const desc = $('meta[name="description"]');
-    if (desc) desc.setAttribute('content', t('metaDescription'));
-
-    $$('[data-i18n]').forEach(el => {
-      const key = el.dataset.i18n;
-      if (I18N[state.lang]?.[key] !== undefined) el.textContent = t(key);
-    });
-    $$('[data-i18n-placeholder]').forEach(el => el.setAttribute('placeholder', t(el.dataset.i18nPlaceholder)));
-    $$('[data-i18n-alt]').forEach(el => el.setAttribute('alt', t(el.dataset.i18nAlt))); 
-    $$('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
-
-    const langButton = $('#langToggle');
-    if (langButton) {
-      langButton.textContent = t('langButton');
-      langButton.setAttribute('aria-label', state.lang === 'ru' ? 'Switch to English' : 'Переключить на русский');
-      langButton.title = state.lang === 'ru' ? 'English' : 'Русский';
-    }
-
-    $$('.platform').forEach(el => {
-      const name = state.lang === 'en' ? el.dataset.platformEn : el.dataset.platformRu;
-      if (name) el.textContent = `${name} · ${t('soon')}`;
-    });
-
-    updateRatingLabel();
-    updateComposerUI();
-    setServiceState(state.serviceState);
-    const freshState = $('#freshnessState');
-    if (freshState) freshState.textContent = freshnessCategory(state.lastFreshness);
-    if (dataLayerStarted) { refreshStats(); loadReviews(state.sort); }
-  }
-
-  function setLanguage(lang) {
-    if (!I18N[lang]) return;
-    state.lang = lang;
-    safeStorage.set('theft_lang', lang);
-    if (!state.user && state.pendingProfile) state.pendingProfile.display_name = generateAlias(lang);
-    applyTranslations();
-    renderProfilePreview();
-  }
-
-  function setStatus(message, kind = '') {
-    const el = $('#reviewStatus');
-    if (!el) return;
-    el.textContent = message || '';
-    el.className = `review-status${kind ? ` ${kind}` : ''}`;
-  }
-
-  function renderProfilePreview() {
-    const p = state.profile || state.pendingProfile || (state.pendingProfile = createPendingProfile());
-    const avatar = $('#profileAvatar');
-    const name = $('#profileName');
-    if (avatar) avatar.innerHTML = avatarSvg(p.avatar_seed, p.avatar_style, 76);
-    if (name) name.textContent = p.display_name;
-  }
-
-  async function ensureUserAndProfile() {
-    // If this tab already restored both the session and profile, do not block a write
-    // behind another authenticated read.
-    if (state.user?.id && state.profile?.id) return state.profile;
-    if (identityPromise) return identityPromise;
-    identityPromise = (async () => {
-      const session = await getAuthSession({ create: true });
-      state.user = session.user;
-      if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
-
-      const p = state.profile || state.pendingProfile || createPendingProfile();
-      let profile = await readMyProfile();
-      if (!profile?.id) profile = await createMyProfile(p);
-      state.profile = profile;
-      state.pendingProfile = null;
-      setServiceState('online');
-      renderProfilePreview();
-      return profile;
+  async function ensureIdentityProfile(){
+    if(state.profile?.id)return state.profile;
+    if(identityPromise)return identityPromise;
+    identityPromise=(async()=>{
+      const s=await getSession(true); state.user=s.user;
+      const p=profileForWrite();
+      const saved=await rpcPost('update_my_profile_v4',{p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style});
+      state.profile=saved;state.pendingProfile=null;renderProfile();return saved;
     })();
-
-    try { return await identityPromise; }
-    finally { identityPromise = null; }
+    try{return await identityPromise;}finally{identityPromise=null;}
   }
 
-  async function loadExistingSession() {
-    const session = await getAuthSession({ create: false });
-    if (!session?.user?.id) return;
-    state.user = session.user;
-
-    // P10-P12 launched profile/review reads in parallel. If the access token needed
-    // refreshing, both branches could rotate the same refresh token at once. The API
-    // logs showed duplicate OPTIONS /auth/v1/token calls and no following write.
-    // Keep identity restoration deliberately sequential and boring.
-    const profile = await readMyProfile();
-    if (profile?.id) state.profile = profile;
-
-    const review = await readMyReview();
-    if (review?.id) {
-      state.ownReview = review;
-      state.selectedRating = Number(review.rating);
-      const textarea = $('#reviewText');
-      if (textarea) textarea.value = review.review_text || '';
+  async function restoreOwnState(){
+    const s=await getSession(false); if(!s?.user?.id)return; state.user=s.user;
+    const data=await rpcGet('get_my_community_state_v2',{},true);
+    state.profile=data?.profile||null;state.ownReview=data?.review||null;state.ownLikes=new Set(data?.likes||[]);state.ownReplies=new Map((data?.replies||[]).map(r=>[r.review_id,r]));
+    if(state.profile&&!state.profile.alias_code){
+      const source=String(state.profile.id||state.user?.id||'legacy');let h=2166136261;for(const ch of source){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)>>>0;}
+      state.profile.alias_code=`an_${h%ALIAS.adjectives.length}_${Math.floor(h/31)%ALIAS.nouns.length}`;state.profile.alias_number=h%1000;state.profile.display_name=renderAlias(state.profile,state.lang).slice(0,40);
     }
-    renderProfilePreview();
-    updateComposerUI();
-    updateRatingLabel();
-    updateCounter();
+    if(state.profile)state.pendingProfile=null;
+    if(state.ownReview){state.selectedRating=Number(state.ownReview.rating);const ta=$('#reviewText');if(ta)ta.value=state.ownReview.review_text||'';}
+    renderProfile();updateRatingLabel();updateCounter();updateComposerUI();
   }
 
-  function updateComposerUI() {
-    const submit = $('#submitReview');
-    const del = $('#deleteReview');
-    if (submit) submit.textContent = state.ownReview ? t('updateReview') : t('publish');
-    if (del) del.hidden = !state.ownReview;
-    renderProfilePreview();
+  let profileMutation=false;
+  async function rerollName(){
+    if(state.busy||profileMutation)return;
+    const fresh=generateAliasProfile(), base=state.profile||state.pendingProfile||generateAliasProfile();
+    const p={...base,alias_code:fresh.alias_code,alias_number:fresh.alias_number};p.display_name=renderAlias(p,state.lang).slice(0,40);
+    if(!state.user&&!loadSession()){state.pendingProfile=p;renderProfile();return;}
+    profileMutation=true;setProfileBusy(true);
+    try{await getSession(true);const saved=await rpcPost('update_my_profile_v4',{p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style});state.profile=saved;state.pendingProfile=null;renderProfile();}
+    catch(err){console.error('[P14/profile/name]',err);setStatus(`${t('profileError')} [${err.code||'PROFILE'}]`,'error');}
+    finally{profileMutation=false;setProfileBusy(false);}
+  }
+  async function rerollAvatar(){
+    if(state.busy||profileMutation)return;
+    const base={...(state.profile||state.pendingProfile||generateAliasProfile())};base.avatar_seed=randomSeed();base.avatar_style=randomInt(6)+1;base.display_name=renderAlias(base,state.lang).slice(0,40);
+    if(!state.user&&!loadSession()){state.pendingProfile=base;renderProfile();return;}
+    profileMutation=true;setProfileBusy(true);
+    try{await getSession(true);const saved=await rpcPost('update_my_profile_v4',{p_display_name:base.display_name,p_alias_code:base.alias_code,p_alias_number:base.alias_number,p_avatar_seed:base.avatar_seed,p_avatar_style:base.avatar_style});state.profile=saved;state.pendingProfile=null;renderProfile();}
+    catch(err){console.error('[P14/profile/avatar]',err);setStatus(`${t('profileError')} [${err.code||'PROFILE'}]`,'error');}
+    finally{profileMutation=false;setProfileBusy(false);}
   }
 
-  function updateRatingLabel() {
-    $$('.rating-button').forEach(button => {
-      button.classList.toggle('selected', Number(button.dataset.rating) === state.selectedRating);
-      button.setAttribute('aria-pressed', Number(button.dataset.rating) === state.selectedRating ? 'true' : 'false');
-    });
-    const value = $('#selectedRatingValue');
-    const word = $('#selectedRatingWord');
-    if (!value || !word) return;
-    if (state.selectedRating === null) {
-      value.textContent = '— / 10';
-      word.textContent = t('ratingPrompt');
-    } else {
-      value.textContent = `${state.selectedRating} / 10`;
-      word.textContent = t('scoreWords')[state.selectedRating];
-    }
+  function setProfileBusy(on){['#rerollName','#rerollAvatar'].forEach(s=>{const e=$(s);if(e)e.disabled=on;});}
+  function setComposerBusy(on){$$('.rating-button').forEach(b=>b.disabled=on);const ta=$('#reviewText');if(ta)ta.disabled=on;const sb=$('#submitReview');if(sb)sb.disabled=on;const db=$('#deleteReview');if(db)db.disabled=on;setProfileBusy(on);}
+  function setStatus(msg,kind=''){const e=$('#reviewStatus');if(!e)return;e.textContent=msg||'';e.className=`review-status${kind?' '+kind:''}`;}
+  function updateCounter(){const ta=$('#reviewText'),c=$('#reviewCounter');if(ta&&c)c.textContent=`${ta.value.length} / 2000`;}
+  function updateRatingLabel(){const v=$('#selectedRatingValue'),w=$('#selectedRatingWord');if(state.selectedRating==null){if(v)v.textContent='— / 10';if(w)w.textContent=t('ratingPrompt');return;}if(v)v.textContent=`${state.selectedRating} / 10`;if(w)w.textContent=t('scoreWords')[state.selectedRating]||'';$$('.rating-button').forEach(b=>{const active=Number(b.dataset.rating)===state.selectedRating;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
+  function selectRating(v){if(state.busy)return;state.selectedRating=Number(v);updateRatingLabel();}
+  function updateComposerUI(){const b=$('#submitReview'),d=$('#deleteReview');if(b)b.textContent=state.ownReview?t('updateReview'):t('publish');if(d)d.hidden=!state.ownReview;}
+
+  async function submitReview(){
+    if(state.busy||profileMutation)return;
+    if(state.selectedRating==null){setStatus(t('chooseRating'),'error');return;}
+    const rating=Number(state.selectedRating), text=($('#reviewText')?.value||'').trim(), p=profileForWrite(), existed=!!state.ownReview;
+    state.busy=true;setComposerBusy(true);setStatus(t('saving'));
+    try{
+      const s=await getSession(true);state.user=s.user;
+      // Critical P14 change: profile + review are one server transaction and one
+      // browser write. No POST /profiles -> empty 201 -> next request chain.
+      const data=await rpcPost('submit_my_review_v4',{p_rating:rating,p_review_text:text,p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style});
+      state.profile=data.profile;state.pendingProfile=null;state.ownReview=data.review;state.selectedRating=Number(data.review.rating);renderProfile();updateComposerUI();updateRatingLabel();setStatus(existed?t('updated'):t('saved'),'success');
+      await Promise.allSettled([refreshStats(),loadReviews(state.sort)]);
+    }catch(err){console.error('[P14/review/save]',err,diag.events);setStatus(`${t('saveError')} [${err.code||'SAVE'}]`,'error');setServiceState('offline',err.code);}
+    finally{state.busy=false;setComposerBusy(false);}
   }
 
-  function setComposerBusy(busy) {
-    const controls = [
-      $('#submitReview'), $('#deleteReview'), $('#rerollName'), $('#rerollAvatar'), $('#reviewText'),
-      ...$$('.rating-button')
-    ].filter(Boolean);
-    controls.forEach(control => { control.disabled = Boolean(busy); });
+  async function deleteReview(){if(!state.ownReview||state.busy)return;if(!confirm(t('confirmDelete')))return;state.busy=true;setComposerBusy(true);try{await rpcPost('delete_my_review_v4',{});state.ownReview=null;state.selectedRating=null;const ta=$('#reviewText');if(ta)ta.value='';updateCounter();updateRatingLabel();updateComposerUI();setStatus(t('deleted'),'success');await Promise.allSettled([refreshStats(),loadReviews(state.sort)]);}catch(err){setStatus(`${t('deleteError')} [${err.code||'DELETE'}]`,'error');}finally{state.busy=false;setComposerBusy(false);}}
+
+  function formatDate(v){if(!v)return'';return new Intl.DateTimeFormat(state.lang==='ru'?'ru-RU':'en-US',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(v));}
+
+  async function loadReviews(sort=state.sort,filter=state.filter){
+    if(!$('#reviewsList'))return;
+    const seq=++state.feedSeq;state.sort=sort;state.filter=filter;$$('.review-sort-button').forEach(b=>b.classList.toggle('active',b.dataset.sort===sort));$$('.review-filter-button').forEach(b=>b.classList.toggle('active',b.dataset.filter===filter));
+    try{const rows=await rpcGet('get_public_reviews_v3',{p_sort:sort,p_filter:filter,p_limit:40,p_offset:0});if(seq!==state.feedSeq)return;state.reviews=Array.isArray(rows)?rows:[];renderReviews(state.reviews);setServiceState('online');}
+    catch(err){if(seq!==state.feedSeq)return;console.error('[P14/feed]',err);setServiceState('offline',err.code);const l=$('#reviewsList');if(l)l.replaceChildren(Object.assign(document.createElement('div'),{className:'reviews-empty',textContent:t('loadError')}));}
   }
 
-  async function persistProfilePatch(patch, button) {
-    if (state.busy || profileMutationBusy) return;
-    profileMutationBusy = true;
-    const before = state.profile ? { ...state.profile } : null;
-    setComposerBusy(true);
-    try {
-      await ensureUserAndProfile();
-      const cleanPatch = {};
-      if (Object.prototype.hasOwnProperty.call(patch, 'display_name')) cleanPatch.display_name = patch.display_name;
-      if (Object.prototype.hasOwnProperty.call(patch, 'avatar_seed')) cleanPatch.avatar_seed = Number(patch.avatar_seed);
-      if (Object.prototype.hasOwnProperty.call(patch, 'avatar_style')) cleanPatch.avatar_style = Number(patch.avatar_style);
-      const profile = await updateMyProfileDirect(cleanPatch);
-      state.profile = profile;
-      state.pendingProfile = null;
-      renderProfilePreview();
-      setStatus('');
-      if (state.ownReview) loadReviews(state.sort);
-    } catch (error) {
-      console.error('[reviews/profile]', error);
-      if (before) state.profile = before;
-      renderProfilePreview();
-      setStatus(t('profileError'), 'error');
-    } finally {
-      profileMutationBusy = false;
-      setComposerBusy(false);
-    }
+  function renderReviews(rows){
+    const list=$('#reviewsList');if(!list)return;
+    if(!rows.length){list.replaceChildren(Object.assign(document.createElement('div'),{className:'reviews-empty',textContent:t('reviewsEmpty')}));return;}
+    const frag=document.createDocumentFragment();rows.forEach(r=>frag.append(renderReviewCard(r)));list.replaceChildren(frag);
+    state.openReplies.forEach(id=>{const c=list.querySelector(`[data-review-id="${CSS.escape(id)}"] .review-replies`);if(c)loadReplies(id,c);});
   }
 
-  async function rerollName() {
-    if (state.busy || profileMutationBusy) return;
-    const button = $('#rerollName');
-    const newName = generateAlias(state.lang);
-    if (!state.user) {
-      state.pendingProfile = state.pendingProfile || createPendingProfile();
-      state.pendingProfile.display_name = newName;
-      renderProfilePreview();
-      return;
-    }
-    await persistProfilePatch({ display_name: newName }, button);
+  function renderReviewCard(r){
+    const card=document.createElement('article');card.className='review-card';card.dataset.reviewId=r.id;if(state.ownReview?.id===r.id)card.classList.add('is-own');if(r.is_pinned)card.classList.add('is-pinned');
+    const top=document.createElement('div');top.className='review-card-top';const identity=document.createElement('div');identity.className='review-identity';const av=document.createElement('div');av.className='review-avatar';av.innerHTML=avatarSvg(r.avatar_seed,r.avatar_style,54);const txt=document.createElement('div');const name=document.createElement('strong');name.textContent=renderAlias(r,state.lang);txt.append(name);
+    if(r.is_official){const badge=document.createElement('em');badge.className='official-badge';badge.textContent=t('official');txt.append(badge);}if(state.ownReview?.id===r.id){const own=document.createElement('em');own.className='own-badge';own.textContent=t('yourBadge');txt.append(own);}const date=document.createElement('span');date.textContent=formatDate(r.created_at);txt.append(date);identity.append(av,txt);
+    const score=document.createElement('div');score.className=`review-score${Number(r.rating)>=7?' positive':''}`;score.innerHTML=`<strong>${Number(r.rating)}</strong><span>/10</span>`;top.append(identity,score);
+    const body=document.createElement('p');body.className='review-card-text';body.textContent=r.review_text?.trim()||t('noText');if(!r.review_text?.trim())body.classList.add('muted-text');card.append(top,body);
+    if(new Date(r.updated_at)-new Date(r.created_at)>5000){const e=document.createElement('small');e.className='review-edited';e.textContent=t('edited');card.append(e);}
+    const actions=document.createElement('div');actions.className='review-actions';const like=document.createElement('button');like.type='button';like.className=`review-action-button${state.ownLikes.has(r.id)?' is-active':''}`;like.innerHTML=`♡ <span>${Number(r.like_count||0)}</span> · ${t('useful')}`;like.addEventListener('click',()=>toggleLike(r.id,like));
+    const replies=document.createElement('button');replies.type='button';replies.className='review-action-button';replies.textContent=`${t('replies')} · ${Number(r.reply_count||0)}`;const panel=document.createElement('div');panel.className='review-replies';panel.hidden=true;replies.addEventListener('click',()=>{panel.hidden=!panel.hidden;if(!panel.hidden){state.openReplies.add(r.id);loadReplies(r.id,panel);}else state.openReplies.delete(r.id);});actions.append(like,replies);card.append(actions,panel);return card;
   }
 
-  async function rerollAvatar() {
-    if (state.busy || profileMutationBusy) return;
-    const button = $('#rerollAvatar');
-    const patch = { avatar_seed: randomSeed(), avatar_style: randomInt(3) + 1 };
-    if (!state.user) {
-      state.pendingProfile = state.pendingProfile || createPendingProfile();
-      Object.assign(state.pendingProfile, patch);
-      renderProfilePreview();
-      return;
-    }
-    await persistProfilePatch(patch, button);
+  const interactionBusy=new Set();
+  async function toggleLike(reviewId,button){if(interactionBusy.has(`like:${reviewId}`))return;interactionBusy.add(`like:${reviewId}`);button.disabled=true;try{await ensureIdentityProfile();const data=await rpcPost('toggle_review_like_v1',{p_review_id:reviewId});data.liked?state.ownLikes.add(reviewId):state.ownLikes.delete(reviewId);const r=state.reviews.find(x=>x.id===reviewId);if(r)r.like_count=Number(data.like_count||0);renderReviews(state.reviews);}catch(err){console.error('[P14/like]',err);}finally{interactionBusy.delete(`like:${reviewId}`);button.disabled=false;}}
+
+  async function loadReplies(reviewId,panel){
+    if(interactionBusy.has(`replies:${reviewId}`))return;interactionBusy.add(`replies:${reviewId}`);panel.hidden=false;panel.textContent=t('serviceChecking');
+    try{const rows=await rpcGet('get_public_replies_v1',{p_review_id:reviewId});renderReplies(reviewId,Array.isArray(rows)?rows:[],panel);}catch(err){panel.textContent=t('loadError');}finally{interactionBusy.delete(`replies:${reviewId}`);}
+  }
+  function renderReplies(reviewId,rows,panel){
+    panel.replaceChildren();if(!rows.length){const empty=document.createElement('div');empty.className='reviews-empty';empty.textContent=t('replyEmpty');panel.append(empty);}rows.forEach(r=>{const d=document.createElement('div');d.className='review-reply';const h=document.createElement('div');h.className='reply-head';const n=document.createElement('strong');n.textContent=renderAlias(r,state.lang);h.append(n);if(r.is_official){const b=document.createElement('em');b.className='official-badge';b.textContent=t('official');h.append(b);}const time=document.createElement('time');time.textContent=formatDate(r.created_at);h.append(time);const p=document.createElement('p');p.textContent=r.reply_text;d.append(h,p);const own=state.ownReplies.get(reviewId);if(own?.id===r.id){const del=document.createElement('button');del.type='button';del.className='review-action-button';del.textContent=t('replyDelete');del.addEventListener('click',()=>deleteReply(reviewId,r.id,panel));d.append(del);}panel.append(d);});
+    const composer=document.createElement('div');composer.className='reply-composer';const ta=document.createElement('textarea');ta.maxLength=1200;ta.placeholder=t('replyPlaceholder');const own=state.ownReplies.get(reviewId);if(own)ta.value=own.reply_text||'';const b=document.createElement('button');b.type='button';b.className='review-action-button';b.textContent=t('replySave');b.addEventListener('click',()=>saveReply(reviewId,ta,b,panel));composer.append(ta,b);panel.append(composer);
+  }
+  async function saveReply(reviewId,ta,button,panel){const text=ta.value.trim();if(!text)return;if(interactionBusy.has(`replywrite:${reviewId}`))return;interactionBusy.add(`replywrite:${reviewId}`);button.disabled=true;try{await ensureIdentityProfile();const data=await rpcPost('save_review_reply_v1',{p_review_id:reviewId,p_text:text});state.ownReplies.set(reviewId,data);const r=state.reviews.find(x=>x.id===reviewId);if(r)r.reply_count=Math.max(Number(r.reply_count||0),1);await loadReplies(reviewId,panel);}catch(err){console.error('[P14/reply]',err);button.textContent=t('replyError');}finally{interactionBusy.delete(`replywrite:${reviewId}`);button.disabled=false;}}
+  async function deleteReply(reviewId,replyId,panel){if(interactionBusy.has(`replydel:${reviewId}`))return;interactionBusy.add(`replydel:${reviewId}`);try{await rpcPost('delete_review_reply_v1',{p_reply_id:replyId});state.ownReplies.delete(reviewId);const r=state.reviews.find(x=>x.id===reviewId);if(r)r.reply_count=Math.max(0,Number(r.reply_count||0)-1);await loadReplies(reviewId,panel);}finally{interactionBusy.delete(`replydel:${reviewId}`);}}
+
+  function bindEvents(){
+    $('#langToggle')?.addEventListener('click',()=>setLanguage(state.lang==='ru'?'en':'ru'));
+    $('#rerollName')?.addEventListener('click',rerollName);$('#rerollAvatar')?.addEventListener('click',rerollAvatar);$('#submitReview')?.addEventListener('click',submitReview);$('#deleteReview')?.addEventListener('click',deleteReview);$('#reviewText')?.addEventListener('input',updateCounter);
+    $$('.rating-button').forEach(b=>b.addEventListener('click',()=>selectRating(b.dataset.rating)));$$('.review-sort-button').forEach(b=>b.addEventListener('click',()=>loadReviews(b.dataset.sort,state.filter)));$$('.review-filter-button').forEach(b=>b.addEventListener('click',()=>loadReviews(state.sort,b.dataset.filter)));
+    $('#securityToggle')?.addEventListener('click',()=>{const p=$('#securityPanel'),b=$('#securityToggle');if(!p||!b)return;const open=p.hidden;p.hidden=!open;b.setAttribute('aria-expanded',String(open));});
   }
 
-  function updateCounter() {
-    const textarea = $('#reviewText');
-    const counter = $('#reviewCounter');
-    if (textarea && counter) counter.textContent = `${textarea.value.length} / 2000`;
+  async function boot(){
+    state.pendingProfile=generateAliasProfile();bindEvents();applyTranslations();renderProfile();updateCounter();updateComposerUI();setServiceState('checking');
+    await Promise.allSettled([refreshStats(),loadReviews(state.sort)]);
+    try{await restoreOwnState();if($('#reviewsList'))await loadReviews(state.sort);setServiceState('online');}catch(err){console.warn('[P14/session restore]',err.code||err.message);}
   }
 
-  function selectRating(value) {
-    state.selectedRating = Number(value);
-    updateRatingLabel();
-    setStatus('');
-  }
-
-  async function submitReview() {
-    if (state.busy || profileMutationBusy) return;
-    if (state.selectedRating === null) {
-      setStatus(t('chooseRating'), 'error');
-      return;
-    }
-
-    // Snapshot what the user actually submitted. In P12 the rating/text were read
-    // after Auth finished, so changing them while the network was slow could save a
-    // different value than the one visible when Publish was clicked.
-    const ratingSnapshot = Number(state.selectedRating);
-    const textSnapshot = ($('#reviewText')?.value || '').trim();
-    const wasExisting = Boolean(state.ownReview);
-
-    state.busy = true;
-    setComposerBusy(true);
-    setStatus(t('saving'));
-
-    try {
-      await ensureUserAndProfile();
-      const review = await saveMyReviewDirect(ratingSnapshot, textSnapshot);
-      state.ownReview = review;
-      state.selectedRating = ratingSnapshot;
-      updateComposerUI();
-      updateRatingLabel();
-      setStatus(wasExisting ? t('updated') : t('saved'), 'success');
-      await Promise.allSettled([refreshStats(), loadReviews(state.sort)]);
-    } catch (error) {
-      console.error('[reviews/save]', error);
-      setStatus(t('saveError'), 'error');
-    } finally {
-      state.busy = false;
-      setComposerBusy(false);
-    }
-  }
-
-  async function deleteReview() {
-    if (!state.ownReview || state.busy || profileMutationBusy) return;
-    if (!window.confirm(t('confirmDelete'))) return;
-    state.busy = true;
-    setComposerBusy(true);
-    try {
-      await deleteMyReviewDirect();
-      state.ownReview = null;
-      state.selectedRating = null;
-      const textarea = $('#reviewText');
-      if (textarea) textarea.value = '';
-      updateCounter();
-      updateComposerUI();
-      updateRatingLabel();
-      setStatus(t('deleted'), 'success');
-      await Promise.allSettled([refreshStats(), loadReviews(state.sort)]);
-    } catch (error) {
-      console.error('[reviews/delete]', error);
-      setStatus(t('deleteError'), 'error');
-    } finally {
-      state.busy = false;
-      setComposerBusy(false);
-    }
-  }
-
-  async function refreshStats() {
-    try {
-      const rows = await restRequest('review_stats?select=total_ratings,average_rating,positive_ratings,freshness');
-      const data = Array.isArray(rows) ? rows[0] : rows;
-      setServiceState('online');
-      const total = Number(data?.total_ratings || 0);
-      const avg = data?.average_rating == null ? '—' : Number(data.average_rating).toFixed(1);
-      const freshness = data?.freshness == null ? null : Number(data.freshness);
-
-      const freshState = $('#freshnessState');
-      const ring = $('#freshnessRing');
-      const avgEl = $('#averageRating');
-      const countEl = $('#ratingsCount');
-
-      animateFreshness(freshness);
-      if (freshState) freshState.textContent = freshnessCategory(freshness);
-      if (ring) {
-        if (freshness == null) ring.style.setProperty('--freshness', 0);
-        else requestAnimationFrame(() => ring.style.setProperty('--freshness', freshness));
-        ring.classList.toggle('is-pending', freshness === null);
-      }
-      if (avgEl) avgEl.textContent = avg;
-      if (countEl) countEl.textContent = `${total} ${pluralRatings(total)}`;
-      state.lastFreshness = freshness;
-    } catch (error) {
-      console.error('[reviews/stats]', error);
-      setServiceState('offline');
-    }
-  }
-
-  function formatDate(value) {
-    if (!value) return '';
-    const locale = state.lang === 'ru' ? 'ru-RU' : 'en-US';
-    return new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(value));
-  }
-
-  async function loadReviews(sort = state.sort) {
-    const requestSequence = ++feedRequestSequence;
-    state.sort = sort;
-    $$('.review-sort-button').forEach(btn => btn.classList.toggle('active', btn.dataset.sort === sort));
-    const list = $('#reviewsList');
-    if (!list) return;
-
-    try {
-      const order = sort === 'high' ? 'rating.desc,created_at.desc' : sort === 'low' ? 'rating.asc,created_at.desc' : 'created_at.desc';
-      const reviews = await restRequest(`reviews?select=id,user_id,rating,review_text,created_at,updated_at&limit=40&order=${encodeURIComponent(order)}`);
-      if (requestSequence !== feedRequestSequence) return;
-      setServiceState('online');
-      if (!reviews?.length) {
-        list.replaceChildren(Object.assign(document.createElement('div'), { className: 'reviews-empty', textContent: t('reviewsEmpty') }));
-        return;
-      }
-
-      const ids = [...new Set(reviews.map(r => r.user_id).filter(Boolean))];
-      let profiles = [];
-      if (ids.length) {
-        const filter = `(${ids.join(',')})`;
-        profiles = await restRequest(`profiles?select=id,display_name,avatar_seed,avatar_style&id=in.${encodeURIComponent(filter)}`);
-      }
-      if (requestSequence !== feedRequestSequence) return;
-      const profileMap = new Map((profiles || []).map(p => [p.id, p]));
-
-      const fragment = document.createDocumentFragment();
-      reviews.forEach(review => {
-        const p = profileMap.get(review.user_id) || { display_name: state.lang === 'ru' ? 'Неизвестный профиль' : 'Unknown profile', avatar_seed: 1, avatar_style: 2 };
-        const card = document.createElement('article');
-        card.className = 'review-card';
-        if (state.user?.id === review.user_id) card.classList.add('is-own');
-
-        const top = document.createElement('div');
-        top.className = 'review-card-top';
-        const identity = document.createElement('div');
-        identity.className = 'review-identity';
-        const avatar = document.createElement('div');
-        avatar.className = 'review-avatar';
-        avatar.innerHTML = avatarSvg(p.avatar_seed, p.avatar_style, 54);
-        const identityText = document.createElement('div');
-        const name = document.createElement('strong');
-        name.textContent = p.display_name;
-        const date = document.createElement('span');
-        date.textContent = formatDate(review.created_at);
-        if (state.user?.id === review.user_id) {
-          const badge = document.createElement('em');
-          badge.className = 'own-badge';
-          badge.textContent = t('yourBadge');
-          identityText.append(name, badge, date);
-        } else identityText.append(name, date);
-        identity.append(avatar, identityText);
-
-        const score = document.createElement('div');
-        score.className = `review-score${Number(review.rating) >= 7 ? ' positive' : ''}`;
-        score.innerHTML = `<strong>${Number(review.rating)}</strong><span>/10</span>`;
-        top.append(identity, score);
-
-        const body = document.createElement('p');
-        body.className = 'review-card-text';
-        body.textContent = review.review_text?.trim() || t('noText');
-        if (!review.review_text?.trim()) body.classList.add('muted-text');
-
-        const edited = new Date(review.updated_at).getTime() - new Date(review.created_at).getTime() > 5000;
-        card.append(top, body);
-        if (edited) {
-          const editMark = document.createElement('small');
-          editMark.className = 'review-edited';
-          editMark.textContent = t('edited');
-          card.append(editMark);
-        }
-        fragment.append(card);
-      });
-      list.replaceChildren(fragment);
-    } catch (error) {
-      console.error('[reviews/feed]', error);
-      setServiceState('offline');
-      list.replaceChildren(Object.assign(document.createElement('div'), { className: 'reviews-empty', textContent: t('loadError') }));
-    }
-  }
-
-  function bindEvents() {
-    $('#langToggle')?.addEventListener('click', () => setLanguage(state.lang === 'ru' ? 'en' : 'ru'));
-    $('#rerollName')?.addEventListener('click', rerollName);
-    $('#rerollAvatar')?.addEventListener('click', rerollAvatar);
-    $('#submitReview')?.addEventListener('click', submitReview);
-    $('#deleteReview')?.addEventListener('click', deleteReview);
-    $('#reviewText')?.addEventListener('input', updateCounter);
-    $$('.rating-button').forEach(button => button.addEventListener('click', () => selectRating(button.dataset.rating)));
-    $$('.review-sort-button').forEach(button => button.addEventListener('click', () => loadReviews(button.dataset.sort)));
-    $('#securityToggle')?.addEventListener('click', () => {
-      const panel = $('#securityPanel');
-      const toggle = $('#securityToggle');
-      if (!panel || !toggle) return;
-      const open = panel.hidden;
-      panel.hidden = !open;
-      toggle.setAttribute('aria-expanded', String(open));
-    });
-  }
-
-  let dataLayerStarted = false;
-
-  async function bootDataLayer() {
-    if (dataLayerStarted) return;
-    dataLayerStarted = true;
-    setServiceState('checking');
-
-    // Public data must never wait for Auth. This is what prevents an endless spinner
-    // when a stored session is stale or a VPN slows down the Auth endpoint.
-    await Promise.allSettled([refreshStats(), loadReviews(state.sort)]);
-
-    try {
-      await loadExistingSession();
-      if (state.user) await loadReviews(state.sort);
-      if (state.serviceState === 'checking') setServiceState('online');
-    } catch (error) {
-      console.error('[reviews/session]', error);
-      // Public reviews may still be online even if the private session cannot be restored.
-      if (state.serviceState === 'checking') setServiceState('offline');
-    }
-  }
-
-  function init() {
-    state.pendingProfile = createPendingProfile();
-    bindEvents();
-    applyTranslations();
-    updateCounter();
-    renderProfilePreview();
-    bootDataLayer();
-  }
-
-  window.addEventListener('storage', event => {
-    if (event.key !== SESSION_KEY) return;
-    if (!event.newValue) { memorySession = null; return; }
-    try { memorySession = normalizeSession(JSON.parse(event.newValue)); }
-    catch { memorySession = null; }
-  });
-
-  window.addEventListener('online', () => {
-    dataLayerStarted = false;
-    bootDataLayer();
-  });
-  window.addEventListener('offline', () => setServiceState('offline'));
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
-  else init();
+  addEventListener('storage',e=>{if(e.key===SESSION_KEY){state.session=null;loadSession();}});
+  addEventListener('online',()=>{refreshStats();if($('#reviewsList'))loadReviews(state.sort);});addEventListener('offline',()=>setServiceState('offline','BROWSER_OFFLINE'));
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

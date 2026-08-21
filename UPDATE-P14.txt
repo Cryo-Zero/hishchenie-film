@@ -1,0 +1,57 @@
+ХИЩЕНИЕ / THEFT — P14 THEFT WORLD
+==================================
+
+ВАЖНО
+- Backend P14 уже применён к Supabase проекта xltwwvutqkpmtmlavngi.
+- SQL из docs/supabase/P14_community.sql повторно запускать НЕ НУЖНО.
+- Пакет не содержит старые постеры/трейлер: используются существующие assets проекта.
+- Новые media-файлы только профили-аватары (6 оптимизированных WebP).
+
+REPLACE
+/index.html
+/js/public-response.js
+
+ADD OR REPLACE
+/css/site.css
+/js/site.js
+/reviews.html
+/admin/index.html
+/js/admin.js
+/assets/images/avatars/subject-01.webp
+/assets/images/avatars/subject-02.webp
+/assets/images/avatars/subject-03.webp
+/assets/images/avatars/subject-04.webp
+/assets/images/avatars/subject-05.webp
+/assets/images/avatars/subject-06.webp
+/docs/supabase/P14_community.sql
+/docs/QA-P14.md
+/docs/ADMIN-SETUP-P14.md
+/docs/ROADMAP-AFTER-P14.md
+
+DELETE
+Ничего.
+
+ЧТО ГЛАВНОЕ ИЗМЕНИЛОСЬ
+1. Отзывы вынесены на отдельную страницу reviews.html.
+2. Первый отзыв сохраняется одним атомарным RPC: profile + review в одной транзакции.
+3. Новые cinematic-аватары хранятся локально, без внешнего avatar API и загрузки фото.
+4. Лайки, одноуровневые ответы, сортировки и фильтр «С ответом команды».
+5. Foundation админ-панели: /admin/ (не активна, пока не создан admin account).
+6. Официальный профиль команды: КОМАНДА ФИЛЬМА · OFFICIAL.
+7. Публичный feed не отдаёт UUID пользователей и не читает raw-таблицы.
+8. FAQ + пасхалка «На сайте есть безопасность».
+9. CURRENT SIGNAL, SUBJECT DOSSIER, bilingual alias generator.
+10. ARCHIVE исправлен: постеры не должны сжиматься/обрезаться; навигация приглушена.
+11. Mobile burger-menu сохранён.
+
+ПЕРВЫЙ ПРОД-ТЕСТ ПОСЛЕ ЗАЛИВКИ
+- дождаться зелёного GitHub Pages deployment;
+- Ctrl+F5;
+- открыть /reviews.html;
+- убедиться: «Отзывы доступны · P14»;
+- сменить псевдоним;
+- сменить аватар;
+- поставить 8/10;
+- текст: «Тест P14»;
+- нажать «Опубликовать» ОДИН раз;
+- не удалять до проверки Supabase логов.

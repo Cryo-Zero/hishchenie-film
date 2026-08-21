@@ -1,24 +1,22 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-  <title>ХИЩЕНИЕ — THEFT | Официальный сайт фильма</title>
-  <meta name="description" content="Официальный сайт фильма «ХИЩЕНИЕ / THEFT» — антиутопической драмы о мире 2045 года.">
-  <meta name="theme-color" content="#07090a">
-  <meta name="color-scheme" content="dark">
-  <meta name="format-detection" content="telephone=no">
-  <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://cryo-zero.github.io/hishchenie-film/">
-
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="ХИЩЕНИЕ — THEFT">
-  <meta property="og:description" content="В мире, где человек должен доказать свою пользу системе, взросление становится борьбой за право самому выбирать своё будущее.">
-  <meta property="og:image" content="https://cryo-zero.github.io/hishchenie-film/assets/images/archive/archive-01.jpg">
-  <meta property="og:url" content="https://cryo-zero.github.io/hishchenie-film/">
-
-  <script type="application/ld+json">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>ХИЩЕНИЕ — THEFT | Официальный сайт фильма</title>
+<meta content="Официальный сайт фильма «ХИЩЕНИЕ / THEFT» — антиутопической драмы о мире 2045 года." name="description"/>
+<meta content="#07090a" name="theme-color"/>
+<meta content="dark" name="color-scheme"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta content="index,follow" name="robots"/>
+<link href="https://cryo-zero.github.io/hishchenie-film/" rel="canonical"/>
+<meta content="website" property="og:type"/>
+<meta content="ХИЩЕНИЕ — THEFT" property="og:title"/>
+<meta content="В мире, где человек должен доказать свою пользу системе, взросление становится борьбой за право самому выбирать своё будущее." property="og:description"/>
+<meta content="https://cryo-zero.github.io/hishchenie-film/assets/images/archive/archive-01.jpg" property="og:image"/>
+<meta content="https://cryo-zero.github.io/hishchenie-film/" property="og:url"/>
+<script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Movie",
@@ -34,2908 +32,350 @@
   }
   </script>
 
-  <style>
-    :root {
-      --bg: #07090a;
-      --bg-soft: #0b1011;
-      --panel: #0d1213;
-      --line: #273133;
-      --line-soft: #1b2324;
-      --text: #f2f4f4;
-      --muted: #9aa8a9;
-      --dim: #728284;
-      --accent: #9bc4c7;
-      --header-h: 70px;
-      --max: 1180px;
-      --hero-max: 1360px;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      min-width: 320px;
-      overflow-x: hidden;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.6;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      pointer-events: none;
-      background:
-        radial-gradient(circle at 78% 10%, rgba(78, 119, 123, 0.12), transparent 30%),
-        radial-gradient(circle at 15% 40%, rgba(29, 65, 69, 0.08), transparent 28%),
-        var(--bg);
-    }
-
-    body.lightbox-open {
-      overflow: hidden;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button {
-      font: inherit;
-    }
-
-    img,
-    video {
-      max-width: 100%;
-    }
-
-    .shell {
-      width: min(var(--max), calc(100% - 48px));
-      margin: 0 auto;
-    }
-
-    /* ---------- Шапка ---------- */
-
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      min-height: var(--header-h);
-      border-bottom: 1px solid rgba(39, 49, 51, 0.82);
-      background: rgba(7, 9, 10, 0.92);
-      backdrop-filter: blur(14px);
-    }
-
-    .nav {
-      min-height: var(--header-h);
-      display: grid;
-      grid-template-columns: auto minmax(190px, 1fr) auto;
-      align-items: center;
-      gap: 28px;
-    }
-
-    .brand {
-      flex: 0 0 auto;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    .brand span {
-      color: var(--dim);
-      font-weight: 500;
-    }
-
-    .header-slogan {
-      justify-self: center;
-      color: var(--accent);
-      opacity: 0.72;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 2.8px;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .header-slogan::before,
-    .header-slogan::after {
-      content: "—";
-      margin: 0 9px;
-      color: #4d6669;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 22px;
-      color: #b9c4c5;
-      font-size: 11px;
-      letter-spacing: 1.25px;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .nav-links a {
-      position: relative;
-      transition: color 0.2s ease;
-    }
-
-    .nav-links a::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 100%;
-      bottom: -7px;
-      height: 1px;
-      background: var(--accent);
-      transition: right 0.2s ease;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-      color: #fff;
-    }
-
-    .nav-links a:hover::after,
-    .nav-links a.active::after {
-      right: 0;
-    }
-
-    /* ---------- Первый экран ---------- */
-
-    .hero {
-      position: relative;
-      min-height: calc(100svh - var(--header-h));
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      padding: 0;
-      border-bottom: 1px solid var(--line-soft);
-      background:
-        linear-gradient(110deg, rgba(8, 12, 13, 0.22), rgba(8, 12, 13, 0.9)),
-        var(--bg);
-      isolation: isolate;
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      z-index: -2;
-      inset: -7% -5% -7% 38%;
-      background: url("assets/images/archive/archive-01.jpg") center / cover no-repeat;
-      filter: blur(26px) saturate(0.7) brightness(0.72);
-      transform: scale(1.08);
-      opacity: 0.28;
-      mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.72) 28%, black 100%);
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(90deg, rgba(7, 9, 10, 0.98) 0%, rgba(7, 9, 10, 0.9) 34%, rgba(7, 9, 10, 0.44) 70%, rgba(7, 9, 10, 0.24) 100%),
-        linear-gradient(rgba(155, 196, 199, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(155, 196, 199, 0.035) 1px, transparent 1px);
-      background-size: auto, 58px 58px, 58px 58px;
-    }
-
-    .hero-inner {
-      width: min(var(--hero-max), calc(100% - 48px));
-      margin: 0 auto;
-      padding: clamp(44px, 6vh, 72px) 0;
-      display: grid;
-      grid-template-columns: minmax(0, 1.06fr) minmax(350px, 0.82fr);
-      gap: clamp(38px, 5vw, 76px);
-      align-items: center;
-    }
-
-    .hero-copy-column {
-      min-width: 0;
-    }
-
-    .eyebrow,
-    .section-label {
-      color: var(--accent);
-      font-size: 11px;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-    }
-
-    .eyebrow {
-      margin-bottom: 24px;
-    }
-
-    .mobile-slogan {
-      display: none;
-      margin-bottom: 15px;
-      color: var(--accent);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      max-width: 720px;
-      font-size: clamp(62px, 5.8vw, 106px);
-      font-weight: 900;
-      letter-spacing: -0.058em;
-      line-height: 0.82;
-    }
-
-    .english-title {
-      display: block;
-      margin-top: 28px;
-      color: #b8c9ca;
-      font-size: clamp(17px, 1.8vw, 24px);
-      font-weight: 600;
-      letter-spacing: 0.68em;
-      line-height: 1;
-    }
-
-    .hero-copy {
-      max-width: 630px;
-      margin-top: 42px;
-      color: #d0d6d7;
-      font-size: clamp(17px, 1.55vw, 20px);
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 36px;
-    }
-
-    .button {
-      min-height: 50px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 13px 24px;
-      border: 1px solid #dbe1e1;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-    }
-
-    .button:hover {
-      background: #f1f4f4;
-      color: #071011;
-      transform: translateY(-1px);
-    }
-
-    .button.secondary {
-      border-color: #4a5a5c;
-      color: #b5c3c4;
-    }
-
-    .button.secondary:hover {
-      border-color: #f1f4f4;
-      color: #071011;
-    }
-
-    .hero-poster-frame {
-      position: relative;
-      justify-self: end;
-      width: min(100%, 520px);
-      padding: 9px;
-      border: 1px solid rgba(155, 196, 199, 0.24);
-      background: rgba(8, 12, 13, 0.74);
-      box-shadow: 0 26px 90px rgba(0, 0, 0, 0.46);
-    }
-
-    .hero-poster-frame::before {
-      content: "";
-      position: absolute;
-      inset: -1px;
-      pointer-events: none;
-      box-shadow: inset 0 0 46px rgba(155, 196, 199, 0.055);
-    }
-
-    .hero-poster {
-      width: 100%;
-      height: auto;
-      max-height: calc(100svh - var(--header-h) - 58px);
-      display: block;
-      object-fit: contain;
-      background: #050708;
-    }
-
-    /* ---------- Разделы ---------- */
-
-    main > section:not(.hero) {
-      position: relative;
-      padding: 82px 0;
-      border-bottom: 1px solid var(--line-soft);
-      background: var(--bg);
-      scroll-margin-top: var(--header-h);
-    }
-
-    .section-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 24px;
-      margin-bottom: 38px;
-    }
-
-    .section-label {
-      margin-bottom: 14px;
-    }
-
-    h2 {
-      font-size: clamp(40px, 5vw, 68px);
-      line-height: 1;
-      letter-spacing: -0.035em;
-    }
-
-    .story {
-      max-width: 860px;
-      color: #cbd2d3;
-      font-size: clamp(17px, 2vw, 20px);
-    }
-
-    .story p + p {
-      margin-top: 22px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 52px;
-    }
-
-    .info-card {
-      min-height: 150px;
-      padding: 24px;
-      border: 1px solid var(--line);
-      background: linear-gradient(145deg, #0e1415, #0a0e0f);
-    }
-
-    .info-card small {
-      display: block;
-      margin-bottom: 10px;
-      color: var(--dim);
-      font-size: 10px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-    }
-
-    /* ---------- Галерея ---------- */
-
-    .gallery-wrap {
-      position: relative;
-    }
-
-    .gallery {
-      display: grid;
-      grid-auto-flow: column;
-      grid-auto-columns: minmax(235px, 23.6%);
-      gap: 16px;
-      overflow-x: auto;
-      overscroll-behavior-inline: contain;
-      scroll-snap-type: inline mandatory;
-      scroll-behavior: smooth;
-      scrollbar-width: none;
-      padding: 1px 0 8px;
-    }
-
-    .gallery::-webkit-scrollbar {
-      display: none;
-    }
-
-    .gallery-card {
-      position: relative;
-      aspect-ratio: 2 / 3;
-      overflow: hidden;
-      scroll-snap-align: start;
-      border: 1px solid var(--line);
-      background: #080b0c;
-      cursor: zoom-in;
-    }
-
-    .gallery-card img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-      object-position: center;
-      filter: saturate(0.92) contrast(1.035);
-      transition: transform 0.5s ease, filter 0.4s ease;
-    }
-
-    .gallery-card.is-cover img {
-      object-fit: cover;
-      object-position: center;
-    }
-
-    .gallery-card:hover img {
-      transform: scale(1.025);
-      filter: saturate(1) contrast(1.06);
-    }
-
-    .gallery-card:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 3px;
-    }
-
-    .gallery-card::after {
-      content: "";
-      position: absolute;
-      inset: auto 0 0;
-      height: 28%;
-      pointer-events: none;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.38), transparent);
-    }
-
-    .gallery-button {
-      position: absolute;
-      top: 50%;
-      z-index: 6;
-      width: 48px;
-      height: 58px;
-      display: grid;
-      place-items: center;
-      transform: translateY(-50%);
-      border: 1px solid #394547;
-      background: rgba(7, 10, 11, 0.92);
-      color: #e6eded;
-      cursor: pointer;
-      font-size: 22px;
-      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-      backdrop-filter: blur(8px);
-    }
-
-    .gallery-button.prev {
-      left: -24px;
-    }
-
-    .gallery-button.next {
-      right: -24px;
-    }
-
-    .gallery-button:hover {
-      background: #151d1e;
-      border-color: #607174;
-      transform: translateY(-50%) scale(1.03);
-    }
-
-    /* ---------- Трейлер ---------- */
-
-    .trailer-section {
-      min-height: calc(100svh - var(--header-h));
-      display: flex;
-      align-items: center;
-      padding-top: 48px !important;
-      padding-bottom: 48px !important;
-    }
-
-    .trailer-section .section-head {
-      margin-bottom: 28px;
-    }
-
-    .video-shell {
-      width: min(100%, 1040px);
-      margin: 0 auto;
-      border: 1px solid var(--line);
-      background: #000;
-      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
-    }
-
-    .video-shell video {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      display: block;
-      object-fit: contain;
-      background: #000;
-    }
-
-    /* ---------- Где посмотреть ---------- */
-
-    .watch-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .platform {
-      padding: 16px 22px;
-      border: 1px solid var(--line);
-      background: #0d1213;
-      color: #aebbbc;
-    }
-
-    /* ---------- Актёры ---------- */
-
-    .cast {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .cast-member {
-      min-height: 112px;
-      padding: 24px;
-      border: 1px solid var(--line);
-      background: #0b1011;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .cast-member:hover {
-      transform: translateY(-2px);
-      border-color: #425153;
-    }
-
-    .cast-member strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 17px;
-    }
-
-    .cast-member span {
-      color: #779092;
-      font-size: 14px;
-    }
-
-    /* ---------- Контакты ---------- */
-
-    .contact-box {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 28px;
-    }
-
-    .contact-link {
-      flex: 0 0 auto;
-      display: inline-flex;
-      align-items: center;
-      min-height: 50px;
-      padding: 12px 20px;
-      border: 1px solid var(--line);
-      color: #e4ebeb;
-      transition: background 0.2s ease, border-color 0.2s ease;
-    }
-
-    .contact-link:hover {
-      background: #111819;
-      border-color: #536365;
-    }
-
-    footer {
-      padding: 52px 24px;
-      color: #718083;
-      text-align: center;
-      font-size: 12px;
-    }
-
-    footer strong {
-      color: #dfe5e5;
-    }
-
-    /* ---------- Просмотр изображений ---------- */
-
-    .lightbox {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 28px 78px;
-      background: rgba(2, 4, 5, 0.96);
-      backdrop-filter: blur(8px);
-    }
-
-    .lightbox.open {
-      display: flex;
-    }
-
-    .lightbox-image {
-      display: block;
-      max-width: 100%;
-      max-height: calc(100svh - 56px);
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.55);
-    }
-
-    .lightbox-counter {
-      position: absolute;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      color: #9fb0b2;
-      font-size: 11px;
-      letter-spacing: 2px;
-    }
-
-    .lightbox-button {
-      position: absolute;
-      z-index: 2;
-      display: grid;
-      place-items: center;
-      border: 1px solid #465456;
-      background: rgba(8, 12, 13, 0.88);
-      color: #f1f5f5;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-    }
-
-    .lightbox-close {
-      top: 20px;
-      right: 22px;
-      width: 46px;
-      height: 46px;
-      font-size: 26px;
-    }
-
-    .lightbox-prev,
-    .lightbox-next {
-      top: 50%;
-      width: 48px;
-      height: 64px;
-      transform: translateY(-50%);
-      font-size: 26px;
-    }
-
-    .lightbox-prev {
-      left: 18px;
-    }
-
-    .lightbox-next {
-      right: 18px;
-    }
-
-    .lightbox-button:hover {
-      background: #182122;
-      border-color: #718487;
-    }
-
-    /* ---------- Адаптивность ---------- */
-
-    @media (max-width: 1280px) {
-      .nav {
-        grid-template-columns: auto 1fr;
-      }
-
-      .header-slogan {
-        display: none;
-      }
-
-      .nav-links {
-        justify-self: end;
-      }
-    }
-
-    @media (max-width: 1100px) {
-      .nav-links {
-        gap: 16px;
-        font-size: 10px;
-      }
-
-      .hero-inner {
-        grid-template-columns: minmax(0, 1fr) minmax(300px, 0.72fr);
-        gap: 34px;
-      }
-
-      .info-grid,
-      .cast {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .gallery {
-        grid-auto-columns: minmax(250px, 31%);
-      }
-
-      .gallery-button.prev {
-        left: 8px;
-      }
-
-      .gallery-button.next {
-        right: 8px;
-      }
-    }
-
-    @media (max-width: 820px) {
-      :root {
-        --header-h: 62px;
-      }
-
-      .shell,
-      .hero-inner {
-        width: min(100% - 32px, var(--max));
-      }
-
-      .nav {
-        min-height: var(--header-h);
-      }
-
-      .nav-links a:not(.nav-trailer) {
-        display: none;
-      }
-
-      .hero {
-        min-height: calc(100svh - var(--header-h));
-      }
-
-      .hero::before {
-        inset: -5%;
-        background-position: center;
-        opacity: 0.16;
-        mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,0.45) 54%, transparent 100%);
-      }
-
-      .hero::after {
-        background:
-          linear-gradient(180deg, rgba(7, 9, 10, 0.36) 0%, rgba(7, 9, 10, 0.92) 62%, rgba(7, 9, 10, 1) 100%),
-          linear-gradient(rgba(155, 196, 199, 0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(155, 196, 199, 0.03) 1px, transparent 1px);
-        background-size: auto, 46px 46px, 46px 46px;
-      }
-
-      .hero-inner {
-        grid-template-columns: 1fr;
-        gap: 36px;
-        padding: 30px 0 58px;
-      }
-
-      .hero-poster-frame {
-        order: -1;
-        justify-self: center;
-        width: min(100%, 470px);
-      }
-
-      .hero-poster {
-        max-height: min(56svh, 520px);
-      }
-
-      .mobile-slogan {
-        display: block;
-      }
-
-      h1 {
-        font-size: clamp(58px, 17vw, 94px);
-      }
-
-      .english-title {
-        margin-top: 22px;
-        letter-spacing: 0.48em;
-      }
-
-      .hero-copy {
-        margin-top: 32px;
-        font-size: 16px;
-      }
-
-      .hero-actions {
-        flex-direction: column;
-      }
-
-      .button {
-        width: 100%;
-      }
-
-      main > section:not(.hero) {
-        padding: 68px 0;
-        scroll-margin-top: var(--header-h);
-      }
-
-      .section-head {
-        align-items: start;
-        flex-direction: column;
-        margin-bottom: 30px;
-      }
-
-      .gallery {
-        grid-auto-columns: 64%;
-        gap: 12px;
-      }
-
-      .gallery-button {
-        width: 42px;
-        height: 54px;
-      }
-
-      .gallery-button.prev {
-        left: 7px;
-      }
-
-      .gallery-button.next {
-        right: 7px;
-      }
-
-      .trailer-section {
-        min-height: auto;
-        padding-top: 56px !important;
-        padding-bottom: 56px !important;
-      }
-
-      .video-shell {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-
-      .contact-box {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .lightbox {
-        padding: 62px 14px 70px;
-      }
-
-      .lightbox-image {
-        max-height: calc(100svh - 132px);
-      }
-
-      .lightbox-prev,
-      .lightbox-next {
-        top: auto;
-        bottom: 18px;
-        width: 46px;
-        height: 46px;
-        transform: none;
-      }
-
-      .lightbox-prev {
-        left: calc(50% - 66px);
-      }
-
-      .lightbox-next {
-        right: calc(50% - 66px);
-      }
-
-      .lightbox-counter {
-        bottom: 31px;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .info-grid,
-      .cast {
-        grid-template-columns: 1fr;
-      }
-
-      .info-card {
-        min-height: auto;
-      }
-
-      .gallery {
-        grid-auto-columns: 78%;
-      }
-    }
-
-    @media (max-height: 820px) and (min-width: 821px) {
-      .hero-inner {
-        padding: 30px 0;
-      }
-
-      .hero-poster-frame {
-        width: min(100%, 445px);
-      }
-
-      .eyebrow {
-        margin-bottom: 18px;
-      }
-
-      .english-title {
-        margin-top: 22px;
-      }
-
-      .hero-copy {
-        margin-top: 28px;
-      }
-
-      .hero-actions {
-        margin-top: 26px;
-      }
-
-      .trailer-section {
-        padding-top: 34px !important;
-        padding-bottom: 34px !important;
-      }
-
-      .trailer-section .section-head {
-        margin-bottom: 20px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
-      }
-
-      *,
-      *::before,
-      *::after {
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-      }
-    }
-  
-
-    /* ---------- Язык ---------- */
-
-    .lang-toggle {
-      min-width: 42px;
-      height: 30px;
-      padding: 0 9px;
-      border: 1px solid #344143;
-      border-radius: 3px;
-      background: rgba(14, 20, 21, 0.9);
-      color: var(--accent);
-      cursor: pointer;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1.6px;
-      transition: border-color .2s ease, background .2s ease, color .2s ease;
-    }
-
-    .lang-toggle:hover {
-      border-color: #6d888b;
-      background: #121a1b;
-      color: #fff;
-    }
-
-    /* ---------- Отзывы / Audience protocol ---------- */
-
-    .reviews-section {
-      position: relative;
-      overflow: hidden;
-      border-top: 1px solid var(--line-soft);
-      border-bottom: 1px solid var(--line-soft);
-      background:
-        linear-gradient(rgba(155, 196, 199, 0.022) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(155, 196, 199, 0.022) 1px, transparent 1px),
-        #080b0c;
-      background-size: 42px 42px, 42px 42px, auto;
-    }
-
-    .reviews-section::before {
-      content: "";
-      position: absolute;
-      width: 520px;
-      height: 520px;
-      right: -180px;
-      top: -200px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(91, 143, 147, .11), transparent 68%);
-      pointer-events: none;
-    }
-
-    .reviews-heading {
-      gap: 42px;
-    }
-
-    .reviews-intro {
-      max-width: 520px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .reviews-dashboard {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr);
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .freshness-panel,
-    .average-panel,
-    .review-composer,
-    .review-feed {
-      border: 1px solid var(--line);
-      background: rgba(10, 15, 16, .91);
-      box-shadow: inset 0 1px rgba(255,255,255,.015);
-    }
-
-    .freshness-panel {
-      min-height: 220px;
-      display: flex;
-      align-items: center;
-      gap: clamp(24px, 5vw, 56px);
-      padding: 30px clamp(24px, 4vw, 44px);
-    }
-
-    .freshness-ring {
-      --freshness: 0;
-      width: 158px;
-      height: 158px;
-      flex: 0 0 158px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: conic-gradient(var(--accent) calc(var(--freshness) * 1%), #192123 0);
-      position: relative;
-      transition: background 600ms ease;
-      box-shadow: 0 0 42px rgba(86, 135, 139, .08);
-    }
-
-    .freshness-ring::before {
-      content: "";
-      position: absolute;
-      inset: 7px;
-      border-radius: 50%;
-      background: #090d0e;
-      border: 1px solid #263234;
-    }
-
-    .freshness-ring.is-pending {
-      background: conic-gradient(#415052 20%, #192123 20%);
-    }
-
-    .freshness-ring-inner {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-    }
-
-    .freshness-ring-inner strong {
-      display: block;
-      color: #f5f8f8;
-      font-size: 35px;
-      line-height: 1;
-      letter-spacing: -1px;
-    }
-
-    .freshness-ring-inner span {
-      display: block;
-      max-width: 104px;
-      margin-top: 9px;
-      color: var(--muted);
-      font-size: 9px;
-      line-height: 1.35;
-      letter-spacing: 1.1px;
-      text-transform: uppercase;
-    }
-
-    .metric-kicker,
-    .composer-label {
-      color: var(--accent);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 2.8px;
-      text-transform: uppercase;
-    }
-
-    .freshness-copy p {
-      margin-top: 9px;
-      color: var(--dim);
-      font-size: 13px;
-    }
-
-    .average-panel {
-      min-height: 220px;
-      position: relative;
-      overflow: hidden;
-      padding: 34px;
-    }
-
-    .average-value {
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      margin-top: 25px;
-    }
-
-    .average-value strong {
-      font-size: clamp(54px, 6vw, 78px);
-      line-height: .9;
-      letter-spacing: -3px;
-    }
-
-    .average-value span {
-      padding-bottom: 7px;
-      color: var(--dim);
-      font-size: 18px;
-    }
-
-    .rating-count {
-      margin-top: 17px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .system-lines {
-      position: absolute;
-      right: -12px;
-      bottom: 17px;
-      width: 46%;
-      display: grid;
-      gap: 6px;
-      opacity: .34;
-      transform: skewX(-14deg);
-    }
-
-    .system-lines i {
-      display: block;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent));
-    }
-
-    .system-lines i:nth-child(2) { width: 74%; margin-left: auto; }
-    .system-lines i:nth-child(3) { width: 88%; margin-left: auto; }
-    .system-lines i:nth-child(4) { width: 58%; margin-left: auto; }
-
-    .review-workspace {
-      display: grid;
-      grid-template-columns: minmax(360px, .83fr) minmax(0, 1.17fr);
-      gap: 16px;
-    }
-
-    .review-composer,
-    .review-feed {
-      padding: clamp(22px, 3vw, 32px);
-    }
-
-    .profile-console {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-      margin-top: 20px;
-      padding: 17px;
-      border: 1px solid var(--line-soft);
-      background: #090d0e;
-    }
-
-    .profile-avatar,
-    .review-avatar {
-      flex: 0 0 auto;
-      line-height: 0;
-    }
-
-    .avatar-svg {
-      display: block;
-    }
-
-    .profile-data {
-      min-width: 0;
-    }
-
-    .profile-data > strong {
-      display: block;
-      overflow: hidden;
-      color: #f1f5f5;
-      font-size: 16px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .profile-data p {
-      margin-top: 5px;
-      color: var(--dim);
-      font-size: 11px;
-      line-height: 1.45;
-    }
-
-    .profile-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 11px;
-    }
-
-    .micro-button,
-    .review-sort-button {
-      border: 1px solid #303b3d;
-      background: transparent;
-      color: #a8b5b6;
-      cursor: pointer;
-      font-size: 10px;
-      letter-spacing: .55px;
-      transition: .2s ease;
-    }
-
-    .micro-button {
-      padding: 6px 8px;
-    }
-
-    .micro-button:hover,
-    .review-sort-button:hover,
-    .review-sort-button.active {
-      border-color: #688184;
-      background: #12191a;
-      color: #fff;
-    }
-
-    .score-field,
-    .review-text-field {
-      margin-top: 28px;
-    }
-
-    .field-heading {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 12px;
-    }
-
-    .field-heading > label {
-      color: #dfe5e5;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-    }
-
-    .field-heading small {
-      margin-left: 5px;
-      color: var(--dim);
-      font-size: 9px;
-      font-weight: 500;
-    }
-
-    .score-readout {
-      text-align: right;
-    }
-
-    .score-readout strong {
-      display: block;
-      font-size: 16px;
-    }
-
-    .score-readout span,
-    #reviewCounter {
-      color: var(--dim);
-      font-size: 10px;
-    }
-
-    .rating-scale {
-      display: grid;
-      grid-template-columns: repeat(11, 1fr);
-      gap: 4px;
-    }
-
-    .rating-button {
-      min-width: 0;
-      height: 40px;
-      border: 1px solid #2c3739;
-      background: #0b1011;
-      color: #9ba8a9;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 700;
-      transition: background .16s ease, color .16s ease, border-color .16s ease, transform .16s ease;
-    }
-
-    .rating-button:hover {
-      border-color: #6b8588;
-      color: #fff;
-      transform: translateY(-2px);
-    }
-
-    .rating-button.selected {
-      border-color: var(--accent);
-      background: #182123;
-      color: #fff;
-      box-shadow: inset 0 -2px var(--accent);
-    }
-
-    #reviewText {
-      width: 100%;
-      min-height: 132px;
-      resize: vertical;
-      padding: 14px 15px;
-      border: 1px solid #2a3537;
-      border-radius: 0;
-      outline: none;
-      background: #090d0e;
-      color: #e9eeee;
-      font: inherit;
-      font-size: 13px;
-      line-height: 1.6;
-      transition: border-color .2s ease, box-shadow .2s ease;
-    }
-
-    #reviewText:focus {
-      border-color: #688184;
-      box-shadow: 0 0 0 2px rgba(155,196,199,.05);
-    }
-
-    #reviewText::placeholder {
-      color: #5f6d6f;
-    }
-
-    .review-submit-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .review-submit-row .button {
-      border: 1px solid #6f8789;
-      cursor: pointer;
-    }
-
-    .review-submit-row .button:disabled {
-      cursor: wait;
-      opacity: .55;
-    }
-
-    .danger-button {
-      border-color: #5a3434 !important;
-      background: transparent !important;
-      color: #ba8787 !important;
-    }
-
-    .danger-button:hover {
-      border-color: #9a5555 !important;
-      color: #e2a2a2 !important;
-    }
-
-    .review-status {
-      min-height: 20px;
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .review-status.success { color: #9bc4c7; }
-    .review-status.error { color: #c98d89; }
-
-    .privacy-note {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--line-soft);
-      color: #647274;
-      font-size: 10px;
-      line-height: 1.5;
-    }
-
-    .review-feed-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--line-soft);
-    }
-
-    .review-sort {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 5px;
-    }
-
-    .review-sort-button {
-      padding: 6px 8px;
-    }
-
-    .reviews-list {
-      display: grid;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .reviews-empty {
-      padding: 44px 20px;
-      border: 1px dashed #283234;
-      color: var(--dim);
-      text-align: center;
-      font-size: 12px;
-    }
-
-    .review-card {
-      padding: 17px;
-      border: 1px solid #20292b;
-      background: #090d0e;
-    }
-
-    .review-card.is-own {
-      border-color: #43585a;
-      box-shadow: inset 2px 0 var(--accent);
-    }
-
-    .review-card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 18px;
-    }
-
-    .review-identity {
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .review-identity > div:last-child {
-      min-width: 0;
-    }
-
-    .review-identity strong {
-      display: inline;
-      color: #eef2f2;
-      font-size: 13px;
-    }
-
-    .review-identity span {
-      display: block;
-      margin-top: 4px;
-      color: #667476;
-      font-size: 9px;
-      letter-spacing: .8px;
-      text-transform: uppercase;
-    }
-
-    .own-badge {
-      display: inline-block;
-      margin-left: 7px;
-      padding: 1px 5px;
-      border: 1px solid #3f5658;
-      color: var(--accent);
-      font-size: 8px;
-      font-style: normal;
-      letter-spacing: .7px;
-      text-transform: uppercase;
-    }
-
-    .review-score {
-      flex: 0 0 auto;
-      min-width: 58px;
-      padding: 6px 8px;
-      border: 1px solid #343f41;
-      text-align: center;
-    }
-
-    .review-score.positive {
-      border-color: #557073;
-    }
-
-    .review-score strong {
-      font-size: 19px;
-    }
-
-    .review-score span {
-      margin-left: 2px;
-      color: var(--dim);
-      font-size: 9px;
-    }
-
-    .review-card-text {
-      margin-top: 14px;
-      color: #c9d1d2;
-      font-size: 12px;
-      line-height: 1.65;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .review-card-text.muted-text {
-      color: #647274;
-      font-style: italic;
-    }
-
-    .review-edited {
-      display: block;
-      margin-top: 8px;
-      color: #536164;
-      font-size: 8px;
-      letter-spacing: .7px;
-      text-transform: uppercase;
-    }
-
-    @media (max-width: 1100px) {
-      .reviews-dashboard,
-      .review-workspace {
-        grid-template-columns: 1fr;
-      }
-
-      .freshness-panel,
-      .average-panel {
-        min-height: 190px;
-      }
-    }
-
-    @media (max-width: 820px) {
-      .nav-links {
-        gap: 9px;
-      }
-
-      .lang-toggle {
-        min-width: 38px;
-      }
-
-      .reviews-heading {
-        gap: 16px;
-      }
-
-      .reviews-intro {
-        max-width: none;
-      }
-
-      .freshness-panel {
-        min-height: 0;
-      }
-
-      .review-composer,
-      .review-feed {
-        padding: 20px 16px;
-      }
-
-      .review-feed-head {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .review-sort {
-        justify-content: flex-start;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .freshness-panel {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .freshness-ring {
-        align-self: center;
-      }
-
-      .profile-console {
-        align-items: flex-start;
-      }
-
-      .profile-avatar .avatar-svg {
-        width: 62px;
-        height: 62px;
-      }
-
-      .rating-scale {
-        grid-template-columns: repeat(6, 1fr);
-      }
-
-      .rating-button:last-child {
-        grid-column: span 2;
-      }
-
-      .field-heading {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .score-readout {
-        text-align: left;
-      }
-
-      .review-submit-row {
-        flex-direction: column;
-      }
-
-      .review-submit-row .button {
-        width: 100%;
-      }
-    }
-
-  
-
-    /* ======================================================
-       P7 — SYSTEM LAYER / responsive cinematic identity
-       ====================================================== */
-
-    @property --freshness {
-      syntax: "<number>";
-      inherits: false;
-      initial-value: 0;
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      pointer-events: none;
-      opacity: .055;
-      mix-blend-mode: screen;
-      background-image:
-        repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.12) 4px),
-        radial-gradient(circle at 20% 30%, rgba(255,255,255,.18) 0 .6px, transparent .8px);
-      background-size: 100% 4px, 7px 7px;
-    }
-
-    .scroll-progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 500;
-      width: 0;
-      height: 2px;
-      background: var(--accent);
-      box-shadow: 0 0 12px rgba(155,196,199,.5);
-      pointer-events: none;
-    }
-
-    .system-rail {
-      position: fixed;
-      z-index: 45;
-      right: 14px;
-      top: 50%;
-      display: grid;
-      justify-items: center;
-      gap: 10px;
-      transform: translateY(-50%);
-      color: #5d6c6e;
-      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-      font-size: 8px;
-      letter-spacing: 1.1px;
-      writing-mode: vertical-rl;
-      pointer-events: none;
-    }
-
-    .rail-track {
-      position: relative;
-      width: 1px;
-      height: 120px;
-      overflow: hidden;
-      background: #202a2c;
-    }
-
-    .rail-track i {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 1px;
-      height: 0;
-      background: var(--accent);
-      transition: height .18s linear;
-    }
-
-    .rail-section { color: #89999b; }
-
-    .site-header {
-      padding-top: env(safe-area-inset-top, 0px);
-    }
-
-    .nav {
-      grid-template-columns: auto minmax(100px,1fr) auto auto;
-      gap: 24px;
-    }
-
-    .nav-links { justify-self: end; }
-
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .menu-toggle {
-      display: none;
-      min-height: 38px;
-      padding: 0 11px;
-      align-items: center;
-      gap: 9px;
-      border: 1px solid #344143;
-      background: #0d1314;
-      color: #a9b6b7;
-      cursor: pointer;
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    .menu-toggle i,
-    .menu-toggle i::before,
-    .menu-toggle i::after {
-      width: 14px;
-      height: 1px;
-      display: block;
-      background: currentColor;
-      transition: transform .2s ease, opacity .2s ease;
-    }
-
-    .menu-toggle i { position: relative; }
-    .menu-toggle i::before,
-    .menu-toggle i::after { content: ""; position: absolute; left: 0; }
-    .menu-toggle i::before { top: -5px; }
-    .menu-toggle i::after { top: 5px; }
-    body.nav-open .menu-toggle i { background: transparent; }
-    body.nav-open .menu-toggle i::before { transform: translateY(5px) rotate(45deg); }
-    body.nav-open .menu-toggle i::after { transform: translateY(-5px) rotate(-45deg); }
-
-    .hero-system-strip {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 18px;
-      margin-bottom: 18px;
-      color: #627477;
-      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-      font-size: 9px;
-      letter-spacing: 1.3px;
-      text-transform: uppercase;
-    }
-
-    .status-live {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      color: #8caeb0;
-    }
-
-    .status-live i,
-    .poster-rec i,
-    .service-badge i {
-      width: 6px;
-      height: 6px;
-      flex: 0 0 6px;
-      border-radius: 50%;
-      background: #8eb2b4;
-      box-shadow: 0 0 9px rgba(142,178,180,.55);
-    }
-
-    .status-live b { font: inherit; }
-
-    .hero-poster-frame { overflow: hidden; }
-
-    .poster-hud {
-      position: absolute;
-      z-index: 2;
-      inset: 18px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-content: space-between;
-      pointer-events: none;
-      color: rgba(226,239,239,.72);
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 8px;
-      letter-spacing: 1.2px;
-      text-shadow: 0 1px 5px #000;
-    }
-
-    .poster-hud::before,
-    .poster-hud::after {
-      content: "";
-      position: absolute;
-      width: 24px;
-      height: 24px;
-      border-color: rgba(190,220,222,.42);
-    }
-    .poster-hud::before { left: -6px; top: -6px; border-left: 1px solid; border-top: 1px solid; }
-    .poster-hud::after { right: -6px; bottom: -6px; border-right: 1px solid; border-bottom: 1px solid; }
-
-    .poster-rec {
-      grid-column: 2;
-      align-self: end;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: #d5e4e5;
-    }
-    .poster-rec i { background: #ad6460; box-shadow: 0 0 8px rgba(173,100,96,.7); }
-
-    main > section:not(.hero)::before {
-      content: attr(data-system-watermark);
-      position: absolute;
-      right: max(24px, calc((100vw - var(--max)) / 2));
-      top: 34px;
-      color: rgba(155,196,199,.035);
-      font-size: clamp(54px, 8vw, 116px);
-      font-weight: 900;
-      letter-spacing: -.06em;
-      line-height: 1;
-      pointer-events: none;
-    }
-
-    .section-label {
-      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-      font-size: 10px;
-      letter-spacing: 2.6px;
-    }
-
-    .section-label::before {
-      content: "";
-      width: 18px;
-      height: 1px;
-      display: inline-block;
-      margin: 0 9px 3px 0;
-      background: currentColor;
-      opacity: .55;
-    }
-
-    .section-note {
-      max-width: 760px;
-      margin: -18px 0 28px;
-      color: #6f7f81;
-      font-size: 11px;
-      line-height: 1.55;
-    }
-
-    .gallery-card::before {
-      content: attr(data-file) "  //  ARCHIVE";
-      position: absolute;
-      z-index: 3;
-      left: 12px;
-      right: 12px;
-      bottom: 10px;
-      color: rgba(232,241,241,.78);
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 8px;
-      letter-spacing: 1px;
-      text-shadow: 0 1px 5px #000;
-      transition: transform .25s ease, opacity .25s ease;
-    }
-
-    .gallery-card::after { height: 42%; }
-
-    .gallery-card:hover::before { transform: translateY(-2px); }
-
-    .signal-meta {
-      width: min(100%, 1040px);
-      margin: 0 auto 7px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 6px 16px;
-      color: #5f7072;
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 8px;
-      letter-spacing: 1.2px;
-    }
-
-    .trailer-language-note {
-      width: min(100%, 1040px);
-      margin: 12px auto 0;
-    }
-
-    .platform {
-      position: relative;
-      overflow: hidden;
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 12px;
-    }
-    .platform::after {
-      content: "ACCESS // PENDING";
-      position: absolute;
-      right: 8px;
-      bottom: 2px;
-      color: rgba(155,196,199,.13);
-      font-size: 7px;
-      letter-spacing: 1px;
-    }
-
-    .cast-member { position: relative; overflow: hidden; }
-    .cast-member::before {
-      content: attr(data-subject);
-      display: block;
-      margin-bottom: 14px;
-      color: #536668;
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 8px;
-      letter-spacing: 1.2px;
-    }
-    .cast-member::after {
-      content: "+";
-      position: absolute;
-      right: 12px;
-      top: 8px;
-      color: rgba(155,196,199,.18);
-      font-family: monospace;
-      font-size: 20px;
-    }
-
-    .reviews-head-aside {
-      max-width: 520px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .service-badge {
-      width: fit-content;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 6px 8px;
-      border: 1px solid #2d3a3c;
-      color: #77898b;
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 8px;
-      letter-spacing: 1.1px;
-    }
-    .service-badge.is-online { color: #91b6b8; border-color: #3c5557; }
-    .service-badge.is-offline { color: #b9827f; border-color: #5a3837; }
-    .service-badge.is-offline i { background: #b16a66; box-shadow: 0 0 7px rgba(177,106,102,.5); }
-    .service-badge.is-checking i { animation: signalPulse 1.2s ease-in-out infinite; }
-
-    @keyframes signalPulse {
-      0%,100% { opacity: .25; transform: scale(.72); }
-      50% { opacity: 1; transform: scale(1); }
-    }
-
-    .freshness-ring { transition: --freshness 900ms cubic-bezier(.2,.7,.2,1); }
-
-    .review-card { position: relative; }
-    .review-card::before {
-      content: "PUBLIC RECORD";
-      position: absolute;
-      right: 12px;
-      bottom: 7px;
-      color: rgba(155,196,199,.08);
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 7px;
-      letter-spacing: 1.2px;
-      pointer-events: none;
-    }
-
-    .footer-system {
-      margin-top: 16px;
-      color: #435153;
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 8px;
-      letter-spacing: 1.7px;
-    }
-
-    @media (max-width: 1280px) {
-      .nav { grid-template-columns: auto 1fr auto; }
-      .header-slogan { display: none; }
-      .nav-links { justify-self: end; }
-    }
-
-    @media (max-width: 980px) {
-      .nav {
-        position: relative;
-        grid-template-columns: 1fr auto;
-        gap: 12px;
-      }
-      .header-controls { justify-self: end; }
-      .menu-toggle { display: inline-flex; }
-      .nav-links {
-        position: absolute;
-        z-index: 80;
-        top: calc(100% + 1px);
-        left: 0;
-        right: 0;
-        display: grid;
-        max-height: 0;
-        overflow: hidden;
-        gap: 0;
-        border: 0 solid #283234;
-        background: rgba(7,10,11,.985);
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(-7px);
-        transition: max-height .28s ease, opacity .18s ease, transform .18s ease, border-width .18s ease;
-        backdrop-filter: blur(16px);
-      }
-      .nav-links a,
-      .nav-links a:not(.nav-trailer) {
-        display: block;
-        padding: 15px 16px;
-        border-bottom: 1px solid #182123;
-        font-size: 11px;
-      }
-      .nav-links a::after { display: none; }
-      body.nav-open { overflow: hidden; }
-      body.nav-open .nav-links {
-        max-height: calc(100svh - var(--header-h) - env(safe-area-inset-top,0px));
-        overflow-y: auto;
-        border-width: 1px;
-        opacity: 1;
-        pointer-events: auto;
-        transform: none;
-      }
-      .system-rail { display: none; }
-    }
-
-    @media (max-width: 820px) {
-      .lang-toggle { height: 38px; min-width: 44px; }
-      .hero-system-strip { margin-top: 3px; }
-      main > section:not(.hero)::before { right: 16px; top: 26px; font-size: 58px; }
-      .section-note { margin-top: -12px; }
-      .reviews-head-aside { max-width: none; }
-    }
-
-    @media (max-width: 560px) {
-      .shell, .hero-inner { width: min(100% - 26px, var(--max)); }
-      .brand { font-size: 11px; letter-spacing: 1px; }
-      .menu-toggle { padding: 0 9px; }
-      .menu-toggle span { display: none; }
-      .hero-system-strip { gap: 6px 10px; font-size: 8px; }
-      .poster-hud { inset: 14px; }
-      .section-label { letter-spacing: 1.8px; }
-      .gallery-card::before { left: 9px; bottom: 8px; }
-      .signal-meta { justify-content: flex-start; }
-      .service-badge { max-width: 100%; }
-    }
-
-    @media (hover: none), (pointer: coarse) {
-      .gallery-card:hover img,
-      .cast-member:hover,
-      .rating-button:hover,
-      .button:hover { transform: none; }
-      .button, .micro-button, .review-sort-button, .rating-button, .gallery-button, .contact-link { min-height: 44px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .service-badge.is-checking i { animation: none !important; }
-      .freshness-ring { transition: none !important; }
-      body::after { opacity: .025; }
-    }
-
-  
-    body { -webkit-tap-highlight-color: transparent; }
-    .reviews-section::after {
-      content: ""; position: absolute; width: 520px; height: 520px; right: -180px; top: -200px;
-      border-radius: 50%; background: radial-gradient(circle, rgba(91,143,147,.10), transparent 68%); pointer-events: none;
-    }
-    .reviews-section > .shell { position: relative; z-index: 1; }
-
-    .gallery-button.prev { left: 7px; }
-    .gallery-button.next { right: 7px; }
-
-    /* ===== P8 / visual & navigation fixes ===== */
-    .hero-signal-frame { width: min(100%, 650px); padding: 8px; aspect-ratio: 16 / 9; }
-    .hero-signal-video { width: 100%; height: 100%; max-height: none; object-fit: cover; filter: saturate(.78) contrast(1.08) brightness(.82); }
-    .hero-video-shade { position:absolute; inset:8px; pointer-events:none; background:linear-gradient(90deg,rgba(2,7,8,.28),transparent 38%),linear-gradient(0deg,rgba(2,6,7,.36),transparent 34%); }
-
-    .archive-viewer { display:grid; gap:14px; }
-    .archive-stage-wrap { display:grid; grid-template-columns:56px minmax(0,1fr) 56px; align-items:stretch; gap:10px; }
-    .archive-stage { position:relative; min-height:420px; max-height:58vh; overflow:hidden; border:1px solid var(--line); background:#050708; cursor:zoom-in; }
-    .archive-stage img { width:100%; height:100%; display:block; object-fit:contain; background:radial-gradient(circle at center,#101819 0,#050708 72%); }
-    .archive-stage::after { content:""; position:absolute; inset:0; pointer-events:none; box-shadow:inset 0 0 70px rgba(0,0,0,.24); }
-    .archive-stage-meta { position:absolute; z-index:2; left:0; right:0; bottom:0; display:flex; justify-content:space-between; gap:12px; padding:12px 15px; color:#b7cccc; background:linear-gradient(to top,rgba(3,7,8,.92),rgba(3,7,8,.1)); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:9px; letter-spacing:1.4px; }
-    .archive-stage-wrap .gallery-button { position:static; width:56px; height:auto; min-height:100%; transform:none; display:flex; flex-direction:column; gap:7px; align-items:center; justify-content:center; }
-    .archive-stage-wrap .gallery-button:hover { transform:none; }
-    .archive-stage-wrap .gallery-button small { writing-mode:vertical-rl; color:#607476; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:7px; letter-spacing:1.8px; }
-    .archive-stage-wrap .gallery-button.prev small { transform:rotate(180deg); }
-    .archive-strip-head { display:flex; justify-content:space-between; color:#526568; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:8px; letter-spacing:1.5px; }
-    .archive-thumbs { grid-auto-columns:88px; gap:8px; padding:0 0 4px; }
-    .archive-thumbs .gallery-card { aspect-ratio:1 / 1; border-color:#263234; opacity:.48; cursor:pointer; transition:opacity .2s ease,border-color .2s ease,transform .2s ease; }
-    .archive-thumbs .gallery-card img { object-fit:cover; }
-    .archive-thumbs .gallery-card::before { content:attr(data-file); left:7px; bottom:5px; font-size:6px; }
-    .archive-thumbs .gallery-card::after { height:52%; }
-    .archive-thumbs .gallery-card.is-active { opacity:1; border-color:#91b7b9; box-shadow:0 0 0 1px rgba(145,183,185,.14); }
-    .archive-thumbs .gallery-card.is-active img { filter:saturate(1.04) contrast(1.06); }
-
-    @media (min-width: 981px) and (min-height: 680px) {
-      #about, #materials, #watch, #cast { min-height:calc(100svh - var(--header-h)); display:flex; align-items:center; padding-top:48px; padding-bottom:48px; }
-      #about > .shell, #materials > .shell, #watch > .shell, #cast > .shell { width:min(var(--max),calc(100% - 48px)); }
-      #about .section-head, #materials .section-head, #watch .section-head, #cast .section-head { margin-bottom:30px; }
-    }
-    @media (max-width: 820px) {
-      .hero-signal-frame { aspect-ratio:16 / 10; }
-      .archive-stage-wrap { grid-template-columns:42px minmax(0,1fr) 42px; gap:6px; }
-      .archive-stage { min-height:340px; max-height:62svh; }
-      .archive-stage-wrap .gallery-button { width:42px; }
-      .archive-thumbs { grid-auto-columns:72px; }
-    }
-    @media (max-width: 560px) {
-      .archive-stage-wrap { grid-template-columns:1fr; }
-      .archive-stage-wrap .gallery-button { position:absolute; z-index:5; top:50%; width:44px; min-height:52px; height:52px; transform:translateY(-50%); background:rgba(5,9,10,.88); }
-      .archive-stage-wrap .gallery-button.prev { left:6px; }
-      .archive-stage-wrap .gallery-button.next { right:6px; }
-      .archive-stage-wrap .gallery-button small { display:none; }
-      .archive-stage-wrap { position:relative; }
-      .archive-stage { min-height:0; height:58svh; }
-      .archive-thumbs { grid-auto-columns:64px; }
-    }
-
-
-
-    /* ===== P9 / cleanup, compact rhythm & stable reviews ===== */
-    :root { --header-h: 66px; }
-    @media (min-width: 821px) {
-      h1 { font-size: clamp(64px, 6.2vw, 112px); }
-      h2 { font-size: clamp(40px, 4vw, 68px); }
-      .hero-copy { font-size: clamp(16px, 1.25vw, 20px); max-width: 680px; }
-      #about, #materials, #watch, #cast, #reviews { min-height: calc(100svh - var(--header-h)); padding-top: 38px; padding-bottom: 38px; }
-      #contacts { min-height: 0 !important; padding-top: 64px; padding-bottom: 64px; }
-      #materials .section-head, #watch .section-head, #cast .section-head, #reviews .section-head { margin-bottom: 22px; }
-    }
-
-    .hero-signal-frame, .hero-signal-video, .hero-video-shade { all: unset; }
-    .hero-poster-frame { width:min(100%, 560px); justify-self:end; }
-    .hero-poster { width:100%; height:auto; aspect-ratio: 1 / 1.08; object-fit:cover; }
-
-    .watch-layout { display:grid; grid-template-columns:minmax(0,.9fr) minmax(430px,1.1fr); gap:54px; align-items:center; }
-    .watch-primary { align-self:center; }
-    .watch-intro { max-width:580px; margin:0 0 26px; color:#7e9294; font-size:14px; line-height:1.7; }
-    .watch-list { grid-template-columns:repeat(3,minmax(0,1fr)); }
-    .watch-response .reviews-dashboard { margin:0; grid-template-columns:1fr 1fr; gap:12px; }
-    .watch-response .freshness-panel, .watch-response .average-panel { min-height:190px; padding:28px; }
-    .watch-response .freshness-ring { width:132px; height:132px; }
-    .watch-response .freshness-ring-inner { inset:7px; }
-    .watch-response .freshness-copy p { margin-bottom:0; }
-
-    .reviews-section .reviews-heading { align-items:end; }
-    .reviews-section .reviews-intro { max-width:620px; }
-    .reviews-section .review-workspace { margin-top:8px; }
-
-    .archive-stage-wrap { grid-template-columns:42px minmax(0,1fr) 42px; gap:7px; }
-    .archive-stage { min-height:330px; max-height:50vh; }
-    .archive-stage-wrap .gallery-button { width:42px; border-color:rgba(122,151,153,.25); color:#718789; background:rgba(4,8,9,.36); opacity:.72; }
-    .archive-stage-wrap .gallery-button:hover { opacity:1; border-color:rgba(145,183,185,.55); }
-    .archive-stage-wrap .gallery-button small { opacity:.48; font-size:6px; letter-spacing:1.3px; }
-    .archive-strip-head { opacity:.52; }
-    .archive-thumbs { grid-auto-columns:62px; gap:6px; overflow-x:auto; scrollbar-width:thin; }
-    .archive-thumbs .gallery-card { opacity:.24; border-color:rgba(80,104,106,.22); }
-    .archive-thumbs .gallery-card::before { display:none; }
-    .archive-thumbs .gallery-card.is-active { opacity:.82; border-color:rgba(145,183,185,.48); box-shadow:none; }
-    .archive-stage-meta { opacity:.66; font-size:8px; }
-
-    .cast { grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
-    .cast-member { min-height:154px; padding:24px 22px; display:flex; flex-direction:column; justify-content:flex-end; background:linear-gradient(145deg,rgba(12,20,21,.78),rgba(5,9,10,.55)); }
-    .cast-member::before { content:attr(data-subject); position:absolute; top:18px; left:20px; color:#4f686a; font:7px ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:1.7px; }
-    .cast-member strong { font-size:18px; }
-    .cast-member span { margin-top:8px; font-size:13px; }
-    .cast-member:nth-child(1), .cast-member:nth-child(5) { grid-column:span 2; }
-    .cast-member:nth-child(1) strong, .cast-member:nth-child(5) strong { font-size:22px; }
-
-    @media (max-width: 1100px) {
-      .watch-layout { grid-template-columns:1fr; gap:28px; }
-      .watch-response { max-width:760px; }
-      .cast { grid-template-columns:repeat(2,minmax(0,1fr)); }
-      .cast-member:nth-child(n) { grid-column:auto; }
-    }
-    @media (max-width: 820px) {
-      .hero-poster-frame { width:min(100%,480px); justify-self:center; }
-      .watch-response .reviews-dashboard { grid-template-columns:1fr; }
-      .watch-list { grid-template-columns:1fr; }
-      .archive-stage { height:52svh; max-height:480px; }
-      .archive-thumbs { grid-auto-columns:58px; }
-      .cast { grid-template-columns:1fr; }
-      .cast-member { min-height:128px; }
-    }
-
-
-    /* ---------- P13 / visual QA pass ---------- */
-    /* Keep section headings cinematic without making the interface feel oversized. */
-    @media (min-width: 821px) {
-      h2 { font-size: clamp(36px, 3.45vw, 58px); }
-    }
-
-    /* ACCESS now carries a genuinely new system element rather than recycled ratings. */
-    .watch-layout { grid-template-columns: minmax(0, .95fr) minmax(390px, .85fr); gap: clamp(42px, 7vw, 96px); }
-    .current-signal {
-      position: relative;
-      min-height: 286px;
-      padding: 28px 30px 24px;
-      overflow: hidden;
-      border: 1px solid rgba(122,151,153,.28);
-      background:
-        linear-gradient(rgba(155,196,199,.028) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(155,196,199,.028) 1px, transparent 1px),
-        linear-gradient(145deg, rgba(13,20,21,.88), rgba(5,9,10,.72));
-      background-size: 28px 28px, 28px 28px, auto;
-    }
-    .current-signal::after { content:"CURRENT // 2045"; position:absolute; right:18px; top:18px; color:#304143; font:7px ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:1.7px; }
-    .signal-head { display:flex; align-items:center; gap:14px; }
-    .signal-head i { flex:1; height:1px; background:linear-gradient(90deg,rgba(155,196,199,.32),transparent); }
-    .signal-wave { height:76px; margin:24px 0 20px; display:flex; align-items:center; gap:5px; opacity:.55; }
-    .signal-wave span { width:3px; height:20%; background:#8fb5b8; transform-origin:center; animation:signalPulse 2.8s ease-in-out infinite; }
-    .signal-wave span:nth-child(2n) { height:54%; animation-delay:-.35s; }
-    .signal-wave span:nth-child(3n) { height:82%; animation-delay:-.8s; }
-    .signal-wave span:nth-child(5n) { height:36%; animation-delay:-1.25s; }
-    .signal-data { display:grid; grid-template-columns:1fr 1fr; gap:0; margin:0; border-top:1px solid rgba(122,151,153,.18); }
-    .signal-data div { padding:13px 0; border-bottom:1px solid rgba(122,151,153,.14); }
-    .signal-data div:nth-child(odd) { padding-right:20px; }
-    .signal-data dt { color:#536b6d; font:7px ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:1.6px; text-transform:uppercase; }
-    .signal-data dd { margin:5px 0 0; color:#d9e4e4; font-size:12px; }
-    .signal-live { display:flex; align-items:center; gap:7px; }
-    .signal-live b { width:5px; height:5px; border-radius:50%; background:#9bc4c7; box-shadow:0 0 10px rgba(155,196,199,.45); }
-    .signal-foot { margin-top:16px; color:#4d6567; font:7px ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:1.7px; }
-    @keyframes signalPulse { 0%,100%{ transform:scaleY(.45); opacity:.34 } 50%{ transform:scaleY(1); opacity:.9 } }
-
-    /* Ratings belong to PUBLIC RESPONSE; keep them compact and geometrically exact. */
-    .reviews-head-aside { width:min(650px,100%); }
-    .review-metrics { display:grid; grid-template-columns:96px minmax(130px,1fr) minmax(150px,.8fr); gap:18px; align-items:center; margin:16px 0 12px; }
-    .review-metrics .freshness-ring {
-      width:92px !important;
-      min-width:92px;
-      height:auto !important;
-      aspect-ratio:1 / 1;
-      flex:none;
-      border-radius:50%;
-    }
-    .review-metrics .freshness-ring::before { inset:5px; }
-    .review-metrics .freshness-ring-inner { position:absolute; inset:0; display:grid; place-content:center; justify-items:center; padding:14px; }
-    .review-metrics .freshness-ring-inner strong { font-size:24px; line-height:1; text-align:center; }
-    .review-metrics .freshness-ring-inner span { margin-top:6px; max-width:74px; font-size:6.5px; line-height:1.3; text-align:center; letter-spacing:.7px; }
-    .review-metric-copy small, .review-average small { display:block; margin-top:6px; color:#718587; font-size:10px; }
-    .review-average { padding-left:18px; border-left:1px solid rgba(122,151,153,.18); }
-    .review-average > div { display:flex; align-items:baseline; gap:4px; margin-top:7px; }
-    .review-average strong { font-size:31px; line-height:1; letter-spacing:-1px; }
-    .review-average > div span { color:#64797b; font-size:12px; }
-
-    /* ARCHIVE navigation should assist, not dominate. */
-    .archive-stage-wrap { position:relative; display:block; }
-    .archive-stage { min-height:330px; max-height:52vh; }
-    .archive-stage-wrap .gallery-button {
-      position:absolute;
-      z-index:5;
-      top:50%;
-      width:34px !important;
-      height:48px !important;
-      min-height:0 !important;
-      transform:translateY(-50%) !important;
-      border:1px solid rgba(122,151,153,.12);
-      background:rgba(4,8,9,.30);
-      color:#789092;
-      opacity:.28;
-      backdrop-filter:blur(4px);
-    }
-    .archive-stage-wrap .gallery-button.prev { left:9px; }
-    .archive-stage-wrap .gallery-button.next { right:9px; }
-    .archive-stage-wrap .gallery-button:hover, .archive-stage-wrap .gallery-button:focus-visible { opacity:.88; background:rgba(5,10,11,.72); border-color:rgba(145,183,185,.36); }
-    .archive-stage-wrap .gallery-button small { display:none; }
-    .archive-thumbs { grid-auto-columns:54px; gap:6px; opacity:.68; scrollbar-width:thin; }
-    .archive-thumbs .gallery-card { opacity:.22; border-color:transparent; }
-    .archive-thumbs .gallery-card:hover { opacity:.62; }
-    .archive-thumbs .gallery-card.is-active { opacity:.9; border-color:rgba(145,183,185,.38); }
-    .archive-strip-head { opacity:.34; font-size:7px; }
-    .archive-stage-meta { opacity:.48; }
-
-    /* SUBJECTS: 4 cards + 3 cards fills both rows instead of leaving an accidental hole. */
-    .cast { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:10px; }
-    .cast-member, .cast-member:nth-child(n) { grid-column:span 3; min-height:150px; padding:24px 22px; position:relative; overflow:hidden; }
-    .cast-member:nth-child(n+5) { grid-column:span 4; }
-    .cast-member::after { content:"ACCESS // PUBLIC"; position:absolute; right:18px; top:18px; color:#34494b; font:6px ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:1.4px; }
-    .cast-member::before { top:18px; left:20px; }
-    .cast-member strong, .cast-member:nth-child(1) strong, .cast-member:nth-child(5) strong { font-size:18px; }
-    .cast-member:hover { border-color:rgba(145,183,185,.44); background:linear-gradient(145deg,rgba(15,25,26,.92),rgba(6,11,12,.68)); }
-
-    /* The privacy note becomes a discoverable signature/easter egg in the footer. */
-    .security-easter-egg { margin-top:22px; }
-    .security-toggle { border:0; padding:3px 0; background:transparent; color:#364a4c; cursor:pointer; font:7px ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:1.7px; text-transform:uppercase; transition:color .2s ease; }
-    .security-toggle:hover, .security-toggle:focus-visible { color:#84a5a7; }
-    .security-panel { max-width:580px; margin:12px auto 0; padding:18px 20px; border:1px solid rgba(122,151,153,.18); background:rgba(8,13,14,.76); color:#7d9294; font-size:11px; line-height:1.65; text-align:left; }
-    .security-panel strong { display:block; margin-bottom:7px; color:#b8cccc; font-size:12px; }
-    .security-panel[hidden] { display:none; }
-
-    @media (max-width:1100px) {
-      .watch-layout { grid-template-columns:1fr; gap:30px; }
-      .current-signal { max-width:760px; }
-      .cast-member, .cast-member:nth-child(n), .cast-member:nth-child(n+5) { grid-column:span 6; }
-      .cast-member:last-child { grid-column:span 12; }
-    }
-    @media (max-width:820px) {
-      .review-metrics { grid-template-columns:78px 1fr; gap:14px; }
-      .review-metrics .freshness-ring { width:76px !important; min-width:76px; }
-      .review-average { grid-column:1 / -1; padding:13px 0 0; border-left:0; border-top:1px solid rgba(122,151,153,.16); }
-      .archive-stage-wrap .gallery-button { width:32px !important; height:44px !important; opacity:.42; }
-      .archive-stage { height:52svh; max-height:480px; }
-      .archive-thumbs { grid-auto-columns:50px; }
-      .cast-member, .cast-member:nth-child(n), .cast-member:nth-child(n+5), .cast-member:last-child { grid-column:span 12; min-height:126px; }
-      .current-signal { min-height:0; padding:22px; }
-      .signal-wave { height:54px; }
-      .signal-data { grid-template-columns:1fr; }
-      .signal-data div:nth-child(odd) { padding-right:0; }
-    }
-    @media (prefers-reduced-motion: reduce) { .signal-wave span { animation:none; } }
-
-  </style>
-</head>
-
+<link href="css/site.css?v=14-final" rel="stylesheet"/></head>
 <body>
-  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
-
-  <aside class="system-rail" aria-hidden="true">
-    <span class="rail-status">SYS // 2045</span>
-    <div class="rail-track"><i id="railProgress"></i></div>
-    <span class="rail-section" id="railSection">00 / ENTRY</span>
-  </aside>
-
-  <header class="site-header">
-    <div class="shell nav">
-      <a class="brand" href="#top" aria-label="ХИЩЕНИЕ / THEFT">ХИЩЕНИЕ <span>/ THEFT</span></a>
-
-      <div class="header-slogan" data-i18n="slogan">В системе нет безопасности</div>
-
-      <nav class="nav-links" id="primaryNav" aria-label="Основная навигация" data-i18n-aria="navAria">
-        <a href="#about" data-i18n="navAbout">О фильме</a>
-        <a href="#materials" data-i18n="navMaterials">Материалы</a>
-        <a class="nav-trailer" href="#trailer" data-i18n="navTrailer">Трейлер</a>
-        <a href="#watch" data-i18n="navWatch">Где посмотреть</a>
-        <a href="#cast" data-i18n="navCast">Актёры</a>
-        <a href="#reviews" data-i18n="navReviews">Отзывы</a>
-        <a href="#contacts" data-i18n="navContacts">Контакты</a>
-      </nav>
-
-      <div class="header-controls">
-        <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch to English">EN</button>
-        <button class="menu-toggle" id="menuToggle" type="button" aria-controls="primaryNav" aria-expanded="false">
-          <span data-i18n="menu">Меню</span><i aria-hidden="true"></i>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero" id="top">
-      <div class="hero-inner">
-        <div class="hero-copy-column">
-          <div class="hero-system-strip" aria-label="System status">
-            <span>SYS // 2045</span>
-            <span class="status-live"><i></i><b data-i18n="systemActive">СИСТЕМА АКТИВНА</b></span>
-            <span data-i18n="publicAccess">ПУБЛИЧНЫЙ ДОСТУП</span>
-          </div>
-          <div class="eyebrow" data-i18n="heroEyebrow">Фильм в разработке · 2045</div>
-          <div class="mobile-slogan" data-i18n="slogan">В системе нет безопасности</div>
-
-          <h1>
+<div aria-hidden="true" class="scroll-progress" id="scrollProgress"></div>
+<aside aria-hidden="true" class="system-rail">
+<span class="rail-status">SYS // 2045</span>
+<div class="rail-track"><i id="railProgress"></i></div>
+<span class="rail-section" id="railSection">00 / ENTRY</span>
+</aside>
+<header class="site-header">
+<div class="shell nav">
+<a aria-label="ХИЩЕНИЕ / THEFT" class="brand" href="#top">ХИЩЕНИЕ <span>/ THEFT</span></a>
+<div class="header-slogan" data-i18n="slogan">В системе нет безопасности</div>
+<nav aria-label="Основная навигация" class="nav-links" data-i18n-aria="navAria" id="primaryNav"><a data-i18n="navAbout" href="#about">О фильме</a><a data-i18n="navMaterials" href="#materials">Материалы</a><a class="nav-trailer" data-i18n="navTrailer" href="#trailer">Трейлер</a><a data-i18n="navWatch" href="#watch">Где посмотреть</a><a data-i18n="navCast" href="#cast">Актёры</a><a data-i18n="navReviews" href="reviews.html">Отзывы</a><a data-i18n="navFaq" href="#faq">FAQ</a></nav>
+<div class="header-controls">
+<button aria-label="Switch to English" class="lang-toggle" id="langToggle" type="button">EN</button>
+<button aria-controls="primaryNav" aria-expanded="false" class="menu-toggle" id="menuToggle" type="button">
+<span data-i18n="menu">Меню</span><i aria-hidden="true"></i>
+</button>
+</div>
+</div>
+</header>
+<main>
+<section class="hero" id="top">
+<div class="hero-inner">
+<div class="hero-copy-column">
+<div aria-label="System status" class="hero-system-strip">
+<span>SYS // 2045</span>
+<span class="status-live"><i></i><b data-i18n="systemActive">СИСТЕМА АКТИВНА</b></span>
+<span data-i18n="publicAccess">ПУБЛИЧНЫЙ ДОСТУП</span>
+</div>
+<div class="eyebrow" data-i18n="heroEyebrow">Фильм в разработке · 2045</div>
+<div class="mobile-slogan" data-i18n="slogan">В системе нет безопасности</div>
+<h1>
             ХИЩЕНИЕ
             <span class="english-title">THEFT</span>
-          </h1>
-
-          <p class="hero-copy" data-i18n="heroCopy">В мире, где человек должен доказать свою пользу системе, взросление становится борьбой за право самому выбирать своё будущее.</p>
-
-          <div class="hero-actions">
-            <a class="button" href="#trailer" data-i18n="heroTrailer">Смотреть трейлер</a>
-            <a class="button secondary" href="#about" data-i18n="heroAbout">О фильме</a>
-          </div>
-        </div>
-
-        <div class="hero-poster-frame">
-          <img class="hero-poster" src="assets/images/archive/archive-01.jpg" alt="Официальная обложка фильма Хищение" data-i18n-alt="heroPosterAlt">
-          <div class="poster-hud" aria-hidden="true">
-            <span>FILE // 001</span>
-            <span>THEFT_2045</span>
-            <span class="poster-rec"><i></i> REC</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="about" data-system-watermark="DOSSIER">
-      <div class="shell">
-        <div class="section-head">
-          <div>
-            <div class="section-label" data-i18n="aboutLabel">01 / DOSSIER</div>
-            <h2 data-i18n="aboutTitle">2045 год.</h2>
-          </div>
-        </div>
-
-        <div class="story">
-          <p data-i18n="story1">Население Земли превысило допустимый предел. Государство создаёт новую систему, в которой каждый человек должен доказать свою пользу обществу.</p>
-
-          <p data-i18n="story2">Дети с раннего возраста попадают под особый контроль и распределяются по специальным секциям.</p>
-
-          <p data-i18n="story3">Гор живёт со своим 75-летним дедушкой и пытается приспособиться к новому миру. История показывает взросление Гора, его дружбу с Марком и борьбу за собственное будущее в системе, где человеческая жизнь постепенно превращается в ресурс.</p>
-        </div>
-
-        <div class="info-grid">
-          <div class="info-card">
-            <small data-i18n="infoTitle">Название</small>
+</h1>
+<p class="hero-copy" data-i18n="heroCopy">В мире, где человек должен доказать свою пользу системе, взросление становится борьбой за право самому выбирать своё будущее.</p>
+<div class="hero-actions">
+<a class="button" data-i18n="heroTrailer" href="#trailer">Смотреть трейлер</a>
+<a class="button secondary" data-i18n="heroAbout" href="#about">О фильме</a>
+</div>
+</div>
+<div class="hero-poster-frame">
+<img alt="Официальная обложка фильма Хищение" class="hero-poster" data-i18n-alt="heroPosterAlt" src="assets/images/archive/archive-01.jpg"/>
+<div aria-hidden="true" class="poster-hud">
+<span>FILE // 001</span>
+<span>THEFT_2045</span>
+<span class="poster-rec"><i></i> REC</span>
+</div>
+</div>
+</div>
+</section><section aria-label="Audience signal" class="audience-strip">
+<div class="shell">
+<div class="audience-strip-copy">
+<div class="audience-strip-kicker" data-i18n="audienceSignal">Сигнал аудитории</div>
+<div class="audience-strip-title" data-i18n="audienceSignalCopy">Оценка зрителей доступна сразу — полный раздел отзывов открыт отдельно.</div>
+</div>
+<div class="audience-strip-metric">
+<span data-i18n="freshness">Свежесть</span>
+<strong data-stat="freshness">—</strong>
+<small data-i18n="insufficient" data-stat="freshness-label">Недостаточно оценок</small>
+</div>
+<div class="audience-strip-metric">
+<span data-i18n="average">Средняя оценка</span>
+<strong><span data-stat="average">—</span><small>/10</small></strong>
+<small data-stat="count">0 оценок</small>
+</div>
+<a class="button secondary" data-i18n="openReviews" href="reviews.html">Открыть отзывы</a>
+</div>
+</section>
+<section data-system-watermark="DOSSIER" id="about">
+<div class="shell">
+<div class="section-head">
+<div>
+<div class="section-label" data-i18n="aboutLabel">01 / DOSSIER</div>
+<h2 data-i18n="aboutTitle">2045 год.</h2>
+</div>
+</div>
+<div class="story">
+<p data-i18n="story1">Население Земли превысило допустимый предел. Государство создаёт новую систему, в которой каждый человек должен доказать свою пользу обществу.</p>
+<p data-i18n="story2">Дети с раннего возраста попадают под особый контроль и распределяются по специальным секциям.</p>
+<p data-i18n="story3">Гор живёт со своим 75-летним дедушкой и пытается приспособиться к новому миру. История показывает взросление Гора, его дружбу с Марком и борьбу за собственное будущее в системе, где человеческая жизнь постепенно превращается в ресурс.</p>
+</div>
+<div class="info-grid">
+<div class="info-card">
+<small data-i18n="infoTitle">Название</small>
             ХИЩЕНИЕ / THEFT
           </div>
+<div class="info-card">
+<small data-i18n="infoGenre">Жанр</small>
+<span data-i18n="genreValue">Антиутопия · Драма · Боевик · Приключения · Фантастика</span>
+</div>
+<div class="info-card">
+<small data-i18n="infoDirector">Режиссёр</small>
+<span data-i18n="directorName">Арман О. А.</span>
+</div>
+<div class="info-card">
+<small data-i18n="infoStatus">Статус</small>
+<span data-i18n="statusValue">В разработке</span>
+</div>
+</div>
+</div>
+</section>
+<section data-system-watermark="ARCHIVE" id="materials">
+<div class="shell">
+<div class="section-head">
+<div>
+<div class="section-label" data-i18n="materialsLabel">02 / ARCHIVE</div>
+<h2 data-i18n="materialsTitle">Визуальные материалы</h2>
+</div>
+</div>
+<p class="section-note" data-i18n="materialsNote">Материалы представлены в авторском виде. Текст внутри постеров может оставаться на русском языке.</p>
+<div class="archive-viewer" id="archiveViewer">
+<div class="archive-stage-wrap">
+<button aria-label="Предыдущее изображение" class="gallery-button prev" data-i18n-aria="previousImage" id="galleryPrev" type="button"><span>←</span><small>PREV</small></button>
+<figure aria-label="Открыть изображение" class="archive-stage" data-i18n-aria="openImage" id="archiveStage" tabindex="0">
+<img alt="Обложка фильма Хищение" data-i18n-alt="galleryAlt01" id="archiveMainImage" src="assets/images/archive/archive-01.jpg"/>
+<figcaption class="archive-stage-meta">
+<span id="archiveCode">MAT_001 // ARCHIVE</span>
+<span id="archiveCounter">01 / 11</span>
+</figcaption>
+</figure>
+<button aria-label="Следующее изображение" class="gallery-button next" data-i18n-aria="nextImage" id="galleryNext" type="button"><small>NEXT</small><span>→</span></button>
+</div>
+<div aria-hidden="true" class="archive-strip-head"><span>ARCHIVE INDEX</span><span>11 FILES // PUBLIC</span></div>
+<div aria-label="Галерея материалов фильма" class="gallery archive-thumbs" data-i18n-aria="galleryAria" id="gallery" tabindex="0">
+<figure class="gallery-card is-active" data-file="MAT_001" data-index="0" tabindex="0">
+<img alt="Обложка фильма Хищение" data-i18n-alt="galleryAlt01" loading="lazy" src="assets/images/archive/archive-01.jpg"/>
+</figure>
+<figure class="gallery-card" data-file="MAT_002" data-index="1" tabindex="0">
+<img alt="Постер фильма Хищение — пианино" data-i18n-alt="galleryAlt02" loading="lazy" src="assets/images/archive/archive-02.jpg"/>
+</figure>
+<figure class="gallery-card" data-file="MAT_003" data-index="2" tabindex="0">
+<img alt="Постер фильма Хищение — дедушка и ребёнок" data-i18n-alt="galleryAlt03" loading="lazy" src="assets/images/archive/archive-03.jpg"/>
+</figure>
+<figure class="gallery-card" data-file="MAT_004" data-index="3" tabindex="0">
+<img alt="Постер фильма Хищение — человек в капюшоне" data-i18n-alt="galleryAlt04" loading="lazy" src="assets/images/archive/archive-04.jpg"/>
+</figure>
+<figure class="gallery-card" data-file="MAT_005" data-index="4" tabindex="0">
+<img alt="Постер фильма Хищение" data-i18n-alt="galleryAlt05" loading="lazy" src="assets/images/archive/archive-05.jpg"/>
+</figure>
+<figure class="gallery-card" data-file="MAT_006" data-index="5" tabindex="0">
+<img alt="Постер фильма Хищение — герой в разрушенном городе" data-i18n-alt="galleryAlt06" loading="lazy" src="assets/images/archive/archive-06.jpg"/>
+</figure>
+<figure class="gallery-card" data-file="MAT_007" data-index="6" tabindex="0">
+<img alt="Постер фильма Хищение — ведущая" data-i18n-alt="galleryAlt07" loading="lazy" src="assets/images/archive/archive-07.jpg"/>
+</figure>
+<figure class="gallery-card" data-file="MAT_008" data-index="7" tabindex="0">
+<img alt="Постер фильма Хищение — город" data-i18n-alt="galleryAlt08" loading="lazy" src="assets/images/archive/archive-08.jpg"/>
+</figure>
+<figure class="gallery-card" data-file="MAT_009" data-index="8" tabindex="0">
+<img alt="Постер фильма Хищение — Гор" data-i18n-alt="galleryAlt09" loading="lazy" src="assets/images/archive/archive-09.jpg"/>
+</figure>
+<figure class="gallery-card" data-file="MAT_010" data-index="9" tabindex="0">
+<img alt="Кадры из фильма Хищение" data-i18n-alt="galleryAlt10" loading="lazy" src="assets/images/archive/archive-10.jpg"/>
+</figure>
+<figure class="gallery-card" data-file="MAT_011" data-index="10" tabindex="0">
+<img alt="Постер фильма Хищение — визуальный материал" data-i18n-alt="galleryAlt11" loading="lazy" src="assets/images/archive/archive-11.jpg"/>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section class="trailer-section" data-system-watermark="SIGNAL" id="trailer">
+<div class="shell">
+<div class="section-head">
+<div>
+<div class="section-label" data-i18n="trailerLabel">03 / SIGNAL</div>
+<h2 data-i18n="trailerTitle">Трейлер</h2>
+</div>
+</div>
+<div aria-hidden="true" class="signal-meta"><span>SIGNAL_03</span><span>16:9 / MP4</span><span>ORIGINAL AUDIO // RU</span></div>
+<div class="video-shell" id="videoShell">
+<video controls="" playsinline="" poster="assets/images/signal/signal-preview.jpg" preload="metadata">
+<source src="assets/video/signal/signal-trailer-ru.mp4" type="video/mp4"/>
+<span data-i18n="videoFallback">Ваш браузер не поддерживает воспроизведение видео.</span>
+</video>
+</div>
+<p class="section-note trailer-language-note" data-i18n="trailerLanguageNote">Оригинальная звуковая дорожка трейлера — на русском. Английские субтитры можно добавить после согласования с автором.</p>
+</div>
+</section>
+<section data-system-watermark="ACCESS" id="watch">
+<div class="shell">
+<div class="section-head">
+<div>
+<div class="section-label" data-i18n="watchLabel">04 / ACCESS</div>
+<h2 data-i18n="watchTitle">Где посмотреть</h2>
+</div>
+</div>
+<div class="watch-layout">
+<div class="watch-primary">
+<p class="watch-intro" data-i18n="watchIntro">Площадки появятся здесь после подтверждения релиза. Пока раздел работает как публичная точка доступа к проекту.</p>
+<div class="watch-list">
+<div class="platform" data-platform-en="Kinopoisk" data-platform-ru="Кинопоиск">Кинопоиск · скоро</div>
+<div class="platform" data-platform-en="RuTube" data-platform-ru="RuTube">RuTube · скоро</div>
+<div class="platform" data-platform-en="VK Video" data-platform-ru="VK Видео">VK Видео · скоро</div>
+</div>
+</div>
+<aside aria-label="Current project signal" class="current-signal">
+<div class="signal-head">
+<span class="metric-kicker" data-i18n="signalKicker">Текущий сигнал</span>
+<i aria-hidden="true"></i>
+</div>
+<div aria-hidden="true" class="signal-wave"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+<dl class="signal-data">
+<div><dt data-i18n="signalStatusLabel">Статус</dt><dd data-i18n="signalStatusValue">В разработке</dd></div>
+<div><dt data-i18n="signalYearLabel">Год</dt><dd>2026</dd></div>
+<div><dt data-i18n="signalTrailerLabel">Трейлер</dt><dd data-i18n="signalTrailerValue">В сети</dd></div>
+<div><dt data-i18n="signalAccessLabel">Публичный доступ</dt><dd class="signal-live"><b></b><span data-i18n="signalAccessValue">Активен</span></dd></div>
+</dl>
+<div aria-label="Project signal log" class="signal-log">
+<div class="signal-log-row"><time>14:20</time><span data-i18n="signalLog1">Трейлер доступен</span><b data-i18n="signalNow">СЕЙЧАС</b></div>
+<div class="signal-log-row"><time>SYS</time><span data-i18n="signalLog2">Публичный архив открыт</span><b>ONLINE</b></div>
+<div class="signal-log-row"><time>2045</time><span data-i18n="signalLog3">Релиз ожидает подтверждения</span><b data-i18n="signalPending">PENDING</b></div>
+</div><div class="signal-foot" data-i18n="signalStable">SIGNAL // STABLE</div>
+</aside>
+</div>
+</div>
+</section>
+<section data-system-watermark="SUBJECTS" id="cast">
+<div class="shell">
+<div class="section-head">
+<div>
+<div class="section-label" data-i18n="castLabel">05 / SUBJECTS</div>
+<h2 data-i18n="castTitle">Актёрский состав</h2>
+</div>
+</div>
+<div class="cast">
+<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_01" role="button" tabindex="0"><strong data-i18n="nameArman">Арман О.</strong><span data-i18n="roleGor">Гор</span>
+<div class="subject-more">
+<div class="subject-grid">
+<div class="subject-cell"><small>ROLE</small><b data-i18n="roleGor">Гор</b></div>
+<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
+<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
+</div>
+</div>
+<span aria-hidden="true" class="subject-plus">+</span></div>
+<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_02" role="button" tabindex="0"><strong data-i18n="nameBogdan">Богдан В.</strong><span data-i18n="roleAntagonist">Антагонист</span>
+<div class="subject-more">
+<div class="subject-grid">
+<div class="subject-cell"><small>ROLE</small><b data-i18n="roleAntagonist">Антагонист</b></div>
+<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
+<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
+</div>
+</div>
+<span aria-hidden="true" class="subject-plus">+</span></div>
+<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_03" role="button" tabindex="0"><strong data-i18n="nameLevon">Левон</strong><span data-i18n="roleMark">Марк</span>
+<div class="subject-more">
+<div class="subject-grid">
+<div class="subject-cell"><small>ROLE</small><b data-i18n="roleMark">Марк</b></div>
+<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
+<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
+</div>
+</div>
+<span aria-hidden="true" class="subject-plus">+</span></div>
+<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_04" role="button" tabindex="0"><strong data-i18n="nameYulia">Юля Ш.</strong><span data-i18n="roleHost">Ведущая</span>
+<div class="subject-more">
+<div class="subject-grid">
+<div class="subject-cell"><small>ROLE</small><b data-i18n="roleHost">Ведущая</b></div>
+<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
+<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
+</div>
+</div>
+<span aria-hidden="true" class="subject-plus">+</span></div>
+<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_05" role="button" tabindex="0"><strong data-i18n="nameArsen">Арсен О.</strong><span data-i18n="roleMusician">Музыкант</span>
+<div class="subject-more">
+<div class="subject-grid">
+<div class="subject-cell"><small>ROLE</small><b data-i18n="roleMusician">Музыкант</b></div>
+<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
+<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
+</div>
+</div>
+<span aria-hidden="true" class="subject-plus">+</span></div>
+<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_06" role="button" tabindex="0"><strong data-i18n="nameAlexander">Александр К.</strong><span data-i18n="roleGrandfather">Дедушка Гора</span>
+<div class="subject-more">
+<div class="subject-grid">
+<div class="subject-cell"><small>ROLE</small><b data-i18n="roleGrandfather">Дедушка Гора</b></div>
+<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
+<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
+</div>
+</div>
+<span aria-hidden="true" class="subject-plus">+</span></div>
+<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_07" role="button" tabindex="0"><strong data-i18n="nameBella">Белла А.</strong><span data-i18n="roleDetective">Детектив</span>
+<div class="subject-more">
+<div class="subject-grid">
+<div class="subject-cell"><small>ROLE</small><b data-i18n="roleDetective">Детектив</b></div>
+<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
+<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
+</div>
+</div>
+<span aria-hidden="true" class="subject-plus">+</span></div>
+</div>
+</div>
+</section>
 
-          <div class="info-card">
-            <small data-i18n="infoGenre">Жанр</small>
-            <span data-i18n="genreValue">Антиутопия · Драма · Боевик · Приключения · Фантастика</span>
-          </div>
-
-          <div class="info-card">
-            <small data-i18n="infoDirector">Режиссёр</small>
-            <span data-i18n="directorName">Арман О. А.</span>
-          </div>
-
-          <div class="info-card">
-            <small data-i18n="infoStatus">Статус</small>
-            <span data-i18n="statusValue">В разработке</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="materials" data-system-watermark="ARCHIVE">
-      <div class="shell">
-        <div class="section-head">
-          <div>
-            <div class="section-label" data-i18n="materialsLabel">02 / ARCHIVE</div>
-            <h2 data-i18n="materialsTitle">Визуальные материалы</h2>
-          </div>
-        </div>
-
-        <p class="section-note" data-i18n="materialsNote">Материалы представлены в авторском виде. Текст внутри постеров может оставаться на русском языке.</p>
-
-        <div class="archive-viewer" id="archiveViewer">
-          <div class="archive-stage-wrap">
-            <button class="gallery-button prev" id="galleryPrev" type="button" aria-label="Предыдущее изображение" data-i18n-aria="previousImage"><span>←</span><small>PREV</small></button>
-
-            <figure class="archive-stage" id="archiveStage" tabindex="0" aria-label="Открыть изображение" data-i18n-aria="openImage">
-              <img id="archiveMainImage" src="assets/images/archive/archive-01.jpg" alt="Обложка фильма Хищение" data-i18n-alt="galleryAlt01">
-              <figcaption class="archive-stage-meta">
-                <span id="archiveCode">MAT_001 // ARCHIVE</span>
-                <span id="archiveCounter">01 / 11</span>
-              </figcaption>
-            </figure>
-
-            <button class="gallery-button next" id="galleryNext" type="button" aria-label="Следующее изображение" data-i18n-aria="nextImage"><small>NEXT</small><span>→</span></button>
-          </div>
-
-          <div class="archive-strip-head" aria-hidden="true"><span>ARCHIVE INDEX</span><span>11 FILES // PUBLIC</span></div>
-          <div class="gallery archive-thumbs" id="gallery" tabindex="0" aria-label="Галерея материалов фильма" data-i18n-aria="galleryAria">
-              <figure class="gallery-card is-active" tabindex="0" data-index="0" data-file="MAT_001">
-                <img src="assets/images/archive/archive-01.jpg" alt="Обложка фильма Хищение" data-i18n-alt="galleryAlt01" loading="lazy">
-              </figure>
-              <figure class="gallery-card" tabindex="0" data-index="1" data-file="MAT_002">
-                <img src="assets/images/archive/archive-02.jpg" alt="Постер фильма Хищение — пианино" data-i18n-alt="galleryAlt02" loading="lazy">
-              </figure>
-              <figure class="gallery-card" tabindex="0" data-index="2" data-file="MAT_003">
-                <img src="assets/images/archive/archive-03.jpg" alt="Постер фильма Хищение — дедушка и ребёнок" data-i18n-alt="galleryAlt03" loading="lazy">
-              </figure>
-              <figure class="gallery-card" tabindex="0" data-index="3" data-file="MAT_004">
-                <img src="assets/images/archive/archive-04.jpg" alt="Постер фильма Хищение — человек в капюшоне" data-i18n-alt="galleryAlt04" loading="lazy">
-              </figure>
-              <figure class="gallery-card" tabindex="0" data-index="4" data-file="MAT_005">
-                <img src="assets/images/archive/archive-05.jpg" alt="Постер фильма Хищение" data-i18n-alt="galleryAlt05" loading="lazy">
-              </figure>
-              <figure class="gallery-card" tabindex="0" data-index="5" data-file="MAT_006">
-                <img src="assets/images/archive/archive-06.jpg" alt="Постер фильма Хищение — герой в разрушенном городе" data-i18n-alt="galleryAlt06" loading="lazy">
-              </figure>
-              <figure class="gallery-card" tabindex="0" data-index="6" data-file="MAT_007">
-                <img src="assets/images/archive/archive-07.jpg" alt="Постер фильма Хищение — ведущая" data-i18n-alt="galleryAlt07" loading="lazy">
-              </figure>
-              <figure class="gallery-card" tabindex="0" data-index="7" data-file="MAT_008">
-                <img src="assets/images/archive/archive-08.jpg" alt="Постер фильма Хищение — город" data-i18n-alt="galleryAlt08" loading="lazy">
-              </figure>
-              <figure class="gallery-card" tabindex="0" data-index="8" data-file="MAT_009">
-                <img src="assets/images/archive/archive-09.jpg" alt="Постер фильма Хищение — Гор" data-i18n-alt="galleryAlt09" loading="lazy">
-              </figure>
-              <figure class="gallery-card" tabindex="0" data-index="9" data-file="MAT_010">
-                <img src="assets/images/archive/archive-10.jpg" alt="Кадры из фильма Хищение" data-i18n-alt="galleryAlt10" loading="lazy">
-              </figure>
-              <figure class="gallery-card" tabindex="0" data-index="10" data-file="MAT_011">
-                <img src="assets/images/archive/archive-11.jpg" alt="Постер фильма Хищение — визуальный материал" data-i18n-alt="galleryAlt11" loading="lazy">
-              </figure>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="trailer-section" id="trailer" data-system-watermark="SIGNAL">
-      <div class="shell">
-        <div class="section-head">
-          <div>
-            <div class="section-label" data-i18n="trailerLabel">03 / SIGNAL</div>
-            <h2 data-i18n="trailerTitle">Трейлер</h2>
-          </div>
-        </div>
-
-        <div class="signal-meta" aria-hidden="true"><span>SIGNAL_03</span><span>16:9 / MP4</span><span>ORIGINAL AUDIO // RU</span></div>
-        <div class="video-shell" id="videoShell">
-          <video controls preload="metadata" poster="assets/images/signal/signal-preview.jpg" playsinline>
-            <source src="assets/video/signal/signal-trailer-ru.mp4" type="video/mp4">
-            <span data-i18n="videoFallback">Ваш браузер не поддерживает воспроизведение видео.</span>
-          </video>
-        </div>
-        <p class="section-note trailer-language-note" data-i18n="trailerLanguageNote">Оригинальная звуковая дорожка трейлера — на русском. Английские субтитры можно добавить после согласования с автором.</p>
-      </div>
-    </section>
-
-    <section id="watch" data-system-watermark="ACCESS">
-      <div class="shell">
-        <div class="section-head">
-          <div>
-            <div class="section-label" data-i18n="watchLabel">04 / ACCESS</div>
-            <h2 data-i18n="watchTitle">Где посмотреть</h2>
-          </div>
-        </div>
-
-        <div class="watch-layout">
-          <div class="watch-primary">
-            <p class="watch-intro" data-i18n="watchIntro">Площадки появятся здесь после подтверждения релиза. Пока раздел работает как публичная точка доступа к проекту.</p>
-            <div class="watch-list">
-              <div class="platform" data-platform-ru="Кинопоиск" data-platform-en="Kinopoisk">Кинопоиск · скоро</div>
-              <div class="platform" data-platform-ru="RuTube" data-platform-en="RuTube">RuTube · скоро</div>
-              <div class="platform" data-platform-ru="VK Видео" data-platform-en="VK Video">VK Видео · скоро</div>
-            </div>
-          </div>
-          <aside class="current-signal" aria-label="Current project signal">
-            <div class="signal-head">
-              <span class="metric-kicker" data-i18n="signalKicker">Текущий сигнал</span>
-              <i aria-hidden="true"></i>
-            </div>
-            <div class="signal-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-            <dl class="signal-data">
-              <div><dt data-i18n="signalStatusLabel">Статус</dt><dd data-i18n="signalStatusValue">В разработке</dd></div>
-              <div><dt data-i18n="signalYearLabel">Год</dt><dd>2026</dd></div>
-              <div><dt data-i18n="signalTrailerLabel">Трейлер</dt><dd data-i18n="signalTrailerValue">В сети</dd></div>
-              <div><dt data-i18n="signalAccessLabel">Публичный доступ</dt><dd class="signal-live"><b></b><span data-i18n="signalAccessValue">Активен</span></dd></div>
-            </dl>
-            <div class="signal-foot" data-i18n="signalStable">SIGNAL // STABLE</div>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <section id="cast" data-system-watermark="SUBJECTS">
-      <div class="shell">
-        <div class="section-head">
-          <div>
-            <div class="section-label" data-i18n="castLabel">05 / SUBJECTS</div>
-            <h2 data-i18n="castTitle">Актёрский состав</h2>
-          </div>
-        </div>
-
-        <div class="cast">
-          <div class="cast-member" data-subject="SUBJECT_01"><strong data-i18n="nameArman">Арман О.</strong><span data-i18n="roleGor">Гор</span></div>
-          <div class="cast-member" data-subject="SUBJECT_02"><strong data-i18n="nameBogdan">Богдан В.</strong><span data-i18n="roleAntagonist">Антагонист</span></div>
-          <div class="cast-member" data-subject="SUBJECT_03"><strong data-i18n="nameLevon">Левон</strong><span data-i18n="roleMark">Марк</span></div>
-          <div class="cast-member" data-subject="SUBJECT_04"><strong data-i18n="nameYulia">Юля Ш.</strong><span data-i18n="roleHost">Ведущая</span></div>
-          <div class="cast-member" data-subject="SUBJECT_05"><strong data-i18n="nameArsen">Арсен О.</strong><span data-i18n="roleMusician">Музыкант</span></div>
-          <div class="cast-member" data-subject="SUBJECT_06"><strong data-i18n="nameAlexander">Александр К.</strong><span data-i18n="roleGrandfather">Дедушка Гора</span></div>
-          <div class="cast-member" data-subject="SUBJECT_07"><strong data-i18n="nameBella">Белла А.</strong><span data-i18n="roleDetective">Детектив</span></div>
-        </div>
-      </div>
-    </section>
-
-
-    <section class="reviews-section" id="reviews" data-system-watermark="RESPONSE">
-      <div class="shell">
-        <div class="section-head reviews-heading">
-          <div>
-            <div class="section-label" data-i18n="reviewsLabel">06 / PUBLIC RESPONSE</div>
-            <h2 data-i18n="reviewsTitle">Отзывы зрителей</h2>
-          </div>
-          <div class="reviews-head-aside">
-            <p class="reviews-intro" data-i18n="reviewsIntro">Оценки зрителей формируют «Свежесть» фильма. 7–10 баллов считаются положительной оценкой.</p>
-            <div class="review-metrics" aria-label="Audience score summary">
-              <div class="freshness-ring is-pending" id="freshnessRing" style="--freshness:0">
-                <div class="freshness-ring-inner">
-                  <strong id="freshnessValue">—</strong>
-                  <span id="freshnessState" data-i18n="insufficient">Недостаточно оценок</span>
-                </div>
-              </div>
-              <div class="review-metric-copy">
-                <span class="metric-kicker" data-i18n="freshness">Свежесть</span>
-                <small data-i18n="freshnessHint">7–10 = положительно</small>
-              </div>
-              <div class="review-average">
-                <span class="metric-kicker" data-i18n="average">Средняя оценка</span>
-                <div><strong id="averageRating">—</strong><span>/10</span></div>
-                <small id="ratingsCount">0 оценок</small>
-              </div>
-            </div>
-            <div class="service-badge is-checking" id="reviewServiceBadge" role="status" aria-live="polite"><i></i><span data-i18n="serviceChecking">ПРОВЕРКА КАНАЛА</span></div>
-          </div>
-        </div>
-
-        <div class="review-workspace">
-          <div class="review-composer">
-            <div class="composer-label" data-i18n="yourProtocol">Ваш профиль</div>
-            <div class="profile-console">
-              <div class="profile-avatar" id="profileAvatar" aria-hidden="true"></div>
-              <div class="profile-data">
-                <strong id="profileName">—</strong>
-                <p data-i18n="profileNote">Псевдоним и аватар создаются автоматически. Их можно менять сколько угодно.</p>
-                <div class="profile-actions">
-                  <button class="micro-button" id="rerollName" type="button" data-i18n="rerollName">Другой псевдоним</button>
-                  <button class="micro-button" id="rerollAvatar" type="button" data-i18n="rerollAvatar">Другой аватар</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="score-field">
-              <div class="field-heading">
-                <label data-i18n="yourRating">Ваша оценка</label>
-                <div class="score-readout">
-                  <strong id="selectedRatingValue">— / 10</strong>
-                  <span id="selectedRatingWord" data-i18n="ratingPrompt">Выберите от 0 до 10</span>
-                </div>
-              </div>
-              <div class="rating-scale" role="group" aria-label="Оценка от 0 до 10" data-i18n-aria="ratingScaleAria">
-                <button class="rating-button" type="button" data-rating="0" aria-pressed="false">0</button>
-                <button class="rating-button" type="button" data-rating="1" aria-pressed="false">1</button>
-                <button class="rating-button" type="button" data-rating="2" aria-pressed="false">2</button>
-                <button class="rating-button" type="button" data-rating="3" aria-pressed="false">3</button>
-                <button class="rating-button" type="button" data-rating="4" aria-pressed="false">4</button>
-                <button class="rating-button" type="button" data-rating="5" aria-pressed="false">5</button>
-                <button class="rating-button" type="button" data-rating="6" aria-pressed="false">6</button>
-                <button class="rating-button" type="button" data-rating="7" aria-pressed="false">7</button>
-                <button class="rating-button" type="button" data-rating="8" aria-pressed="false">8</button>
-                <button class="rating-button" type="button" data-rating="9" aria-pressed="false">9</button>
-                <button class="rating-button" type="button" data-rating="10" aria-pressed="false">10</button>
-              </div>
-            </div>
-
-            <div class="review-text-field">
-              <div class="field-heading inline-heading">
-                <label for="reviewText"><span data-i18n="reviewLabel">Ваш отзыв</span> <small data-i18n="reviewOptional">необязательно</small></label>
-                <span id="reviewCounter">0 / 2000</span>
-              </div>
-              <textarea id="reviewText" maxlength="2000" rows="6" data-i18n-placeholder="reviewPlaceholder" placeholder="Расскажите о впечатлениях от фильма…"></textarea>
-            </div>
-
-            <div class="review-submit-row">
-              <button class="button" id="submitReview" type="button" data-i18n="publish">Опубликовать</button>
-              <button class="button danger-button" id="deleteReview" type="button" hidden data-i18n="deleteReview">Удалить отзыв</button>
-            </div>
-            <div class="review-status" id="reviewStatus" aria-live="polite"></div>
-          </div>
-
-          <div class="review-feed">
-            <div class="review-feed-head">
-              <div class="composer-label" data-i18n="reviewsTitle">Отзывы зрителей</div>
-              <div class="review-sort" role="group" aria-label="Review sorting">
-                <button class="review-sort-button active" type="button" data-sort="new" data-i18n="latest">Новые</button>
-                <button class="review-sort-button" type="button" data-sort="high" data-i18n="highest">С высокой оценкой</button>
-                <button class="review-sort-button" type="button" data-sort="low" data-i18n="lowest">С низкой оценкой</button>
-              </div>
-            </div>
-            <div class="reviews-list" id="reviewsList">
-              <div class="reviews-empty" data-i18n="reviewsEmpty">Пока нет отзывов. Ваша оценка может стать первой.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="contacts" data-system-watermark="CONTACT">
-      <div class="shell contact-box">
-        <div>
-          <div class="section-label" data-i18n="contactsLabel">07 / CONTACT</div>
-          <h2 data-i18n="contactsTitle">Контакты</h2>
-        </div>
-
-        <a class="contact-link" href="https://www.instagram.com/armanfut/" target="_blank" rel="noopener noreferrer">
+<section class="faq-section" data-system-watermark="FAQ" id="faq">
+<div class="shell">
+<div class="faq-grid">
+<div>
+<div class="section-label" data-i18n="faqLabel">06 / FAQ</div>
+<h2 data-i18n="faqTitle">Часто задаваемые вопросы</h2>
+<p class="faq-intro" data-i18n="faqIntro">Короткие ответы о фильме и этом публичном архиве. Факты о релизе обновляются только после подтверждения командой.</p>
+</div>
+<div class="faq-list">
+<details class="faq-item"><summary data-i18n="faqQ1">Когда выйдет фильм?</summary><div class="faq-answer" data-i18n="faqA1">Точная дата релиза пока не объявлена. Фильм находится в разработке; подтверждённая дата появится на этом сайте.</div></details>
+<details class="faq-item"><summary data-i18n="faqQ2">Где можно будет посмотреть «Хищение»?</summary><div class="faq-answer" data-i18n="faqA2">Площадки появятся в разделе «Где посмотреть» после подтверждения релиза. Сейчас они помечены как ожидающие.</div></details>
+<details class="faq-item"><summary data-i18n="faqQ3">На каком языке трейлер?</summary><div class="faq-answer" data-i18n="faqA3">Оригинальная звуковая дорожка трейлера — на русском. Текст внутри авторских постеров также может оставаться на русском.</div></details>
+<details class="faq-item"><summary data-i18n="faqQ4">Будут ли английские субтитры?</summary><div class="faq-answer" data-i18n="faqA4">Возможность английских субтитров предусмотрена, но публиковать обещание до согласования с автором мы не будем.</div></details>
+<details class="faq-item"><summary data-i18n="faqQ5">Как оставить отзыв?</summary><div class="faq-answer" data-i18n="faqA5">Откройте отдельную вкладку «Отзывы», выберите оценку от 0 до 10 и при желании добавьте текст. Email, телефон и обычная регистрация не нужны.</div></details>
+</div>
+</div>
+</div>
+</section><section data-system-watermark="CONTACT" id="contacts">
+<div class="shell contact-box">
+<div>
+<div class="section-label" data-i18n="contactsLabel">07 / CONTACT</div>
+<h2 data-i18n="contactsTitle">Контакты</h2>
+</div>
+<a class="contact-link" href="https://www.instagram.com/armanfut/" rel="noopener noreferrer" target="_blank">
           Instagram · @armanfut ↗
         </a>
-      </div>
-    </section>
-  </main>
+</div>
+</section>
+</main>
+<footer>
+<strong>ХИЩЕНИЕ / THEFT</strong><br/><br/>
+<span data-i18n="footer">Официальный сайт фильма · фильм находится в разработке</span>
+<div class="security-easter-egg">
+<button aria-controls="securityPanel" aria-expanded="false" class="security-toggle" data-i18n="securityTeaser" id="securityToggle" type="button">SYS // SECURITY: PRESENT</button>
+<div class="security-panel" hidden="" id="securityPanel">
+<strong data-i18n="securityTitle">На сайте есть безопасность</strong>
+<p data-i18n="securityText">Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва, а также ваши реакции и ответы, если вы ими пользуетесь. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.</p>
+</div>
+</div>
+<div aria-hidden="true" class="footer-system">THEFT // PUBLIC FILE // 2045</div>
+<div class="build-mark">BUILD // P14 // THEFT WORLD</div></footer>
+<div aria-hidden="true" aria-label="Просмотр изображения" aria-modal="true" class="lightbox" data-i18n-aria="lightboxAria" id="lightbox" role="dialog">
+<button aria-label="Закрыть" class="lightbox-button lightbox-close" data-i18n-aria="close" id="lightboxClose" type="button">×</button>
+<button aria-label="Предыдущее изображение" class="lightbox-button lightbox-prev" data-i18n-aria="previousImage" id="lightboxPrev" type="button">←</button>
+<img alt="" class="lightbox-image" id="lightboxImage" src=""/>
+<div aria-live="polite" class="lightbox-counter" id="lightboxCounter"></div>
+<button aria-label="Следующее изображение" class="lightbox-button lightbox-next" data-i18n-aria="nextImage" id="lightboxNext" type="button">→</button>
+</div>
 
-  <footer>
-    <strong>ХИЩЕНИЕ / THEFT</strong><br><br>
-    <span data-i18n="footer">Официальный сайт фильма · фильм находится в разработке</span>
-    <div class="security-easter-egg">
-      <button id="securityToggle" class="security-toggle" type="button" aria-expanded="false" aria-controls="securityPanel" data-i18n="securityTeaser">SYS // SECURITY: PRESENT</button>
-      <div class="security-panel" id="securityPanel" hidden>
-        <strong data-i18n="securityTitle">На сайте есть безопасность</strong>
-        <p data-i18n="securityText">Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.</p>
-      </div>
-    </div>
-    <div class="footer-system" aria-hidden="true">THEFT // PUBLIC FILE // 2045</div>
-  </footer>
 
-  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Просмотр изображения" data-i18n-aria="lightboxAria">
-    <button class="lightbox-button lightbox-close" id="lightboxClose" type="button" aria-label="Закрыть" data-i18n-aria="close">×</button>
-    <button class="lightbox-button lightbox-prev" id="lightboxPrev" type="button" aria-label="Предыдущее изображение" data-i18n-aria="previousImage">←</button>
-
-    <img class="lightbox-image" id="lightboxImage" src="" alt="">
-    <div class="lightbox-counter" id="lightboxCounter" aria-live="polite"></div>
-
-    <button class="lightbox-button lightbox-next" id="lightboxNext" type="button" aria-label="Следующее изображение" data-i18n-aria="nextImage">→</button>
-  </div>
-
-  <script>
-    (() => {
-      const body = document.body;
-      const header = document.querySelector('.site-header');
-      const menu = document.getElementById('menuToggle');
-      const nav = document.getElementById('primaryNav');
-      const scrollProgress = document.getElementById('scrollProgress');
-      const railProgress = document.getElementById('railProgress');
-      const railSection = document.getElementById('railSection');
-      const sections = [
-        ['top','00 / ENTRY'], ['about','01 / DOSSIER'], ['materials','02 / ARCHIVE'],
-        ['trailer','03 / SIGNAL'], ['watch','04 / ACCESS'], ['cast','05 / SUBJECTS'],
-        ['reviews','06 / RESPONSE'], ['contacts','07 / CONTACT']
-      ].map(([id, code]) => [document.getElementById(id), code]).filter(([el]) => el);
-
-      const closeNav = () => {
-        body.classList.remove('nav-open');
-        menu?.setAttribute('aria-expanded','false');
-      };
-      menu?.addEventListener('click', () => {
-        const open = body.classList.toggle('nav-open');
-        menu.setAttribute('aria-expanded', String(open));
-      });
-      nav?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
-      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
-      window.addEventListener('resize', () => { if (innerWidth > 980) closeNav(); }, { passive:true });
-
-      const updateSystemUI = () => {
-        const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
-        const pct = Math.min(100, Math.max(0, scrollY / max * 100));
-        if (scrollProgress) scrollProgress.style.width = pct + '%';
-        if (railProgress) railProgress.style.height = pct + '%';
-        const offset = (header?.offsetHeight || 70) + innerHeight * .22;
-        let current = sections[0]?.[1] || '00 / ENTRY';
-        sections.forEach(([el, code]) => { if (el.getBoundingClientRect().top <= offset) current = code; });
-        if (railSection) railSection.textContent = current;
-      };
-      updateSystemUI();
-      addEventListener('scroll', updateSystemUI, { passive:true });
-      addEventListener('resize', updateSystemUI, { passive:true });
-    })();
-
-    /* P8: единая точная навигация с учётом sticky-header */
-    (() => {
-      const header = document.querySelector('.site-header');
-      document.querySelectorAll('a[href^="#"]').forEach(link => {
-        link.addEventListener('click', event => {
-          const id = link.getAttribute('href');
-          if (!id || id === '#') return;
-          const target = document.querySelector(id);
-          if (!target) return;
-          event.preventDefault();
-          const headerH = header?.offsetHeight || 0;
-          const top = id === '#top' ? 0 : Math.max(0, target.offsetTop - headerH);
-          window.scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-          history.replaceState(null, '', id === '#top' ? location.pathname + location.search : id);
-        });
-      });
-    })();
-
-    const gallery = document.getElementById('gallery');
-    const galleryPrev = document.getElementById('galleryPrev');
-    const galleryNext = document.getElementById('galleryNext');
-    const galleryCards = Array.from(document.querySelectorAll('.gallery-card'));
-    const archiveStage = document.getElementById('archiveStage');
-    const archiveMainImage = document.getElementById('archiveMainImage');
-    const archiveCode = document.getElementById('archiveCode');
-    const archiveCounter = document.getElementById('archiveCounter');
-    let archiveIndex = 0;
-
-    function setArchiveImage(index, scrollThumb = true) {
-      archiveIndex = (index + galleryCards.length) % galleryCards.length;
-      const card = galleryCards[archiveIndex];
-      const img = card.querySelector('img');
-      archiveMainImage.src = img.src;
-      archiveMainImage.alt = img.alt;
-      archiveCode.textContent = `${card.dataset.file} // ARCHIVE`;
-      archiveCounter.textContent = `${String(archiveIndex + 1).padStart(2,'0')} / ${String(galleryCards.length).padStart(2,'0')}`;
-      galleryCards.forEach((item,i) => item.classList.toggle('is-active', i === archiveIndex));
-      if (scrollThumb) card.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
-    }
-
-    galleryPrev.addEventListener('click', () => setArchiveImage(archiveIndex - 1));
-    galleryNext.addEventListener('click', () => setArchiveImage(archiveIndex + 1));
-
-    /* Просмотр изображений */
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImage = document.getElementById('lightboxImage');
-    const lightboxCounter = document.getElementById('lightboxCounter');
-    const lightboxClose = document.getElementById('lightboxClose');
-    const lightboxPrev = document.getElementById('lightboxPrev');
-    const lightboxNext = document.getElementById('lightboxNext');
-
-    const galleryImages = galleryCards.map(card => {
-      const img = card.querySelector('img');
-      return { src: img.src, alt: img.alt };
-    });
-
-    let currentImageIndex = 0;
-    let lightboxTouchStartX = 0;
-
-    function showLightboxImage(index) {
-      currentImageIndex = (index + galleryImages.length) % galleryImages.length;
-      lightboxImage.src = galleryImages[currentImageIndex].src;
-      lightboxImage.alt = galleryImages[currentImageIndex].alt;
-      lightboxCounter.textContent = `${currentImageIndex + 1} / ${galleryImages.length}`;
-    }
-
-    function openLightbox(index) {
-      showLightboxImage(index);
-      lightbox.classList.add('open');
-      lightbox.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('lightbox-open');
-      lightboxClose.focus();
-    }
-
-    function closeLightbox() {
-      lightbox.classList.remove('open');
-      lightbox.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('lightbox-open');
-    }
-
-    galleryCards.forEach((card, index) => {
-      card.addEventListener('click', () => setArchiveImage(index));
-      card.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          setArchiveImage(index);
-        }
-      });
-    });
-    archiveStage?.addEventListener('click', () => openLightbox(archiveIndex));
-    archiveStage?.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox(archiveIndex); }
-    });
-    setArchiveImage(0, false);
-
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightboxPrev.addEventListener('click', () => showLightboxImage(currentImageIndex - 1));
-    lightboxNext.addEventListener('click', () => showLightboxImage(currentImageIndex + 1));
-
-    lightbox.addEventListener('click', event => {
-      if (event.target === lightbox) closeLightbox();
-    });
-
-    lightbox.addEventListener('touchstart', event => {
-      lightboxTouchStartX = event.changedTouches[0].clientX;
-    }, { passive: true });
-
-    lightbox.addEventListener('touchend', event => {
-      const delta = event.changedTouches[0].clientX - lightboxTouchStartX;
-      if (Math.abs(delta) < 50) return;
-      if (delta < 0) showLightboxImage(currentImageIndex + 1);
-      else showLightboxImage(currentImageIndex - 1);
-    }, { passive: true });
-
-    document.addEventListener('keydown', event => {
-      if (!lightbox.classList.contains('open')) return;
-
-      if (event.key === 'Escape') closeLightbox();
-      if (event.key === 'ArrowLeft') showLightboxImage(currentImageIndex - 1);
-      if (event.key === 'ArrowRight') showLightboxImage(currentImageIndex + 1);
-    });
-
-    /* Подгоняем трейлер под высоту экрана на компьютере */
-    const videoShell = document.getElementById('videoShell');
-    const siteHeader = document.querySelector('.site-header');
-
-    function fitTrailerToViewport() {
-      if (window.innerWidth <= 820) {
-        videoShell.style.width = '100%';
-        return;
-      }
-
-      const headerHeight = siteHeader.offsetHeight;
-      const reservedHeight = 235;
-      const availableVideoHeight = Math.max(360, window.innerHeight - headerHeight - reservedHeight);
-      const widthByHeight = availableVideoHeight * (16 / 9);
-      const finalWidth = Math.min(1040, widthByHeight);
-
-      videoShell.style.width = `${finalWidth}px`;
-    }
-
-    fitTrailerToViewport();
-    window.addEventListener('resize', fitTrailerToViewport);
-
-    /* Подсвечиваем текущий раздел в меню */
-    const navAnchors = Array.from(document.querySelectorAll('.nav-links a'));
-    const observedSections = navAnchors
-      .map(link => document.querySelector(link.getAttribute('href')))
-      .filter(Boolean);
-
-    const sectionObserver = new IntersectionObserver(entries => {
-      const visible = entries
-        .filter(entry => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
-      if (!visible) return;
-
-      navAnchors.forEach(link => {
-        link.classList.toggle('active', link.getAttribute('href') === `#${visible.target.id}`);
-      });
-    }, {
-      rootMargin: `-${siteHeader.offsetHeight + 10}px 0px -55% 0px`,
-      threshold: [0.1, 0.25, 0.5]
-    });
-
-    observedSections.forEach(section => sectionObserver.observe(section));
-  </script>
-
-  <script src="js/public-response.js"></script>
-
-</body>
+<script src="js/site.js?v=14-final"></script><script src="js/public-response.js?v=14-final"></script></body>
 </html>
