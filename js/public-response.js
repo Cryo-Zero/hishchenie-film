@@ -3,22 +3,13 @@
 
   const SUPABASE_URL = 'https://xltwwvutqkpmtmlavngi.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_0hT3y-7p26Ngnq2zaPK-0w_5vtJX15k';
+  const SUPABASE_ANON_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhsdHd3dnV0cWtwbXRtbGF2bmdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwMzczNDUsImV4cCI6MjEwMjYxMzM0NX0.6NHPtuon2292W9aE_mn8_FzoFo_BnpT10_CicWbhFSA';
+  const PROJECT_REF = 'xltwwvutqkpmtmlavngi';
+  const SESSION_KEY = `sb-${PROJECT_REF}-auth-token`;
+  const REQUEST_TIMEOUT = 12000;
 
-  let db = null;
   let identityPromise = null;
-
-  function createDbClient() {
-    if (db) return db;
-    if (!window.supabase?.createClient) return null;
-    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: false
-      }
-    });
-    return db;
-  }
+  let memorySession = null;
 
   const I18N = {
     ru: {
@@ -145,7 +136,8 @@
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   const safeStorage = {
     get(key) { try { return window.localStorage?.getItem(key) ?? null; } catch { return null; } },
-    set(key, value) { try { window.localStorage?.setItem(key, value); } catch {} }
+    set(key, value) { try { window.localStorage?.setItem(key, value); } catch {} },
+    del(key) { try { window.localStorage?.removeItem(key); } catch {} }
   };
   const initialLanguage = safeStorage.get('theft_lang') || (navigator.language?.toLowerCase().startsWith('ru') ? 'ru' : 'en');
   const t = key => I18N[state.lang]?.[key] ?? I18N.ru[key] ?? key;
@@ -162,6 +154,167 @@
     serviceState: 'checking',
     lastFreshness: null
   };
+
+
+  class ApiError extends Error {
+    constructor(message, status = 0, payload = null) {
+      super(message);
+      this.name = 'ApiError';
+      this.status = status;
+      this.payload = payload;
+    }
+  }
+
+  function normalizeSession(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const session = raw.session && raw.session.access_token ? raw.session : raw;
+    if (!session.access_token || !session.refresh_token) return null;
+    if (!session.expires_at && session.expires_in) {
+      session.expires_at = Math.floor(Date.now() / 1000) + Number(session.expires_in);
+    }
+    return session;
+  }
+
+  function loadStoredSession() {
+    if (memorySession?.access_token) return memorySession;
+    const raw = safeStorage.get(SESSION_KEY);
+    if (!raw) return null;
+    try { return normalizeSession(JSON.parse(raw)); }
+    catch { return null; }
+  }
+
+  function storeSession(session) {
+    const normalized = normalizeSession(session);
+    if (!normalized) return null;
+    memorySession = normalized;
+    safeStorage.set(SESSION_KEY, JSON.stringify(normalized));
+    return normalized;
+  }
+
+  function clearSession() {
+    memorySession = null;
+    safeStorage.del(SESSION_KEY);
+    state.user = null;
+  }
+
+  function jwtExpiry(token) {
+    try {
+      const payload = token.split('.')[1];
+      if (!payload) return 0;
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64 + '='.repeat((4 - base64.length % 4) % 4);
+      return Number(JSON.parse(atob(padded)).exp || 0);
+    } catch { return 0; }
+  }
+
+  function isSessionFresh(session) {
+    if (!session?.access_token) return false;
+    const exp = Number(session.expires_at || jwtExpiry(session.access_token) || 0);
+    return exp === 0 || exp > Math.floor(Date.now() / 1000) + 90;
+  }
+
+  async function fetchJson(url, options = {}, timeout = REQUEST_TIMEOUT) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    try {
+      const response = await fetch(url, { ...options, signal: controller.signal, cache: 'no-store' });
+      const text = await response.text();
+      let payload = null;
+      if (text) {
+        try { payload = JSON.parse(text); }
+        catch { payload = text; }
+      }
+      if (!response.ok) {
+        const message = payload?.message || payload?.msg || payload?.error_description || payload?.error || `HTTP ${response.status}`;
+        throw new ApiError(String(message), response.status, payload);
+      }
+      return payload;
+    } catch (error) {
+      if (error?.name === 'AbortError') throw new ApiError('Request timed out', 408);
+      throw error;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function signInAnonymously() {
+    const session = await fetchJson(`${SUPABASE_URL}/auth/v1/signup`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ data: {}, gotrue_meta_security: { captcha_token: null } })
+    });
+    const stored = storeSession(session);
+    if (!stored?.user?.id) throw new ApiError('Anonymous session was not returned');
+    state.user = stored.user;
+    return stored;
+  }
+
+  async function refreshAuthSession(session) {
+    const refreshed = await fetchJson(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ refresh_token: session.refresh_token })
+    });
+    const stored = storeSession(refreshed);
+    if (!stored?.access_token) throw new ApiError('Session refresh failed');
+    state.user = stored.user || session.user || null;
+    return stored;
+  }
+
+  async function getAuthSession({ create = false } = {}) {
+    let session = loadStoredSession();
+    if (session && isSessionFresh(session)) {
+      state.user = session.user || state.user;
+      return session;
+    }
+    if (session?.refresh_token) {
+      try { return await refreshAuthSession(session); }
+      catch (error) {
+        // Keep temporary network failures retryable; discard only a definitely invalid token.
+        if (error instanceof ApiError && [400, 401, 403].includes(error.status)) clearSession();
+        else throw error;
+      }
+    }
+    if (!create) return null;
+    return signInAnonymously();
+  }
+
+  function restHeaders(token, hasBody = false) {
+    const headers = {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${token || SUPABASE_ANON_JWT}`,
+      Accept: 'application/json'
+    };
+    if (hasBody) headers['Content-Type'] = 'application/json';
+    return headers;
+  }
+
+  async function restRequest(resource, { method = 'GET', body = null, authenticated = false, prefer = '' } = {}) {
+    let token = SUPABASE_ANON_JWT;
+    if (authenticated) {
+      const session = await getAuthSession({ create: true });
+      token = session.access_token;
+      state.user = session.user || state.user;
+    }
+    const headers = restHeaders(token, body !== null);
+    if (prefer) headers.Prefer = prefer;
+    return fetchJson(`${SUPABASE_URL}/rest/v1/${resource}`, {
+      method,
+      headers,
+      body: body === null ? undefined : JSON.stringify(body)
+    });
+  }
+
+  async function rpc(name, args = {}) {
+    const data = await restRequest(`rpc/${name}`, { method: 'POST', body: args, authenticated: true });
+    return Array.isArray(data) && data.length === 1 ? data[0] : data;
+  }
 
   function randomInt(max) {
     if (window.crypto?.getRandomValues) {
@@ -354,7 +507,7 @@
     setServiceState(state.serviceState);
     const freshState = $('#freshnessState');
     if (freshState) freshState.textContent = freshnessCategory(state.lastFreshness);
-    if (db && dataLayerStarted) { refreshStats(); loadReviews(state.sort); }
+    if (dataLayerStarted) { refreshStats(); loadReviews(state.sort); }
   }
 
   function setLanguage(lang) {
@@ -384,70 +537,45 @@
   async function ensureUserAndProfile() {
     if (identityPromise) return identityPromise;
     identityPromise = (async () => {
-      if (!db) throw new Error('Supabase client unavailable');
+      const session = await getAuthSession({ create: true });
+      state.user = session.user;
+      if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
 
-      if (!state.user) {
-        const { data, error } = await db.auth.signInAnonymously();
-        if (error) throw error;
-        state.user = data.user;
-      }
-
-      if (!state.profile) {
-        const { data: existing, error: readError } = await db
-          .from('profiles')
-          .select('id,display_name,avatar_seed,avatar_style')
-          .eq('id', state.user.id)
-          .maybeSingle();
-        if (readError) throw readError;
-
-        if (existing) {
-          state.profile = existing;
-        } else {
-          const p = state.pendingProfile || createPendingProfile();
-          const { data: created, error: insertError } = await db
-            .from('profiles')
-            .upsert({
-              id: state.user.id,
-              display_name: p.display_name,
-              avatar_seed: p.avatar_seed,
-              avatar_style: p.avatar_style
-            }, { onConflict: 'id' })
-            .select('id,display_name,avatar_seed,avatar_style')
-            .single();
-          if (insertError) throw insertError;
-          state.profile = created;
-        }
-      }
-
+      const p = state.profile || state.pendingProfile || createPendingProfile();
+      const profile = await rpc('ensure_my_profile', {
+        p_display_name: p.display_name,
+        p_avatar_seed: Number(p.avatar_seed),
+        p_avatar_style: Number(p.avatar_style)
+      });
+      if (!profile?.id) throw new ApiError('Profile was not returned');
+      state.profile = profile;
+      state.pendingProfile = null;
       setServiceState('online');
       renderProfilePreview();
-      return state.profile;
+      return profile;
     })();
 
-    try {
-      return await identityPromise;
-    } finally {
-      identityPromise = null;
-    }
+    try { return await identityPromise; }
+    finally { identityPromise = null; }
   }
 
   async function loadExistingSession() {
-    if (!db) return;
-    const { data } = await db.auth.getSession();
-    state.user = data.session?.user || null;
-    if (!state.user) return;
+    const session = await getAuthSession({ create: false });
+    if (!session?.user?.id) return;
+    state.user = session.user;
 
-    const [{ data: profile }, { data: review }] = await Promise.all([
-      db.from('profiles').select('id,display_name,avatar_seed,avatar_style').eq('id', state.user.id).maybeSingle(),
-      db.from('reviews').select('id,user_id,rating,review_text,created_at,updated_at').eq('user_id', state.user.id).maybeSingle()
+    const uid = encodeURIComponent(state.user.id);
+    const [profileResult, reviewResult] = await Promise.allSettled([
+      restRequest(`profiles?select=id,display_name,avatar_seed,avatar_style&id=eq.${uid}`, { authenticated: true }),
+      restRequest(`reviews?select=id,user_id,rating,review_text,created_at,updated_at&user_id=eq.${uid}`, { authenticated: true })
     ]);
 
-    if (profile) state.profile = profile;
-    if (review) {
-      state.ownReview = review;
-      state.selectedRating = review.rating;
+    if (profileResult.status === 'fulfilled' && profileResult.value?.[0]) state.profile = profileResult.value[0];
+    if (reviewResult.status === 'fulfilled' && reviewResult.value?.[0]) {
+      state.ownReview = reviewResult.value[0];
+      state.selectedRating = Number(state.ownReview.rating);
       const textarea = $('#reviewText');
-      if (textarea) textarea.value = review.review_text || '';
+      if (textarea) textarea.value = state.ownReview.review_text || '';
     }
     renderProfilePreview();
     updateComposerUI();
@@ -480,6 +608,32 @@
     }
   }
 
+  async function persistProfilePatch(patch, button) {
+    const before = state.profile ? { ...state.profile } : null;
+    if (button) button.disabled = true;
+    try {
+      await ensureUserAndProfile();
+      const profile = await rpc('update_my_profile', {
+        p_display_name: Object.prototype.hasOwnProperty.call(patch, 'display_name') ? patch.display_name : null,
+        p_avatar_seed: Object.prototype.hasOwnProperty.call(patch, 'avatar_seed') ? Number(patch.avatar_seed) : null,
+        p_avatar_style: Object.prototype.hasOwnProperty.call(patch, 'avatar_style') ? Number(patch.avatar_style) : null
+      });
+      if (!profile?.id) throw new ApiError('Updated profile was not returned');
+      state.profile = profile;
+      state.pendingProfile = null;
+      renderProfilePreview();
+      setStatus('');
+      if (state.ownReview) await loadReviews(state.sort);
+    } catch (error) {
+      console.error('[reviews/profile]', error);
+      if (before) state.profile = before;
+      renderProfilePreview();
+      setStatus(t('profileError'), 'error');
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
   async function rerollName() {
     const button = $('#rerollName');
     const newName = generateAlias(state.lang);
@@ -489,24 +643,7 @@
       renderProfilePreview();
       return;
     }
-    try {
-      if (button) button.disabled = true;
-      await ensureUserAndProfile();
-      const { data, error } = await db.from('profiles')
-        .update({ display_name: newName })
-        .eq('id', state.user.id)
-        .select('id,display_name,avatar_seed,avatar_style')
-        .single();
-      if (error) throw error;
-      state.profile = data;
-      renderProfilePreview();
-      await loadReviews(state.sort);
-    } catch (error) {
-      console.error(error);
-      setStatus(t('profileError'), 'error');
-    } finally {
-      if (button) button.disabled = false;
-    }
+    await persistProfilePatch({ display_name: newName }, button);
   }
 
   async function rerollAvatar() {
@@ -518,24 +655,7 @@
       renderProfilePreview();
       return;
     }
-    try {
-      if (button) button.disabled = true;
-      await ensureUserAndProfile();
-      const { data, error } = await db.from('profiles')
-        .update(patch)
-        .eq('id', state.user.id)
-        .select('id,display_name,avatar_seed,avatar_style')
-        .single();
-      if (error) throw error;
-      state.profile = data;
-      renderProfilePreview();
-      await loadReviews(state.sort);
-    } catch (error) {
-      console.error(error);
-      setStatus(t('profileError'), 'error');
-    } finally {
-      if (button) button.disabled = false;
-    }
+    await persistProfilePatch(patch, button);
   }
 
   function updateCounter() {
@@ -544,16 +664,10 @@
     if (textarea && counter) counter.textContent = `${textarea.value.length} / 2000`;
   }
 
-  async function selectRating(value) {
+  function selectRating(value) {
     state.selectedRating = Number(value);
     updateRatingLabel();
     setStatus('');
-    try {
-      await ensureUserAndProfile();
-    } catch (error) {
-      console.error(error);
-      setStatus(t('authError'), 'error');
-    }
   }
 
   async function submitReview() {
@@ -571,24 +685,18 @@
     try {
       await ensureUserAndProfile();
       const text = ($('#reviewText')?.value || '').trim();
-      const payload = {
-        user_id: state.user.id,
-        rating: state.selectedRating,
-        review_text: text
-      };
       const wasExisting = Boolean(state.ownReview);
-      const { data, error } = await db
-        .from('reviews')
-        .upsert(payload, { onConflict: 'user_id' })
-        .select('id,user_id,rating,review_text,created_at,updated_at')
-        .single();
-      if (error) throw error;
-      state.ownReview = data;
+      const review = await rpc('save_my_review', {
+        p_rating: Number(state.selectedRating),
+        p_review_text: text
+      });
+      if (!review?.id) throw new ApiError('Saved review was not returned');
+      state.ownReview = review;
       updateComposerUI();
       setStatus(wasExisting ? t('updated') : t('saved'), 'success');
-      await Promise.all([refreshStats(), loadReviews(state.sort)]);
+      await Promise.allSettled([refreshStats(), loadReviews(state.sort)]);
     } catch (error) {
-      console.error(error);
+      console.error('[reviews/save]', error);
       setStatus(t('saveError'), 'error');
     } finally {
       state.busy = false;
@@ -597,12 +705,11 @@
   }
 
   async function deleteReview() {
-    if (!state.ownReview || !state.user || state.busy) return;
+    if (!state.ownReview || state.busy) return;
     if (!window.confirm(t('confirmDelete'))) return;
     state.busy = true;
     try {
-      const { error } = await db.from('reviews').delete().eq('user_id', state.user.id);
-      if (error) throw error;
+      await rpc('delete_my_review');
       state.ownReview = null;
       state.selectedRating = null;
       const textarea = $('#reviewText');
@@ -611,9 +718,9 @@
       updateComposerUI();
       updateRatingLabel();
       setStatus(t('deleted'), 'success');
-      await Promise.all([refreshStats(), loadReviews(state.sort)]);
+      await Promise.allSettled([refreshStats(), loadReviews(state.sort)]);
     } catch (error) {
-      console.error(error);
+      console.error('[reviews/delete]', error);
       setStatus(t('deleteError'), 'error');
     } finally {
       state.busy = false;
@@ -621,10 +728,9 @@
   }
 
   async function refreshStats() {
-    if (!db) { setServiceState('offline'); return; }
     try {
-      const { data, error } = await db.from('review_stats').select('total_ratings,average_rating,positive_ratings,freshness').single();
-      if (error) throw error;
+      const rows = await restRequest('review_stats?select=total_ratings,average_rating,positive_ratings,freshness');
+      const data = Array.isArray(rows) ? rows[0] : rows;
       setServiceState('online');
       const total = Number(data?.total_ratings || 0);
       const avg = data?.average_rating == null ? '—' : Number(data.average_rating).toFixed(1);
@@ -646,7 +752,7 @@
       if (countEl) countEl.textContent = `${total} ${pluralRatings(total)}`;
       state.lastFreshness = freshness;
     } catch (error) {
-      console.error(error);
+      console.error('[reviews/stats]', error);
       setServiceState('offline');
     }
   }
@@ -658,32 +764,26 @@
   }
 
   async function loadReviews(sort = state.sort) {
-    if (!db) return;
     state.sort = sort;
     $$('.review-sort-button').forEach(btn => btn.classList.toggle('active', btn.dataset.sort === sort));
     const list = $('#reviewsList');
     if (!list) return;
 
     try {
-      let query = db.from('reviews').select('id,user_id,rating,review_text,created_at,updated_at').limit(40);
-      if (sort === 'high') query = query.order('rating', { ascending: false }).order('created_at', { ascending: false });
-      else if (sort === 'low') query = query.order('rating', { ascending: true }).order('created_at', { ascending: false });
-      else query = query.order('created_at', { ascending: false });
-
-      const { data: reviews, error } = await query;
-      if (error) throw error;
+      const order = sort === 'high' ? 'rating.desc,created_at.desc' : sort === 'low' ? 'rating.asc,created_at.desc' : 'created_at.desc';
+      const reviews = await restRequest(`reviews?select=id,user_id,rating,review_text,created_at,updated_at&limit=40&order=${encodeURIComponent(order)}`);
       setServiceState('online');
       if (!reviews?.length) {
         list.replaceChildren(Object.assign(document.createElement('div'), { className: 'reviews-empty', textContent: t('reviewsEmpty') }));
         return;
       }
 
-      const ids = [...new Set(reviews.map(r => r.user_id))];
-      const { data: profiles, error: profileError } = await db
-        .from('profiles')
-        .select('id,display_name,avatar_seed,avatar_style')
-        .in('id', ids);
-      if (profileError) throw profileError;
+      const ids = [...new Set(reviews.map(r => r.user_id).filter(Boolean))];
+      let profiles = [];
+      if (ids.length) {
+        const filter = `(${ids.join(',')})`;
+        profiles = await restRequest(`profiles?select=id,display_name,avatar_seed,avatar_style&id=in.${encodeURIComponent(filter)}`);
+      }
       const profileMap = new Map((profiles || []).map(p => [p.id, p]));
 
       const fragment = document.createDocumentFragment();
@@ -710,13 +810,11 @@
           badge.className = 'own-badge';
           badge.textContent = t('yourBadge');
           identityText.append(name, badge, date);
-        } else {
-          identityText.append(name, date);
-        }
+        } else identityText.append(name, date);
         identity.append(avatar, identityText);
 
         const score = document.createElement('div');
-        score.className = `review-score${review.rating >= 7 ? ' positive' : ''}`;
+        score.className = `review-score${Number(review.rating) >= 7 ? ' positive' : ''}`;
         score.innerHTML = `<strong>${Number(review.rating)}</strong><span>/10</span>`;
         top.append(identity, score);
 
@@ -737,7 +835,7 @@
       });
       list.replaceChildren(fragment);
     } catch (error) {
-      console.error(error);
+      console.error('[reviews/feed]', error);
       setServiceState('offline');
       list.replaceChildren(Object.assign(document.createElement('div'), { className: 'reviews-empty', textContent: t('loadError') }));
     }
@@ -757,39 +855,37 @@
   let dataLayerStarted = false;
 
   async function bootDataLayer() {
-    if (dataLayerStarted || !createDbClient()) return;
+    if (dataLayerStarted) return;
     dataLayerStarted = true;
     setServiceState('checking');
+
+    // Public data must never wait for Auth. This is what prevents an endless spinner
+    // when a stored session is stale or a VPN slows down the Auth endpoint.
+    await Promise.allSettled([refreshStats(), loadReviews(state.sort)]);
+
     try {
       await loadExistingSession();
-      await Promise.allSettled([refreshStats(), loadReviews(state.sort)]);
+      if (state.user) await loadReviews(state.sort);
       if (state.serviceState === 'checking') setServiceState('online');
     } catch (error) {
-      console.error(error);
-      setServiceState('offline');
+      console.error('[reviews/session]', error);
+      // Public reviews may still be online even if the private session cannot be restored.
+      if (state.serviceState === 'checking') setServiceState('offline');
     }
   }
 
-  async function init() {
+  function init() {
     state.pendingProfile = createPendingProfile();
     bindEvents();
     applyTranslations();
     updateCounter();
     renderProfilePreview();
-
-    if (createDbClient()) await bootDataLayer();
-    else setServiceState('checking');
+    bootDataLayer();
   }
 
-  window.addEventListener('theft:supabase-ready', () => bootDataLayer());
-  window.addEventListener('theft:supabase-failed', () => {
-    if (!db) {
-      setServiceState('offline');
-      setStatus(t('loadError'), 'error');
-    }
-  });
   window.addEventListener('online', () => {
-    if (db) { dataLayerStarted = false; bootDataLayer(); }
+    dataLayerStarted = false;
+    bootDataLayer();
   });
   window.addEventListener('offline', () => setServiceState('offline'));
 
