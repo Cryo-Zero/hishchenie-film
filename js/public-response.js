@@ -7,7 +7,7 @@
   const PROJECT_REF = 'xltwwvutqkpmtmlavngi';
   const SESSION_KEY = `sb-${PROJECT_REF}-auth-token`;
   const REQUEST_TIMEOUT = 12000;
-  const CLIENT_REVISION = 'P11-direct-rest';
+  const CLIENT_REVISION = 'P12-single-write';
 
   let identityPromise = null;
   let memorySession = null;
@@ -349,17 +349,20 @@
     if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
     const uid = encodeURIComponent(state.user.id);
     await restRequest(`profiles?id=eq.${uid}`, { method: 'PATCH', body: patch, authenticated: true });
-    const stored = await readMyProfile();
-    if (!stored?.id) throw new ApiError('Updated profile was not returned');
-    return stored;
+    // Do not immediately issue a verification GET. On some browser/network paths the
+    // preflight for the follow-up read is the part that stalls even though the write succeeded.
+    return { ...(state.profile || {}), ...patch, id: state.user.id };
   }
 
   async function saveMyReviewDirect(rating, reviewText) {
     if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
     const uid = encodeURIComponent(state.user.id);
     const payload = { rating: Number(rating), review_text: reviewText || '' };
-    const existing = state.ownReview || await readMyReview();
+    const existing = state.ownReview;
 
+    // P12 deliberately performs ONE write first. P11 made a redundant authenticated
+    // GET before the write and another one afterwards; on the affected browser that
+    // preflight could stall, so the actual POST/PATCH was never sent.
     if (existing?.id) {
       await restRequest(`reviews?user_id=eq.${uid}`, { method: 'PATCH', body: payload, authenticated: true });
     } else {
@@ -370,15 +373,22 @@
           authenticated: true
         });
       } catch (error) {
-        // If the local state was stale and a review already exists, update it instead.
+        // If the browser state is stale and the row already exists, fall back to update.
         if (!(error instanceof ApiError) || error.status !== 409) throw error;
         await restRequest(`reviews?user_id=eq.${uid}`, { method: 'PATCH', body: payload, authenticated: true });
       }
     }
 
-    const stored = await readMyReview();
-    if (!stored?.id) throw new ApiError('Saved review was not returned');
-    return stored;
+    const now = new Date().toISOString();
+    return {
+      ...(existing || {}),
+      id: existing?.id || `local-${state.user.id}`,
+      user_id: state.user.id,
+      rating: Number(rating),
+      review_text: reviewText || '',
+      created_at: existing?.created_at || now,
+      updated_at: now
+    };
   }
 
   async function deleteMyReviewDirect() {
@@ -527,7 +537,11 @@
     badge.classList.remove('is-checking','is-online','is-offline');
     badge.classList.add(`is-${next}`);
     const label = $('span', badge);
-    if (label) label.textContent = next === 'online' ? t('serviceOnline') : next === 'offline' ? t('serviceOffline') : t('serviceChecking');
+    if (label) {
+      const base = next === 'online' ? t('serviceOnline') : next === 'offline' ? t('serviceOffline') : t('serviceChecking');
+      label.textContent = `${base} · P12`;
+      label.title = CLIENT_REVISION;
+    }
   }
 
   function animateFreshness(value) {
@@ -607,6 +621,9 @@
   }
 
   async function ensureUserAndProfile() {
+    // If this tab already restored both the session and profile, do not block a write
+    // behind another authenticated read.
+    if (state.user?.id && state.profile?.id) return state.profile;
     if (identityPromise) return identityPromise;
     identityPromise = (async () => {
       const session = await getAuthSession({ create: true });
