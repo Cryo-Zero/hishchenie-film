@@ -7,9 +7,10 @@
   <meta name="description" content="Отзывы зрителей и оценка фильма «ХИЩЕНИЕ / THEFT». Анонимный профиль без email, телефона и пароля.">
   <meta name="theme-color" content="#07090a">
   <meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://xltwwvutqkpmtmlavngi.supabase.co" crossorigin>
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://cryo-zero.github.io/hishchenie-film/reviews.html">
-  <link rel="stylesheet" href="css/site.css?v=14-final">
+  <link rel="stylesheet" href="css/site.css?v=15-signal">
 </head>
 <body class="community-page">
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
@@ -28,30 +29,47 @@
       </nav>
       <div class="header-controls">
         <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch to English">EN</button>
+        <a class="header-rating" data-header-rating href="#reviewWorkspace" aria-label="Рейтинг зрителей">
+          <span aria-hidden="true" class="header-rating-ring"><i></i></span>
+          <span class="header-rating-copy"><strong data-stat="header-average">—</strong><small>/10</small></span>
+        </a>
         <button class="menu-toggle" id="menuToggle" type="button" aria-controls="primaryNav" aria-expanded="false"><span data-i18n="menu">Меню</span><i aria-hidden="true"></i></button>
       </div>
     </div>
   </header>
 
   <main>
-    <section class="community-hero" data-system-watermark="RESPONSE">
-      <div class="shell">
-        <div class="section-label" data-i18n="reviewsLabel">R / PUBLIC RESPONSE</div>
-        <h1 data-i18n="reviewsTitle">Отзывы зрителей</h1>
-        <p data-i18n="reviewsIntro">Оценки зрителей формируют «Свежесть» фильма. 7–10 баллов считаются положительной оценкой.</p>
-        <div class="community-metrics" aria-label="Audience score summary">
-          <div class="community-metric freshness-mini">
-            <div class="freshness-ring is-pending" id="freshnessRing" style="--freshness:0">
-              <div class="freshness-ring-inner"><strong id="freshnessValue">—</strong><span id="freshnessState" data-i18n="insufficient">Недостаточно оценок</span></div>
+    <section class="community-hero" data-system-watermark="RESPONSE" id="reviewsTop">
+      <div class="shell community-hero-grid">
+        <div class="community-hero-copy">
+          <div class="section-label" data-i18n="reviewsLabel">R / PUBLIC RESPONSE</div>
+          <h1 data-i18n="reviewsTitle">Отзывы зрителей</h1>
+          <p data-i18n="reviewsIntro">Оценки зрителей формируют «Свежесть» фильма. 7–10 баллов считаются положительной оценкой.</p>
+          <div class="community-metrics" aria-label="Audience score summary">
+            <div class="community-metric freshness-mini">
+              <div class="freshness-ring is-pending" id="freshnessRing" style="--freshness:0">
+                <div class="freshness-ring-inner"><strong id="freshnessValue">—</strong><span id="freshnessState" data-i18n="insufficient">Недостаточно оценок</span></div>
+              </div>
             </div>
+            <div class="community-metric"><strong><span id="averageRating">—</span><small>/10</small></strong><span data-i18n="average">Средняя оценка</span><small id="ratingsCount">0 оценок</small></div>
+            <div class="community-metric"><strong>7–10</strong><span data-i18n="freshnessHint">7–10 = положительно</span><div class="service-badge is-checking" id="reviewServiceBadge" role="status" aria-live="polite"><i></i><span data-i18n="serviceChecking">Проверка канала</span></div></div>
           </div>
-          <div class="community-metric"><strong><span id="averageRating">—</span><small>/10</small></strong><span data-i18n="average">Средняя оценка</span><small id="ratingsCount">0 оценок</small></div>
-          <div class="community-metric"><strong>7–10</strong><span data-i18n="freshnessHint">7–10 = положительно</span><div class="service-badge is-checking" id="reviewServiceBadge" role="status" aria-live="polite"><i></i><span data-i18n="serviceChecking">Проверка канала</span></div></div>
         </div>
+        <aside aria-label="Пульс аудитории" class="audience-pulse" data-i18n-aria="audiencePulseAria">
+          <div class="audience-pulse-head"><span data-i18n="audiencePulse">Пульс аудитории</span><i></i></div>
+          <div aria-hidden="true" class="audience-pulse-wave" data-pulse-wave><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <dl class="audience-pulse-data">
+            <div><dt data-i18n="pulseSamples">Сигналов</dt><dd data-stat="pulse-samples">0</dd></div>
+            <div><dt data-i18n="pulseAverage">Средняя</dt><dd><span data-stat="pulse-average">—</span><small>/10</small></dd></div>
+            <div><dt data-i18n="pulsePositive">Положительных</dt><dd data-stat="pulse-positive">—</dd></div>
+            <div><dt data-i18n="pulseState">Канал</dt><dd class="pulse-live"><b></b><span data-i18n="pulseLive">LIVE</span></dd></div>
+          </dl>
+          <div class="audience-pulse-foot" data-i18n="pulseFoot">PUBLIC RESPONSE // LIVE SIGNAL</div>
+        </aside>
       </div>
     </section>
 
-    <section class="community-section">
+    <section class="community-section" id="reviewWorkspace">
       <div class="shell community-layout">
         <aside class="community-sidebar">
           <div class="review-composer">
@@ -115,10 +133,10 @@
       <button id="securityToggle" class="security-toggle" type="button" aria-expanded="false" aria-controls="securityPanel" data-i18n="securityTeaser">SYS // SECURITY: PRESENT</button>
       <div class="security-panel" id="securityPanel" hidden><strong data-i18n="securityTitle">На сайте есть безопасность</strong><p data-i18n="securityText">Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва, а также ваши реакции и ответы, если вы ими пользуетесь. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.</p></div>
     </div>
-    <div class="build-mark">BUILD // P14 // THEFT WORLD</div>
+    <div class="build-mark">BUILD // P15 // SIGNAL UI</div>
   </footer>
 
-  <script src="js/site.js?v=14-final"></script>
-  <script src="js/public-response.js?v=14-final"></script>
+  <script src="js/site.js?v=15-signal"></script>
+  <script src="js/public-response.js?v=15-signal"></script>
 </body>
 </html>

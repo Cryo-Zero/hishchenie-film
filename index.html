@@ -32,7 +32,7 @@
   }
   </script>
 
-<link href="css/site.css?v=14-final" rel="stylesheet"/></head>
+<link href="css/site.css?v=15-signal" rel="stylesheet"/></head>
 <body>
 <div aria-hidden="true" class="scroll-progress" id="scrollProgress"></div>
 <aside aria-hidden="true" class="system-rail">
@@ -47,6 +47,10 @@
 <nav aria-label="Основная навигация" class="nav-links" data-i18n-aria="navAria" id="primaryNav"><a data-i18n="navAbout" href="#about">О фильме</a><a data-i18n="navMaterials" href="#materials">Материалы</a><a class="nav-trailer" data-i18n="navTrailer" href="#trailer">Трейлер</a><a data-i18n="navWatch" href="#watch">Где посмотреть</a><a data-i18n="navCast" href="#cast">Актёры</a><a data-i18n="navReviews" href="reviews.html">Отзывы</a><a data-i18n="navFaq" href="#faq">FAQ</a></nav>
 <div class="header-controls">
 <button aria-label="Switch to English" class="lang-toggle" id="langToggle" type="button">EN</button>
+<a class="header-rating" data-header-rating href="reviews.html" aria-label="Рейтинг зрителей">
+<span aria-hidden="true" class="header-rating-ring"><i></i></span>
+<span class="header-rating-copy"><strong data-stat="header-average">—</strong><small>/10</small></span>
+</a>
 <button aria-controls="primaryNav" aria-expanded="false" class="menu-toggle" id="menuToggle" type="button">
 <span data-i18n="menu">Меню</span><i aria-hidden="true"></i>
 </button>
@@ -146,7 +150,7 @@
 <p class="section-note" data-i18n="materialsNote">Материалы представлены в авторском виде. Текст внутри постеров может оставаться на русском языке.</p>
 <div class="archive-viewer" id="archiveViewer">
 <div class="archive-stage-wrap">
-<button aria-label="Предыдущее изображение" class="gallery-button prev" data-i18n-aria="previousImage" id="galleryPrev" type="button"><span>←</span><small>PREV</small></button>
+<button aria-label="Предыдущее изображение" class="gallery-button prev" data-i18n-aria="previousImage" id="galleryPrev" type="button"><span aria-hidden="true" class="archive-nav-icon"><i></i><b></b></span><small>PREV</small></button>
 <figure aria-label="Открыть изображение" class="archive-stage" data-i18n-aria="openImage" id="archiveStage" tabindex="0">
 <img alt="Обложка фильма Хищение" data-i18n-alt="galleryAlt01" id="archiveMainImage" src="assets/images/archive/archive-01.jpg"/>
 <figcaption class="archive-stage-meta">
@@ -154,7 +158,7 @@
 <span id="archiveCounter">01 / 11</span>
 </figcaption>
 </figure>
-<button aria-label="Следующее изображение" class="gallery-button next" data-i18n-aria="nextImage" id="galleryNext" type="button"><small>NEXT</small><span>→</span></button>
+<button aria-label="Следующее изображение" class="gallery-button next" data-i18n-aria="nextImage" id="galleryNext" type="button"><small>NEXT</small><span aria-hidden="true" class="archive-nav-icon"><i></i><b></b></span></button>
 </div>
 <div aria-hidden="true" class="archive-strip-head"><span>ARCHIVE INDEX</span><span>11 FILES // PUBLIC</span></div>
 <div aria-label="Галерея материалов фильма" class="gallery archive-thumbs" data-i18n-aria="galleryAria" id="gallery" tabindex="0">
@@ -259,70 +263,32 @@
 <h2 data-i18n="castTitle">Актёрский состав</h2>
 </div>
 </div>
-<div class="cast">
-<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_01" role="button" tabindex="0"><strong data-i18n="nameArman">Арман О.</strong><span data-i18n="roleGor">Гор</span>
-<div class="subject-more">
-<div class="subject-grid">
-<div class="subject-cell"><small>ROLE</small><b data-i18n="roleGor">Гор</b></div>
-<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
-<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
+<div class="cast-console">
+<div aria-label="Список актёров" class="cast-list" data-i18n-aria="castListAria" role="listbox">
+<button aria-selected="false" class="cast-list-item" data-name-key="nameArman" data-role-key="roleGor" data-subject="SUBJECT_01" role="option" type="button"><span>SUBJECT_01</span><strong data-i18n="nameArman">Арман О.</strong><em data-i18n="roleGor">Гор</em><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameBogdan" data-role-key="roleAntagonist" data-subject="SUBJECT_02" role="option" type="button"><span>SUBJECT_02</span><strong data-i18n="nameBogdan">Богдан В.</strong><em data-i18n="roleAntagonist">Антагонист</em><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameLevon" data-role-key="roleMark" data-subject="SUBJECT_03" role="option" type="button"><span>SUBJECT_03</span><strong data-i18n="nameLevon">Левон</strong><em data-i18n="roleMark">Марк</em><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameYulia" data-role-key="roleHost" data-subject="SUBJECT_04" role="option" type="button"><span>SUBJECT_04</span><strong data-i18n="nameYulia">Юля Ш.</strong><em data-i18n="roleHost">Ведущая</em><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameArsen" data-role-key="roleMusician" data-subject="SUBJECT_05" role="option" type="button"><span>SUBJECT_05</span><strong data-i18n="nameArsen">Арсен О.</strong><em data-i18n="roleMusician">Музыкант</em><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameAlexander" data-role-key="roleGrandfather" data-subject="SUBJECT_06" role="option" type="button"><span>SUBJECT_06</span><strong data-i18n="nameAlexander">Александр К.</strong><em data-i18n="roleGrandfather">Дедушка Гора</em><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameBella" data-role-key="roleDetective" data-subject="SUBJECT_07" role="option" type="button"><span>SUBJECT_07</span><strong data-i18n="nameBella">Белла А.</strong><em data-i18n="roleDetective">Детектив</em><i aria-hidden="true"></i></button>
 </div>
+<aside aria-live="polite" class="subject-dossier" id="subjectDossier">
+<div aria-hidden="true" class="dossier-scan"></div>
+<div class="dossier-topline"><span data-i18n="dossierHeader">SUBJECT DOSSIER // PUBLIC</span><button aria-label="Закрыть досье" class="dossier-close" data-i18n-aria="dossierClose" id="subjectDossierClose" type="button">×</button></div>
+<div class="dossier-reveal">
+<div class="dossier-subject" id="dossierSubject">SUBJECT // UNIDENTIFIED</div>
+<h3 id="dossierName">???</h3>
+<p class="dossier-role" id="dossierRole">???</p>
+<div class="dossier-data">
+<div><small data-i18n="dossierRoleLabel">Роль</small><strong id="dossierRoleValue">???</strong></div>
+<div><small data-i18n="dossierStatusLabel">Статус</small><strong id="dossierStatusValue">???</strong></div>
+<div><small data-i18n="dossierAccessLabel">Доступ</small><strong id="dossierAccessValue">PUBLIC</strong></div>
+<div><small data-i18n="dossierRefLabel">Системная запись</small><strong id="dossierRefValue">—</strong></div>
 </div>
-<span aria-hidden="true" class="subject-plus">+</span></div>
-<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_02" role="button" tabindex="0"><strong data-i18n="nameBogdan">Богдан В.</strong><span data-i18n="roleAntagonist">Антагонист</span>
-<div class="subject-more">
-<div class="subject-grid">
-<div class="subject-cell"><small>ROLE</small><b data-i18n="roleAntagonist">Антагонист</b></div>
-<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
-<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
+<div class="dossier-prompt" id="dossierPrompt" data-i18n="dossierAwaiting">SELECT SUBJECT // AWAITING INPUT</div>
 </div>
-</div>
-<span aria-hidden="true" class="subject-plus">+</span></div>
-<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_03" role="button" tabindex="0"><strong data-i18n="nameLevon">Левон</strong><span data-i18n="roleMark">Марк</span>
-<div class="subject-more">
-<div class="subject-grid">
-<div class="subject-cell"><small>ROLE</small><b data-i18n="roleMark">Марк</b></div>
-<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
-<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
-</div>
-</div>
-<span aria-hidden="true" class="subject-plus">+</span></div>
-<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_04" role="button" tabindex="0"><strong data-i18n="nameYulia">Юля Ш.</strong><span data-i18n="roleHost">Ведущая</span>
-<div class="subject-more">
-<div class="subject-grid">
-<div class="subject-cell"><small>ROLE</small><b data-i18n="roleHost">Ведущая</b></div>
-<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
-<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
-</div>
-</div>
-<span aria-hidden="true" class="subject-plus">+</span></div>
-<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_05" role="button" tabindex="0"><strong data-i18n="nameArsen">Арсен О.</strong><span data-i18n="roleMusician">Музыкант</span>
-<div class="subject-more">
-<div class="subject-grid">
-<div class="subject-cell"><small>ROLE</small><b data-i18n="roleMusician">Музыкант</b></div>
-<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
-<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
-</div>
-</div>
-<span aria-hidden="true" class="subject-plus">+</span></div>
-<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_06" role="button" tabindex="0"><strong data-i18n="nameAlexander">Александр К.</strong><span data-i18n="roleGrandfather">Дедушка Гора</span>
-<div class="subject-more">
-<div class="subject-grid">
-<div class="subject-cell"><small>ROLE</small><b data-i18n="roleGrandfather">Дедушка Гора</b></div>
-<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
-<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
-</div>
-</div>
-<span aria-hidden="true" class="subject-plus">+</span></div>
-<div aria-expanded="false" class="cast-member" data-subject="SUBJECT_07" role="button" tabindex="0"><strong data-i18n="nameBella">Белла А.</strong><span data-i18n="roleDetective">Детектив</span>
-<div class="subject-more">
-<div class="subject-grid">
-<div class="subject-cell"><small>ROLE</small><b data-i18n="roleDetective">Детектив</b></div>
-<div class="subject-cell"><small>STATUS</small><b>CAST CONFIRMED</b></div>
-<div class="subject-cell"><small>FILE ACCESS</small><b>PUBLIC</b></div>
-</div>
-</div>
-<span aria-hidden="true" class="subject-plus">+</span></div>
+</aside>
 </div>
 </div>
 </section>
@@ -350,9 +316,11 @@
 <div class="section-label" data-i18n="contactsLabel">07 / CONTACT</div>
 <h2 data-i18n="contactsTitle">Контакты</h2>
 </div>
-<a class="contact-link" href="https://www.instagram.com/armanfut/" rel="noopener noreferrer" target="_blank">
-          Instagram · @armanfut ↗
-        </a>
+<a aria-label="Instagram автора фильма @armanfut" class="contact-signal" href="https://www.instagram.com/armanfut/" rel="noopener noreferrer" target="_blank">
+<div class="contact-signal-copy"><span data-i18n="contactSignal">CONTACT SIGNAL // AUTHOR</span><strong>Instagram · @armanfut</strong></div>
+<div aria-hidden="true" class="contact-signal-track"><i></i><b></b></div>
+<span class="contact-signal-status" data-i18n="contactOpen">CHANNEL // OPEN ↗</span>
+</a>
 </div>
 </section>
 </main>
@@ -367,7 +335,7 @@
 </div>
 </div>
 <div aria-hidden="true" class="footer-system">THEFT // PUBLIC FILE // 2045</div>
-<div class="build-mark">BUILD // P14 // THEFT WORLD</div></footer>
+<div class="build-mark">BUILD // P15 // SIGNAL UI</div></footer>
 <div aria-hidden="true" aria-label="Просмотр изображения" aria-modal="true" class="lightbox" data-i18n-aria="lightboxAria" id="lightbox" role="dialog">
 <button aria-label="Закрыть" class="lightbox-button lightbox-close" data-i18n-aria="close" id="lightboxClose" type="button">×</button>
 <button aria-label="Предыдущее изображение" class="lightbox-button lightbox-prev" data-i18n-aria="previousImage" id="lightboxPrev" type="button">←</button>
@@ -377,5 +345,5 @@
 </div>
 
 
-<script src="js/site.js?v=14-final"></script><script src="js/public-response.js?v=14-final"></script></body>
+<script src="js/site.js?v=15-signal"></script><script src="js/public-response.js?v=15-signal"></script></body>
 </html>
