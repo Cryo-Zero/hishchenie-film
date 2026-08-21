@@ -5,6 +5,7 @@
   const SUPABASE_KEY = 'sb_publishable_0hT3y-7p26Ngnq2zaPK-0w_5vtJX15k';
 
   let db = null;
+  let identityPromise = null;
 
   function createDbClient() {
     if (db) return db;
@@ -28,6 +29,7 @@
       menu: 'Меню', systemActive: 'Система активна', publicAccess: 'Публичный доступ',
       heroPosterAlt: 'Официальная обложка фильма «Хищение»', heroVideoAria: 'Беззвучный фрагмент трейлера фильма «Хищение»',
       navAbout: 'О фильме', navMaterials: 'Материалы', navTrailer: 'Трейлер', navWatch: 'Где посмотреть', navCast: 'Актёры', navReviews: 'Отзывы', navContacts: 'Контакты',
+      watchIntro: 'Площадки появятся здесь после подтверждения релиза. Пока раздел работает как публичная точка доступа к проекту.',
       heroEyebrow: 'Фильм в разработке · 2045',
       heroCopy: 'В мире, где человек должен доказать свою пользу системе, взросление становится борьбой за право самому выбирать своё будущее.',
       heroTrailer: 'Смотреть трейлер', heroAbout: 'О фильме',
@@ -352,8 +354,7 @@
     setServiceState(state.serviceState);
     const freshState = $('#freshnessState');
     if (freshState) freshState.textContent = freshnessCategory(state.lastFreshness);
-    refreshStats();
-    loadReviews(state.sort);
+    if (db && dataLayerStarted) { refreshStats(); loadReviews(state.sort); }
   }
 
   function setLanguage(lang) {
@@ -381,44 +382,53 @@
   }
 
   async function ensureUserAndProfile() {
-    if (!db) throw new Error('Supabase client unavailable');
+    if (identityPromise) return identityPromise;
+    identityPromise = (async () => {
+      if (!db) throw new Error('Supabase client unavailable');
 
-    if (!state.user) {
-      const { data, error } = await db.auth.signInAnonymously();
-      if (error) throw error;
-      state.user = data.user;
-    }
-
-    if (!state.profile) {
-      const { data: existing, error: readError } = await db
-        .from('profiles')
-        .select('id,display_name,avatar_seed,avatar_style')
-        .eq('id', state.user.id)
-        .maybeSingle();
-      if (readError) throw readError;
-
-      if (existing) {
-        state.profile = existing;
-      } else {
-        const p = state.pendingProfile || createPendingProfile();
-        const { data: created, error: insertError } = await db
-          .from('profiles')
-          .insert({
-            id: state.user.id,
-            display_name: p.display_name,
-            avatar_seed: p.avatar_seed,
-            avatar_style: p.avatar_style
-          })
-          .select('id,display_name,avatar_seed,avatar_style')
-          .single();
-        if (insertError) throw insertError;
-        state.profile = created;
+      if (!state.user) {
+        const { data, error } = await db.auth.signInAnonymously();
+        if (error) throw error;
+        state.user = data.user;
       }
-    }
 
-    setServiceState('online');
-    renderProfilePreview();
-    return state.profile;
+      if (!state.profile) {
+        const { data: existing, error: readError } = await db
+          .from('profiles')
+          .select('id,display_name,avatar_seed,avatar_style')
+          .eq('id', state.user.id)
+          .maybeSingle();
+        if (readError) throw readError;
+
+        if (existing) {
+          state.profile = existing;
+        } else {
+          const p = state.pendingProfile || createPendingProfile();
+          const { data: created, error: insertError } = await db
+            .from('profiles')
+            .upsert({
+              id: state.user.id,
+              display_name: p.display_name,
+              avatar_seed: p.avatar_seed,
+              avatar_style: p.avatar_style
+            }, { onConflict: 'id' })
+            .select('id,display_name,avatar_seed,avatar_style')
+            .single();
+          if (insertError) throw insertError;
+          state.profile = created;
+        }
+      }
+
+      setServiceState('online');
+      renderProfilePreview();
+      return state.profile;
+    })();
+
+    try {
+      return await identityPromise;
+    } finally {
+      identityPromise = null;
+    }
   }
 
   async function loadExistingSession() {
@@ -471,6 +481,7 @@
   }
 
   async function rerollName() {
+    const button = $('#rerollName');
     const newName = generateAlias(state.lang);
     if (!state.user) {
       state.pendingProfile = state.pendingProfile || createPendingProfile();
@@ -479,19 +490,27 @@
       return;
     }
     try {
+      if (button) button.disabled = true;
       await ensureUserAndProfile();
-      const { error } = await db.from('profiles').update({ display_name: newName }).eq('id', state.user.id);
+      const { data, error } = await db.from('profiles')
+        .update({ display_name: newName })
+        .eq('id', state.user.id)
+        .select('id,display_name,avatar_seed,avatar_style')
+        .single();
       if (error) throw error;
-      state.profile.display_name = newName;
+      state.profile = data;
       renderProfilePreview();
-      loadReviews(state.sort);
+      await loadReviews(state.sort);
     } catch (error) {
       console.error(error);
       setStatus(t('profileError'), 'error');
+    } finally {
+      if (button) button.disabled = false;
     }
   }
 
   async function rerollAvatar() {
+    const button = $('#rerollAvatar');
     const patch = { avatar_seed: randomSeed(), avatar_style: randomInt(3) + 1 };
     if (!state.user) {
       state.pendingProfile = state.pendingProfile || createPendingProfile();
@@ -500,15 +519,22 @@
       return;
     }
     try {
+      if (button) button.disabled = true;
       await ensureUserAndProfile();
-      const { error } = await db.from('profiles').update(patch).eq('id', state.user.id);
+      const { data, error } = await db.from('profiles')
+        .update(patch)
+        .eq('id', state.user.id)
+        .select('id,display_name,avatar_seed,avatar_style')
+        .single();
       if (error) throw error;
-      Object.assign(state.profile, patch);
+      state.profile = data;
       renderProfilePreview();
-      loadReviews(state.sort);
+      await loadReviews(state.sort);
     } catch (error) {
       console.error(error);
       setStatus(t('profileError'), 'error');
+    } finally {
+      if (button) button.disabled = false;
     }
   }
 
@@ -734,7 +760,14 @@
     if (dataLayerStarted || !createDbClient()) return;
     dataLayerStarted = true;
     setServiceState('checking');
-    await Promise.allSettled([loadExistingSession(), refreshStats(), loadReviews(state.sort)]);
+    try {
+      await loadExistingSession();
+      await Promise.allSettled([refreshStats(), loadReviews(state.sort)]);
+      if (state.serviceState === 'checking') setServiceState('online');
+    } catch (error) {
+      console.error(error);
+      setServiceState('offline');
+    }
   }
 
   async function init() {
