@@ -186,16 +186,100 @@
   fitTrailer();
   addEventListener('resize', fitTrailer);
 
-  // SUBJECT DOSSIER: only one expanded card per row/interaction.
-  $$('.cast-member').forEach(card => {
-    const toggle = () => {
-      const wasOpen = card.classList.contains('is-open');
-      $$('.cast-member.is-open').forEach(c => { if (c !== card) { c.classList.remove('is-open'); c.setAttribute('aria-expanded','false'); } });
-      card.classList.toggle('is-open', !wasOpen);
-      card.setAttribute('aria-expanded', String(!wasOpen));
-    };
-    card.addEventListener('click', toggle);
-    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+  // SUBJECT DOSSIER ------------------------------------------------------------
+  // The list never changes its geometry. A permanent panel on the right receives
+  // the selected subject and reveals fields top-to-bottom.
+  const castItems = $$('.cast-list-item');
+  const dossier = $('#subjectDossier');
+  const dossierClose = $('#subjectDossierClose');
+  const dossierSubject = $('#dossierSubject');
+  const dossierName = $('#dossierName');
+  const dossierRole = $('#dossierRole');
+  const dossierRoleValue = $('#dossierRoleValue');
+  const dossierStatusValue = $('#dossierStatusValue');
+  const dossierAccessValue = $('#dossierAccessValue');
+  const dossierRefValue = $('#dossierRefValue');
+  const dossierPrompt = $('#dossierPrompt');
+  let activeSubject = null;
+  let dossierTimer = 0;
+
+  const motionReduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function dossierText(item, selector) {
+    return item?.querySelector(selector)?.textContent?.trim() || '???';
+  }
+
+  function setDossierValues(item) {
+    if (!dossier) return;
+    if (!item) {
+      dossierSubject.textContent = 'SUBJECT // UNIDENTIFIED';
+      dossierName.textContent = '???';
+      dossierRole.textContent = '???';
+      dossierRoleValue.textContent = '???';
+      dossierStatusValue.textContent = '???';
+      dossierAccessValue.textContent = 'PUBLIC';
+      dossierRefValue.textContent = '—';
+      dossierPrompt.dataset.i18n = 'dossierAwaiting';
+      dossierPrompt.textContent = document.documentElement.lang === 'en'
+        ? 'SELECT SUBJECT // AWAITING INPUT'
+        : 'ВЫБЕРИТЕ СУБЪЕКТ // ОЖИДАНИЕ';
+      dossier.classList.remove('has-subject');
+      return;
+    }
+    const subject = item.dataset.subject || 'SUBJECT';
+    const name = dossierText(item, 'strong');
+    const role = dossierText(item, 'em');
+    dossierSubject.textContent = `${subject} // IDENTIFIED`;
+    dossierName.textContent = name;
+    dossierRole.textContent = role;
+    dossierRoleValue.textContent = role;
+    dossierStatusValue.textContent = document.documentElement.lang === 'en' ? 'CAST CONFIRMED' : 'СОСТАВ ПОДТВЕРЖДЁН';
+    dossierAccessValue.textContent = 'PUBLIC';
+    dossierRefValue.textContent = `PUBLIC/${subject.replace('SUBJECT_','')}`;
+    dossierPrompt.dataset.i18n = 'dossierLoaded';
+    dossierPrompt.textContent = document.documentElement.lang === 'en'
+      ? 'FILE LOADED // SELECT ANOTHER SUBJECT'
+      : 'ФАЙЛ ЗАГРУЖЕН // ВЫБЕРИТЕ ДРУГОЙ СУБЪЕКТ';
+    dossier.classList.add('has-subject');
+  }
+
+  function animateDossier(item) {
+    if (!dossier) return;
+    clearTimeout(dossierTimer);
+    dossier.classList.remove('is-revealed');
+    dossier.classList.add('is-revealing');
+    setDossierValues(item);
+    if (motionReduced()) {
+      dossier.classList.remove('is-revealing');
+      dossier.classList.add('is-revealed');
+      return;
+    }
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      dossier.classList.remove('is-revealing');
+      dossier.classList.add('is-revealed');
+    }));
+  }
+
+  function selectSubject(item) {
+    const closing = item && activeSubject === item;
+    activeSubject = closing ? null : item;
+    castItems.forEach(row => {
+      const selected = row === activeSubject;
+      row.classList.toggle('is-selected', selected);
+      row.setAttribute('aria-selected', String(selected));
+    });
+    animateDossier(activeSubject);
+  }
+
+  castItems.forEach(item => item.addEventListener('click', () => selectSubject(item)));
+  dossierClose?.addEventListener('click', () => selectSubject(null));
+  if (dossier) {
+    setDossierValues(null);
+    dossier.classList.add('is-revealed');
+  }
+  addEventListener('theft:language', () => {
+    // public-response translated the list first; re-read visible values.
+    setDossierValues(activeSubject);
   });
 
   // Keep FAQ tidy: opening one closes the others.

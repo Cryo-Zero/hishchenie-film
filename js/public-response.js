@@ -6,7 +6,7 @@
   const PROJECT_REF = 'xltwwvutqkpmtmlavngi';
   const SESSION_KEY = `theft-${PROJECT_REF}-auth-v4`;
   const AUTH_LOCK_NAME = `theft-${PROJECT_REF}-auth-lock-v4`;
-  const CLIENT_REVISION = 'P14-theft-world';
+  const CLIENT_REVISION = 'P15-signal-ui';
   const REQUEST_TIMEOUT = 18000;
   const AUTH_TIMEOUT = 30000;
   const WRITE_TIMEOUT = 30000;
@@ -37,6 +37,9 @@
       watchLabel: '04 / ACCESS', watchTitle: 'Где посмотреть', soon: 'скоро',
       signalKicker: 'Текущий сигнал', signalStatusLabel: 'Статус', signalStatusValue: 'В разработке', signalYearLabel: 'Год', signalTrailerLabel: 'Трейлер', signalTrailerValue: 'В сети', signalAccessLabel: 'Публичный доступ', signalAccessValue: 'Активен', signalStable: 'SIGNAL // STABLE',
       castLabel: '05 / SUBJECTS', castTitle: 'Актёрский состав',
+      castListAria: 'Список актёров', dossierHeader: 'SUBJECT DOSSIER // PUBLIC', dossierClose: 'Закрыть досье',
+      dossierRoleLabel: 'Роль', dossierStatusLabel: 'Статус', dossierAccessLabel: 'Доступ', dossierRefLabel: 'Системная запись',
+      dossierAwaiting: 'ВЫБЕРИТЕ СУБЪЕКТ // ОЖИДАНИЕ', dossierLoaded: 'ФАЙЛ ЗАГРУЖЕН // ВЫБЕРИТЕ ДРУГОЙ СУБЪЕКТ',
       nameArman: 'Арман О.', nameBogdan: 'Богдан В.', nameLevon: 'Левон', nameYulia: 'Юля Ш.', nameArsen: 'Арсен О.', nameAlexander: 'Александр К.', nameBella: 'Белла А.',
       roleGor: 'Гор', roleAntagonist: 'Антагонист', roleMark: 'Марк', roleHost: 'Ведущая', roleMusician: 'Музыкант', roleGrandfather: 'Дедушка Гора', roleDetective: 'Детектив',
       reviewsLabel: 'R / PUBLIC RESPONSE', reviewsTitle: 'Отзывы зрителей', reviewsIntro: 'Оценки зрителей формируют «Свежесть» фильма. 7–10 баллов считаются положительной оценкой.',
@@ -58,6 +61,8 @@
       confirmDelete: 'Удалить ваш отзыв? Это действие нельзя отменить.',
       oldSort: 'Старые', popular: 'Популярные', withOfficialResponse: 'С ответом команды', allReviews: 'Все отзывы', useful: 'Полезно', replies: 'Ответы', reply: 'Ответить', replyPlaceholder: 'Короткий ответ на отзыв…', replySave: 'Отправить', replyDelete: 'Удалить ответ', replyEmpty: 'Ответов пока нет.', replySaved: 'Ответ сохранён.', replyError: 'Не удалось сохранить ответ.', pinned: 'закреплено', official: 'КОМАНДА ФИЛЬМА · OFFICIAL',
       audienceSignal: 'Сигнал аудитории', audienceSignalCopy: 'Оценка зрителей доступна сразу — полный раздел отзывов открыт отдельно.', openReviews: 'Открыть отзывы',
+      audiencePulse: 'Пульс аудитории', audiencePulseAria: 'Пульс аудитории и статистика оценок', pulseSamples: 'Сигналов', pulseAverage: 'Средняя',
+      pulsePositive: 'Положительных', pulseState: 'Канал', pulseLive: 'LIVE', pulseFoot: 'PUBLIC RESPONSE // LIVE SIGNAL',
       faqLabel: '06 / FAQ', faqTitle: 'Часто задаваемые вопросы', faqIntro: 'Короткие ответы о фильме и этом публичном архиве. Факты о релизе обновляются только после подтверждения командой.',
       faqQ1: 'Когда выйдет фильм?', faqA1: 'Точная дата релиза пока не объявлена. Фильм находится в разработке; подтверждённая дата появится на этом сайте.',
       faqQ2: 'Где можно будет посмотреть «Хищение»?', faqA2: 'Площадки появятся в разделе «Где посмотреть» после подтверждения релиза. Сейчас они помечены как ожидающие.',
@@ -67,6 +72,7 @@
       signalLog1: 'Трейлер доступен', signalLog2: 'Публичный архив открыт', signalLog3: 'Релиз ожидает подтверждения', signalNow: 'СЕЙЧАС', signalPending: 'PENDING',
       galleryAlt01: 'Обложка фильма «Хищение»', galleryAlt02: 'Постер фильма «Хищение» — пианино', galleryAlt03: 'Постер фильма «Хищение» — дедушка и ребёнок', galleryAlt04: 'Постер фильма «Хищение» — человек в капюшоне', galleryAlt05: 'Постер фильма «Хищение»', galleryAlt06: 'Постер фильма «Хищение» — герой в разрушенном городе', galleryAlt07: 'Постер фильма «Хищение» — ведущая', galleryAlt08: 'Постер фильма «Хищение» — город', galleryAlt09: 'Постер фильма «Хищение» — Гор', galleryAlt10: 'Кадры из фильма «Хищение»', galleryAlt11: 'Визуальный материал фильма «Хищение»',
       contactsLabel: '07 / CONTACT', contactsTitle: 'Контакты',
+      contactSignal: 'CONTACT SIGNAL // AUTHOR', contactOpen: 'CHANNEL // OPEN ↗',
       securityTeaser: 'SYS // SECURITY: PRESENT', securityTitle: 'На сайте есть безопасность',
       securityText: 'Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва, а также ваши реакции и ответы, если вы ими пользуетесь. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.',
       securityClose: 'Скрыть',
@@ -101,6 +107,9 @@
       watchLabel: '04 / ACCESS', watchTitle: 'Where to watch', soon: 'coming soon',
       signalKicker: 'Current signal', signalStatusLabel: 'Status', signalStatusValue: 'In development', signalYearLabel: 'Year', signalTrailerLabel: 'Trailer', signalTrailerValue: 'Online', signalAccessLabel: 'Public access', signalAccessValue: 'Active', signalStable: 'SIGNAL // STABLE',
       castLabel: '05 / SUBJECTS', castTitle: 'Cast',
+      castListAria: 'Cast list', dossierHeader: 'SUBJECT DOSSIER // PUBLIC', dossierClose: 'Close dossier',
+      dossierRoleLabel: 'Role', dossierStatusLabel: 'Status', dossierAccessLabel: 'Access', dossierRefLabel: 'System record',
+      dossierAwaiting: 'SELECT SUBJECT // AWAITING INPUT', dossierLoaded: 'FILE LOADED // SELECT ANOTHER SUBJECT',
       nameArman: 'Arman O.', nameBogdan: 'Bogdan V.', nameLevon: 'Levon', nameYulia: 'Yulia Sh.', nameArsen: 'Arsen O.', nameAlexander: 'Aleksandr K.', nameBella: 'Bella A.',
       roleGor: 'Gor', roleAntagonist: 'Antagonist', roleMark: 'Mark', roleHost: 'News anchor', roleMusician: 'Musician', roleGrandfather: "Gor's grandfather", roleDetective: 'Detective',
       reviewsLabel: 'R / PUBLIC RESPONSE', reviewsTitle: 'Audience reviews', reviewsIntro: 'Audience scores form the film’s “Freshness” rating. Scores from 7 to 10 count as positive.',
@@ -122,6 +131,8 @@
       confirmDelete: 'Delete your review? This cannot be undone.',
       oldSort: 'Oldest', popular: 'Most liked', withOfficialResponse: 'Team replied', allReviews: 'All reviews', useful: 'Useful', replies: 'Replies', reply: 'Reply', replyPlaceholder: 'Write a short reply…', replySave: 'Send', replyDelete: 'Delete reply', replyEmpty: 'No replies yet.', replySaved: 'Reply saved.', replyError: 'Could not save the reply.', pinned: 'pinned', official: 'FILM TEAM · OFFICIAL',
       audienceSignal: 'Audience signal', audienceSignalCopy: 'The audience score is visible early; the full community feed lives on a dedicated reviews page.', openReviews: 'Open reviews',
+      audiencePulse: 'Audience pulse', audiencePulseAria: 'Audience pulse and rating statistics', pulseSamples: 'Signals', pulseAverage: 'Average',
+      pulsePositive: 'Positive', pulseState: 'Channel', pulseLive: 'LIVE', pulseFoot: 'PUBLIC RESPONSE // LIVE SIGNAL',
       faqLabel: '06 / FAQ', faqTitle: 'Frequently asked questions', faqIntro: 'Short answers about the film and this public archive. Release facts are updated only after confirmation by the film team.',
       faqQ1: 'When will the film be released?', faqA1: 'The exact release date has not been announced. The film is in development; a confirmed date will appear on this website.',
       faqQ2: 'Where will THEFT be available?', faqA2: 'Platforms will appear in the Watch section after the release is confirmed. For now they are marked as pending.',
@@ -131,6 +142,7 @@
       signalLog1: 'Trailer online', signalLog2: 'Public archive open', signalLog3: 'Release awaiting confirmation', signalNow: 'NOW', signalPending: 'PENDING',
       galleryAlt01: 'THEFT film cover', galleryAlt02: 'THEFT poster — piano scene', galleryAlt03: 'THEFT poster — grandfather and child', galleryAlt04: 'THEFT poster — hooded figure', galleryAlt05: 'THEFT film poster', galleryAlt06: 'THEFT poster — protagonist in a ruined city', galleryAlt07: 'THEFT poster — news anchor', galleryAlt08: 'THEFT poster — city', galleryAlt09: 'THEFT poster — Gor', galleryAlt10: 'Frames from THEFT', galleryAlt11: 'THEFT visual material',
       contactsLabel: '07 / CONTACT', contactsTitle: 'Contacts',
+      contactSignal: 'CONTACT SIGNAL // AUTHOR', contactOpen: 'CHANNEL // OPEN ↗',
       securityTeaser: 'SYS // SECURITY: PRESENT', securityTitle: 'There is safety on this site',
       securityText: 'No email, phone number or password. The site stores only a technical identifier, alias, avatar settings, score and review text, plus your reactions and replies if you use them. The profile is tied to this browser; clearing browser data may remove access to editing the old review.',
       securityClose: 'Hide',
@@ -162,7 +174,7 @@
     sort: 'new',
     filter: 'all',
     serviceState: 'checking',
-    lastStats: { total_ratings:0, average_rating:null, freshness:null },
+    lastStats: { total_ratings:0, average_rating:null, positive_ratings:0, freshness:null },
     reviews: [],
     busy: false,
     feedSeq: 0,
@@ -377,7 +389,7 @@
     state.serviceState=next;
     const badge=$('#reviewServiceBadge'); if(!badge) return;
     badge.classList.remove('is-checking','is-online','is-offline'); badge.classList.add(`is-${next}`);
-    const span=$('span',badge); if(span){ const base=next==='online'?t('serviceOnline'):next==='offline'?t('serviceOffline'):t('serviceChecking'); span.textContent=`${base} · P14`; span.title=detail||CLIENT_REVISION; }
+    const span=$('span',badge); if(span){ const base=next==='online'?t('serviceOnline'):next==='offline'?t('serviceOffline'):t('serviceChecking'); span.textContent=`${base} · P15`; span.title=detail||CLIENT_REVISION; }
   }
 
   function pluralRatings(count) {
@@ -387,12 +399,40 @@
   function freshnessCategory(v){ if(v==null)return t('insufficient'); if(v<40)return t('freshnessCold'); if(v<60)return t('freshnessMixed'); if(v<80)return t('freshnessFresh'); if(v<90)return t('freshnessVeryFresh'); return t('freshnessChoice'); }
 
   function updateStatsUI(data) {
-    const total=Number(data?.total_ratings||0), avg=data?.average_rating==null?'—':Number(data.average_rating).toFixed(1), freshness=data?.freshness==null?null:Number(data.freshness);
-    state.lastStats={total_ratings:total,average_rating:data?.average_rating,freshness};
+    const total=Number(data?.total_ratings||0);
+    const avgNumber=data?.average_rating==null?null:Number(data.average_rating);
+    const avg=avgNumber==null?'—':avgNumber.toFixed(1);
+    const positive=Number(data?.positive_ratings||0);
+    const freshness=data?.freshness==null?null:Number(data.freshness);
+    const positivePct=total?Math.round(positive*100/total):null;
+    state.lastStats={total_ratings:total,average_rating:avgNumber,positive_ratings:positive,freshness};
+
     $$('[data-stat="average"]').forEach(el=>el.textContent=avg);
+    $$('[data-stat="header-average"]').forEach(el=>el.textContent=avg);
     $$('[data-stat="count"]').forEach(el=>el.textContent=`${total} ${pluralRatings(total)}`);
     $$('[data-stat="freshness"]').forEach(el=>el.textContent=freshness==null?'—':`${freshness}%`);
     $$('[data-stat="freshness-label"]').forEach(el=>el.textContent=freshnessCategory(freshness));
+    $$('[data-stat="pulse-samples"]').forEach(el=>el.textContent=String(total));
+    $$('[data-stat="pulse-average"]').forEach(el=>el.textContent=avg);
+    $$('[data-stat="pulse-positive"]').forEach(el=>el.textContent=positivePct==null?'—':`${positivePct}%`);
+
+    $$('[data-header-rating]').forEach(el=>{
+      const pct=avgNumber==null?0:Math.max(0,Math.min(100,avgNumber*10));
+      el.style.setProperty('--score-pct',`${pct}%`);
+      const label=avgNumber==null
+        ? (state.lang==='ru'?'Рейтинг зрителей: недостаточно данных':'Audience rating: not enough data')
+        : (state.lang==='ru'?`Рейтинг зрителей: ${avg} из 10`:`Audience rating: ${avg} out of 10`);
+      el.setAttribute('aria-label',label);
+      el.title=label;
+    });
+
+    const pulseLevel=avgNumber==null?0.18:Math.max(.18,Math.min(1,avgNumber/10));
+    const pulsePattern=[.18,.34,.62,.28,.78,.42,.92,.36,.66,.24,.84,.48,.72,.31,.96,.39,.69,.26,.81,.45,.9,.33,.58,.22];
+    $$('[data-pulse-wave] span').forEach((el,i)=>{
+      const factor=pulsePattern[i%pulsePattern.length];
+      el.style.setProperty('--bar-height',`${Math.round(10+factor*pulseLevel*88)}%`);
+    });
+
     const ring=$('#freshnessRing'); if(ring){ring.style.setProperty('--freshness',freshness??0);ring.classList.toggle('is-pending',freshness==null);}
     const fv=$('#freshnessValue'); if(fv)fv.textContent=freshness==null?'—':`${freshness}%`;
     const fs=$('#freshnessState'); if(fs)fs.textContent=freshnessCategory(freshness);
@@ -400,7 +440,7 @@
     const rc=$('#ratingsCount'); if(rc)rc.textContent=`${total} ${pluralRatings(total)}`;
   }
 
-  async function refreshStats(){ try{const data=await rpcGet('get_public_stats_v2');updateStatsUI(data||{});setServiceState('online');}catch(err){console.error('[P14/stats]',err);setServiceState('offline',err.code);}}
+  async function refreshStats(){ try{const data=await rpcGet('get_public_stats_v2');updateStatsUI(data||{});setServiceState('online');}catch(err){console.error('[P15/stats]',err);setServiceState('offline',err.code);}}
 
   function applyTranslations(){
     document.documentElement.lang=state.lang;
@@ -417,6 +457,7 @@
     renderProfile();
     if($('#reviewsList')) renderReviews(state.reviews);
     const rating=state.selectedRating; if(rating!=null) updateRatingLabel();
+    dispatchEvent(new CustomEvent('theft:language',{detail:{lang:state.lang}}));
   }
   function setLanguage(lang){if(!I18N[lang])return;state.lang=lang;safeStorage.set('theft_lang',lang);if(!state.profile&&state.pendingProfile)state.pendingProfile.display_name=renderAlias(state.pendingProfile,lang).slice(0,40);applyTranslations();}
 
@@ -480,23 +521,66 @@
   function selectRating(v){if(state.busy)return;state.selectedRating=Number(v);updateRatingLabel();}
   function updateComposerUI(){const b=$('#submitReview'),d=$('#deleteReview');if(b)b.textContent=state.ownReview?t('updateReview'):t('publish');if(d)d.hidden=!state.ownReview;}
 
+  function applyLocalReviewStats(previousReview,newReview){
+    const s=state.lastStats||{};
+    let total=Number(s.total_ratings||0);
+    let avg=s.average_rating==null?0:Number(s.average_rating);
+    let positive=Number(s.positive_ratings||0);
+    let sum=avg*total;
+    if(previousReview){
+      const oldRating=Number(previousReview.rating);
+      sum-=oldRating;
+      if(oldRating>=7)positive=Math.max(0,positive-1);
+    }else total+=1;
+    const newRating=Number(newReview.rating);
+    sum+=newRating;
+    if(newRating>=7)positive+=1;
+    const average=total?sum/total:null;
+    const freshness=total<5?null:Math.round(positive*100/total);
+    updateStatsUI({total_ratings:total,average_rating:average,positive_ratings:positive,freshness});
+  }
+
   async function submitReview(){
     if(state.busy||profileMutation)return;
     if(state.selectedRating==null){setStatus(t('chooseRating'),'error');return;}
-    const rating=Number(state.selectedRating), text=($('#reviewText')?.value||'').trim(), p=profileForWrite(), existed=!!state.ownReview;
+    const rating=Number(state.selectedRating), text=($('#reviewText')?.value||'').trim(), p=profileForWrite();
+    const previousReview=state.ownReview?{...state.ownReview}:null;
+    const existed=!!previousReview;
     state.busy=true;setComposerBusy(true);setStatus(t('saving'));
+    const submitButton=$('#submitReview'); if(submitButton)submitButton.classList.add('is-saving');
+    let unlocked=false;
     try{
       const s=await getSession(true);state.user=s.user;
-      // Critical P14 change: profile + review are one server transaction and one
-      // browser write. No POST /profiles -> empty 201 -> next request chain.
       const data=await rpcPost('submit_my_review_v4',{p_rating:rating,p_review_text:text,p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style});
-      state.profile=data.profile;state.pendingProfile=null;state.ownReview=data.review;state.selectedRating=Number(data.review.rating);renderProfile();updateComposerUI();updateRatingLabel();setStatus(existed?t('updated'):t('saved'),'success');
-      await Promise.allSettled([refreshStats(),loadReviews(state.sort)]);
-    }catch(err){console.error('[P14/review/save]',err,diag.events);setStatus(`${t('saveError')} [${err.code||'SAVE'}]`,'error');setServiceState('offline',err.code);}
-    finally{state.busy=false;setComposerBusy(false);}
+      state.profile=data.profile;state.pendingProfile=null;state.ownReview=data.review;state.selectedRating=Number(data.review.rating);
+      renderProfile();updateComposerUI();updateRatingLabel();applyLocalReviewStats(previousReview,data.review);
+      setStatus(existed?t('updated'):t('saved'),'success');
+      // The write is complete. Do not make the user wait for two reconciliation GETs.
+      state.busy=false;setComposerBusy(false);unlocked=true;if(submitButton)submitButton.classList.remove('is-saving');
+      Promise.allSettled([refreshStats(),loadReviews(state.sort,state.filter)]).catch(()=>{});
+    }catch(err){console.error('[P15/review/save]',err,diag.events);setStatus(`${t('saveError')} [${err.code||'SAVE'}]`,'error');setServiceState('offline',err.code);}
+    finally{if(!unlocked){state.busy=false;setComposerBusy(false);if(submitButton)submitButton.classList.remove('is-saving');}}
   }
 
-  async function deleteReview(){if(!state.ownReview||state.busy)return;if(!confirm(t('confirmDelete')))return;state.busy=true;setComposerBusy(true);try{await rpcPost('delete_my_review_v4',{});state.ownReview=null;state.selectedRating=null;const ta=$('#reviewText');if(ta)ta.value='';updateCounter();updateRatingLabel();updateComposerUI();setStatus(t('deleted'),'success');await Promise.allSettled([refreshStats(),loadReviews(state.sort)]);}catch(err){setStatus(`${t('deleteError')} [${err.code||'DELETE'}]`,'error');}finally{state.busy=false;setComposerBusy(false);}}
+  async function deleteReview(){
+    if(!state.ownReview||state.busy)return;
+    if(!confirm(t('confirmDelete')))return;
+    const previous={...state.ownReview};
+    state.busy=true;setComposerBusy(true);
+    try{
+      await rpcPost('delete_my_review_v4',{});
+      const s=state.lastStats||{}, total=Math.max(0,Number(s.total_ratings||0)-1);
+      const oldRating=Number(previous.rating), oldAvg=Number(s.average_rating||0), oldPositive=Number(s.positive_ratings||0);
+      const sum=Math.max(0,oldAvg*Number(s.total_ratings||0)-oldRating);
+      const positive=Math.max(0,oldPositive-(oldRating>=7?1:0));
+      updateStatsUI({total_ratings:total,average_rating:total?sum/total:null,positive_ratings:positive,freshness:total<5?null:Math.round(positive*100/total)});
+      state.ownReview=null;state.selectedRating=null;
+      const ta=$('#reviewText');if(ta)ta.value='';
+      updateCounter();updateRatingLabel();updateComposerUI();setStatus(t('deleted'),'success');
+      state.busy=false;setComposerBusy(false);
+      Promise.allSettled([refreshStats(),loadReviews(state.sort,state.filter)]).catch(()=>{});
+    }catch(err){setStatus(`${t('deleteError')} [${err.code||'DELETE'}]`,'error');state.busy=false;setComposerBusy(false);}
+  }
 
   function formatDate(v){if(!v)return'';return new Intl.DateTimeFormat(state.lang==='ru'?'ru-RU':'en-US',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(v));}
 
