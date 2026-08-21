@@ -7,6 +7,7 @@
   const PROJECT_REF = 'xltwwvutqkpmtmlavngi';
   const SESSION_KEY = `sb-${PROJECT_REF}-auth-token`;
   const REQUEST_TIMEOUT = 12000;
+  const CLIENT_REVISION = 'P11-direct-rest';
 
   let identityPromise = null;
   let memorySession = null;
@@ -311,9 +312,80 @@
     });
   }
 
-  async function rpc(name, args = {}) {
-    const data = await restRequest(`rpc/${name}`, { method: 'POST', body: args, authenticated: true });
-    return Array.isArray(data) && data.length === 1 ? data[0] : data;
+  async function readMyProfile() {
+    if (!state.user?.id) return null;
+    const uid = encodeURIComponent(state.user.id);
+    const rows = await restRequest(`profiles?select=id,display_name,avatar_seed,avatar_style&id=eq.${uid}`, { authenticated: true });
+    return Array.isArray(rows) ? (rows[0] || null) : null;
+  }
+
+  async function readMyReview() {
+    if (!state.user?.id) return null;
+    const uid = encodeURIComponent(state.user.id);
+    const rows = await restRequest(`reviews?select=id,user_id,rating,review_text,created_at,updated_at&user_id=eq.${uid}`, { authenticated: true });
+    return Array.isArray(rows) ? (rows[0] || null) : null;
+  }
+
+  async function createMyProfile(profile) {
+    if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
+    const payload = {
+      id: state.user.id,
+      display_name: profile.display_name,
+      avatar_seed: Number(profile.avatar_seed),
+      avatar_style: Number(profile.avatar_style)
+    };
+    try {
+      await restRequest('profiles', { method: 'POST', body: payload, authenticated: true });
+    } catch (error) {
+      // A 409 means another in-flight/previous request already created this exact profile.
+      if (!(error instanceof ApiError) || error.status !== 409) throw error;
+    }
+    const stored = await readMyProfile();
+    if (!stored?.id) throw new ApiError('Profile was not returned');
+    return stored;
+  }
+
+  async function updateMyProfileDirect(patch) {
+    if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
+    const uid = encodeURIComponent(state.user.id);
+    await restRequest(`profiles?id=eq.${uid}`, { method: 'PATCH', body: patch, authenticated: true });
+    const stored = await readMyProfile();
+    if (!stored?.id) throw new ApiError('Updated profile was not returned');
+    return stored;
+  }
+
+  async function saveMyReviewDirect(rating, reviewText) {
+    if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
+    const uid = encodeURIComponent(state.user.id);
+    const payload = { rating: Number(rating), review_text: reviewText || '' };
+    const existing = state.ownReview || await readMyReview();
+
+    if (existing?.id) {
+      await restRequest(`reviews?user_id=eq.${uid}`, { method: 'PATCH', body: payload, authenticated: true });
+    } else {
+      try {
+        await restRequest('reviews', {
+          method: 'POST',
+          body: { user_id: state.user.id, ...payload },
+          authenticated: true
+        });
+      } catch (error) {
+        // If the local state was stale and a review already exists, update it instead.
+        if (!(error instanceof ApiError) || error.status !== 409) throw error;
+        await restRequest(`reviews?user_id=eq.${uid}`, { method: 'PATCH', body: payload, authenticated: true });
+      }
+    }
+
+    const stored = await readMyReview();
+    if (!stored?.id) throw new ApiError('Saved review was not returned');
+    return stored;
+  }
+
+  async function deleteMyReviewDirect() {
+    if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
+    const uid = encodeURIComponent(state.user.id);
+    await restRequest(`reviews?user_id=eq.${uid}`, { method: 'DELETE', authenticated: true });
+    return !(await readMyReview());
   }
 
   function randomInt(max) {
@@ -542,12 +614,8 @@
       if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
 
       const p = state.profile || state.pendingProfile || createPendingProfile();
-      const profile = await rpc('ensure_my_profile', {
-        p_display_name: p.display_name,
-        p_avatar_seed: Number(p.avatar_seed),
-        p_avatar_style: Number(p.avatar_style)
-      });
-      if (!profile?.id) throw new ApiError('Profile was not returned');
+      let profile = await readMyProfile();
+      if (!profile?.id) profile = await createMyProfile(p);
       state.profile = profile;
       state.pendingProfile = null;
       setServiceState('online');
@@ -613,12 +681,11 @@
     if (button) button.disabled = true;
     try {
       await ensureUserAndProfile();
-      const profile = await rpc('update_my_profile', {
-        p_display_name: Object.prototype.hasOwnProperty.call(patch, 'display_name') ? patch.display_name : null,
-        p_avatar_seed: Object.prototype.hasOwnProperty.call(patch, 'avatar_seed') ? Number(patch.avatar_seed) : null,
-        p_avatar_style: Object.prototype.hasOwnProperty.call(patch, 'avatar_style') ? Number(patch.avatar_style) : null
-      });
-      if (!profile?.id) throw new ApiError('Updated profile was not returned');
+      const cleanPatch = {};
+      if (Object.prototype.hasOwnProperty.call(patch, 'display_name')) cleanPatch.display_name = patch.display_name;
+      if (Object.prototype.hasOwnProperty.call(patch, 'avatar_seed')) cleanPatch.avatar_seed = Number(patch.avatar_seed);
+      if (Object.prototype.hasOwnProperty.call(patch, 'avatar_style')) cleanPatch.avatar_style = Number(patch.avatar_style);
+      const profile = await updateMyProfileDirect(cleanPatch);
       state.profile = profile;
       state.pendingProfile = null;
       renderProfilePreview();
@@ -686,11 +753,7 @@
       await ensureUserAndProfile();
       const text = ($('#reviewText')?.value || '').trim();
       const wasExisting = Boolean(state.ownReview);
-      const review = await rpc('save_my_review', {
-        p_rating: Number(state.selectedRating),
-        p_review_text: text
-      });
-      if (!review?.id) throw new ApiError('Saved review was not returned');
+      const review = await saveMyReviewDirect(Number(state.selectedRating), text);
       state.ownReview = review;
       updateComposerUI();
       setStatus(wasExisting ? t('updated') : t('saved'), 'success');
@@ -709,7 +772,7 @@
     if (!window.confirm(t('confirmDelete'))) return;
     state.busy = true;
     try {
-      await rpc('delete_my_review');
+      await deleteMyReviewDirect();
       state.ownReview = null;
       state.selectedRating = null;
       const textarea = $('#reviewText');
