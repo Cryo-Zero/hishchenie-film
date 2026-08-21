@@ -3,14 +3,24 @@
 
   const SUPABASE_URL = 'https://xltwwvutqkpmtmlavngi.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_0hT3y-7p26Ngnq2zaPK-0w_5vtJX15k';
-  const SUPABASE_ANON_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhsdHd3dnV0cWtwbXRtbGF2bmdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwMzczNDUsImV4cCI6MjEwMjYxMzM0NX0.6NHPtuon2292W9aE_mn8_FzoFo_BnpT10_CicWbhFSA';
   const PROJECT_REF = 'xltwwvutqkpmtmlavngi';
-  const SESSION_KEY = `sb-${PROJECT_REF}-auth-token`;
-  const REQUEST_TIMEOUT = 12000;
-  const CLIENT_REVISION = 'P12-single-write';
+  // P13 deliberately uses a fresh project-owned storage namespace.
+  // Old P7-P12 experiments used Supabase SDK-compatible keys and could leave
+  // rotated/stale refresh tokens behind. Existing production users do not exist yet,
+  // so we reset the test identity once instead of asking visitors to clear cookies.
+  const SESSION_KEY = `theft-${PROJECT_REF}-auth-v3`;
+  const REQUEST_TIMEOUT = 15000;
+  const AUTH_TIMEOUT = 30000;
+  const WRITE_TIMEOUT = 30000;
+  const CLIENT_REVISION = 'P13-stable-auth';
+  const AUTH_LOCK_NAME = `theft-${PROJECT_REF}-auth-lock-v3`;
 
   let identityPromise = null;
   let memorySession = null;
+  let refreshPromise = null;
+  let signInPromise = null;
+  let profileMutationBusy = false;
+  let feedRequestSequence = 0;
 
   const I18N = {
     ru: {
@@ -36,6 +46,7 @@
       trailerLabel: '03 / SIGNAL', trailerTitle: 'Трейлер', videoFallback: 'Ваш браузер не поддерживает воспроизведение видео.',
       trailerLanguageNote: 'Оригинальная звуковая дорожка трейлера — на русском. Английские субтитры можно добавить после согласования с автором.',
       watchLabel: '04 / ACCESS', watchTitle: 'Где посмотреть', soon: 'скоро',
+      signalKicker: 'Текущий сигнал', signalStatusLabel: 'Статус', signalStatusValue: 'В разработке', signalYearLabel: 'Год', signalTrailerLabel: 'Трейлер', signalTrailerValue: 'В сети', signalAccessLabel: 'Публичный доступ', signalAccessValue: 'Активен', signalStable: 'SIGNAL // STABLE',
       castLabel: '05 / SUBJECTS', castTitle: 'Актёрский состав',
       nameArman: 'Арман О.', nameBogdan: 'Богдан В.', nameLevon: 'Левон', nameYulia: 'Юля Ш.', nameArsen: 'Арсен О.', nameAlexander: 'Александр К.', nameBella: 'Белла А.',
       roleGor: 'Гор', roleAntagonist: 'Антагонист', roleMark: 'Марк', roleHost: 'Ведущая', roleMusician: 'Музыкант', roleGrandfather: 'Дедушка Гора', roleDetective: 'Детектив',
@@ -58,6 +69,9 @@
       confirmDelete: 'Удалить ваш отзыв? Это действие нельзя отменить.',
       galleryAlt01: 'Обложка фильма «Хищение»', galleryAlt02: 'Постер фильма «Хищение» — пианино', galleryAlt03: 'Постер фильма «Хищение» — дедушка и ребёнок', galleryAlt04: 'Постер фильма «Хищение» — человек в капюшоне', galleryAlt05: 'Постер фильма «Хищение»', galleryAlt06: 'Постер фильма «Хищение» — герой в разрушенном городе', galleryAlt07: 'Постер фильма «Хищение» — ведущая', galleryAlt08: 'Постер фильма «Хищение» — город', galleryAlt09: 'Постер фильма «Хищение» — Гор', galleryAlt10: 'Кадры из фильма «Хищение»', galleryAlt11: 'Визуальный материал фильма «Хищение»',
       contactsLabel: '07 / CONTACT', contactsTitle: 'Контакты',
+      securityTeaser: 'SYS // SECURITY: PRESENT', securityTitle: 'На сайте есть безопасность',
+      securityText: 'Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.',
+      securityClose: 'Скрыть',
       footer: 'Официальный сайт фильма · фильм находится в разработке',
       close: 'Закрыть', previousImage: 'Предыдущее изображение', nextImage: 'Следующее изображение', openImage: 'Открыть выбранное изображение', galleryAria: 'Галерея материалов фильма', lightboxAria: 'Просмотр изображения',
       langButton: 'EN',
@@ -71,6 +85,7 @@
       menu: 'Menu', systemActive: 'System active', publicAccess: 'Public access',
       heroPosterAlt: 'Official poster for THEFT / ХИЩЕНИЕ', heroVideoAria: 'Muted trailer excerpt from THEFT / ХИЩЕНИЕ',
       navAbout: 'About', navMaterials: 'Materials', navTrailer: 'Trailer', navWatch: 'Watch', navCast: 'Cast', navReviews: 'Reviews', navContacts: 'Contacts',
+      watchIntro: 'Platforms will appear here once the release is confirmed. For now, this section serves as a public access point to the project.',
       heroEyebrow: 'Film in development · 2045',
       heroCopy: 'In a world where every person must prove their value to the system, growing up becomes a struggle for the right to choose your own future.',
       heroTrailer: 'Watch trailer', heroAbout: 'About the film',
@@ -85,6 +100,7 @@
       trailerLabel: '03 / SIGNAL', trailerTitle: 'Trailer', videoFallback: 'Your browser does not support video playback.',
       trailerLanguageNote: 'The original trailer audio is in Russian. English subtitles can be added after approval with the filmmaker.',
       watchLabel: '04 / ACCESS', watchTitle: 'Where to watch', soon: 'coming soon',
+      signalKicker: 'Current signal', signalStatusLabel: 'Status', signalStatusValue: 'In development', signalYearLabel: 'Year', signalTrailerLabel: 'Trailer', signalTrailerValue: 'Online', signalAccessLabel: 'Public access', signalAccessValue: 'Active', signalStable: 'SIGNAL // STABLE',
       castLabel: '05 / SUBJECTS', castTitle: 'Cast',
       nameArman: 'Arman O.', nameBogdan: 'Bogdan V.', nameLevon: 'Levon', nameYulia: 'Yulia Sh.', nameArsen: 'Arsen O.', nameAlexander: 'Aleksandr K.', nameBella: 'Bella A.',
       roleGor: 'Gor', roleAntagonist: 'Antagonist', roleMark: 'Mark', roleHost: 'News anchor', roleMusician: 'Musician', roleGrandfather: "Gor's grandfather", roleDetective: 'Detective',
@@ -107,6 +123,9 @@
       confirmDelete: 'Delete your review? This cannot be undone.',
       galleryAlt01: 'THEFT film cover', galleryAlt02: 'THEFT poster — piano scene', galleryAlt03: 'THEFT poster — grandfather and child', galleryAlt04: 'THEFT poster — hooded figure', galleryAlt05: 'THEFT film poster', galleryAlt06: 'THEFT poster — protagonist in a ruined city', galleryAlt07: 'THEFT poster — news anchor', galleryAlt08: 'THEFT poster — city', galleryAlt09: 'THEFT poster — Gor', galleryAlt10: 'Frames from THEFT', galleryAlt11: 'THEFT visual material',
       contactsLabel: '07 / CONTACT', contactsTitle: 'Contacts',
+      securityTeaser: 'SYS // SECURITY: PRESENT', securityTitle: 'There is safety on this site',
+      securityText: 'No email, phone number or password. The site stores only a technical identifier, alias, avatar settings, score and review text. The profile is tied to this browser; clearing browser data may remove access to editing the old review.',
+      securityClose: 'Hide',
       footer: 'Official film website · the film is in development',
       close: 'Close', previousImage: 'Previous image', nextImage: 'Next image', openImage: 'Open selected image', galleryAria: 'Film materials gallery', lightboxAria: 'Image viewer',
       langButton: 'RU',
@@ -198,6 +217,11 @@
     state.user = null;
   }
 
+  async function withAuthLock(task) {
+    if (navigator.locks?.request) return navigator.locks.request(AUTH_LOCK_NAME, task);
+    return task();
+  }
+
   function jwtExpiry(token) {
     try {
       const payload = token.split('.')[1];
@@ -239,33 +263,57 @@
   }
 
   async function signInAnonymously() {
-    const session = await fetchJson(`${SUPABASE_URL}/auth/v1/signup`, {
-      method: 'POST',
-      headers: {
-        apikey: SUPABASE_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ data: {}, gotrue_meta_security: { captcha_token: null } })
+    if (signInPromise) return signInPromise;
+    signInPromise = withAuthLock(async () => {
+      // Another tab may have created the browser identity while this tab waited.
+      const existing = loadStoredSession();
+      if (existing && isSessionFresh(existing)) {
+        state.user = existing.user || state.user;
+        return existing;
+      }
+      const session = await fetchJson(`${SUPABASE_URL}/auth/v1/signup`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ data: {} })
+      }, AUTH_TIMEOUT);
+      const stored = storeSession(session);
+      if (!stored?.user?.id) throw new ApiError('Anonymous session was not returned');
+      state.user = stored.user;
+      return stored;
     });
-    const stored = storeSession(session);
-    if (!stored?.user?.id) throw new ApiError('Anonymous session was not returned');
-    state.user = stored.user;
-    return stored;
+    try { return await signInPromise; }
+    finally { signInPromise = null; }
   }
 
   async function refreshAuthSession(session) {
-    const refreshed = await fetchJson(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
-      method: 'POST',
-      headers: {
-        apikey: SUPABASE_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ refresh_token: session.refresh_token })
+    if (!session?.refresh_token) throw new ApiError('Refresh token is unavailable', 401);
+    if (refreshPromise) return refreshPromise;
+    refreshPromise = withAuthLock(async () => {
+      const latest = loadStoredSession();
+      // A second tab may already have rotated the token while we were waiting.
+      if (latest && latest.refresh_token !== session.refresh_token && isSessionFresh(latest)) {
+        state.user = latest.user || state.user;
+        return latest;
+      }
+      const source = latest?.refresh_token ? latest : session;
+      const refreshed = await fetchJson(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refresh_token: source.refresh_token })
+      }, AUTH_TIMEOUT);
+      const stored = storeSession(refreshed);
+      if (!stored?.access_token) throw new ApiError('Session refresh failed');
+      state.user = stored.user || source.user || null;
+      return stored;
     });
-    const stored = storeSession(refreshed);
-    if (!stored?.access_token) throw new ApiError('Session refresh failed');
-    state.user = stored.user || session.user || null;
-    return stored;
+    try { return await refreshPromise; }
+    finally { refreshPromise = null; }
   }
 
   async function getAuthSession({ create = false } = {}) {
@@ -275,11 +323,18 @@
       return session;
     }
     if (session?.refresh_token) {
-      try { return await refreshAuthSession(session); }
-      catch (error) {
-        // Keep temporary network failures retryable; discard only a definitely invalid token.
-        if (error instanceof ApiError && [400, 401, 403].includes(error.status)) clearSession();
-        else throw error;
+      try {
+        return await refreshAuthSession(session);
+      } catch (error) {
+        // A definitely invalid refresh token cannot recover. Network timeouts are
+        // intentionally not converted into a new identity because that could orphan
+        // a real user's existing review.
+        if (error instanceof ApiError && [400, 401, 403].includes(error.status)) {
+          clearSession();
+          session = null;
+        } else {
+          throw error;
+        }
       }
     }
     if (!create) return null;
@@ -289,27 +344,40 @@
   function restHeaders(token, hasBody = false) {
     const headers = {
       apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${token || SUPABASE_ANON_JWT}`,
       Accept: 'application/json'
     };
+    // New sb_publishable_* keys belong only in `apikey`. Authorization is added
+    // exclusively for a real Supabase Auth user JWT.
+    if (token) headers.Authorization = `Bearer ${token}`;
     if (hasBody) headers['Content-Type'] = 'application/json';
     return headers;
   }
 
-  async function restRequest(resource, { method = 'GET', body = null, authenticated = false, prefer = '' } = {}) {
-    let token = SUPABASE_ANON_JWT;
+  async function restRequest(resource, { method = 'GET', body = null, authenticated = false } = {}) {
+    let session = null;
     if (authenticated) {
-      const session = await getAuthSession({ create: true });
-      token = session.access_token;
+      session = await getAuthSession({ create: true });
       state.user = session.user || state.user;
     }
-    const headers = restHeaders(token, body !== null);
-    if (prefer) headers.Prefer = prefer;
-    return fetchJson(`${SUPABASE_URL}/rest/v1/${resource}`, {
+
+    const timeout = authenticated || method !== 'GET' ? WRITE_TIMEOUT : REQUEST_TIMEOUT;
+    const send = token => fetchJson(`${SUPABASE_URL}/rest/v1/${resource}`, {
       method,
-      headers,
+      headers: restHeaders(token, body !== null),
       body: body === null ? undefined : JSON.stringify(body)
-    });
+    }, timeout);
+
+    try {
+      return await send(authenticated ? session?.access_token : null);
+    } catch (error) {
+      // One safe retry covers the narrow race where a JWT expires between the
+      // freshness check and PostgREST receiving the request.
+      if (!authenticated || !(error instanceof ApiError) || error.status !== 401) throw error;
+      const current = loadStoredSession();
+      if (!current?.refresh_token) throw error;
+      const refreshed = await refreshAuthSession(current);
+      return send(refreshed.access_token);
+    }
   }
 
   async function readMyProfile() {
@@ -336,13 +404,15 @@
     };
     try {
       await restRequest('profiles', { method: 'POST', body: payload, authenticated: true });
+      return payload;
     } catch (error) {
-      // A 409 means another in-flight/previous request already created this exact profile.
+      // A 409 means this identity already has a profile. Read the existing row
+      // instead of racing another INSERT.
       if (!(error instanceof ApiError) || error.status !== 409) throw error;
+      const stored = await readMyProfile();
+      if (!stored?.id) throw error;
+      return stored;
     }
-    const stored = await readMyProfile();
-    if (!stored?.id) throw new ApiError('Profile was not returned');
-    return stored;
   }
 
   async function updateMyProfileDirect(patch) {
@@ -395,7 +465,7 @@
     if (!state.user?.id) throw new ApiError('Anonymous user is unavailable');
     const uid = encodeURIComponent(state.user.id);
     await restRequest(`reviews?user_id=eq.${uid}`, { method: 'DELETE', authenticated: true });
-    return !(await readMyReview());
+    return true;
   }
 
   function randomInt(max) {
@@ -539,7 +609,7 @@
     const label = $('span', badge);
     if (label) {
       const base = next === 'online' ? t('serviceOnline') : next === 'offline' ? t('serviceOffline') : t('serviceChecking');
-      label.textContent = `${base} · P12`;
+      label.textContent = `${base} · P13`;
       label.title = CLIENT_REVISION;
     }
   }
@@ -649,18 +719,19 @@
     if (!session?.user?.id) return;
     state.user = session.user;
 
-    const uid = encodeURIComponent(state.user.id);
-    const [profileResult, reviewResult] = await Promise.allSettled([
-      restRequest(`profiles?select=id,display_name,avatar_seed,avatar_style&id=eq.${uid}`, { authenticated: true }),
-      restRequest(`reviews?select=id,user_id,rating,review_text,created_at,updated_at&user_id=eq.${uid}`, { authenticated: true })
-    ]);
+    // P10-P12 launched profile/review reads in parallel. If the access token needed
+    // refreshing, both branches could rotate the same refresh token at once. The API
+    // logs showed duplicate OPTIONS /auth/v1/token calls and no following write.
+    // Keep identity restoration deliberately sequential and boring.
+    const profile = await readMyProfile();
+    if (profile?.id) state.profile = profile;
 
-    if (profileResult.status === 'fulfilled' && profileResult.value?.[0]) state.profile = profileResult.value[0];
-    if (reviewResult.status === 'fulfilled' && reviewResult.value?.[0]) {
-      state.ownReview = reviewResult.value[0];
-      state.selectedRating = Number(state.ownReview.rating);
+    const review = await readMyReview();
+    if (review?.id) {
+      state.ownReview = review;
+      state.selectedRating = Number(review.rating);
       const textarea = $('#reviewText');
-      if (textarea) textarea.value = state.ownReview.review_text || '';
+      if (textarea) textarea.value = review.review_text || '';
     }
     renderProfilePreview();
     updateComposerUI();
@@ -693,9 +764,19 @@
     }
   }
 
+  function setComposerBusy(busy) {
+    const controls = [
+      $('#submitReview'), $('#deleteReview'), $('#rerollName'), $('#rerollAvatar'), $('#reviewText'),
+      ...$$('.rating-button')
+    ].filter(Boolean);
+    controls.forEach(control => { control.disabled = Boolean(busy); });
+  }
+
   async function persistProfilePatch(patch, button) {
+    if (state.busy || profileMutationBusy) return;
+    profileMutationBusy = true;
     const before = state.profile ? { ...state.profile } : null;
-    if (button) button.disabled = true;
+    setComposerBusy(true);
     try {
       await ensureUserAndProfile();
       const cleanPatch = {};
@@ -707,18 +788,20 @@
       state.pendingProfile = null;
       renderProfilePreview();
       setStatus('');
-      if (state.ownReview) await loadReviews(state.sort);
+      if (state.ownReview) loadReviews(state.sort);
     } catch (error) {
       console.error('[reviews/profile]', error);
       if (before) state.profile = before;
       renderProfilePreview();
       setStatus(t('profileError'), 'error');
     } finally {
-      if (button) button.disabled = false;
+      profileMutationBusy = false;
+      setComposerBusy(false);
     }
   }
 
   async function rerollName() {
+    if (state.busy || profileMutationBusy) return;
     const button = $('#rerollName');
     const newName = generateAlias(state.lang);
     if (!state.user) {
@@ -731,6 +814,7 @@
   }
 
   async function rerollAvatar() {
+    if (state.busy || profileMutationBusy) return;
     const button = $('#rerollAvatar');
     const patch = { avatar_seed: randomSeed(), avatar_style: randomInt(3) + 1 };
     if (!state.user) {
@@ -755,24 +839,30 @@
   }
 
   async function submitReview() {
-    if (state.busy) return;
+    if (state.busy || profileMutationBusy) return;
     if (state.selectedRating === null) {
       setStatus(t('chooseRating'), 'error');
       return;
     }
 
+    // Snapshot what the user actually submitted. In P12 the rating/text were read
+    // after Auth finished, so changing them while the network was slow could save a
+    // different value than the one visible when Publish was clicked.
+    const ratingSnapshot = Number(state.selectedRating);
+    const textSnapshot = ($('#reviewText')?.value || '').trim();
+    const wasExisting = Boolean(state.ownReview);
+
     state.busy = true;
-    const submit = $('#submitReview');
-    if (submit) submit.disabled = true;
+    setComposerBusy(true);
     setStatus(t('saving'));
 
     try {
       await ensureUserAndProfile();
-      const text = ($('#reviewText')?.value || '').trim();
-      const wasExisting = Boolean(state.ownReview);
-      const review = await saveMyReviewDirect(Number(state.selectedRating), text);
+      const review = await saveMyReviewDirect(ratingSnapshot, textSnapshot);
       state.ownReview = review;
+      state.selectedRating = ratingSnapshot;
       updateComposerUI();
+      updateRatingLabel();
       setStatus(wasExisting ? t('updated') : t('saved'), 'success');
       await Promise.allSettled([refreshStats(), loadReviews(state.sort)]);
     } catch (error) {
@@ -780,14 +870,15 @@
       setStatus(t('saveError'), 'error');
     } finally {
       state.busy = false;
-      if (submit) submit.disabled = false;
+      setComposerBusy(false);
     }
   }
 
   async function deleteReview() {
-    if (!state.ownReview || state.busy) return;
+    if (!state.ownReview || state.busy || profileMutationBusy) return;
     if (!window.confirm(t('confirmDelete'))) return;
     state.busy = true;
+    setComposerBusy(true);
     try {
       await deleteMyReviewDirect();
       state.ownReview = null;
@@ -804,6 +895,7 @@
       setStatus(t('deleteError'), 'error');
     } finally {
       state.busy = false;
+      setComposerBusy(false);
     }
   }
 
@@ -844,6 +936,7 @@
   }
 
   async function loadReviews(sort = state.sort) {
+    const requestSequence = ++feedRequestSequence;
     state.sort = sort;
     $$('.review-sort-button').forEach(btn => btn.classList.toggle('active', btn.dataset.sort === sort));
     const list = $('#reviewsList');
@@ -852,6 +945,7 @@
     try {
       const order = sort === 'high' ? 'rating.desc,created_at.desc' : sort === 'low' ? 'rating.asc,created_at.desc' : 'created_at.desc';
       const reviews = await restRequest(`reviews?select=id,user_id,rating,review_text,created_at,updated_at&limit=40&order=${encodeURIComponent(order)}`);
+      if (requestSequence !== feedRequestSequence) return;
       setServiceState('online');
       if (!reviews?.length) {
         list.replaceChildren(Object.assign(document.createElement('div'), { className: 'reviews-empty', textContent: t('reviewsEmpty') }));
@@ -864,6 +958,7 @@
         const filter = `(${ids.join(',')})`;
         profiles = await restRequest(`profiles?select=id,display_name,avatar_seed,avatar_style&id=in.${encodeURIComponent(filter)}`);
       }
+      if (requestSequence !== feedRequestSequence) return;
       const profileMap = new Map((profiles || []).map(p => [p.id, p]));
 
       const fragment = document.createDocumentFragment();
@@ -930,6 +1025,14 @@
     $('#reviewText')?.addEventListener('input', updateCounter);
     $$('.rating-button').forEach(button => button.addEventListener('click', () => selectRating(button.dataset.rating)));
     $$('.review-sort-button').forEach(button => button.addEventListener('click', () => loadReviews(button.dataset.sort)));
+    $('#securityToggle')?.addEventListener('click', () => {
+      const panel = $('#securityPanel');
+      const toggle = $('#securityToggle');
+      if (!panel || !toggle) return;
+      const open = panel.hidden;
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+    });
   }
 
   let dataLayerStarted = false;
@@ -962,6 +1065,13 @@
     renderProfilePreview();
     bootDataLayer();
   }
+
+  window.addEventListener('storage', event => {
+    if (event.key !== SESSION_KEY) return;
+    if (!event.newValue) { memorySession = null; return; }
+    try { memorySession = normalizeSession(JSON.parse(event.newValue)); }
+    catch { memorySession = null; }
+  });
 
   window.addEventListener('online', () => {
     dataLayerStarted = false;
