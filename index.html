@@ -2138,7 +2138,74 @@
       .archive-thumbs { grid-auto-columns:64px; }
     }
 
-</style>
+
+
+    /* ===== P9 / cleanup, compact rhythm & stable reviews ===== */
+    :root { --header-h: 66px; }
+    @media (min-width: 821px) {
+      h1 { font-size: clamp(64px, 6.2vw, 112px); }
+      h2 { font-size: clamp(40px, 4vw, 68px); }
+      .hero-copy { font-size: clamp(16px, 1.25vw, 20px); max-width: 680px; }
+      #about, #materials, #watch, #cast, #reviews { min-height: calc(100svh - var(--header-h)); padding-top: 38px; padding-bottom: 38px; }
+      #contacts { min-height: 0 !important; padding-top: 64px; padding-bottom: 64px; }
+      #materials .section-head, #watch .section-head, #cast .section-head, #reviews .section-head { margin-bottom: 22px; }
+    }
+
+    .hero-signal-frame, .hero-signal-video, .hero-video-shade { all: unset; }
+    .hero-poster-frame { width:min(100%, 560px); justify-self:end; }
+    .hero-poster { width:100%; height:auto; aspect-ratio: 1 / 1.08; object-fit:cover; }
+
+    .watch-layout { display:grid; grid-template-columns:minmax(0,.9fr) minmax(430px,1.1fr); gap:54px; align-items:center; }
+    .watch-primary { align-self:center; }
+    .watch-intro { max-width:580px; margin:0 0 26px; color:#7e9294; font-size:14px; line-height:1.7; }
+    .watch-list { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .watch-response .reviews-dashboard { margin:0; grid-template-columns:1fr 1fr; gap:12px; }
+    .watch-response .freshness-panel, .watch-response .average-panel { min-height:190px; padding:28px; }
+    .watch-response .freshness-ring { width:132px; height:132px; }
+    .watch-response .freshness-ring-inner { inset:7px; }
+    .watch-response .freshness-copy p { margin-bottom:0; }
+
+    .reviews-section .reviews-heading { align-items:end; }
+    .reviews-section .reviews-intro { max-width:620px; }
+    .reviews-section .review-workspace { margin-top:8px; }
+
+    .archive-stage-wrap { grid-template-columns:42px minmax(0,1fr) 42px; gap:7px; }
+    .archive-stage { min-height:330px; max-height:50vh; }
+    .archive-stage-wrap .gallery-button { width:42px; border-color:rgba(122,151,153,.25); color:#718789; background:rgba(4,8,9,.36); opacity:.72; }
+    .archive-stage-wrap .gallery-button:hover { opacity:1; border-color:rgba(145,183,185,.55); }
+    .archive-stage-wrap .gallery-button small { opacity:.48; font-size:6px; letter-spacing:1.3px; }
+    .archive-strip-head { opacity:.52; }
+    .archive-thumbs { grid-auto-columns:62px; gap:6px; overflow-x:auto; scrollbar-width:thin; }
+    .archive-thumbs .gallery-card { opacity:.24; border-color:rgba(80,104,106,.22); }
+    .archive-thumbs .gallery-card::before { display:none; }
+    .archive-thumbs .gallery-card.is-active { opacity:.82; border-color:rgba(145,183,185,.48); box-shadow:none; }
+    .archive-stage-meta { opacity:.66; font-size:8px; }
+
+    .cast { grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+    .cast-member { min-height:154px; padding:24px 22px; display:flex; flex-direction:column; justify-content:flex-end; background:linear-gradient(145deg,rgba(12,20,21,.78),rgba(5,9,10,.55)); }
+    .cast-member::before { content:attr(data-subject); position:absolute; top:18px; left:20px; color:#4f686a; font:7px ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:1.7px; }
+    .cast-member strong { font-size:18px; }
+    .cast-member span { margin-top:8px; font-size:13px; }
+    .cast-member:nth-child(1), .cast-member:nth-child(5) { grid-column:span 2; }
+    .cast-member:nth-child(1) strong, .cast-member:nth-child(5) strong { font-size:22px; }
+
+    @media (max-width: 1100px) {
+      .watch-layout { grid-template-columns:1fr; gap:28px; }
+      .watch-response { max-width:760px; }
+      .cast { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .cast-member:nth-child(n) { grid-column:auto; }
+    }
+    @media (max-width: 820px) {
+      .hero-poster-frame { width:min(100%,480px); justify-self:center; }
+      .watch-response .reviews-dashboard { grid-template-columns:1fr; }
+      .watch-list { grid-template-columns:1fr; }
+      .archive-stage { height:52svh; max-height:480px; }
+      .archive-thumbs { grid-auto-columns:58px; }
+      .cast { grid-template-columns:1fr; }
+      .cast-member { min-height:128px; }
+    }
+
+  </style>
 </head>
 
 <body>
@@ -2200,11 +2267,8 @@
           </div>
         </div>
 
-        <div class="hero-poster-frame hero-signal-frame">
-          <video class="hero-poster hero-signal-video" autoplay muted loop playsinline preload="metadata" poster="material-01.jpg" aria-label="Фрагмент трейлера фильма Хищение" data-i18n-aria="heroVideoAria">
-            <source src="trailer-16x9-web.mp4" type="video/mp4">
-          </video>
-          <div class="hero-video-shade" aria-hidden="true"></div>
+        <div class="hero-poster-frame">
+          <img class="hero-poster" src="material-01.jpg" alt="Официальная обложка фильма Хищение" data-i18n-alt="heroPosterAlt">
           <div class="poster-hud" aria-hidden="true">
             <span>FILE // 001</span>
             <span>THEFT_2045</span>
@@ -2332,7 +2396,7 @@
 
         <div class="signal-meta" aria-hidden="true"><span>SIGNAL_03</span><span>16:9 / MP4</span><span>ORIGINAL AUDIO // RU</span></div>
         <div class="video-shell" id="videoShell">
-          <video controls preload="metadata" poster="trailer-cover.jpg" playsinline>
+          <video controls preload="metadata" poster="trailer-preview.jpg" playsinline>
             <source src="trailer-16x9-web.mp4" type="video/mp4">
             <span data-i18n="videoFallback">Ваш браузер не поддерживает воспроизведение видео.</span>
           </video>
@@ -2350,10 +2414,39 @@
           </div>
         </div>
 
-        <div class="watch-list">
-          <div class="platform" data-platform-ru="Кинопоиск" data-platform-en="Kinopoisk">Кинопоиск · скоро</div>
-          <div class="platform" data-platform-ru="RuTube" data-platform-en="RuTube">RuTube · скоро</div>
-          <div class="platform" data-platform-ru="VK Видео" data-platform-en="VK Video">VK Видео · скоро</div>
+        <div class="watch-layout">
+          <div class="watch-primary">
+            <p class="watch-intro" data-i18n="watchIntro">Площадки появятся здесь после подтверждения релиза. Пока раздел работает как публичная точка доступа к проекту.</p>
+            <div class="watch-list">
+              <div class="platform" data-platform-ru="Кинопоиск" data-platform-en="Kinopoisk">Кинопоиск · скоро</div>
+              <div class="platform" data-platform-ru="RuTube" data-platform-en="RuTube">RuTube · скоро</div>
+              <div class="platform" data-platform-ru="VK Видео" data-platform-en="VK Video">VK Видео · скоро</div>
+            </div>
+          </div>
+          <aside class="watch-response" aria-label="Оценки зрителей">
+        <div class="reviews-dashboard">
+          <div class="freshness-panel">
+            <div class="freshness-ring is-pending" id="freshnessRing" style="--freshness:0">
+              <div class="freshness-ring-inner">
+                <strong id="freshnessValue">—</strong>
+                <span id="freshnessState" data-i18n="insufficient">Недостаточно оценок</span>
+              </div>
+            </div>
+            <div class="freshness-copy">
+              <div class="metric-kicker" data-i18n="freshness">Свежесть</div>
+              <p data-i18n="freshnessHint">7–10 = положительно</p>
+            </div>
+          </div>
+
+          <div class="average-panel">
+            <div class="metric-kicker" data-i18n="average">Средняя оценка</div>
+            <div class="average-value"><strong id="averageRating">—</strong><span>/10</span></div>
+            <div class="rating-count" id="ratingsCount">0 оценок</div>
+            <div class="system-lines" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+
+          </aside>
         </div>
       </div>
     </section>
@@ -2390,28 +2483,6 @@
           <div class="reviews-head-aside">
             <p class="reviews-intro" data-i18n="reviewsIntro">Оценки зрителей формируют «Свежесть» фильма. 7–10 баллов считаются положительной оценкой.</p>
             <div class="service-badge is-checking" id="reviewServiceBadge" role="status" aria-live="polite"><i></i><span data-i18n="serviceChecking">ПРОВЕРКА КАНАЛА</span></div>
-          </div>
-        </div>
-
-        <div class="reviews-dashboard">
-          <div class="freshness-panel">
-            <div class="freshness-ring is-pending" id="freshnessRing" style="--freshness:0">
-              <div class="freshness-ring-inner">
-                <strong id="freshnessValue">—</strong>
-                <span id="freshnessState" data-i18n="insufficient">Недостаточно оценок</span>
-              </div>
-            </div>
-            <div class="freshness-copy">
-              <div class="metric-kicker" data-i18n="freshness">Свежесть</div>
-              <p data-i18n="freshnessHint">7–10 = положительно</p>
-            </div>
-          </div>
-
-          <div class="average-panel">
-            <div class="metric-kicker" data-i18n="average">Средняя оценка</div>
-            <div class="average-value"><strong id="averageRating">—</strong><span>/10</span></div>
-            <div class="rating-count" id="ratingsCount">0 оценок</div>
-            <div class="system-lines" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
           </div>
         </div>
 
