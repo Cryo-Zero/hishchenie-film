@@ -2,11 +2,13 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <title>ХИЩЕНИЕ — THEFT | Официальный сайт фильма</title>
   <meta name="description" content="Официальный сайт фильма «ХИЩЕНИЕ / THEFT» — антиутопической драмы о мире 2045 года.">
   <meta name="theme-color" content="#07090a">
+  <meta name="color-scheme" content="dark">
+  <meta name="format-detection" content="telephone=no">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://cryo-zero.github.io/hishchenie-film/">
 
@@ -973,24 +975,1154 @@
         animation-iteration-count: 1 !important;
       }
     }
-  </style>
+  
+
+    /* ---------- Язык ---------- */
+
+    .lang-toggle {
+      min-width: 42px;
+      height: 30px;
+      padding: 0 9px;
+      border: 1px solid #344143;
+      border-radius: 3px;
+      background: rgba(14, 20, 21, 0.9);
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.6px;
+      transition: border-color .2s ease, background .2s ease, color .2s ease;
+    }
+
+    .lang-toggle:hover {
+      border-color: #6d888b;
+      background: #121a1b;
+      color: #fff;
+    }
+
+    /* ---------- Отзывы / Audience protocol ---------- */
+
+    .reviews-section {
+      position: relative;
+      overflow: hidden;
+      border-top: 1px solid var(--line-soft);
+      border-bottom: 1px solid var(--line-soft);
+      background:
+        linear-gradient(rgba(155, 196, 199, 0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(155, 196, 199, 0.022) 1px, transparent 1px),
+        #080b0c;
+      background-size: 42px 42px, 42px 42px, auto;
+    }
+
+    .reviews-section::before {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      right: -180px;
+      top: -200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(91, 143, 147, .11), transparent 68%);
+      pointer-events: none;
+    }
+
+    .reviews-heading {
+      gap: 42px;
+    }
+
+    .reviews-intro {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .reviews-dashboard {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr);
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .freshness-panel,
+    .average-panel,
+    .review-composer,
+    .review-feed {
+      border: 1px solid var(--line);
+      background: rgba(10, 15, 16, .91);
+      box-shadow: inset 0 1px rgba(255,255,255,.015);
+    }
+
+    .freshness-panel {
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      gap: clamp(24px, 5vw, 56px);
+      padding: 30px clamp(24px, 4vw, 44px);
+    }
+
+    .freshness-ring {
+      --freshness: 0;
+      width: 158px;
+      height: 158px;
+      flex: 0 0 158px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) calc(var(--freshness) * 1%), #192123 0);
+      position: relative;
+      transition: background 600ms ease;
+      box-shadow: 0 0 42px rgba(86, 135, 139, .08);
+    }
+
+    .freshness-ring::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border-radius: 50%;
+      background: #090d0e;
+      border: 1px solid #263234;
+    }
+
+    .freshness-ring.is-pending {
+      background: conic-gradient(#415052 20%, #192123 20%);
+    }
+
+    .freshness-ring-inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .freshness-ring-inner strong {
+      display: block;
+      color: #f5f8f8;
+      font-size: 35px;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .freshness-ring-inner span {
+      display: block;
+      max-width: 104px;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.35;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+    }
+
+    .metric-kicker,
+    .composer-label {
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2.8px;
+      text-transform: uppercase;
+    }
+
+    .freshness-copy p {
+      margin-top: 9px;
+      color: var(--dim);
+      font-size: 13px;
+    }
+
+    .average-panel {
+      min-height: 220px;
+      position: relative;
+      overflow: hidden;
+      padding: 34px;
+    }
+
+    .average-value {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      margin-top: 25px;
+    }
+
+    .average-value strong {
+      font-size: clamp(54px, 6vw, 78px);
+      line-height: .9;
+      letter-spacing: -3px;
+    }
+
+    .average-value span {
+      padding-bottom: 7px;
+      color: var(--dim);
+      font-size: 18px;
+    }
+
+    .rating-count {
+      margin-top: 17px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .system-lines {
+      position: absolute;
+      right: -12px;
+      bottom: 17px;
+      width: 46%;
+      display: grid;
+      gap: 6px;
+      opacity: .34;
+      transform: skewX(-14deg);
+    }
+
+    .system-lines i {
+      display: block;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent));
+    }
+
+    .system-lines i:nth-child(2) { width: 74%; margin-left: auto; }
+    .system-lines i:nth-child(3) { width: 88%; margin-left: auto; }
+    .system-lines i:nth-child(4) { width: 58%; margin-left: auto; }
+
+    .review-workspace {
+      display: grid;
+      grid-template-columns: minmax(360px, .83fr) minmax(0, 1.17fr);
+      gap: 16px;
+    }
+
+    .review-composer,
+    .review-feed {
+      padding: clamp(22px, 3vw, 32px);
+    }
+
+    .profile-console {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      margin-top: 20px;
+      padding: 17px;
+      border: 1px solid var(--line-soft);
+      background: #090d0e;
+    }
+
+    .profile-avatar,
+    .review-avatar {
+      flex: 0 0 auto;
+      line-height: 0;
+    }
+
+    .avatar-svg {
+      display: block;
+    }
+
+    .profile-data {
+      min-width: 0;
+    }
+
+    .profile-data > strong {
+      display: block;
+      overflow: hidden;
+      color: #f1f5f5;
+      font-size: 16px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .profile-data p {
+      margin-top: 5px;
+      color: var(--dim);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .profile-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 11px;
+    }
+
+    .micro-button,
+    .review-sort-button {
+      border: 1px solid #303b3d;
+      background: transparent;
+      color: #a8b5b6;
+      cursor: pointer;
+      font-size: 10px;
+      letter-spacing: .55px;
+      transition: .2s ease;
+    }
+
+    .micro-button {
+      padding: 6px 8px;
+    }
+
+    .micro-button:hover,
+    .review-sort-button:hover,
+    .review-sort-button.active {
+      border-color: #688184;
+      background: #12191a;
+      color: #fff;
+    }
+
+    .score-field,
+    .review-text-field {
+      margin-top: 28px;
+    }
+
+    .field-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .field-heading > label {
+      color: #dfe5e5;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .field-heading small {
+      margin-left: 5px;
+      color: var(--dim);
+      font-size: 9px;
+      font-weight: 500;
+    }
+
+    .score-readout {
+      text-align: right;
+    }
+
+    .score-readout strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .score-readout span,
+    #reviewCounter {
+      color: var(--dim);
+      font-size: 10px;
+    }
+
+    .rating-scale {
+      display: grid;
+      grid-template-columns: repeat(11, 1fr);
+      gap: 4px;
+    }
+
+    .rating-button {
+      min-width: 0;
+      height: 40px;
+      border: 1px solid #2c3739;
+      background: #0b1011;
+      color: #9ba8a9;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .16s ease, color .16s ease, border-color .16s ease, transform .16s ease;
+    }
+
+    .rating-button:hover {
+      border-color: #6b8588;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .rating-button.selected {
+      border-color: var(--accent);
+      background: #182123;
+      color: #fff;
+      box-shadow: inset 0 -2px var(--accent);
+    }
+
+    #reviewText {
+      width: 100%;
+      min-height: 132px;
+      resize: vertical;
+      padding: 14px 15px;
+      border: 1px solid #2a3537;
+      border-radius: 0;
+      outline: none;
+      background: #090d0e;
+      color: #e9eeee;
+      font: inherit;
+      font-size: 13px;
+      line-height: 1.6;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    #reviewText:focus {
+      border-color: #688184;
+      box-shadow: 0 0 0 2px rgba(155,196,199,.05);
+    }
+
+    #reviewText::placeholder {
+      color: #5f6d6f;
+    }
+
+    .review-submit-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .review-submit-row .button {
+      border: 1px solid #6f8789;
+      cursor: pointer;
+    }
+
+    .review-submit-row .button:disabled {
+      cursor: wait;
+      opacity: .55;
+    }
+
+    .danger-button {
+      border-color: #5a3434 !important;
+      background: transparent !important;
+      color: #ba8787 !important;
+    }
+
+    .danger-button:hover {
+      border-color: #9a5555 !important;
+      color: #e2a2a2 !important;
+    }
+
+    .review-status {
+      min-height: 20px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .review-status.success { color: #9bc4c7; }
+    .review-status.error { color: #c98d89; }
+
+    .privacy-note {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line-soft);
+      color: #647274;
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .review-feed-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .review-sort {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 5px;
+    }
+
+    .review-sort-button {
+      padding: 6px 8px;
+    }
+
+    .reviews-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .reviews-empty {
+      padding: 44px 20px;
+      border: 1px dashed #283234;
+      color: var(--dim);
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .review-card {
+      padding: 17px;
+      border: 1px solid #20292b;
+      background: #090d0e;
+    }
+
+    .review-card.is-own {
+      border-color: #43585a;
+      box-shadow: inset 2px 0 var(--accent);
+    }
+
+    .review-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .review-identity {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .review-identity > div:last-child {
+      min-width: 0;
+    }
+
+    .review-identity strong {
+      display: inline;
+      color: #eef2f2;
+      font-size: 13px;
+    }
+
+    .review-identity span {
+      display: block;
+      margin-top: 4px;
+      color: #667476;
+      font-size: 9px;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    .own-badge {
+      display: inline-block;
+      margin-left: 7px;
+      padding: 1px 5px;
+      border: 1px solid #3f5658;
+      color: var(--accent);
+      font-size: 8px;
+      font-style: normal;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+    }
+
+    .review-score {
+      flex: 0 0 auto;
+      min-width: 58px;
+      padding: 6px 8px;
+      border: 1px solid #343f41;
+      text-align: center;
+    }
+
+    .review-score.positive {
+      border-color: #557073;
+    }
+
+    .review-score strong {
+      font-size: 19px;
+    }
+
+    .review-score span {
+      margin-left: 2px;
+      color: var(--dim);
+      font-size: 9px;
+    }
+
+    .review-card-text {
+      margin-top: 14px;
+      color: #c9d1d2;
+      font-size: 12px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .review-card-text.muted-text {
+      color: #647274;
+      font-style: italic;
+    }
+
+    .review-edited {
+      display: block;
+      margin-top: 8px;
+      color: #536164;
+      font-size: 8px;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 1100px) {
+      .reviews-dashboard,
+      .review-workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .freshness-panel,
+      .average-panel {
+        min-height: 190px;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .nav-links {
+        gap: 9px;
+      }
+
+      .lang-toggle {
+        min-width: 38px;
+      }
+
+      .reviews-heading {
+        gap: 16px;
+      }
+
+      .reviews-intro {
+        max-width: none;
+      }
+
+      .freshness-panel {
+        min-height: 0;
+      }
+
+      .review-composer,
+      .review-feed {
+        padding: 20px 16px;
+      }
+
+      .review-feed-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .review-sort {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .freshness-panel {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .freshness-ring {
+        align-self: center;
+      }
+
+      .profile-console {
+        align-items: flex-start;
+      }
+
+      .profile-avatar .avatar-svg {
+        width: 62px;
+        height: 62px;
+      }
+
+      .rating-scale {
+        grid-template-columns: repeat(6, 1fr);
+      }
+
+      .rating-button:last-child {
+        grid-column: span 2;
+      }
+
+      .field-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .score-readout {
+        text-align: left;
+      }
+
+      .review-submit-row {
+        flex-direction: column;
+      }
+
+      .review-submit-row .button {
+        width: 100%;
+      }
+    }
+
+  
+
+    /* ======================================================
+       P7 — SYSTEM LAYER / responsive cinematic identity
+       ====================================================== */
+
+    @property --freshness {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: 0;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: .055;
+      mix-blend-mode: screen;
+      background-image:
+        repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.12) 4px),
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.18) 0 .6px, transparent .8px);
+      background-size: 100% 4px, 7px 7px;
+    }
+
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 500;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(155,196,199,.5);
+      pointer-events: none;
+    }
+
+    .system-rail {
+      position: fixed;
+      z-index: 45;
+      right: 14px;
+      top: 50%;
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      transform: translateY(-50%);
+      color: #5d6c6e;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 8px;
+      letter-spacing: 1.1px;
+      writing-mode: vertical-rl;
+      pointer-events: none;
+    }
+
+    .rail-track {
+      position: relative;
+      width: 1px;
+      height: 120px;
+      overflow: hidden;
+      background: #202a2c;
+    }
+
+    .rail-track i {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1px;
+      height: 0;
+      background: var(--accent);
+      transition: height .18s linear;
+    }
+
+    .rail-section { color: #89999b; }
+
+    .site-header {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    .nav {
+      grid-template-columns: auto minmax(100px,1fr) auto auto;
+      gap: 24px;
+    }
+
+    .nav-links { justify-self: end; }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .menu-toggle {
+      display: none;
+      min-height: 38px;
+      padding: 0 11px;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid #344143;
+      background: #0d1314;
+      color: #a9b6b7;
+      cursor: pointer;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .menu-toggle i,
+    .menu-toggle i::before,
+    .menu-toggle i::after {
+      width: 14px;
+      height: 1px;
+      display: block;
+      background: currentColor;
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    .menu-toggle i { position: relative; }
+    .menu-toggle i::before,
+    .menu-toggle i::after { content: ""; position: absolute; left: 0; }
+    .menu-toggle i::before { top: -5px; }
+    .menu-toggle i::after { top: 5px; }
+    body.nav-open .menu-toggle i { background: transparent; }
+    body.nav-open .menu-toggle i::before { transform: translateY(5px) rotate(45deg); }
+    body.nav-open .menu-toggle i::after { transform: translateY(-5px) rotate(-45deg); }
+
+    .hero-system-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin-bottom: 18px;
+      color: #627477;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 9px;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+
+    .status-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #8caeb0;
+    }
+
+    .status-live i,
+    .poster-rec i,
+    .service-badge i {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 6px;
+      border-radius: 50%;
+      background: #8eb2b4;
+      box-shadow: 0 0 9px rgba(142,178,180,.55);
+    }
+
+    .status-live b { font: inherit; }
+
+    .hero-poster-frame { overflow: hidden; }
+
+    .poster-hud {
+      position: absolute;
+      z-index: 2;
+      inset: 18px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-content: space-between;
+      pointer-events: none;
+      color: rgba(226,239,239,.72);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 8px;
+      letter-spacing: 1.2px;
+      text-shadow: 0 1px 5px #000;
+    }
+
+    .poster-hud::before,
+    .poster-hud::after {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-color: rgba(190,220,222,.42);
+    }
+    .poster-hud::before { left: -6px; top: -6px; border-left: 1px solid; border-top: 1px solid; }
+    .poster-hud::after { right: -6px; bottom: -6px; border-right: 1px solid; border-bottom: 1px solid; }
+
+    .poster-rec {
+      grid-column: 2;
+      align-self: end;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #d5e4e5;
+    }
+    .poster-rec i { background: #ad6460; box-shadow: 0 0 8px rgba(173,100,96,.7); }
+
+    main > section:not(.hero)::before {
+      content: attr(data-system-watermark);
+      position: absolute;
+      right: max(24px, calc((100vw - var(--max)) / 2));
+      top: 34px;
+      color: rgba(155,196,199,.035);
+      font-size: clamp(54px, 8vw, 116px);
+      font-weight: 900;
+      letter-spacing: -.06em;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .section-label {
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 2.6px;
+    }
+
+    .section-label::before {
+      content: "";
+      width: 18px;
+      height: 1px;
+      display: inline-block;
+      margin: 0 9px 3px 0;
+      background: currentColor;
+      opacity: .55;
+    }
+
+    .section-note {
+      max-width: 760px;
+      margin: -18px 0 28px;
+      color: #6f7f81;
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .gallery-card::before {
+      content: attr(data-file) "  //  ARCHIVE";
+      position: absolute;
+      z-index: 3;
+      left: 12px;
+      right: 12px;
+      bottom: 10px;
+      color: rgba(232,241,241,.78);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 8px;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 5px #000;
+      transition: transform .25s ease, opacity .25s ease;
+    }
+
+    .gallery-card::after { height: 42%; }
+
+    .gallery-card:hover::before { transform: translateY(-2px); }
+
+    .signal-meta {
+      width: min(100%, 1040px);
+      margin: 0 auto 7px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px 16px;
+      color: #5f7072;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 8px;
+      letter-spacing: 1.2px;
+    }
+
+    .trailer-language-note {
+      width: min(100%, 1040px);
+      margin: 12px auto 0;
+    }
+
+    .platform {
+      position: relative;
+      overflow: hidden;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+    }
+    .platform::after {
+      content: "ACCESS // PENDING";
+      position: absolute;
+      right: 8px;
+      bottom: 2px;
+      color: rgba(155,196,199,.13);
+      font-size: 7px;
+      letter-spacing: 1px;
+    }
+
+    .cast-member { position: relative; overflow: hidden; }
+    .cast-member::before {
+      content: attr(data-subject);
+      display: block;
+      margin-bottom: 14px;
+      color: #536668;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 8px;
+      letter-spacing: 1.2px;
+    }
+    .cast-member::after {
+      content: "+";
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      color: rgba(155,196,199,.18);
+      font-family: monospace;
+      font-size: 20px;
+    }
+
+    .reviews-head-aside {
+      max-width: 520px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .service-badge {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 8px;
+      border: 1px solid #2d3a3c;
+      color: #77898b;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 8px;
+      letter-spacing: 1.1px;
+    }
+    .service-badge.is-online { color: #91b6b8; border-color: #3c5557; }
+    .service-badge.is-offline { color: #b9827f; border-color: #5a3837; }
+    .service-badge.is-offline i { background: #b16a66; box-shadow: 0 0 7px rgba(177,106,102,.5); }
+    .service-badge.is-checking i { animation: signalPulse 1.2s ease-in-out infinite; }
+
+    @keyframes signalPulse {
+      0%,100% { opacity: .25; transform: scale(.72); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
+    .freshness-ring { transition: --freshness 900ms cubic-bezier(.2,.7,.2,1); }
+
+    .review-card { position: relative; }
+    .review-card::before {
+      content: "PUBLIC RECORD";
+      position: absolute;
+      right: 12px;
+      bottom: 7px;
+      color: rgba(155,196,199,.08);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 7px;
+      letter-spacing: 1.2px;
+      pointer-events: none;
+    }
+
+    .footer-system {
+      margin-top: 16px;
+      color: #435153;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 8px;
+      letter-spacing: 1.7px;
+    }
+
+    @media (max-width: 1280px) {
+      .nav { grid-template-columns: auto 1fr auto; }
+      .header-slogan { display: none; }
+      .nav-links { justify-self: end; }
+    }
+
+    @media (max-width: 980px) {
+      .nav {
+        position: relative;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+      }
+      .header-controls { justify-self: end; }
+      .menu-toggle { display: inline-flex; }
+      .nav-links {
+        position: absolute;
+        z-index: 80;
+        top: calc(100% + 1px);
+        left: 0;
+        right: 0;
+        display: grid;
+        max-height: 0;
+        overflow: hidden;
+        gap: 0;
+        border: 0 solid #283234;
+        background: rgba(7,10,11,.985);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-7px);
+        transition: max-height .28s ease, opacity .18s ease, transform .18s ease, border-width .18s ease;
+        backdrop-filter: blur(16px);
+      }
+      .nav-links a,
+      .nav-links a:not(.nav-trailer) {
+        display: block;
+        padding: 15px 16px;
+        border-bottom: 1px solid #182123;
+        font-size: 11px;
+      }
+      .nav-links a::after { display: none; }
+      body.nav-open { overflow: hidden; }
+      body.nav-open .nav-links {
+        max-height: calc(100svh - var(--header-h) - env(safe-area-inset-top,0px));
+        overflow-y: auto;
+        border-width: 1px;
+        opacity: 1;
+        pointer-events: auto;
+        transform: none;
+      }
+      .system-rail { display: none; }
+    }
+
+    @media (max-width: 820px) {
+      .lang-toggle { height: 38px; min-width: 44px; }
+      .hero-system-strip { margin-top: 3px; }
+      main > section:not(.hero)::before { right: 16px; top: 26px; font-size: 58px; }
+      .section-note { margin-top: -12px; }
+      .reviews-head-aside { max-width: none; }
+    }
+
+    @media (max-width: 560px) {
+      .shell, .hero-inner { width: min(100% - 26px, var(--max)); }
+      .brand { font-size: 11px; letter-spacing: 1px; }
+      .menu-toggle { padding: 0 9px; }
+      .menu-toggle span { display: none; }
+      .hero-system-strip { gap: 6px 10px; font-size: 8px; }
+      .poster-hud { inset: 14px; }
+      .section-label { letter-spacing: 1.8px; }
+      .gallery-card::before { left: 9px; bottom: 8px; }
+      .signal-meta { justify-content: flex-start; }
+      .service-badge { max-width: 100%; }
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      .gallery-card:hover img,
+      .cast-member:hover,
+      .rating-button:hover,
+      .button:hover { transform: none; }
+      .button, .micro-button, .review-sort-button, .rating-button, .gallery-button, .contact-link { min-height: 44px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .service-badge.is-checking i { animation: none !important; }
+      .freshness-ring { transition: none !important; }
+      body::after { opacity: .025; }
+    }
+
+  
+    body { -webkit-tap-highlight-color: transparent; }
+    .reviews-section::after {
+      content: ""; position: absolute; width: 520px; height: 520px; right: -180px; top: -200px;
+      border-radius: 50%; background: radial-gradient(circle, rgba(91,143,147,.10), transparent 68%); pointer-events: none;
+    }
+    .reviews-section > .shell { position: relative; z-index: 1; }
+
+    .gallery-button.prev { left: 7px; }
+    .gallery-button.next { right: 7px; }
+</style>
 </head>
 
 <body>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <aside class="system-rail" aria-hidden="true">
+    <span class="rail-status">SYS // 2045</span>
+    <div class="rail-track"><i id="railProgress"></i></div>
+    <span class="rail-section" id="railSection">00 / ENTRY</span>
+  </aside>
+
   <header class="site-header">
     <div class="shell nav">
-      <a class="brand" href="#top">ХИЩЕНИЕ <span>/ THEFT</span></a>
+      <a class="brand" href="#top" aria-label="ХИЩЕНИЕ / THEFT">ХИЩЕНИЕ <span>/ THEFT</span></a>
 
-      <div class="header-slogan">В системе нет безопасности</div>
+      <div class="header-slogan" data-i18n="slogan">В системе нет безопасности</div>
 
-      <nav class="nav-links" aria-label="Основная навигация">
-        <a href="#about">О фильме</a>
-        <a href="#materials">Материалы</a>
-        <a class="nav-trailer" href="#trailer">Трейлер</a>
-        <a href="#watch">Где посмотреть</a>
-        <a href="#cast">Актёры</a>
-        <a href="#contacts">Контакты</a>
+      <nav class="nav-links" id="primaryNav" aria-label="Основная навигация" data-i18n-aria="navAria">
+        <a href="#about" data-i18n="navAbout">О фильме</a>
+        <a href="#materials" data-i18n="navMaterials">Материалы</a>
+        <a class="nav-trailer" href="#trailer" data-i18n="navTrailer">Трейлер</a>
+        <a href="#watch" data-i18n="navWatch">Где посмотреть</a>
+        <a href="#cast" data-i18n="navCast">Актёры</a>
+        <a href="#reviews" data-i18n="navReviews">Отзывы</a>
+        <a href="#contacts" data-i18n="navContacts">Контакты</a>
       </nav>
+
+      <div class="header-controls">
+        <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch to English">EN</button>
+        <button class="menu-toggle" id="menuToggle" type="button" aria-controls="primaryNav" aria-expanded="false">
+          <span data-i18n="menu">Меню</span><i aria-hidden="true"></i>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -998,196 +2130,304 @@
     <section class="hero" id="top">
       <div class="hero-inner">
         <div class="hero-copy-column">
-          <div class="eyebrow">Фильм в разработке · 2045</div>
-          <div class="mobile-slogan">В системе нет безопасности</div>
+          <div class="hero-system-strip" aria-label="System status">
+            <span>SYS // 2045</span>
+            <span class="status-live"><i></i><b data-i18n="systemActive">СИСТЕМА АКТИВНА</b></span>
+            <span data-i18n="publicAccess">ПУБЛИЧНЫЙ ДОСТУП</span>
+          </div>
+          <div class="eyebrow" data-i18n="heroEyebrow">Фильм в разработке · 2045</div>
+          <div class="mobile-slogan" data-i18n="slogan">В системе нет безопасности</div>
 
           <h1>
             ХИЩЕНИЕ
             <span class="english-title">THEFT</span>
           </h1>
 
-          <p class="hero-copy">
-            В мире, где человек должен доказать свою пользу системе,
-            взросление становится борьбой за право самому выбирать своё будущее.
-          </p>
+          <p class="hero-copy" data-i18n="heroCopy">В мире, где человек должен доказать свою пользу системе, взросление становится борьбой за право самому выбирать своё будущее.</p>
 
           <div class="hero-actions">
-            <a class="button" href="#trailer">Смотреть трейлер</a>
-            <a class="button secondary" href="#about">О фильме</a>
+            <a class="button" href="#trailer" data-i18n="heroTrailer">Смотреть трейлер</a>
+            <a class="button secondary" href="#about" data-i18n="heroAbout">О фильме</a>
           </div>
         </div>
 
         <div class="hero-poster-frame">
-          <img class="hero-poster" src="material-01.jpg" alt="Официальная обложка фильма Хищение">
+          <img class="hero-poster" src="material-01.jpg" alt="Официальная обложка фильма Хищение" data-i18n-alt="heroPosterAlt">
+          <div class="poster-hud" aria-hidden="true">
+            <span>FILE // 001</span>
+            <span>THEFT_2045</span>
+            <span class="poster-rec"><i></i> REC</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="about">
+    <section id="about" data-system-watermark="DOSSIER">
       <div class="shell">
         <div class="section-head">
           <div>
-            <div class="section-label">О фильме</div>
-            <h2>2045 год.</h2>
+            <div class="section-label" data-i18n="aboutLabel">01 / DOSSIER</div>
+            <h2 data-i18n="aboutTitle">2045 год.</h2>
           </div>
         </div>
 
         <div class="story">
-          <p>
-            Население Земли превысило допустимый предел. Государство создаёт
-            новую систему, в которой каждый человек должен доказать свою пользу обществу.
-          </p>
+          <p data-i18n="story1">Население Земли превысило допустимый предел. Государство создаёт новую систему, в которой каждый человек должен доказать свою пользу обществу.</p>
 
-          <p>
-            Дети с раннего возраста попадают под особый контроль и распределяются
-            по специальным секциям.
-          </p>
+          <p data-i18n="story2">Дети с раннего возраста попадают под особый контроль и распределяются по специальным секциям.</p>
 
-          <p>
-            Гор живёт со своим 75-летним дедушкой и пытается приспособиться к новому миру.
-            История показывает взросление Гора, его дружбу с Марком и борьбу за собственное
-            будущее в системе, где человеческая жизнь постепенно превращается в ресурс.
-          </p>
+          <p data-i18n="story3">Гор живёт со своим 75-летним дедушкой и пытается приспособиться к новому миру. История показывает взросление Гора, его дружбу с Марком и борьбу за собственное будущее в системе, где человеческая жизнь постепенно превращается в ресурс.</p>
         </div>
 
         <div class="info-grid">
           <div class="info-card">
-            <small>Название</small>
+            <small data-i18n="infoTitle">Название</small>
             ХИЩЕНИЕ / THEFT
           </div>
 
           <div class="info-card">
-            <small>Жанр</small>
-            Антиутопия · Драма · Боевик · Приключения · Фантастика
+            <small data-i18n="infoGenre">Жанр</small>
+            <span data-i18n="genreValue">Антиутопия · Драма · Боевик · Приключения · Фантастика</span>
           </div>
 
           <div class="info-card">
-            <small>Режиссёр</small>
+            <small data-i18n="infoDirector">Режиссёр</small>
             Арман О. А.
           </div>
 
           <div class="info-card">
-            <small>Статус</small>
-            В разработке
+            <small data-i18n="infoStatus">Статус</small>
+            <span data-i18n="statusValue">В разработке</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="materials">
+    <section id="materials" data-system-watermark="ARCHIVE">
       <div class="shell">
         <div class="section-head">
           <div>
-            <div class="section-label">Materials</div>
-            <h2>Визуальные материалы</h2>
+            <div class="section-label" data-i18n="materialsLabel">02 / ARCHIVE</div>
+            <h2 data-i18n="materialsTitle">Визуальные материалы</h2>
           </div>
         </div>
+
+        <p class="section-note" data-i18n="materialsNote">Материалы представлены в авторском виде. Текст внутри постеров может оставаться на русском языке.</p>
 
         <div class="gallery-wrap">
-          <button class="gallery-button prev" id="galleryPrev" type="button" aria-label="Предыдущее изображение">←</button>
+          <button class="gallery-button prev" id="galleryPrev" type="button" aria-label="Предыдущее изображение" data-i18n-aria="previousImage">←</button>
 
-          <div class="gallery" id="gallery" tabindex="0" aria-label="Галерея материалов фильма">
-            <figure class="gallery-card is-cover" tabindex="0" data-index="0">
-              <img src="material-01.jpg" alt="Обложка фильма Хищение" loading="lazy">
+          <div class="gallery" id="gallery" tabindex="0" aria-label="Галерея материалов фильма" data-i18n-aria="galleryAria">
+            <figure class="gallery-card is-cover" tabindex="0" data-index="0" data-file="MAT_001">
+              <img src="material-01.jpg" alt="Обложка фильма Хищение" data-i18n-alt="galleryAlt01" loading="lazy">
             </figure>
-            <figure class="gallery-card" tabindex="0" data-index="1">
-              <img src="material-02.jpg" alt="Постер фильма Хищение — пианино" loading="lazy">
+            <figure class="gallery-card" tabindex="0" data-index="1" data-file="MAT_002">
+              <img src="material-02.jpg" alt="Постер фильма Хищение — пианино" data-i18n-alt="galleryAlt02" loading="lazy">
             </figure>
-            <figure class="gallery-card" tabindex="0" data-index="2">
-              <img src="material-03.jpg" alt="Постер фильма Хищение — дедушка и ребёнок" loading="lazy">
+            <figure class="gallery-card" tabindex="0" data-index="2" data-file="MAT_003">
+              <img src="material-03.jpg" alt="Постер фильма Хищение — дедушка и ребёнок" data-i18n-alt="galleryAlt03" loading="lazy">
             </figure>
-            <figure class="gallery-card" tabindex="0" data-index="3">
-              <img src="material-04.jpg" alt="Постер фильма Хищение — человек в капюшоне" loading="lazy">
+            <figure class="gallery-card" tabindex="0" data-index="3" data-file="MAT_004">
+              <img src="material-04.jpg" alt="Постер фильма Хищение — человек в капюшоне" data-i18n-alt="galleryAlt04" loading="lazy">
             </figure>
-            <figure class="gallery-card" tabindex="0" data-index="4">
-              <img src="material-05.jpg" alt="Постер фильма Хищение" loading="lazy">
+            <figure class="gallery-card" tabindex="0" data-index="4" data-file="MAT_005">
+              <img src="material-05.jpg" alt="Постер фильма Хищение" data-i18n-alt="galleryAlt05" loading="lazy">
             </figure>
-            <figure class="gallery-card" tabindex="0" data-index="5">
-              <img src="material-06.jpg" alt="Постер фильма Хищение — герой в разрушенном городе" loading="lazy">
+            <figure class="gallery-card" tabindex="0" data-index="5" data-file="MAT_006">
+              <img src="material-06.jpg" alt="Постер фильма Хищение — герой в разрушенном городе" data-i18n-alt="galleryAlt06" loading="lazy">
             </figure>
-            <figure class="gallery-card" tabindex="0" data-index="6">
-              <img src="material-07.jpg" alt="Постер фильма Хищение — ведущая" loading="lazy">
+            <figure class="gallery-card" tabindex="0" data-index="6" data-file="MAT_007">
+              <img src="material-07.jpg" alt="Постер фильма Хищение — ведущая" data-i18n-alt="galleryAlt07" loading="lazy">
             </figure>
-            <figure class="gallery-card" tabindex="0" data-index="7">
-              <img src="material-08.jpg" alt="Постер фильма Хищение — город" loading="lazy">
+            <figure class="gallery-card" tabindex="0" data-index="7" data-file="MAT_008">
+              <img src="material-08.jpg" alt="Постер фильма Хищение — город" data-i18n-alt="galleryAlt08" loading="lazy">
             </figure>
-            <figure class="gallery-card" tabindex="0" data-index="8">
-              <img src="material-09.jpg" alt="Постер фильма Хищение — Гор" loading="lazy">
+            <figure class="gallery-card" tabindex="0" data-index="8" data-file="MAT_009">
+              <img src="material-09.jpg" alt="Постер фильма Хищение — Гор" data-i18n-alt="galleryAlt09" loading="lazy">
             </figure>
-            <figure class="gallery-card" tabindex="0" data-index="9">
-              <img src="material-10.jpg" alt="Кадры из фильма Хищение" loading="lazy">
+            <figure class="gallery-card" tabindex="0" data-index="9" data-file="MAT_010">
+              <img src="material-10.jpg" alt="Кадры из фильма Хищение" data-i18n-alt="galleryAlt10" loading="lazy">
             </figure>
-            <figure class="gallery-card" tabindex="0" data-index="10">
-              <img src="material-11.jpg" alt="Постер фильма Хищение — визуальный материал" loading="lazy">
+            <figure class="gallery-card" tabindex="0" data-index="10" data-file="MAT_011">
+              <img src="material-11.jpg" alt="Постер фильма Хищение — визуальный материал" data-i18n-alt="galleryAlt11" loading="lazy">
             </figure>
           </div>
 
-          <button class="gallery-button next" id="galleryNext" type="button" aria-label="Следующее изображение">→</button>
+          <button class="gallery-button next" id="galleryNext" type="button" aria-label="Следующее изображение" data-i18n-aria="nextImage">→</button>
         </div>
       </div>
     </section>
 
-    <section class="trailer-section" id="trailer">
+    <section class="trailer-section" id="trailer" data-system-watermark="SIGNAL">
       <div class="shell">
         <div class="section-head">
           <div>
-            <div class="section-label">Trailer</div>
-            <h2>Трейлер</h2>
+            <div class="section-label" data-i18n="trailerLabel">03 / SIGNAL</div>
+            <h2 data-i18n="trailerTitle">Трейлер</h2>
           </div>
         </div>
 
+        <div class="signal-meta" aria-hidden="true"><span>SIGNAL_03</span><span>16:9 / MP4</span><span>ORIGINAL AUDIO // RU</span></div>
         <div class="video-shell" id="videoShell">
           <video controls preload="metadata" poster="trailer-cover.jpg" playsinline>
             <source src="trailer-16x9-web.mp4" type="video/mp4">
-            Ваш браузер не поддерживает воспроизведение видео.
+            <span data-i18n="videoFallback">Ваш браузер не поддерживает воспроизведение видео.</span>
           </video>
         </div>
+        <p class="section-note trailer-language-note" data-i18n="trailerLanguageNote">Оригинальная звуковая дорожка трейлера — на русском. Английские субтитры можно добавить после согласования с автором.</p>
       </div>
     </section>
 
-    <section id="watch">
+    <section id="watch" data-system-watermark="ACCESS">
       <div class="shell">
         <div class="section-head">
           <div>
-            <div class="section-label">Watch</div>
-            <h2>Где посмотреть</h2>
+            <div class="section-label" data-i18n="watchLabel">04 / ACCESS</div>
+            <h2 data-i18n="watchTitle">Где посмотреть</h2>
           </div>
         </div>
 
         <div class="watch-list">
-          <div class="platform">Кинопоиск · скоро</div>
-          <div class="platform">RuTube · скоро</div>
-          <div class="platform">VK Видео · скоро</div>
+          <div class="platform" data-platform-ru="Кинопоиск" data-platform-en="Kinopoisk">Кинопоиск · скоро</div>
+          <div class="platform" data-platform-ru="RuTube" data-platform-en="RuTube">RuTube · скоро</div>
+          <div class="platform" data-platform-ru="VK Видео" data-platform-en="VK Video">VK Видео · скоро</div>
         </div>
       </div>
     </section>
 
-    <section id="cast">
+    <section id="cast" data-system-watermark="SUBJECTS">
       <div class="shell">
         <div class="section-head">
           <div>
-            <div class="section-label">Cast</div>
-            <h2>Актёрский состав</h2>
+            <div class="section-label" data-i18n="castLabel">05 / SUBJECTS</div>
+            <h2 data-i18n="castTitle">Актёрский состав</h2>
           </div>
         </div>
 
         <div class="cast">
-          <div class="cast-member"><strong>Арман О.</strong><span>Гор</span></div>
-          <div class="cast-member"><strong>Богдан В.</strong><span>Антагонист</span></div>
-          <div class="cast-member"><strong>Левон</strong><span>Марк</span></div>
-          <div class="cast-member"><strong>Юля Ш.</strong><span>Ведущая</span></div>
-          <div class="cast-member"><strong>Арсен О.</strong><span>Музыкант</span></div>
-          <div class="cast-member"><strong>Александр К.</strong><span>Дедушка Гора</span></div>
-          <div class="cast-member"><strong>Белла А.</strong><span>Детектив</span></div>
+          <div class="cast-member" data-subject="SUBJECT_01"><strong>Арман О.</strong><span data-i18n="roleGor">Гор</span></div>
+          <div class="cast-member" data-subject="SUBJECT_02"><strong>Богдан В.</strong><span data-i18n="roleAntagonist">Антагонист</span></div>
+          <div class="cast-member" data-subject="SUBJECT_03"><strong>Левон</strong><span data-i18n="roleMark">Марк</span></div>
+          <div class="cast-member" data-subject="SUBJECT_04"><strong>Юля Ш.</strong><span data-i18n="roleHost">Ведущая</span></div>
+          <div class="cast-member" data-subject="SUBJECT_05"><strong>Арсен О.</strong><span data-i18n="roleMusician">Музыкант</span></div>
+          <div class="cast-member" data-subject="SUBJECT_06"><strong>Александр К.</strong><span data-i18n="roleGrandfather">Дедушка Гора</span></div>
+          <div class="cast-member" data-subject="SUBJECT_07"><strong>Белла А.</strong><span data-i18n="roleDetective">Детектив</span></div>
         </div>
       </div>
     </section>
 
-    <section id="contacts">
+
+    <section class="reviews-section" id="reviews" data-system-watermark="RESPONSE">
+      <div class="shell">
+        <div class="section-head reviews-heading">
+          <div>
+            <div class="section-label" data-i18n="reviewsLabel">06 / PUBLIC RESPONSE</div>
+            <h2 data-i18n="reviewsTitle">Отзывы зрителей</h2>
+          </div>
+          <div class="reviews-head-aside">
+            <p class="reviews-intro" data-i18n="reviewsIntro">Оценки зрителей формируют «Свежесть» фильма. 7–10 баллов считаются положительной оценкой.</p>
+            <div class="service-badge is-checking" id="reviewServiceBadge" role="status" aria-live="polite"><i></i><span data-i18n="serviceChecking">ПРОВЕРКА КАНАЛА</span></div>
+          </div>
+        </div>
+
+        <div class="reviews-dashboard">
+          <div class="freshness-panel">
+            <div class="freshness-ring is-pending" id="freshnessRing" style="--freshness:0">
+              <div class="freshness-ring-inner">
+                <strong id="freshnessValue">—</strong>
+                <span id="freshnessState" data-i18n="insufficient">Недостаточно оценок</span>
+              </div>
+            </div>
+            <div class="freshness-copy">
+              <div class="metric-kicker" data-i18n="freshness">Свежесть</div>
+              <p data-i18n="freshnessHint">7–10 = положительно</p>
+            </div>
+          </div>
+
+          <div class="average-panel">
+            <div class="metric-kicker" data-i18n="average">Средняя оценка</div>
+            <div class="average-value"><strong id="averageRating">—</strong><span>/10</span></div>
+            <div class="rating-count" id="ratingsCount">0 оценок</div>
+            <div class="system-lines" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+
+        <div class="review-workspace">
+          <div class="review-composer">
+            <div class="composer-label" data-i18n="yourProtocol">Ваш профиль</div>
+            <div class="profile-console">
+              <div class="profile-avatar" id="profileAvatar" aria-hidden="true"></div>
+              <div class="profile-data">
+                <strong id="profileName">—</strong>
+                <p data-i18n="profileNote">Псевдоним и аватар создаются автоматически. Их можно менять сколько угодно.</p>
+                <div class="profile-actions">
+                  <button class="micro-button" id="rerollName" type="button" data-i18n="rerollName">Другой псевдоним</button>
+                  <button class="micro-button" id="rerollAvatar" type="button" data-i18n="rerollAvatar">Другой аватар</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="score-field">
+              <div class="field-heading">
+                <label data-i18n="yourRating">Ваша оценка</label>
+                <div class="score-readout">
+                  <strong id="selectedRatingValue">— / 10</strong>
+                  <span id="selectedRatingWord" data-i18n="ratingPrompt">Выберите от 0 до 10</span>
+                </div>
+              </div>
+              <div class="rating-scale" role="group" aria-label="Оценка от 0 до 10" data-i18n-aria="ratingScaleAria">
+                <button class="rating-button" type="button" data-rating="0" aria-pressed="false">0</button>
+                <button class="rating-button" type="button" data-rating="1" aria-pressed="false">1</button>
+                <button class="rating-button" type="button" data-rating="2" aria-pressed="false">2</button>
+                <button class="rating-button" type="button" data-rating="3" aria-pressed="false">3</button>
+                <button class="rating-button" type="button" data-rating="4" aria-pressed="false">4</button>
+                <button class="rating-button" type="button" data-rating="5" aria-pressed="false">5</button>
+                <button class="rating-button" type="button" data-rating="6" aria-pressed="false">6</button>
+                <button class="rating-button" type="button" data-rating="7" aria-pressed="false">7</button>
+                <button class="rating-button" type="button" data-rating="8" aria-pressed="false">8</button>
+                <button class="rating-button" type="button" data-rating="9" aria-pressed="false">9</button>
+                <button class="rating-button" type="button" data-rating="10" aria-pressed="false">10</button>
+              </div>
+            </div>
+
+            <div class="review-text-field">
+              <div class="field-heading inline-heading">
+                <label for="reviewText"><span data-i18n="reviewLabel">Ваш отзыв</span> <small data-i18n="reviewOptional">необязательно</small></label>
+                <span id="reviewCounter">0 / 2000</span>
+              </div>
+              <textarea id="reviewText" maxlength="2000" rows="6" data-i18n-placeholder="reviewPlaceholder" placeholder="Расскажите о впечатлениях от фильма…"></textarea>
+            </div>
+
+            <div class="review-submit-row">
+              <button class="button" id="submitReview" type="button" data-i18n="publish">Опубликовать</button>
+              <button class="button danger-button" id="deleteReview" type="button" hidden data-i18n="deleteReview">Удалить отзыв</button>
+            </div>
+            <div class="review-status" id="reviewStatus" aria-live="polite"></div>
+            <p class="privacy-note" data-i18n="privacy">Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.</p>
+          </div>
+
+          <div class="review-feed">
+            <div class="review-feed-head">
+              <div class="composer-label" data-i18n="reviewsTitle">Отзывы зрителей</div>
+              <div class="review-sort" role="group" aria-label="Review sorting">
+                <button class="review-sort-button active" type="button" data-sort="new" data-i18n="latest">Новые</button>
+                <button class="review-sort-button" type="button" data-sort="high" data-i18n="highest">С высокой оценкой</button>
+                <button class="review-sort-button" type="button" data-sort="low" data-i18n="lowest">С низкой оценкой</button>
+              </div>
+            </div>
+            <div class="reviews-list" id="reviewsList">
+              <div class="reviews-empty" data-i18n="reviewsEmpty">Пока нет отзывов. Ваша оценка может стать первой.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacts" data-system-watermark="CONTACT">
       <div class="shell contact-box">
         <div>
-          <div class="section-label">Contacts</div>
-          <h2>Контакты</h2>
+          <div class="section-label" data-i18n="contactsLabel">07 / CONTACT</div>
+          <h2 data-i18n="contactsTitle">Контакты</h2>
         </div>
 
         <a class="contact-link" href="https://www.instagram.com/armanfut/" target="_blank" rel="noopener noreferrer">
@@ -1199,20 +2439,62 @@
 
   <footer>
     <strong>ХИЩЕНИЕ / THEFT</strong><br><br>
-    Официальный сайт фильма · фильм находится в разработке
+    <span data-i18n="footer">Официальный сайт фильма · фильм находится в разработке</span>
+    <div class="footer-system" aria-hidden="true">THEFT // PUBLIC FILE // 2045</div>
   </footer>
 
-  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Просмотр изображения">
-    <button class="lightbox-button lightbox-close" id="lightboxClose" type="button" aria-label="Закрыть">×</button>
-    <button class="lightbox-button lightbox-prev" id="lightboxPrev" type="button" aria-label="Предыдущее изображение">←</button>
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Просмотр изображения" data-i18n-aria="lightboxAria">
+    <button class="lightbox-button lightbox-close" id="lightboxClose" type="button" aria-label="Закрыть" data-i18n-aria="close">×</button>
+    <button class="lightbox-button lightbox-prev" id="lightboxPrev" type="button" aria-label="Предыдущее изображение" data-i18n-aria="previousImage">←</button>
 
     <img class="lightbox-image" id="lightboxImage" src="" alt="">
     <div class="lightbox-counter" id="lightboxCounter" aria-live="polite"></div>
 
-    <button class="lightbox-button lightbox-next" id="lightboxNext" type="button" aria-label="Следующее изображение">→</button>
+    <button class="lightbox-button lightbox-next" id="lightboxNext" type="button" aria-label="Следующее изображение" data-i18n-aria="nextImage">→</button>
   </div>
 
   <script>
+    (() => {
+      const body = document.body;
+      const header = document.querySelector('.site-header');
+      const menu = document.getElementById('menuToggle');
+      const nav = document.getElementById('primaryNav');
+      const scrollProgress = document.getElementById('scrollProgress');
+      const railProgress = document.getElementById('railProgress');
+      const railSection = document.getElementById('railSection');
+      const sections = [
+        ['top','00 / ENTRY'], ['about','01 / DOSSIER'], ['materials','02 / ARCHIVE'],
+        ['trailer','03 / SIGNAL'], ['watch','04 / ACCESS'], ['cast','05 / SUBJECTS'],
+        ['reviews','06 / RESPONSE'], ['contacts','07 / CONTACT']
+      ].map(([id, code]) => [document.getElementById(id), code]).filter(([el]) => el);
+
+      const closeNav = () => {
+        body.classList.remove('nav-open');
+        menu?.setAttribute('aria-expanded','false');
+      };
+      menu?.addEventListener('click', () => {
+        const open = body.classList.toggle('nav-open');
+        menu.setAttribute('aria-expanded', String(open));
+      });
+      nav?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
+      window.addEventListener('resize', () => { if (innerWidth > 980) closeNav(); }, { passive:true });
+
+      const updateSystemUI = () => {
+        const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+        const pct = Math.min(100, Math.max(0, scrollY / max * 100));
+        if (scrollProgress) scrollProgress.style.width = pct + '%';
+        if (railProgress) railProgress.style.height = pct + '%';
+        const offset = (header?.offsetHeight || 70) + innerHeight * .22;
+        let current = sections[0]?.[1] || '00 / ENTRY';
+        sections.forEach(([el, code]) => { if (el.getBoundingClientRect().top <= offset) current = code; });
+        if (railSection) railSection.textContent = current;
+      };
+      updateSystemUI();
+      addEventListener('scroll', updateSystemUI, { passive:true });
+      addEventListener('resize', updateSystemUI, { passive:true });
+    })();
+
     const gallery = document.getElementById('gallery');
     const galleryPrev = document.getElementById('galleryPrev');
     const galleryNext = document.getElementById('galleryNext');
@@ -1351,6 +2633,29 @@
     });
 
     observedSections.forEach(section => sectionObserver.observe(section));
+  </script>
+
+  <script src="reviews.js"></script>
+  <script>
+    (() => {
+      const sources = [
+        'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3',
+        'https://unpkg.com/@supabase/supabase-js@2.112.3/dist/umd/supabase.js'
+      ];
+      const ready = () => window.dispatchEvent(new Event('theft:supabase-ready'));
+      const failed = () => window.dispatchEvent(new Event('theft:supabase-failed'));
+      const loadSupabase = (index = 0) => {
+        if (window.supabase?.createClient) { ready(); return; }
+        if (index >= sources.length) { failed(); return; }
+        const script = document.createElement('script');
+        script.src = sources[index];
+        script.defer = true;
+        script.onload = ready;
+        script.onerror = () => loadSupabase(index + 1);
+        document.head.appendChild(script);
+      };
+      loadSupabase();
+    })();
   </script>
 </body>
 </html>
