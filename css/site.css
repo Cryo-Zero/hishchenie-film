@@ -3217,3 +3217,133 @@
   .review-sort { width:100%; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
   .review-sort-button { min-width:0; padding:8px 5px; font-size:7px; }
 }
+
+/* ========================================================================== */
+/* P17 / GLOBAL SUPPORT GRID + AVATAR LIBRARY                                 */
+/* ========================================================================== */
+
+/* One support grid for the whole desktop site. The hero remains the visual
+   reference: every major section gets equal left/right outer space. Internal
+   cards are free to have different widths and heights. */
+:root {
+  --support-max: 1360px;
+  --support-gutter: clamp(48px, 5vw, 96px);
+}
+
+@media (min-width: 821px) {
+  .shell,
+  .hero-inner {
+    width: min(
+      var(--support-max),
+      calc(100% - var(--support-gutter) - var(--support-gutter))
+    ) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Old section-specific widths must not override the global support grid. */
+  #about > .shell,
+  #materials > .shell,
+  #trailer > .shell,
+  #watch > .shell,
+  #cast > .shell,
+  #faq > .shell,
+  #contacts > .shell,
+  .community-hero > .shell,
+  .community-section > .shell,
+  .audience-strip > .shell {
+    width: min(
+      var(--support-max),
+      calc(100% - var(--support-gutter) - var(--support-gutter))
+    ) !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* System watermarks also terminate at the same right-hand guide. */
+  main > section:not(.hero)::before {
+    right: max(
+      var(--support-gutter),
+      calc((100vw - var(--support-max)) / 2)
+    ) !important;
+  }
+
+  /* Reviews: equal outside margins; the two inner modules remain deliberately
+     different in size. */
+  .community-layout {
+    width: 100% !important;
+    grid-template-columns: minmax(320px, 420px) minmax(0, 1fr) !important;
+    gap: clamp(28px, 2.2vw, 36px) !important;
+  }
+
+  /* SUBJECTS: the list starts on the global left guide, the dossier ends on
+     the global right guide. Their internal widths stay independent. */
+  #cast {
+    --cast-rail: clamp(390px, 33.25%, 462px);
+  }
+  #cast .section-head {
+    width: var(--cast-rail) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: 24px !important;
+  }
+  #cast .section-head h2 {
+    font-size: clamp(42px, 4.1vw, 60px) !important;
+    white-space: nowrap;
+  }
+  #cast .cast-console {
+    width: 100%;
+    grid-template-columns: var(--cast-rail) minmax(0, 1fr) !important;
+    gap: clamp(26px, 2.25vw, 34px) !important;
+    align-items: start !important;
+  }
+  #cast .cast-list-item {
+    min-height: 62px;
+    grid-template-columns: 116px minmax(0, 1fr) 20px !important;
+    gap: 16px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+  #cast .cast-list-item > span {
+    font-size: 9px !important;
+    letter-spacing: 1.45px !important;
+    color: #5f7b7d;
+  }
+  #cast .cast-list-item em {
+    display: block !important;
+    font-size: 13px !important;
+    color: #89a5a7;
+  }
+  #cast .subject-dossier {
+    width: 100%;
+    min-height: 420px;
+  }
+  #cast .subject-dossier h3 {
+    font-size: clamp(25px, 2.15vw, 34px) !important;
+  }
+}
+
+/* Tablet/mobile keeps comfortable safe-area gutters rather than inheriting
+   the desktop max-width logic. */
+@media (max-width: 820px) {
+  .shell,
+  .hero-inner,
+  #about > .shell,
+  #materials > .shell,
+  #trailer > .shell,
+  #watch > .shell,
+  #cast > .shell,
+  #faq > .shell,
+  #contacts > .shell,
+  .community-hero > .shell,
+  .community-section > .shell,
+  .audience-strip > .shell {
+    width: calc(100% - 26px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  #cast .section-head { width: 100% !important; }
+  #cast .cast-console { grid-template-columns: 1fr !important; gap: 20px !important; }
+  #cast .cast-list-item { grid-template-columns: 96px minmax(0,1fr) 18px !important; }
+}
