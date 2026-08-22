@@ -1,0 +1,86 @@
+HISHCHENIE / THEFT — P20 DESIGNER EDITION
+=========================================
+
+Goal
+----
+Full desktop visual redesign of the public site as one coherent 2045 system interface.
+No canonical film assets were duplicated or invented in this package.
+The existing author-provided images/video remain in /assets and are reused by path.
+
+What changed
+------------
+1. Global visual system
+- One symmetric global content grid for desktop.
+- Same left/right page gutters.
+- Dark steel / cyan system language, quieter and more cinematic than a generic cyberpunk UI.
+- Unified section labels, borders, system metadata, scroll rail and footer.
+
+2. Header
+- Cleaner single-row desktop header.
+- Brand left, navigation centered, language + rating right.
+- Existing navigation functions retained; Contacts added to the visible navigation.
+
+3. Hero / ENTRY
+- Full cinematic first screen using the existing official archive image.
+- Large THEFT title, system status, synopsis, two primary actions.
+- Official poster remains a separate framed object on the right.
+
+4. ABOUT / DOSSIER
+- Film information presented as a public dossier.
+- Existing synopsis and confirmed metadata retained.
+- Uses an existing author image as atmospheric background only.
+
+5. MATERIALS / ARCHIVE
+- Main viewer keeps the regular content grid.
+- ARCHIVE is the one deliberate exception: the button protrudes from the left wall.
+- Drawer slides out from the left wall; button moves with the drawer.
+- Drawer does not close when choosing a material.
+- Drawer does not close when the image viewer/lightbox is opened.
+- Bottom thumbnail strip is removed; thumbnails live inside the drawer.
+- Only the existing author archive files are referenced.
+- New restrained arrow design and pagination.
+- Clicking the frame opens the existing image viewer; the image is zoomed, not stretched edge-to-edge.
+
+6. TRAILER / SIGNAL
+- Existing trailer remains untouched as content.
+- Redesigned as a monitored signal frame with subtle HUD corners/metadata.
+
+7. WHERE TO WATCH / ACCESS
+- Existing pending platforms retained.
+- Current Signal panel integrated into the same grid.
+
+8. CAST / SUBJECTS
+- Compact SUBJECT list on the left.
+- Persistent DOSSIER on the right.
+- Existing interaction model retained.
+
+9. PUBLIC RESPONSE preview
+- Home page gets a dedicated visual response/pulse section.
+- No duplicate rating card on the home page; header rating remains authoritative.
+- Reviews still open on reviews.html.
+
+10. FAQ / SYSTEM QUERY
+- Exactly 8 agreed questions.
+- Initial state is standby (???), analogous to SUBJECT DOSSIER.
+- Fixed response geometry: long/short answers do not move the status card.
+- Security text now lives in FAQ; old footer security card remains removed.
+
+11. CONTACT + FOOTER
+- Contact signal remains the official author contact.
+- Footer rebuilt as a compact system status area.
+
+12. Reviews page
+- Same P20 visual system applied without changing backend IDs used by public-response.js.
+- Public publishing state remains controlled by Supabase as before.
+
+Files in this update
+--------------------
+/index.html
+/reviews.html
+/css/p20-designer.css
+/js/p20-designer.js
+/docs/QA-P20.md
+/UPDATE-P20.txt
+
+No SQL migration is required.
+Do not delete existing /assets, /css/site.css, /js/site.js or /js/public-response.js.
