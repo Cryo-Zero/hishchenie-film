@@ -31,10 +31,10 @@
     "image": "https://cryo-zero.github.io/hishchenie-film/assets/images/archive/archive-01.jpg"
   }
   </script>
-<link href="css/site.css?v=20-designer" rel="stylesheet"/>
-<link href="css/p20-designer.css?v=20-designer" rel="stylesheet"/>
+<link href="css/site.css?v=21-true-designer" rel="stylesheet"/>
+<link href="css/p21-designer.css?v=21-true-designer" rel="stylesheet"/>
 </head>
-<body class="designer-edition">
+<body class="designer-edition p21-edition">
 <div aria-hidden="true" class="scroll-progress" id="scrollProgress"></div>
 <aside aria-hidden="true" class="system-rail">
 <span class="rail-status">SYS // 2045</span>
@@ -62,6 +62,7 @@
 <section class="hero" id="top">
 <div class="hero-inner">
 <div class="hero-copy-column">
+<div class="hero-file-tag"><span>PUBLIC FILE // THEFT_2045</span><i></i><span>ACCESS // VERIFIED</span></div>
 <div aria-label="System status" class="hero-system-strip">
 <span>SYS // 2045</span>
 <span class="status-live"><i></i><b data-i18n="systemActive">СИСТЕМА АКТИВНА</b></span>
@@ -80,6 +81,7 @@
 </div>
 </div>
 <div class="hero-poster-frame">
+<div class="hero-poster-ambient" aria-hidden="true"></div>
 <img alt="Официальная обложка фильма Хищение" class="hero-poster" data-i18n-alt="heroPosterAlt" src="assets/images/archive/archive-01.jpg"/>
 <div aria-hidden="true" class="poster-hud">
 <span>FILE // 001</span>
@@ -99,6 +101,8 @@
 </div>
 </div>
 <div aria-hidden="true" class="about-system-row"><span>PUBLIC DOSSIER // 01</span><i></i><span>ACCESS LEVEL: OPEN</span></div>
+<div class="about-layout">
+<div class="about-copy">
 <div class="story">
 <p data-i18n="story1">Население Земли превысило допустимый предел. Государство создаёт новую систему, в которой каждый человек должен доказать свою пользу обществу.</p>
 <p data-i18n="story2">Дети с раннего возраста попадают под особый контроль и распределяются по специальным секциям.</p>
@@ -123,6 +127,9 @@
 </div>
 </div>
 </div>
+<figure class="about-visual" aria-label="Авторский визуальный материал фильма"><img src="assets/images/archive/archive-10.jpg" alt="Авторский визуальный материал фильма Хищение" loading="lazy"><figcaption><span>AUTHOR FILE // MAT_010</span><b>PUBLIC DOSSIER VISUAL</b></figcaption></figure>
+</div>
+</div>
 </section>
 <section data-system-watermark="ARCHIVE" id="materials">
 <div class="shell">
@@ -137,7 +144,7 @@
 <div class="archive-drawer-shell">
 <button aria-controls="archiveDrawer" aria-expanded="false" class="archive-drawer-toggle" id="archiveDrawerToggle" type="button"><span>ARCHIVE</span><small>AUTHOR FILES</small></button>
 <aside aria-hidden="true" class="archive-drawer" id="archiveDrawer">
-<div class="archive-drawer-head"><span>ARCHIVE INDEX</span><span>11 FILES</span><button aria-label="Закрыть архив" class="archive-drawer-close" id="archiveDrawerClose" type="button">×</button></div>
+<div class="archive-drawer-head"><span>ARCHIVE // AUTHOR FILES</span><span>11 VERIFIED</span><button aria-label="Закрыть архив" class="archive-drawer-close" id="archiveDrawerClose" type="button">×</button></div>
 <div aria-label="Архив материалов фильма" class="archive-drawer-grid" id="gallery" tabindex="0">
 <figure class="gallery-card is-active" data-file="MAT_001" data-index="0" data-type="POSTER" tabindex="0"><img alt="Обложка фильма Хищение" data-i18n-alt="galleryAlt01" loading="lazy" src="assets/images/archive/archive-01.jpg"/></figure>
 <figure class="gallery-card" data-file="MAT_002" data-index="1" data-type="STILL" tabindex="0"><img alt="Постер фильма Хищение — пианино" data-i18n-alt="galleryAlt02" loading="lazy" src="assets/images/archive/archive-02.jpg"/></figure>
@@ -162,7 +169,7 @@
 <button aria-label="Следующее изображение" class="gallery-button next" data-i18n-aria="nextImage" id="galleryNext" type="button"><span aria-hidden="true" class="archive-nav-icon"><i></i><b></b></span></button>
 </div>
 <div class="archive-bottom-controls">
-<span class="archive-bottom-code">AUTHOR FILES // VERIFIED</span><span class="archive-open-hint">CLICK FRAME // OPEN VIEWER</span>
+<span class="archive-bottom-code">AUTHOR FILES // VERIFIED</span><span class="archive-open-hint">FRAME ACCESS // CLICK TO INSPECT</span>
 <div aria-hidden="true" class="archive-pagination" id="archivePagination"></div>
 </div>
 </div>
@@ -288,14 +295,14 @@
 </div>
 <div class="faq-console">
 <div aria-label="Список часто задаваемых вопросов" class="faq-query-list" data-i18n-aria="faqListAria" role="listbox">
-<button aria-selected="false" class="faq-query-item" data-query="QUERY_01" data-query-code="QUERY_01 // RELEASE STATUS" data-query-message="ПОДТВЕРЖДЁННАЯ ДАТА ПОЯВИТСЯ НА ЭТОМ САЙТЕ" data-query-status="ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ" role="option" type="button"><span>QUERY_01</span><strong data-i18n="faqQ1">Когда выйдет фильм?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA1" hidden="">Точная дата релиза будет объявлена, когда система завершит разработку. Подтверждённая дата появится на этом сайте.</b><b class="faq-source-status" hidden="">ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ</b><b class="faq-source-message" hidden="">ПОДТВЕРЖДЁННАЯ ДАТА ПОЯВИТСЯ НА ЭТОМ САЙТЕ</b></button>
-<button aria-selected="false" class="faq-query-item" data-query="QUERY_02" data-query-code="QUERY_02 // VERIFIED RESPONSE" data-query-message="СПИСОК ПЛОЩАДОК ПУБЛИКУЕТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ" data-query-status="ОЖИДАНИЕ РЕЛИЗА" role="option" type="button"><span>QUERY_02</span><strong data-i18n="faqQ2">Где можно будет посмотреть фильм?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA2" hidden="">Площадки появятся в разделе «Где посмотреть» после подтверждения релиза.</b><b class="faq-source-status" hidden="">ОЖИДАНИЕ РЕЛИЗА</b><b class="faq-source-message" hidden="">СПИСОК ПЛОЩАДОК ПУБЛИКУЕТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ</b></button>
-<button aria-selected="false" class="faq-query-item" data-query="QUERY_03" data-query-code="QUERY_03 // CINEMA STATUS" data-query-message="КАНАЛЫ ПОКАЗА УТОЧНЯЮТСЯ" data-query-status="ТРЕБУЕТСЯ УТОЧНЕНИЕ" role="option" type="button"><span>QUERY_03</span><strong data-i18n="faqQ3">Будет ли показ в кинотеатрах?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA3" hidden="">Требуется уточнение.</b><b class="faq-source-status" hidden="">ТРЕБУЕТСЯ УТОЧНЕНИЕ</b><b class="faq-source-message" hidden="">КАНАЛЫ ПОКАЗА УТОЧНЯЮТСЯ</b></button>
-<button aria-selected="false" class="faq-query-item" data-query="QUERY_04" data-query-code="QUERY_04 // CONTACT CHANNEL" data-query-message="ИСПОЛЬЗУЙТЕ РАЗДЕЛ «КОНТАКТЫ»" data-query-status="ПУБЛИЧНЫЙ КАНАЛ ОТКРЫТ" role="option" type="button"><span>QUERY_04</span><strong data-i18n="faqQ4">Как связаться с создателями?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA4" hidden="">Официальный публичный контакт автора находится в разделе «Контакты».</b><b class="faq-source-status" hidden="">ПУБЛИЧНЫЙ КАНАЛ ОТКРЫТ</b><b class="faq-source-message" hidden="">ИСПОЛЬЗУЙТЕ РАЗДЕЛ «КОНТАКТЫ»</b></button>
-<button aria-selected="false" class="faq-query-item" data-query="QUERY_05" data-query-code="QUERY_05 // DOSSIER SUMMARY" data-query-message="БАЗОВАЯ ИНФОРМАЦИЯ ДОСТУПНА В РАЗДЕЛЕ «О ФИЛЬМЕ»" data-query-status="ДОСЬЕ ОТКРЫТО" role="option" type="button"><span>QUERY_05</span><strong data-i18n="faqQ5">Что за история у Хищения?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA5" hidden="">История разворачивается в 2045 году в системе, где человек должен доказать обществу свою пользу. Подробнее — в разделе «О фильме».</b><b class="faq-source-status" hidden="">ДОСЬЕ ОТКРЫТО</b><b class="faq-source-message" hidden="">БАЗОВАЯ ИНФОРМАЦИЯ ДОСТУПНА В РАЗДЕЛЕ «О ФИЛЬМЕ»</b></button>
-<button aria-selected="false" class="faq-query-item" data-query="QUERY_06" data-query-code="QUERY_06 // ARCHIVE UPDATE" data-query-message="НОВЫЕ МАТЕРИАЛЫ ПУБЛИКУЮТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ" data-query-status="ОЖИДАНИЕ ОБНОВЛЕНИЯ" role="option" type="button"><span>QUERY_06</span><strong data-i18n="faqQ6">Когда появятся новые материалы?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA6" hidden="">Новые материалы публикуются после подтверждения автора и подготовки к публикации.</b><b class="faq-source-status" hidden="">ОЖИДАНИЕ ОБНОВЛЕНИЯ</b><b class="faq-source-message" hidden="">НОВЫЕ МАТЕРИАЛЫ ПУБЛИКУЮТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ</b></button>
-<button aria-selected="false" class="faq-query-item" data-query="QUERY_07" data-query-code="QUERY_07 // VERIFIED TEAM" data-query-message="СОСТАВ ОБНОВЛЯЕТСЯ ПО МЕРЕ ПОДТВЕРЖДЕНИЯ" data-query-status="ПОДТВЕРЖДЁННЫЕ ДАННЫЕ" role="option" type="button"><span>QUERY_07</span><strong data-i18n="faqQ7">Кто работает над фильмом?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA7" hidden="">Подтверждённые имена режиссёра и актёров публикуются на этом сайте. Состав может дополняться по мере подтверждения материалов.</b><b class="faq-source-status" hidden="">ПОДТВЕРЖДЁННЫЕ ДАННЫЕ</b><b class="faq-source-message" hidden="">СОСТАВ ОБНОВЛЯЕТСЯ ПО МЕРЕ ПОДТВЕРЖДЕНИЯ</b></button>
-<button aria-selected="false" class="faq-query-item" data-query="QUERY_08" data-query-code="QUERY_08 // SECURITY PROTOCOL" data-query-message="МИНИМУМ ДАННЫХ // ЛОКАЛЬНАЯ ПРИВЯЗКА ПРОФИЛЯ" data-query-status="ПРОТОКОЛ АКТИВЕН" role="option" type="button"><span>QUERY_08</span><strong data-i18n="faqQ8">На сайте есть безопасность?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA8" hidden="">Система позволяет пользователям использовать технический идентификатор без привязки личных данных для работы профиля и отзывов.</b><b class="faq-source-status" hidden="">ПРОТОКОЛ АКТИВЕН</b><b class="faq-source-message" hidden="">МИНИМУМ ДАННЫХ // ЛОКАЛЬНАЯ ПРИВЯЗКА ПРОФИЛЯ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_01" data-query-code="QUERY_01 // RELEASE STATUS" data-query-message="ПОДТВЕРЖДЁННАЯ ДАТА ПОЯВИТСЯ НА ЭТОМ САЙТЕ" data-query-status="ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ" role="option" type="button"><span>QUERY_01</span><strong data-i18n="faqQ1">Когда выйдет фильм?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA1" hidden="">Точная дата релиза будет объявлена, когда система завершит разработку. Подтверждённая дата появится на этом сайте.</b><b class="faq-source-status" data-i18n="faqStatus1" hidden="">ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ</b><b class="faq-source-message" data-i18n="faqMessage1" hidden="">ПОДТВЕРЖДЁННАЯ ДАТА ПОЯВИТСЯ НА ЭТОМ САЙТЕ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_02" data-query-code="QUERY_02 // VERIFIED RESPONSE" data-query-message="СПИСОК ПЛОЩАДОК ПУБЛИКУЕТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ" data-query-status="ОЖИДАНИЕ РЕЛИЗА" role="option" type="button"><span>QUERY_02</span><strong data-i18n="faqQ2">Где можно будет посмотреть фильм?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA2" hidden="">Площадки появятся в разделе «Где посмотреть» после подтверждения релиза.</b><b class="faq-source-status" data-i18n="faqStatus2" hidden="">ОЖИДАНИЕ РЕЛИЗА</b><b class="faq-source-message" data-i18n="faqMessage2" hidden="">СПИСОК ПЛОЩАДОК ПУБЛИКУЕТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_03" data-query-code="QUERY_03 // CINEMA STATUS" data-query-message="КАНАЛЫ ПОКАЗА УТОЧНЯЮТСЯ" data-query-status="ТРЕБУЕТСЯ УТОЧНЕНИЕ" role="option" type="button"><span>QUERY_03</span><strong data-i18n="faqQ3">Будет ли показ в кинотеатрах?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA3" hidden="">Требуется уточнение.</b><b class="faq-source-status" data-i18n="faqStatus3" hidden="">ТРЕБУЕТСЯ УТОЧНЕНИЕ</b><b class="faq-source-message" data-i18n="faqMessage3" hidden="">КАНАЛЫ ПОКАЗА УТОЧНЯЮТСЯ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_04" data-query-code="QUERY_04 // CONTACT CHANNEL" data-query-message="ИСПОЛЬЗУЙТЕ РАЗДЕЛ «КОНТАКТЫ»" data-query-status="ПУБЛИЧНЫЙ КАНАЛ ОТКРЫТ" role="option" type="button"><span>QUERY_04</span><strong data-i18n="faqQ4">Как связаться с создателями?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA4" hidden="">Официальный публичный контакт автора находится в разделе «Контакты».</b><b class="faq-source-status" data-i18n="faqStatus4" hidden="">ПУБЛИЧНЫЙ КАНАЛ ОТКРЫТ</b><b class="faq-source-message" data-i18n="faqMessage4" hidden="">ИСПОЛЬЗУЙТЕ РАЗДЕЛ «КОНТАКТЫ»</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_05" data-query-code="QUERY_05 // DOSSIER SUMMARY" data-query-message="БАЗОВАЯ ИНФОРМАЦИЯ ДОСТУПНА В РАЗДЕЛЕ «О ФИЛЬМЕ»" data-query-status="ДОСЬЕ ОТКРЫТО" role="option" type="button"><span>QUERY_05</span><strong data-i18n="faqQ5">Что за история у Хищения?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA5" hidden="">История разворачивается в 2045 году в системе, где человек должен доказать обществу свою пользу. Подробнее — в разделе «О фильме».</b><b class="faq-source-status" data-i18n="faqStatus5" hidden="">ДОСЬЕ ОТКРЫТО</b><b class="faq-source-message" data-i18n="faqMessage5" hidden="">БАЗОВАЯ ИНФОРМАЦИЯ ДОСТУПНА В РАЗДЕЛЕ «О ФИЛЬМЕ»</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_06" data-query-code="QUERY_06 // ARCHIVE UPDATE" data-query-message="НОВЫЕ МАТЕРИАЛЫ ПУБЛИКУЮТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ" data-query-status="ОЖИДАНИЕ ОБНОВЛЕНИЯ" role="option" type="button"><span>QUERY_06</span><strong data-i18n="faqQ6">Когда появятся новые материалы?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA6" hidden="">Новые материалы публикуются после подтверждения автора и подготовки к публикации.</b><b class="faq-source-status" data-i18n="faqStatus6" hidden="">ОЖИДАНИЕ ОБНОВЛЕНИЯ</b><b class="faq-source-message" data-i18n="faqMessage6" hidden="">НОВЫЕ МАТЕРИАЛЫ ПУБЛИКУЮТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_07" data-query-code="QUERY_07 // VERIFIED TEAM" data-query-message="СОСТАВ ОБНОВЛЯЕТСЯ ПО МЕРЕ ПОДТВЕРЖДЕНИЯ" data-query-status="ПОДТВЕРЖДЁННЫЕ ДАННЫЕ" role="option" type="button"><span>QUERY_07</span><strong data-i18n="faqQ7">Кто работает над фильмом?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA7" hidden="">Подтверждённые имена режиссёра и актёров публикуются на этом сайте. Состав может дополняться по мере подтверждения материалов.</b><b class="faq-source-status" data-i18n="faqStatus7" hidden="">ПОДТВЕРЖДЁННЫЕ ДАННЫЕ</b><b class="faq-source-message" data-i18n="faqMessage7" hidden="">СОСТАВ ОБНОВЛЯЕТСЯ ПО МЕРЕ ПОДТВЕРЖДЕНИЯ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_08" data-query-code="QUERY_08 // SECURITY PROTOCOL" data-query-message="МИНИМУМ ДАННЫХ // ЛОКАЛЬНАЯ ПРИВЯЗКА ПРОФИЛЯ" data-query-status="ПРОТОКОЛ АКТИВЕН" role="option" type="button"><span>QUERY_08</span><strong data-i18n="faqQ8">На сайте есть безопасность?</strong><i aria-hidden="true"></i><b class="faq-source-answer" data-i18n="faqA8" hidden="">Система позволяет пользователям использовать технический идентификатор без привязки личных данных для работы профиля и отзывов.</b><b class="faq-source-status" data-i18n="faqStatus8" hidden="">ПРОТОКОЛ АКТИВЕН</b><b class="faq-source-message" data-i18n="faqMessage8" hidden="">МИНИМУМ ДАННЫХ // ЛОКАЛЬНАЯ ПРИВЯЗКА ПРОФИЛЯ</b></button>
 </div>
 <aside aria-live="polite" class="faq-response-panel" id="faqResponsePanel">
 <div class="faq-response-header"><span data-i18n="faqResponseHeader">SYSTEM RESPONSE // VERIFIED DATA</span><i></i></div>
@@ -316,6 +323,7 @@
 </div>
 </div>
 </section>
+<section class="system-bridge" aria-hidden="true"><div class="shell"><span>SYSTEM // PUBLIC INTERFACE</span><i></i><span>UNCONFIRMED DATA IS NOT PUBLISHED</span></div></section>
 <section data-system-watermark="CONTACT" id="contacts">
 <div class="shell contact-box">
 <div>
@@ -336,7 +344,7 @@
 <div class="footer-status"><span><i></i>SYSTEM ONLINE</span><small>PUBLIC INTERFACE // 2045</small></div>
 <div class="footer-links"><a data-i18n="navAbout" href="#about">О фильме</a><a data-i18n="navMaterials" href="#materials">Материалы</a><a href="#faq">FAQ</a><a data-i18n="contactsTitle" href="#contacts">Контакты</a></div>
 </div>
-<div class="shell footer-meta"><span>AUTHOR FILES // VERIFIED</span><span>BUILD // P20 // DESIGNER EDITION</span></div>
+<div class="shell footer-meta"><span>AUTHOR FILES // VERIFIED</span><span>BUILD // P21 // TRUE DESIGNER EDITION</span></div>
 </footer>
 <div aria-hidden="true" aria-label="Просмотр изображения" aria-modal="true" class="lightbox" data-i18n-aria="lightboxAria" id="lightbox" role="dialog">
 <button aria-label="Закрыть" class="lightbox-button lightbox-close" data-i18n-aria="close" id="lightboxClose" type="button">×</button>
@@ -345,7 +353,7 @@
 <div aria-live="polite" class="lightbox-counter" id="lightboxCounter"></div>
 <button aria-label="Следующее изображение" class="lightbox-button lightbox-next" data-i18n-aria="nextImage" id="lightboxNext" type="button">→</button>
 </div>
-<script src="js/site.js?v=20-designer"></script><script src="js/public-response.js?v=20-designer"></script>
-<script src="js/p20-designer.js?v=20-designer"></script>
+<script src="js/site.js?v=21-true-designer"></script><script src="js/public-response.js?v=21-true-designer"></script>
+
 </body>
 </html>
