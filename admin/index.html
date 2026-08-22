@@ -1,37 +1,381 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="robots" content="noindex,nofollow,noarchive">
-  <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#040707">
-  <title>THEFT // CONTROL PANEL</title>
-  <link rel="stylesheet" href="../css/site.css?v=14-final">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>ХИЩЕНИЕ — THEFT | Официальный сайт фильма</title>
+<meta content="Официальный сайт фильма «ХИЩЕНИЕ / THEFT» — антиутопической драмы о мире 2045 года." name="description"/>
+<meta content="#07090a" name="theme-color"/>
+<meta content="dark" name="color-scheme"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta content="index,follow" name="robots"/>
+<link href="https://cryo-zero.github.io/hishchenie-film/" rel="canonical"/>
+<meta content="website" property="og:type"/>
+<meta content="ХИЩЕНИЕ — THEFT" property="og:title"/>
+<meta content="В мире, где человек должен доказать свою пользу системе, взросление становится борьбой за право самому выбирать своё будущее." property="og:description"/>
+<meta content="https://cryo-zero.github.io/hishchenie-film/assets/images/archive/archive-01.jpg" property="og:image"/>
+<meta content="https://cryo-zero.github.io/hishchenie-film/" property="og:url"/>
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Movie",
+    "name": "ХИЩЕНИЕ",
+    "alternateName": "THEFT",
+    "description": "Антиутопическая драма о мире 2045 года, в котором каждый человек должен доказать свою пользу системе.",
+    "genre": ["Антиутопия", "Драма", "Боевик", "Приключения", "Фантастика"],
+    "director": {
+      "@type": "Person",
+      "name": "Арман О. А."
+    },
+    "image": "https://cryo-zero.github.io/hishchenie-film/assets/images/archive/archive-01.jpg"
+  }
+  </script>
+
+<link href="css/site.css?v=18-system-ui" rel="stylesheet"/>
+<style>
+/* P19 archive + faq refinement patch */
+.archive-viewer--drawer{position:relative;display:grid;gap:1.25rem}.archive-stage-wrap{display:grid;grid-template-columns:minmax(44px,64px) 1fr minmax(44px,64px);align-items:center;gap:1rem}.archive-stage{margin:0;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.archive-stage img{width:100%;height:100%;object-fit:contain;background:rgba(0,0,0,.14)}.archive-bottom-controls{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem}.archive-bottom-code{font-size:.72rem;letter-spacing:.24em;opacity:.78}.archive-fullscreen{justify-self:center;background:transparent;border:1px solid rgba(160,230,255,.25);color:inherit;padding:.85rem 1.15rem;letter-spacing:.2em;font-size:.7rem}.archive-pagination{display:flex;justify-content:flex-end;gap:.45rem;min-height:8px}.archive-pagination i{width:14px;height:2px;background:rgba(130,190,220,.18);display:block}.archive-pagination i.is-active{background:rgba(210,246,255,.95)}
+.archive-drawer-shell{position:absolute;left:0;top:0;bottom:0;display:flex;align-items:stretch;z-index:4;pointer-events:none}.archive-drawer-toggle,.archive-drawer{pointer-events:auto}.archive-drawer-toggle{writing-mode:vertical-rl;transform:rotate(180deg);align-self:center;background:transparent;border:1px solid rgba(160,230,255,.18);color:inherit;padding:.95rem .55rem;letter-spacing:.24em;font-size:.72rem;min-height:124px}.archive-drawer{position:absolute;left:0;top:0;bottom:0;width:min(320px,78vw);background:rgba(7,10,12,.92);border:1px solid rgba(160,230,255,.12);transform:translateX(-104%);transition:transform .35s ease,opacity .35s ease;opacity:0;padding:.95rem 1rem .95rem 1rem;overflow:auto}.archive-drawer.is-open{transform:translateX(0);opacity:1}.archive-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;font-size:.72rem;letter-spacing:.2em;margin-bottom:1rem}.archive-drawer-close{background:transparent;border:1px solid rgba(160,230,255,.16);color:inherit;width:34px;height:34px}.archive-drawer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem}.archive-drawer-grid .gallery-card{margin:0;border:1px solid rgba(160,230,255,.12);padding:.35rem;background:rgba(255,255,255,.02);cursor:pointer}.archive-drawer-grid .gallery-card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}.archive-drawer-grid .gallery-card::after{content:attr(data-file) "  //  " attr(data-type);display:block;font-size:.62rem;letter-spacing:.14em;opacity:.72;padding-top:.35rem}.archive-drawer-grid .gallery-card.is-active{border-color:rgba(220,245,255,.5);box-shadow:0 0 0 1px rgba(220,245,255,.15) inset}
+.gallery-button{background:transparent;border:1px solid rgba(160,230,255,.18);height:100%;min-height:100px;display:flex;align-items:center;justify-content:center}.archive-nav-icon{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;position:relative}.archive-nav-icon i,.archive-nav-icon b{display:block;position:absolute;background:rgba(220,245,255,.82)}.archive-nav-icon i{width:12px;height:2px}.archive-nav-icon b{width:8px;height:8px;border-left:2px solid rgba(220,245,255,.82);border-bottom:2px solid rgba(220,245,255,.82);background:transparent;transform:rotate(45deg);left:2px;top:4px}.gallery-button.next .archive-nav-icon b{transform:rotate(225deg);left:auto;right:2px}
+.faq-query-list{display:grid;gap:.7rem}.faq-query-item{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1rem}.faq-query-item.is-selected{border-color:rgba(220,245,255,.45);background:linear-gradient(90deg,rgba(180,240,255,.08),rgba(180,240,255,0))}.faq-response-panel{min-height:640px;display:flex;flex-direction:column}.faq-response-content{min-height:220px}.faq-response-content h3{min-height:5.2rem;display:flex;align-items:flex-end}.faq-response-content p{min-height:6rem}.faq-system-box{grid-auto-rows:minmax(84px,auto)}.faq-system-box>div{min-height:84px;display:flex;flex-direction:column;justify-content:center}.faq-response-log{margin-top:auto}
+@media (max-width: 980px){.archive-stage-wrap{grid-template-columns:38px 1fr 38px;gap:.65rem}.archive-bottom-controls{grid-template-columns:1fr;justify-items:start}.archive-fullscreen{justify-self:start}.archive-pagination{justify-content:flex-start}.archive-drawer{width:min(300px,86vw)}.faq-response-panel{min-height:unset}}
+@media (max-width: 700px){.archive-viewer--drawer{gap:.8rem}.archive-stage{aspect-ratio:3/4}.archive-drawer-toggle{min-height:104px;padding:.7rem .45rem;font-size:.66rem}.archive-drawer-grid{grid-template-columns:1fr 1fr;gap:.75rem}.archive-drawer{padding:.8rem}.faq-query-item{grid-template-columns:1fr auto}.faq-query-item span{grid-column:1/-1}.faq-query-item strong{grid-column:1/2}.faq-response-content h3{min-height:4.4rem}.faq-response-content p{min-height:7.2rem}}
+</style>
 </head>
-<body class="admin-page">
-  <main class="admin-shell">
-    <div class="admin-brand">THEFT // CONTROL PANEL // P14</div>
+<body>
+<div aria-hidden="true" class="scroll-progress" id="scrollProgress"></div>
+<aside aria-hidden="true" class="system-rail">
+<span class="rail-status">SYS // 2045</span>
+<div class="rail-track"><i id="railProgress"></i></div>
+<span class="rail-section" id="railSection">00 / ENTRY</span>
+</aside>
+<header class="site-header">
+<div class="shell nav">
+<a aria-label="ХИЩЕНИЕ / THEFT" class="brand" href="#top">ХИЩЕНИЕ <span>/ THEFT</span></a>
+<div class="header-slogan" data-i18n="slogan">В системе нет безопасности</div>
+<nav aria-label="Основная навигация" class="nav-links" data-i18n-aria="navAria" id="primaryNav"><a data-i18n="navAbout" href="#about">О фильме</a><a data-i18n="navMaterials" href="#materials">Материалы</a><a class="nav-trailer" data-i18n="navTrailer" href="#trailer">Трейлер</a><a data-i18n="navWatch" href="#watch">Где посмотреть</a><a data-i18n="navCast" href="#cast">Актёры</a><a data-i18n="navReviews" href="reviews.html">Отзывы</a><a data-i18n="navFaq" href="#faq">FAQ</a></nav>
+<div class="header-controls">
+<button aria-label="Switch to English" class="lang-toggle" id="langToggle" type="button">EN</button>
+<a class="header-rating" data-header-rating href="reviews.html" aria-label="Рейтинг зрителей">
+<span aria-hidden="true" class="header-rating-ring"><i></i></span>
+<span class="header-rating-copy"><strong data-stat="header-average">—</strong><small>/10</small></span>
+</a>
+<button aria-controls="primaryNav" aria-expanded="false" class="menu-toggle" id="menuToggle" type="button">
+<span data-i18n="menu">Меню</span><i aria-hidden="true"></i>
+</button>
+</div>
+</div>
+</header>
+<main>
+<section class="hero" id="top">
+<div class="hero-inner">
+<div class="hero-copy-column">
+<div aria-label="System status" class="hero-system-strip">
+<span>SYS // 2045</span>
+<span class="status-live"><i></i><b data-i18n="systemActive">СИСТЕМА АКТИВНА</b></span>
+<span data-i18n="publicAccess">ПУБЛИЧНЫЙ ДОСТУП</span>
+</div>
+<div class="eyebrow" data-i18n="heroEyebrow">Фильм в разработке · 2045</div>
+<div class="mobile-slogan" data-i18n="slogan">В системе нет безопасности</div>
+<h1>
+            ХИЩЕНИЕ
+            <span class="english-title">THEFT</span>
+</h1>
+<p class="hero-copy" data-i18n="heroCopy">В мире, где человек должен доказать свою пользу системе, взросление становится борьбой за право самому выбирать своё будущее.</p>
+<div class="hero-actions">
+<a class="button" data-i18n="heroTrailer" href="#trailer">Смотреть трейлер</a>
+<a class="button secondary" data-i18n="heroAbout" href="#about">О фильме</a>
+</div>
+</div>
+<div class="hero-poster-frame">
+<img alt="Официальная обложка фильма Хищение" class="hero-poster" data-i18n-alt="heroPosterAlt" src="assets/images/archive/archive-01.jpg"/>
+<div aria-hidden="true" class="poster-hud">
+<span>FILE // 001</span>
+<span>THEFT_2045</span>
+<span class="poster-rec"><i></i> REC</span>
+</div>
+</div>
+</div>
+</section>
+<section data-system-watermark="DOSSIER" id="about">
+<div class="shell">
+<div class="section-head">
+<div>
+<div class="section-label" data-i18n="aboutLabel">01 / DOSSIER</div>
+<h2 data-i18n="aboutTitle">2045 год.</h2>
+</div>
+</div>
+<div class="story">
+<p data-i18n="story1">Население Земли превысило допустимый предел. Государство создаёт новую систему, в которой каждый человек должен доказать свою пользу обществу.</p>
+<p data-i18n="story2">Дети с раннего возраста попадают под особый контроль и распределяются по специальным секциям.</p>
+<p data-i18n="story3">Гор живёт со своим 75-летним дедушкой и пытается приспособиться к новому миру. История показывает взросление Гора, его дружбу с Марком и борьбу за собственное будущее в системе, где человеческая жизнь постепенно превращается в ресурс.</p>
+</div>
+<div class="info-grid">
+<div class="info-card">
+<small data-i18n="infoTitle">Название</small>
+            ХИЩЕНИЕ / THEFT
+          </div>
+<div class="info-card">
+<small data-i18n="infoGenre">Жанр</small>
+<span data-i18n="genreValue">Антиутопия · Драма · Боевик · Приключения · Фантастика</span>
+</div>
+<div class="info-card">
+<small data-i18n="infoDirector">Режиссёр</small>
+<span data-i18n="directorName">Арман О. А.</span>
+</div>
+<div class="info-card">
+<small data-i18n="infoStatus">Статус</small>
+<span data-i18n="statusValue">В разработке</span>
+</div>
+</div>
+</div>
+</section>
+<section data-system-watermark="ARCHIVE" id="materials">
+<div class="shell">
+<div class="section-head">
+<div>
+<div class="section-label" data-i18n="materialsLabel">02 / ARCHIVE</div>
+<h2 data-i18n="materialsTitle">Визуальные материалы</h2>
+</div>
+</div>
+<p class="section-note" data-i18n="materialsNote">Материалы представлены в авторском виде. Текст внутри постеров может оставаться на русском языке.</p>
+<div class="archive-viewer archive-viewer--drawer" id="archiveViewer">
+<div class="archive-drawer-shell">
+<button aria-controls="archiveDrawer" aria-expanded="false" class="archive-drawer-toggle" id="archiveDrawerToggle" type="button"><span>ARCHIVE</span></button>
+<aside aria-hidden="true" class="archive-drawer" id="archiveDrawer">
+<div class="archive-drawer-head"><span>ARCHIVE INDEX</span><span>11 FILES</span><button aria-label="Закрыть архив" class="archive-drawer-close" id="archiveDrawerClose" type="button">×</button></div>
+<div aria-label="Архив материалов фильма" class="archive-drawer-grid" id="gallery" tabindex="0">
+<figure class="gallery-card is-active" data-file="MAT_001" data-index="0" data-type="POSTER" tabindex="0"><img alt="Обложка фильма Хищение" data-i18n-alt="galleryAlt01" loading="lazy" src="assets/images/archive/archive-01.jpg"/></figure>
+<figure class="gallery-card" data-file="MAT_002" data-index="1" data-type="STILL" tabindex="0"><img alt="Постер фильма Хищение — пианино" data-i18n-alt="galleryAlt02" loading="lazy" src="assets/images/archive/archive-02.jpg"/></figure>
+<figure class="gallery-card" data-file="MAT_003" data-index="2" data-type="STILL" tabindex="0"><img alt="Постер фильма Хищение — дедушка и ребёнок" data-i18n-alt="galleryAlt03" loading="lazy" src="assets/images/archive/archive-03.jpg"/></figure>
+<figure class="gallery-card" data-file="MAT_004" data-index="3" data-type="POSTER" tabindex="0"><img alt="Постер фильма Хищение — человек в капюшоне" data-i18n-alt="galleryAlt04" loading="lazy" src="assets/images/archive/archive-04.jpg"/></figure>
+<figure class="gallery-card" data-file="MAT_005" data-index="4" data-type="STILL" tabindex="0"><img alt="Постер фильма Хищение" data-i18n-alt="galleryAlt05" loading="lazy" src="assets/images/archive/archive-05.jpg"/></figure>
+<figure class="gallery-card" data-file="MAT_006" data-index="5" data-type="STILL" tabindex="0"><img alt="Постер фильма Хищение — герой в разрушенном городе" data-i18n-alt="galleryAlt06" loading="lazy" src="assets/images/archive/archive-06.jpg"/></figure>
+<figure class="gallery-card" data-file="MAT_007" data-index="6" data-type="POSTER" tabindex="0"><img alt="Постер фильма Хищение — ведущая" data-i18n-alt="galleryAlt07" loading="lazy" src="assets/images/archive/archive-07.jpg"/></figure>
+<figure class="gallery-card" data-file="MAT_008" data-index="7" data-type="STILL" tabindex="0"><img alt="Постер фильма Хищение — город" data-i18n-alt="galleryAlt08" loading="lazy" src="assets/images/archive/archive-08.jpg"/></figure>
+<figure class="gallery-card" data-file="MAT_009" data-index="8" data-type="POSTER" tabindex="0"><img alt="Постер фильма Хищение — Гор" data-i18n-alt="galleryAlt09" loading="lazy" src="assets/images/archive/archive-09.jpg"/></figure>
+<figure class="gallery-card" data-file="MAT_010" data-index="9" data-type="STILL" tabindex="0"><img alt="Кадры из фильма Хищение" data-i18n-alt="galleryAlt10" loading="lazy" src="assets/images/archive/archive-10.jpg"/></figure>
+<figure class="gallery-card" data-file="MAT_011" data-index="10" data-type="POSTER" tabindex="0"><img alt="Постер фильма Хищение — визуальный материал" data-i18n-alt="galleryAlt11" loading="lazy" src="assets/images/archive/archive-11.jpg"/></figure>
+</div>
+</aside>
+</div>
+<div class="archive-stage-wrap">
+<button aria-label="Предыдущее изображение" class="gallery-button prev" data-i18n-aria="previousImage" id="galleryPrev" type="button"><span aria-hidden="true" class="archive-nav-icon"><i></i><b></b></span></button>
+<figure aria-label="Открыть изображение" class="archive-stage" data-i18n-aria="openImage" id="archiveStage" tabindex="0">
+<img alt="Обложка фильма Хищение" data-i18n-alt="galleryAlt01" id="archiveMainImage" src="assets/images/archive/archive-01.jpg"/>
+<figcaption class="archive-stage-meta"><span id="archiveCode">MAT_001 // POSTER</span><span id="archiveCounter">01 / 11</span></figcaption>
+</figure>
+<button aria-label="Следующее изображение" class="gallery-button next" data-i18n-aria="nextImage" id="galleryNext" type="button"><span aria-hidden="true" class="archive-nav-icon"><i></i><b></b></span></button>
+</div>
+<div class="archive-bottom-controls">
+<span class="archive-bottom-code">AUTHOR FILES // VERIFIED</span>
+<button class="archive-fullscreen" id="archiveFullscreen" type="button">FULLSCREEN</button>
+<div aria-hidden="true" class="archive-pagination" id="archivePagination"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="trailer-section" data-system-watermark="SIGNAL" id="trailer">
+<div class="shell">
+<div class="section-head">
+<div>
+<div class="section-label" data-i18n="trailerLabel">03 / SIGNAL</div>
+<h2 data-i18n="trailerTitle">Трейлер</h2>
+</div>
+</div>
+<div aria-hidden="true" class="signal-meta"><span>SIGNAL_03</span><span>16:9 / MP4</span><span>ORIGINAL AUDIO // RU</span></div>
+<div class="video-shell" id="videoShell">
+<video controls="" playsinline="" poster="assets/images/signal/signal-preview.jpg" preload="metadata">
+<source src="assets/video/signal/signal-trailer-ru.mp4" type="video/mp4"/>
+<span data-i18n="videoFallback">Ваш браузер не поддерживает воспроизведение видео.</span>
+</video>
+</div>
+<p class="section-note trailer-language-note" data-i18n="trailerLanguageNote">Оригинальная звуковая дорожка трейлера — на русском. Английские субтитры можно добавить после согласования с автором.</p>
+</div>
+</section>
+<section data-system-watermark="ACCESS" id="watch">
+<div class="shell">
+<div class="section-head">
+<div>
+<div class="section-label" data-i18n="watchLabel">04 / ACCESS</div>
+<h2 data-i18n="watchTitle">Где посмотреть</h2>
+</div>
+</div>
+<div class="watch-layout">
+<div class="watch-primary">
+<p class="watch-intro" data-i18n="watchIntro">Площадки появятся здесь после подтверждения релиза. Пока раздел работает как публичная точка доступа к проекту.</p>
+<div class="watch-list">
+<div class="platform" data-platform-en="Kinopoisk" data-platform-ru="Кинопоиск">Кинопоиск · скоро</div>
+<div class="platform" data-platform-en="RuTube" data-platform-ru="RuTube">RuTube · скоро</div>
+<div class="platform" data-platform-en="VK Video" data-platform-ru="VK Видео">VK Видео · скоро</div>
+</div>
+</div>
+<aside aria-label="Current project signal" class="current-signal">
+<div class="signal-head">
+<span class="metric-kicker" data-i18n="signalKicker">Текущий сигнал</span>
+<i aria-hidden="true"></i>
+</div>
+<div aria-hidden="true" class="signal-wave"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+<dl class="signal-data">
+<div><dt data-i18n="signalStatusLabel">Статус</dt><dd data-i18n="signalStatusValue">В разработке</dd></div>
+<div><dt data-i18n="signalYearLabel">Год</dt><dd>2026</dd></div>
+<div><dt data-i18n="signalTrailerLabel">Трейлер</dt><dd data-i18n="signalTrailerValue">В сети</dd></div>
+<div><dt data-i18n="signalAccessLabel">Публичный доступ</dt><dd class="signal-live"><b></b><span data-i18n="signalAccessValue">Активен</span></dd></div>
+</dl>
+<div aria-label="Project signal log" class="signal-log">
+<div class="signal-log-row"><time>14:20</time><span data-i18n="signalLog1">Трейлер доступен</span><b data-i18n="signalNow">СЕЙЧАС</b></div>
+<div class="signal-log-row"><time>SYS</time><span data-i18n="signalLog2">Публичный архив открыт</span><b>ONLINE</b></div>
+<div class="signal-log-row"><time>2045</time><span data-i18n="signalLog3">Релиз ожидает подтверждения</span><b data-i18n="signalPending">PENDING</b></div>
+</div><div class="signal-foot" data-i18n="signalStable">SIGNAL // STABLE</div>
+</aside>
+</div>
+</div>
+</section>
+<section data-system-watermark="SUBJECTS" id="cast">
+<div class="shell">
+<div class="section-head">
+<div>
+<div class="section-label" data-i18n="castLabel">05 / SUBJECTS</div>
+<h2 data-i18n="castTitle">Актёрский состав</h2>
+</div>
+</div>
+<div class="cast-console">
+<div aria-label="Список актёров" class="cast-list" data-i18n-aria="castListAria" role="listbox">
+<button aria-selected="false" class="cast-list-item" data-name-key="nameArman" data-role-key="roleGor" data-subject="SUBJECT_01" role="option" type="button"><span>SUBJECT_01</span><em data-i18n="roleGor">Гор</em><strong class="cast-actor-source" data-i18n="nameArman" hidden>Арман О.</strong><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameBogdan" data-role-key="roleAntagonist" data-subject="SUBJECT_02" role="option" type="button"><span>SUBJECT_02</span><em data-i18n="roleAntagonist">Антагонист</em><strong class="cast-actor-source" data-i18n="nameBogdan" hidden>Богдан В.</strong><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameLevon" data-role-key="roleMark" data-subject="SUBJECT_03" role="option" type="button"><span>SUBJECT_03</span><em data-i18n="roleMark">Марк</em><strong class="cast-actor-source" data-i18n="nameLevon" hidden>Левон</strong><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameYulia" data-role-key="roleHost" data-subject="SUBJECT_04" role="option" type="button"><span>SUBJECT_04</span><em data-i18n="roleHost">Ведущая</em><strong class="cast-actor-source" data-i18n="nameYulia" hidden>Юля Ш.</strong><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameArsen" data-role-key="roleMusician" data-subject="SUBJECT_05" role="option" type="button"><span>SUBJECT_05</span><em data-i18n="roleMusician">Музыкант</em><strong class="cast-actor-source" data-i18n="nameArsen" hidden>Арсен О.</strong><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameAlexander" data-role-key="roleGrandfather" data-subject="SUBJECT_06" role="option" type="button"><span>SUBJECT_06</span><em data-i18n="roleGrandfather">Дедушка Гора</em><strong class="cast-actor-source" data-i18n="nameAlexander" hidden>Александр К.</strong><i aria-hidden="true"></i></button>
+<button aria-selected="false" class="cast-list-item" data-name-key="nameBella" data-role-key="roleDetective" data-subject="SUBJECT_07" role="option" type="button"><span>SUBJECT_07</span><em data-i18n="roleDetective">Детектив</em><strong class="cast-actor-source" data-i18n="nameBella" hidden>Белла А.</strong><i aria-hidden="true"></i></button>
+</div>
+<aside aria-live="polite" class="subject-dossier" id="subjectDossier">
+<div aria-hidden="true" class="dossier-scan"></div>
+<div class="dossier-topline"><span data-i18n="dossierHeader">SUBJECT DOSSIER // PUBLIC</span><button aria-label="Закрыть досье" class="dossier-close" data-i18n-aria="dossierClose" id="subjectDossierClose" type="button">×</button></div>
+<div class="dossier-reveal">
+<div class="dossier-subject" id="dossierSubject">SUBJECT // UNIDENTIFIED</div>
+<h3 id="dossierName">???</h3>
+<p class="dossier-role" id="dossierRole">???</p>
+<div class="dossier-data">
+<div><small data-i18n="dossierRoleLabel">Роль</small><strong id="dossierRoleValue">???</strong></div>
+<div><small data-i18n="dossierStatusLabel">Статус</small><strong id="dossierStatusValue">???</strong></div>
+<div><small data-i18n="dossierAccessLabel">Доступ</small><strong id="dossierAccessValue">PUBLIC</strong></div>
+<div><small data-i18n="dossierRefLabel">Системная запись</small><strong id="dossierRefValue">—</strong></div>
+</div>
+<div class="dossier-prompt" id="dossierPrompt" data-i18n="dossierAwaiting">SELECT SUBJECT // AWAITING INPUT</div>
+</div>
+</aside>
+</div>
+</div>
+</section>
 
-    <section class="admin-login" id="adminLogin">
-      <div class="section-label">ACCESS // RESTRICTED</div>
-      <h1>Вход команды</h1>
-      <div class="admin-field"><label for="adminEmail">Email</label><input id="adminEmail" type="email" autocomplete="username" spellcheck="false"></div>
-      <div class="admin-field"><label for="adminPassword">Пароль</label><input id="adminPassword" type="password" autocomplete="current-password"></div>
-      <button class="button" id="adminLoginButton" type="button">Войти</button>
-      <div class="admin-status" id="adminLoginStatus" role="status" aria-live="polite"></div>
-      <p class="faq-answer">Эта форма не регистрирует посетителей. Доступ получают только аккаунты, заранее добавленные в список администраторов Supabase.</p>
-    </section>
+<section class="faq-section" data-system-watermark="QUERY" id="faq">
+<div class="shell">
+<div class="faq-section-head">
+<div class="section-label" data-i18n="faqLabel">06 / SYSTEM QUERY</div>
+<h2 data-i18n="faqTitle">Часто задаваемые вопросы</h2>
+</div>
+<div class="faq-console">
+<div aria-label="Список часто задаваемых вопросов" class="faq-query-list" data-i18n-aria="faqListAria" role="listbox">
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_01" data-query-code="QUERY_01 // RELEASE STATUS" data-query-status="ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ" data-query-message="ПОДТВЕРЖДЁННАЯ ДАТА ПОЯВИТСЯ НА ЭТОМ САЙТЕ" role="option" type="button"><span>QUERY_01</span><strong data-i18n="faqQ1">Когда выйдет фильм?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA1">Точная дата релиза будет объявлена, когда система завершит разработку. Подтверждённая дата появится на этом сайте.</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_02" data-query-code="QUERY_02 // VERIFIED RESPONSE" data-query-status="ОЖИДАНИЕ РЕЛИЗА" data-query-message="СПИСОК ПЛОЩАДОК ПУБЛИКУЕТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ" role="option" type="button"><span>QUERY_02</span><strong data-i18n="faqQ2">Где можно будет посмотреть фильм?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA2">Площадки появятся в разделе «Где посмотреть» после подтверждения релиза.</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_03" data-query-code="QUERY_03 // CINEMA STATUS" data-query-status="ТРЕБУЕТСЯ УТОЧНЕНИЕ" data-query-message="КАНАЛЫ ПОКАЗА УТОЧНЯЮТСЯ" role="option" type="button"><span>QUERY_03</span><strong data-i18n="faqQ3">Будет ли показ в кинотеатрах?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA3">Требуется уточнение.</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_04" data-query-code="QUERY_04 // CONTACT CHANNEL" data-query-status="ПУБЛИЧНЫЙ КАНАЛ ОТКРЫТ" data-query-message="ИСПОЛЬЗУЙТЕ РАЗДЕЛ «КОНТАКТЫ»" role="option" type="button"><span>QUERY_04</span><strong data-i18n="faqQ4">Как связаться с создателями?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA4">Официальный публичный контакт автора находится в разделе «Контакты».</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_05" data-query-code="QUERY_05 // DOSSIER SUMMARY" data-query-status="ДОСЬЕ ОТКРЫТО" data-query-message="БАЗОВАЯ ИНФОРМАЦИЯ ДОСТУПНА В РАЗДЕЛЕ «О ФИЛЬМЕ»" role="option" type="button"><span>QUERY_05</span><strong data-i18n="faqQ5">Что за история у Хищения?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA5">История разворачивается в 2045 году в системе, где человек должен доказать обществу свою пользу. Подробнее — в разделе «О фильме».</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_06" data-query-code="QUERY_06 // ARCHIVE UPDATE" data-query-status="ОЖИДАНИЕ ОБНОВЛЕНИЯ" data-query-message="НОВЫЕ МАТЕРИАЛЫ ПУБЛИКУЮТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ" role="option" type="button"><span>QUERY_06</span><strong data-i18n="faqQ6">Когда появятся новые материалы?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA6">Новые материалы публикуются после подтверждения автора и подготовки к публикации.</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_07" data-query-code="QUERY_07 // VERIFIED TEAM" data-query-status="ПОДТВЕРЖДЁННЫЕ ДАННЫЕ" data-query-message="СОСТАВ ОБНОВЛЯЕТСЯ ПО МЕРЕ ПОДТВЕРЖДЕНИЯ" role="option" type="button"><span>QUERY_07</span><strong data-i18n="faqQ7">Кто работает над фильмом?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA7">Подтверждённые имена режиссёра и актёров публикуются на этом сайте. Состав может дополняться по мере подтверждения материалов.</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_08" data-query-code="QUERY_08 // SECURITY PROTOCOL" data-query-status="ПРОТОКОЛ АКТИВЕН" data-query-message="МИНИМУМ ДАННЫХ // ЛОКАЛЬНАЯ ПРИВЯЗКА ПРОФИЛЯ" role="option" type="button"><span>QUERY_08</span><strong data-i18n="faqQ8">На сайте есть безопасность?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA8">Система позволяет пользователям использовать технический идентификатор без привязки личных данных для работы профиля и отзывов.</b></button>
+</div>
+<aside aria-live="polite" class="faq-response-panel" id="faqResponsePanel">
+<div class="faq-response-header"><span data-i18n="faqResponseHeader">SYSTEM RESPONSE // VERIFIED DATA</span><i></i></div>
+<div aria-hidden="true" class="faq-response-watermark">QUERY</div>
+<div class="faq-response-content">
+<span class="faq-response-code" id="faqResponseCode">QUERY_00 // STANDBY</span>
+<h3 id="faqResponseQuestion">???</h3>
+<p id="faqResponseAnswer">Выберите вопрос // ожидание ответа</p>
+</div>
+<div class="faq-system-box">
+<div><span data-i18n="faqStatusLabel">Статус запроса</span><strong id="faqResponseStatus">???</strong></div>
+<div><span data-i18n="faqSourceLabel">Источник</span><strong data-i18n="faqSourceValue">ОФИЦИАЛЬНЫЙ КАНАЛ</strong></div>
+<div><span data-i18n="faqMessageLabel">Системное сообщение</span><strong id="faqResponseMessage">???</strong></div>
+<div><span data-i18n="faqUpdateLabel">Последнее обновление</span><strong>—</strong></div>
+</div>
+<div class="faq-response-log"><span id="faqResponseLog">SYSTEM LOG // Q00.STBY</span><span>VERIFIED ◆ SECURE ◆ ENCRYPTED</span></div>
+</aside>
+</div>
+</div>
+</section>
+<section data-system-watermark="CONTACT" id="contacts">
+<div class="shell contact-box">
+<div>
+<div class="section-label" data-i18n="contactsLabel">07 / CONTACT</div>
+<h2 data-i18n="contactsTitle">Контакты</h2>
+</div>
+<a aria-label="Instagram автора фильма @armanfut" class="contact-signal" href="https://www.instagram.com/armanfut/" rel="noopener noreferrer" target="_blank">
+<div class="contact-signal-copy"><span data-i18n="contactSignal">CONTACT SIGNAL // AUTHOR</span><strong>Instagram · @armanfut</strong></div>
+<div aria-hidden="true" class="contact-signal-track"><i></i><b></b></div>
+<span class="contact-signal-status" data-i18n="contactOpen">CHANNEL // OPEN ↗</span>
+</a>
+</div>
+</section>
+</main>
+<footer>
+<strong>ХИЩЕНИЕ / THEFT</strong><br/><br/>
+<span data-i18n="footer">Официальный сайт фильма · фильм находится в разработке</span>
+<div aria-hidden="true" class="footer-system">THEFT // PUBLIC FILE // 2045</div>
+<div class="build-mark">BUILD // P19 // ARCHIVE + FAQ</div></footer>
+<div aria-hidden="true" aria-label="Просмотр изображения" aria-modal="true" class="lightbox" data-i18n-aria="lightboxAria" id="lightbox" role="dialog">
+<button aria-label="Закрыть" class="lightbox-button lightbox-close" data-i18n-aria="close" id="lightboxClose" type="button">×</button>
+<button aria-label="Предыдущее изображение" class="lightbox-button lightbox-prev" data-i18n-aria="previousImage" id="lightboxPrev" type="button">←</button>
+<img alt="" class="lightbox-image" id="lightboxImage" src=""/>
+<div aria-live="polite" class="lightbox-counter" id="lightboxCounter"></div>
+<button aria-label="Следующее изображение" class="lightbox-button lightbox-next" data-i18n-aria="nextImage" id="lightboxNext" type="button">→</button>
+</div>
 
-    <section id="adminPanel" hidden>
-      <div class="admin-toolbar">
-        <div><div class="section-label">OFFICIAL // MODERATION</div><h1>PUBLIC RESPONSE</h1></div>
-        <button class="micro-button" id="adminLogout" type="button">Выйти</button>
-      </div>
-      <div class="admin-status" id="adminStatus" role="status" aria-live="polite"></div>
-      <div class="admin-grid" id="adminReviews"></div>
-    </section>
-  </main>
-  <script src="../js/admin.js?v=14-final"></script>
+
+<script src="js/site.js?v=18-system-ui"></script><script src="js/public-response.js?v=18-system-ui"></script>
+<script>
+(function(){
+  const archiveItems=[...document.querySelectorAll('#gallery .gallery-card')];
+  const drawer=document.getElementById('archiveDrawer');
+  const drawerToggle=document.getElementById('archiveDrawerToggle');
+  const drawerClose=document.getElementById('archiveDrawerClose');
+  const mainImage=document.getElementById('archiveMainImage');
+  const codeEl=document.getElementById('archiveCode');
+  const counterEl=document.getElementById('archiveCounter');
+  const pagination=document.getElementById('archivePagination');
+  const prev=document.getElementById('galleryPrev');
+  const next=document.getElementById('galleryNext');
+  const stage=document.getElementById('archiveStage');
+  const fsButton=document.getElementById('archiveFullscreen');
+  let active=0;
+  function buildPagination(){ if(!pagination) return; pagination.innerHTML=''; archiveItems.forEach((_,i)=>{ const dot=document.createElement('i'); if(i===active) dot.classList.add('is-active'); pagination.appendChild(dot); }); }
+  function sync(){ const item=archiveItems[active]; if(!item||!mainImage) return; const img=item.querySelector('img'); archiveItems.forEach((card,i)=>card.classList.toggle('is-active',i===active)); mainImage.src=img.getAttribute('src'); mainImage.alt=img.getAttribute('alt')||''; if(codeEl) codeEl.textContent=(item.dataset.file||`MAT_${String(active+1).padStart(3,'0')}`)+' // '+(item.dataset.type||'ARCHIVE'); if(counterEl) counterEl.textContent=`${String(active+1).padStart(2,'0')} / ${archiveItems.length}`; buildPagination(); }
+  function openDrawer(force){ if(!drawer||!drawerToggle) return; const show = force!==undefined ? force : !drawer.classList.contains('is-open'); drawer.classList.toggle('is-open',show); drawer.setAttribute('aria-hidden', show ? 'false' : 'true'); drawerToggle.setAttribute('aria-expanded', show ? 'true' : 'false'); }
+  archiveItems.forEach((item,i)=>item.addEventListener('click',()=>{ active=i; sync(); openDrawer(false); }));
+  prev && prev.addEventListener('click',()=>{ active=(active-1+archiveItems.length)%archiveItems.length; sync(); });
+  next && next.addEventListener('click',()=>{ active=(active+1)%archiveItems.length; sync(); });
+  drawerToggle && drawerToggle.addEventListener('click',()=>openDrawer());
+  drawerClose && drawerClose.addEventListener('click',()=>openDrawer(false));
+  document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') openDrawer(false); if(e.key==='ArrowLeft') {active=(active-1+archiveItems.length)%archiveItems.length; sync();} if(e.key==='ArrowRight'){active=(active+1)%archiveItems.length; sync();} });
+  stage && stage.addEventListener('click',()=>{ if(fsButton) fsButton.click(); });
+  fsButton && fsButton.addEventListener('click',()=>{ const t=stage || mainImage; if(t && t.requestFullscreen) t.requestFullscreen(); });
+  sync();
+})();
+(function(){
+  const items=[...document.querySelectorAll('.faq-query-item')];
+  const code=document.getElementById('faqResponseCode');
+  const q=document.getElementById('faqResponseQuestion');
+  const a=document.getElementById('faqResponseAnswer');
+  const st=document.getElementById('faqResponseStatus');
+  const msg=document.getElementById('faqResponseMessage');
+  const log=document.getElementById('faqResponseLog');
+  function reset(){ items.forEach(it=>{it.classList.remove('is-selected');it.setAttribute('aria-selected','false');}); if(code) code.textContent='QUERY_00 // STANDBY'; if(q) q.textContent='???'; if(a) a.textContent='Выберите вопрос // ожидание ответа'; if(st) st.textContent='???'; if(msg) msg.textContent='???'; if(log) log.textContent='SYSTEM LOG // Q00.STBY'; }
+  function apply(item){ items.forEach(it=>{const on=it===item; it.classList.toggle('is-selected',on); it.setAttribute('aria-selected', on ? 'true' : 'false');}); const question=item.querySelector('strong[data-i18n]')?.textContent || '???'; const answer=item.querySelector('.faq-source-answer')?.textContent || '—'; const qid=item.dataset.query || 'QUERY'; if(code) code.textContent=item.dataset.queryCode || `${qid} // VERIFIED RESPONSE`; if(q) q.textContent=question; if(a) a.textContent=answer; if(st) st.textContent=item.dataset.queryStatus || 'ПУБЛИЧНЫЕ ДАННЫЕ'; if(msg) msg.textContent=item.dataset.queryMessage || 'ДАННЫЕ ДОСТУПНЫ'; if(log) log.textContent=`SYSTEM LOG // ${qid.replace('QUERY_','Q')}.RSP`; }
+  items.forEach(item=>item.addEventListener('click',()=>apply(item)));
+  reset();
+})();
+</script>
 </body>
 </html>
