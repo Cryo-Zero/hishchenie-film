@@ -6,7 +6,7 @@
   const PROJECT_REF = 'xltwwvutqkpmtmlavngi';
   const SESSION_KEY = `theft-${PROJECT_REF}-auth-v4`;
   const AUTH_LOCK_NAME = `theft-${PROJECT_REF}-auth-lock-v4`;
-  const CLIENT_REVISION = 'P15-signal-ui';
+  const CLIENT_REVISION = 'P16-grid-subjects';
   const REQUEST_TIMEOUT = 18000;
   const AUTH_TIMEOUT = 30000;
   const WRITE_TIMEOUT = 30000;
@@ -45,7 +45,7 @@
       reviewsLabel: 'R / PUBLIC RESPONSE', reviewsTitle: 'Отзывы зрителей', reviewsIntro: 'Оценки зрителей формируют «Свежесть» фильма. 7–10 баллов считаются положительной оценкой.',
       freshness: 'Свежесть', insufficient: 'Недостаточно оценок', freshnessHint: '7–10 = положительно',
       freshnessCold: 'Холодный приём', freshnessMixed: 'Смешанные отзывы', freshnessFresh: 'Свежий', freshnessVeryFresh: 'Очень свежий', freshnessChoice: 'Выбор зрителей',
-      serviceChecking: 'Проверка канала', serviceOnline: 'Отзывы доступны', serviceOffline: 'Отзывы временно недоступны',
+      serviceChecking: 'Проверка канала', serviceOnline: 'Отзывы доступны', serviceOffline: 'Отзывы временно недоступны', serviceClosed: 'Канал отзывов закрыт', channelClosedNote: 'Публикация отзывов временно закрыта.',
       average: 'Средняя оценка', ratings: 'оценок', ratingOne: 'оценка', ratingFew: 'оценки', ratingMany: 'оценок',
       yourProtocol: 'Ваш профиль', profileNote: 'Псевдоним и аватар создаются автоматически. Их можно менять сколько угодно.',
       rerollName: 'Другой псевдоним', rerollAvatar: 'Другой аватар',
@@ -115,7 +115,7 @@
       reviewsLabel: 'R / PUBLIC RESPONSE', reviewsTitle: 'Audience reviews', reviewsIntro: 'Audience scores form the film’s “Freshness” rating. Scores from 7 to 10 count as positive.',
       freshness: 'Freshness', insufficient: 'Not enough ratings', freshnessHint: '7–10 = positive',
       freshnessCold: 'Cold reception', freshnessMixed: 'Mixed response', freshnessFresh: 'Fresh', freshnessVeryFresh: 'Very fresh', freshnessChoice: 'Audience choice',
-      serviceChecking: 'Checking channel', serviceOnline: 'Reviews online', serviceOffline: 'Reviews temporarily unavailable',
+      serviceChecking: 'Checking channel', serviceOnline: 'Reviews online', serviceOffline: 'Reviews temporarily unavailable', serviceClosed: 'Review channel closed', channelClosedNote: 'Review publishing is temporarily closed.',
       average: 'Average score', ratings: 'ratings', ratingOne: 'rating', ratingFew: 'ratings', ratingMany: 'ratings',
       yourProtocol: 'Your profile', profileNote: 'Your alias and avatar are generated automatically. You can reroll them at any time.',
       rerollName: 'New alias', rerollAvatar: 'New avatar',
@@ -174,6 +174,7 @@
     sort: 'new',
     filter: 'all',
     serviceState: 'checking',
+    channel: { reviews_enabled:null, likes_enabled:null, replies_enabled:null },
     lastStats: { total_ratings:0, average_rating:null, positive_ratings:0, freshness:null },
     reviews: [],
     busy: false,
@@ -386,10 +387,45 @@
   }
 
   function setServiceState(next, detail='') {
+    if(next==='online' && state.channel?.reviews_enabled===false) next='closed';
     state.serviceState=next;
-    const badge=$('#reviewServiceBadge'); if(!badge) return;
-    badge.classList.remove('is-checking','is-online','is-offline'); badge.classList.add(`is-${next}`);
-    const span=$('span',badge); if(span){ const base=next==='online'?t('serviceOnline'):next==='offline'?t('serviceOffline'):t('serviceChecking'); span.textContent=`${base} · P15`; span.title=detail||CLIENT_REVISION; }
+    const badge=$('#reviewServiceBadge');
+    if(badge){
+      badge.classList.remove('is-checking','is-online','is-offline','is-closed');
+      badge.classList.add(`is-${next}`);
+      const span=$('span',badge);
+      if(span){
+        const base=next==='online'?t('serviceOnline'):next==='offline'?t('serviceOffline'):next==='closed'?t('serviceClosed'):t('serviceChecking');
+        span.textContent=`${base} · P16`;
+        span.title=detail||CLIENT_REVISION;
+      }
+    }
+    $$('[data-channel-indicator]').forEach(el=>{
+      const live=next==='online';
+      el.classList.toggle('is-closed',!live);
+      const span=$('span',el); if(span) span.textContent=live?t('pulseLive'):(state.lang==='ru'?'CLOSED':'CLOSED');
+    });
+  }
+
+  function applyChannelState(data={}) {
+    state.channel={
+      reviews_enabled:data.reviews_enabled!==false,
+      likes_enabled:data.likes_enabled!==false,
+      replies_enabled:data.replies_enabled!==false
+    };
+    document.body?.classList.toggle('channel-closed',!state.channel.reviews_enabled);
+    const closed=!state.channel.reviews_enabled;
+    $$('.rating-button').forEach(b=>b.disabled=closed||state.busy);
+    const ta=$('#reviewText'); if(ta) ta.disabled=closed||state.busy;
+    const submit=$('#submitReview'); if(submit) submit.disabled=closed||state.busy;
+    const del=$('#deleteReview'); if(del) del.disabled=closed||state.busy;
+    if(closed) setStatus(t('channelClosedNote'),'');
+    setServiceState(closed?'closed':'online');
+  }
+
+  async function refreshChannelState(){
+    try{const data=await rpcGet('get_public_channel_state_v1'); applyChannelState(data||{});}
+    catch(err){console.warn('[P16/channel]',err); setServiceState('offline',err.code);}
   }
 
   function pluralRatings(count) {
@@ -426,11 +462,15 @@
       el.title=label;
     });
 
-    const pulseLevel=avgNumber==null?0.18:Math.max(.18,Math.min(1,avgNumber/10));
+    const pulseLevel=avgNumber==null?0.16:Math.max(.16,Math.min(1,avgNumber/10));
     const pulsePattern=[.18,.34,.62,.28,.78,.42,.92,.36,.66,.24,.84,.48,.72,.31,.96,.39,.69,.26,.81,.45,.9,.33,.58,.22];
+    const pulseSpeed=avgNumber==null?3.2:Math.max(1.15,3.35-(avgNumber/10)*2.15);
+    const pulseDensity=Math.max(.34,Math.min(1,.34+Math.log10(total+1)*.42));
+    const pulse=$('.audience-pulse');
+    if(pulse){ pulse.style.setProperty('--pulse-speed',`${pulseSpeed.toFixed(2)}s`); pulse.style.setProperty('--pulse-density',pulseDensity.toFixed(2)); pulse.style.setProperty('--pulse-level',pulseLevel.toFixed(2)); }
     $$('[data-pulse-wave] span').forEach((el,i)=>{
       const factor=pulsePattern[i%pulsePattern.length];
-      el.style.setProperty('--bar-height',`${Math.round(10+factor*pulseLevel*88)}%`);
+      el.style.setProperty('--bar-height',`${Math.round(8+factor*pulseLevel*92)}%`);
     });
 
     const ring=$('#freshnessRing'); if(ring){ring.style.setProperty('--freshness',freshness??0);ring.classList.toggle('is-pending',freshness==null);}
@@ -440,7 +480,7 @@
     const rc=$('#ratingsCount'); if(rc)rc.textContent=`${total} ${pluralRatings(total)}`;
   }
 
-  async function refreshStats(){ try{const data=await rpcGet('get_public_stats_v2');updateStatsUI(data||{});setServiceState('online');}catch(err){console.error('[P15/stats]',err);setServiceState('offline',err.code);}}
+  async function refreshStats(){ try{const data=await rpcGet('get_public_stats_v2');updateStatsUI(data||{});setServiceState(state.channel?.reviews_enabled===false?'closed':'online');}catch(err){console.error('[P16/stats]',err);setServiceState('offline',err.code);}}
 
   function applyTranslations(){
     document.documentElement.lang=state.lang;
@@ -514,7 +554,7 @@
   }
 
   function setProfileBusy(on){['#rerollName','#rerollAvatar'].forEach(s=>{const e=$(s);if(e)e.disabled=on;});}
-  function setComposerBusy(on){$$('.rating-button').forEach(b=>b.disabled=on);const ta=$('#reviewText');if(ta)ta.disabled=on;const sb=$('#submitReview');if(sb)sb.disabled=on;const db=$('#deleteReview');if(db)db.disabled=on;setProfileBusy(on);}
+  function setComposerBusy(on){const blocked=on||state.channel?.reviews_enabled===false;$$('.rating-button').forEach(b=>b.disabled=blocked);const ta=$('#reviewText');if(ta)ta.disabled=blocked;const sb=$('#submitReview');if(sb)sb.disabled=blocked;const db=$('#deleteReview');if(db)db.disabled=blocked;setProfileBusy(on);}
   function setStatus(msg,kind=''){const e=$('#reviewStatus');if(!e)return;e.textContent=msg||'';e.className=`review-status${kind?' '+kind:''}`;}
   function updateCounter(){const ta=$('#reviewText'),c=$('#reviewCounter');if(ta&&c)c.textContent=`${ta.value.length} / 2000`;}
   function updateRatingLabel(){const v=$('#selectedRatingValue'),w=$('#selectedRatingWord');if(state.selectedRating==null){if(v)v.textContent='— / 10';if(w)w.textContent=t('ratingPrompt');return;}if(v)v.textContent=`${state.selectedRating} / 10`;if(w)w.textContent=t('scoreWords')[state.selectedRating]||'';$$('.rating-button').forEach(b=>{const active=Number(b.dataset.rating)===state.selectedRating;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
@@ -542,6 +582,7 @@
 
   async function submitReview(){
     if(state.busy||profileMutation)return;
+    if(state.channel?.reviews_enabled===false){setStatus(t('channelClosedNote'),'');return;}
     if(state.selectedRating==null){setStatus(t('chooseRating'),'error');return;}
     const rating=Number(state.selectedRating), text=($('#reviewText')?.value||'').trim(), p=profileForWrite();
     const previousReview=state.ownReview?{...state.ownReview}:null;
@@ -586,9 +627,9 @@
 
   async function loadReviews(sort=state.sort,filter=state.filter){
     if(!$('#reviewsList'))return;
-    const seq=++state.feedSeq;state.sort=sort;state.filter=filter;$$('.review-sort-button').forEach(b=>b.classList.toggle('active',b.dataset.sort===sort));$$('.review-filter-button').forEach(b=>b.classList.toggle('active',b.dataset.filter===filter));
-    try{const rows=await rpcGet('get_public_reviews_v3',{p_sort:sort,p_filter:filter,p_limit:40,p_offset:0});if(seq!==state.feedSeq)return;state.reviews=Array.isArray(rows)?rows:[];renderReviews(state.reviews);setServiceState('online');}
-    catch(err){if(seq!==state.feedSeq)return;console.error('[P14/feed]',err);setServiceState('offline',err.code);const l=$('#reviewsList');if(l)l.replaceChildren(Object.assign(document.createElement('div'),{className:'reviews-empty',textContent:t('loadError')}));}
+    const seq=++state.feedSeq;state.sort=sort;state.filter='all';filter='all';$$('.review-sort-button').forEach(b=>b.classList.toggle('active',b.dataset.sort===sort));
+    try{const rows=await rpcGet('get_public_reviews_v3',{p_sort:sort,p_filter:filter,p_limit:40,p_offset:0});if(seq!==state.feedSeq)return;state.reviews=Array.isArray(rows)?rows:[];renderReviews(state.reviews);setServiceState(state.channel?.reviews_enabled===false?'closed':'online');}
+    catch(err){if(seq!==state.feedSeq)return;console.error('[P16/feed]',err);setServiceState('offline',err.code);const l=$('#reviewsList');if(l)l.replaceChildren(Object.assign(document.createElement('div'),{className:'reviews-empty',textContent:t('loadError')}));}
   }
 
   function renderReviews(rows){
@@ -626,17 +667,17 @@
   function bindEvents(){
     $('#langToggle')?.addEventListener('click',()=>setLanguage(state.lang==='ru'?'en':'ru'));
     $('#rerollName')?.addEventListener('click',rerollName);$('#rerollAvatar')?.addEventListener('click',rerollAvatar);$('#submitReview')?.addEventListener('click',submitReview);$('#deleteReview')?.addEventListener('click',deleteReview);$('#reviewText')?.addEventListener('input',updateCounter);
-    $$('.rating-button').forEach(b=>b.addEventListener('click',()=>selectRating(b.dataset.rating)));$$('.review-sort-button').forEach(b=>b.addEventListener('click',()=>loadReviews(b.dataset.sort,state.filter)));$$('.review-filter-button').forEach(b=>b.addEventListener('click',()=>loadReviews(state.sort,b.dataset.filter)));
+    $$('.rating-button').forEach(b=>b.addEventListener('click',()=>selectRating(b.dataset.rating)));$$('.review-sort-button').forEach(b=>b.addEventListener('click',()=>loadReviews(b.dataset.sort,'all')));
     $('#securityToggle')?.addEventListener('click',()=>{const p=$('#securityPanel'),b=$('#securityToggle');if(!p||!b)return;const open=p.hidden;p.hidden=!open;b.setAttribute('aria-expanded',String(open));});
   }
 
   async function boot(){
     state.pendingProfile=generateAliasProfile();bindEvents();applyTranslations();renderProfile();updateCounter();updateComposerUI();setServiceState('checking');
-    await Promise.allSettled([refreshStats(),loadReviews(state.sort)]);
-    try{await restoreOwnState();if($('#reviewsList'))await loadReviews(state.sort);setServiceState('online');}catch(err){console.warn('[P14/session restore]',err.code||err.message);}
+    await Promise.allSettled([refreshChannelState(),refreshStats(),loadReviews(state.sort)]);
+    try{await restoreOwnState();if($('#reviewsList'))await loadReviews(state.sort);setServiceState(state.channel?.reviews_enabled===false?'closed':'online');}catch(err){console.warn('[P14/session restore]',err.code||err.message);}
   }
 
   addEventListener('storage',e=>{if(e.key===SESSION_KEY){state.session=null;loadSession();}});
-  addEventListener('online',()=>{refreshStats();if($('#reviewsList'))loadReviews(state.sort);});addEventListener('offline',()=>setServiceState('offline','BROWSER_OFFLINE'));
+  addEventListener('online',()=>{refreshChannelState();refreshStats();if($('#reviewsList'))loadReviews(state.sort);});addEventListener('offline',()=>setServiceState('offline','BROWSER_OFFLINE'));
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

@@ -10,13 +10,18 @@
 <link rel="preconnect" href="https://xltwwvutqkpmtmlavngi.supabase.co" crossorigin>
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://cryo-zero.github.io/hishchenie-film/reviews.html">
-  <link rel="stylesheet" href="css/site.css?v=15-signal">
+  <link rel="stylesheet" href="css/site.css?v=16-grid">
 </head>
 <body class="community-page">
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <aside class="system-rail" aria-hidden="true">
+    <span class="rail-status">SYS // 2045</span>
+    <div class="rail-track"><i id="railProgress"></i></div>
+    <span class="rail-section" id="railSection">R / RESPONSE</span>
+  </aside>
   <header class="site-header">
     <div class="shell nav">
-      <a class="brand" href="index.html#top" aria-label="ХИЩЕНИЕ / THEFT">ХИЩЕНИЕ <span>/ THEFT</span></a>
+      <a class="brand" href="index.html" aria-label="ХИЩЕНИЕ / THEFT">ХИЩЕНИЕ <span>/ THEFT</span></a>
       <div class="header-slogan" data-i18n="slogan">В системе нет безопасности</div>
       <nav class="nav-links" id="primaryNav" aria-label="Основная навигация" data-i18n-aria="navAria">
         <a href="index.html#about" data-i18n="navAbout">О фильме</a>
@@ -52,7 +57,7 @@
               </div>
             </div>
             <div class="community-metric"><strong><span id="averageRating">—</span><small>/10</small></strong><span data-i18n="average">Средняя оценка</span><small id="ratingsCount">0 оценок</small></div>
-            <div class="community-metric"><strong>7–10</strong><span data-i18n="freshnessHint">7–10 = положительно</span><div class="service-badge is-checking" id="reviewServiceBadge" role="status" aria-live="polite"><i></i><span data-i18n="serviceChecking">Проверка канала</span></div></div>
+            <div class="community-metric"><strong>7–10</strong><span data-i18n="freshnessHint">7–10 = положительно</span></div>
           </div>
         </div>
         <aside aria-label="Пульс аудитории" class="audience-pulse" data-i18n-aria="audiencePulseAria">
@@ -62,7 +67,7 @@
             <div><dt data-i18n="pulseSamples">Сигналов</dt><dd data-stat="pulse-samples">0</dd></div>
             <div><dt data-i18n="pulseAverage">Средняя</dt><dd><span data-stat="pulse-average">—</span><small>/10</small></dd></div>
             <div><dt data-i18n="pulsePositive">Положительных</dt><dd data-stat="pulse-positive">—</dd></div>
-            <div><dt data-i18n="pulseState">Канал</dt><dd class="pulse-live"><b></b><span data-i18n="pulseLive">LIVE</span></dd></div>
+            <div><dt data-i18n="pulseState">Канал</dt><dd class="pulse-live" data-channel-indicator><b></b><span data-i18n="pulseLive">LIVE</span></dd></div>
           </dl>
           <div class="audience-pulse-foot" data-i18n="pulseFoot">PUBLIC RESPONSE // LIVE SIGNAL</div>
         </aside>
@@ -107,17 +112,15 @@
 
         <div class="review-feed">
           <div class="community-feed-toolbar">
-            <div><div class="composer-label">PUBLIC FEED // 2045</div><h2 data-i18n="reviewsTitle">Отзывы зрителей</h2></div>
+            <div class="community-feed-heading">
+              <div class="composer-label">PUBLIC FEED // 2045</div>
+              <h2 data-i18n="reviewsTitle">Отзывы зрителей</h2>
+              <div class="service-badge is-checking" id="reviewServiceBadge" role="status" aria-live="polite"><i></i><span data-i18n="serviceChecking">Проверка канала</span></div>
+            </div>
             <div class="review-sort" role="group" aria-label="Review sorting">
               <button class="review-sort-button active" type="button" data-sort="new" data-i18n="latest">Новые</button>
               <button class="review-sort-button" type="button" data-sort="old" data-i18n="oldSort">Старые</button>
               <button class="review-sort-button" type="button" data-sort="popular" data-i18n="popular">Популярные</button>
-              <button class="review-sort-button" type="button" data-sort="high" data-i18n="highest">С высокой оценкой</button>
-              <button class="review-sort-button" type="button" data-sort="low" data-i18n="lowest">С низкой оценкой</button>
-            </div>
-            <div class="review-filter" role="group" aria-label="Review filters">
-              <button class="review-filter-button active" type="button" data-filter="all" data-i18n="allReviews">Все отзывы</button>
-              <button class="review-filter-button" type="button" data-filter="official" data-i18n="withOfficialResponse">С ответом команды</button>
             </div>
           </div>
           <div class="reviews-list" id="reviewsList"><div class="reviews-empty" data-i18n="reviewsEmpty">Пока нет отзывов. Ваша оценка может стать первой.</div></div>
@@ -133,10 +136,10 @@
       <button id="securityToggle" class="security-toggle" type="button" aria-expanded="false" aria-controls="securityPanel" data-i18n="securityTeaser">SYS // SECURITY: PRESENT</button>
       <div class="security-panel" id="securityPanel" hidden><strong data-i18n="securityTitle">На сайте есть безопасность</strong><p data-i18n="securityText">Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва, а также ваши реакции и ответы, если вы ими пользуетесь. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.</p></div>
     </div>
-    <div class="build-mark">BUILD // P15 // SIGNAL UI</div>
+    <div class="build-mark">BUILD // P16 // GRID + SUBJECTS</div>
   </footer>
 
-  <script src="js/site.js?v=15-signal"></script>
-  <script src="js/public-response.js?v=15-signal"></script>
+  <script src="js/site.js?v=16-grid"></script>
+  <script src="js/public-response.js?v=16-grid"></script>
 </body>
 </html>
