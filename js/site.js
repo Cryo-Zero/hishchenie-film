@@ -29,6 +29,15 @@
     closeNav();
   });
 
+  // A cross-page brand link uses index.html#top. Force the exact origin instead
+  // of letting browser scroll-restoration revive the last position on index.html.
+  function enforceTopHash() {
+    if (location.hash !== '#top') return;
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'auto' }));
+  }
+  enforceTopHash();
+  addEventListener('pageshow', enforceTopHash);
+
   // Offset hash navigation under the sticky header.
   document.addEventListener('click', event => {
     const link = event.target.closest('a[href^="#"]');
@@ -51,7 +60,7 @@
   const sectionCodes = [
     ['top','00 / ENTRY'], ['about','01 / DOSSIER'], ['materials','02 / ARCHIVE'],
     ['trailer','03 / SIGNAL'], ['watch','04 / ACCESS'], ['cast','05 / SUBJECTS'],
-    ['faq','06 / FAQ'], ['contacts','07 / CONTACT'], ['reviewsTop','R / RESPONSE'], ['reviewWorkspace','R1 / FEED']
+    ['faq','06 / QUERY'], ['contacts','07 / CONTACT'], ['reviewsTop','R / RESPONSE'], ['reviewWorkspace','R1 / FEED']
   ].map(([id, code]) => [document.getElementById(id), code]).filter(([el]) => el);
 
   function updateScrollUI() {
@@ -175,16 +184,23 @@
   });
   if (archiveItems.length) setArchive(0);
 
-  // Trailer width fits the viewport without forcing an oversized section.
+  // Trailer and the closed ARCHIVE frame use the same visual media width.
+  // The lightbox remains full-size; only the in-page material viewer is matched.
   const videoShell = $('#videoShell');
-  function fitTrailer() {
-    if (!videoShell) return;
-    if (innerWidth <= 820) { videoShell.style.width = '100%'; return; }
+  const archiveViewer = $('#archiveViewer');
+  function fitMediaFrames() {
+    if (innerWidth <= 820) {
+      if (videoShell) videoShell.style.width = '100%';
+      if (archiveViewer) archiveViewer.style.removeProperty('--media-frame-width');
+      return;
+    }
     const available = Math.max(340, innerHeight - headerHeight() - 215);
-    videoShell.style.width = `${Math.min(1040, available * 16 / 9)}px`;
+    const width = Math.min(1040, available * 16 / 9);
+    if (videoShell) videoShell.style.width = `${width}px`;
+    if (archiveViewer) archiveViewer.style.setProperty('--media-frame-width', `${width}px`);
   }
-  fitTrailer();
-  addEventListener('resize', fitTrailer);
+  fitMediaFrames();
+  addEventListener('resize', fitMediaFrames);
 
   // SUBJECT DOSSIER ------------------------------------------------------------
   // The list never changes its geometry. A permanent panel on the right receives
@@ -282,9 +298,44 @@
     setDossierValues(activeSubject);
   });
 
-  // Keep FAQ tidy: opening one closes the others.
-  $$('.faq-item').forEach(item => item.addEventListener('toggle', () => {
-    if (!item.open) return;
-    $$('.faq-item[open]').forEach(other => { if (other !== item) other.removeAttribute('open'); });
-  }));
+  // SYSTEM QUERY / FAQ --------------------------------------------------------
+  // Same external logic as SUBJECTS: a stable query rail on the left and one
+  // permanent response panel on the right. No layout jumping on selection.
+  const faqQueries = $$('.faq-query-item');
+  const faqPanel = $('#faqResponsePanel');
+  const faqCode = $('#faqResponseCode');
+  const faqQuestion = $('#faqResponseQuestion');
+  const faqAnswer = $('#faqResponseAnswer');
+  const faqStatus = $('#faqResponseStatus');
+  const faqMessage = $('#faqResponseMessage');
+  const faqLog = $('#faqResponseLog');
+  let activeFaq = faqQueries[0] || null;
+
+  function faqText(item, selector) {
+    return item?.querySelector(selector)?.textContent?.trim() || '—';
+  }
+
+  function renderFaq(item, animate = true) {
+    if (!item || !faqPanel) return;
+    activeFaq = item;
+    faqQueries.forEach(row => {
+      const selected = row === item;
+      row.classList.toggle('is-selected', selected);
+      row.setAttribute('aria-selected', String(selected));
+    });
+    const code = item.dataset.query || 'QUERY_00';
+    if (faqCode) faqCode.textContent = `${code} // ${code === 'QUERY_01' ? 'RELEASE STATUS' : 'VERIFIED RESPONSE'}`;
+    if (faqQuestion) faqQuestion.textContent = faqText(item, 'strong[data-i18n]');
+    if (faqAnswer) faqAnswer.textContent = faqText(item, '.faq-source-answer');
+    if (faqStatus) faqStatus.textContent = faqText(item, '.faq-source-status');
+    if (faqMessage) faqMessage.textContent = faqText(item, '.faq-source-message');
+    if (faqLog) faqLog.textContent = `SYSTEM LOG // Q${code.slice(-2)}.RSP`;
+    if (!animate || motionReduced()) return;
+    faqPanel.classList.remove('is-revealed');
+    requestAnimationFrame(() => requestAnimationFrame(() => faqPanel.classList.add('is-revealed')));
+  }
+
+  faqQueries.forEach(item => item.addEventListener('click', () => renderFaq(item, true)));
+  if (activeFaq) { faqPanel?.classList.add('is-revealed'); renderFaq(activeFaq, false); }
+  addEventListener('theft:language', () => { if (activeFaq) renderFaq(activeFaq, false); });
 })();

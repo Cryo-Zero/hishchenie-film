@@ -32,7 +32,7 @@
   }
   </script>
 
-<link href="css/site.css?v=17-grid" rel="stylesheet"/></head>
+<link href="css/site.css?v=18-system-ui" rel="stylesheet"/></head>
 <body>
 <div aria-hidden="true" class="scroll-progress" id="scrollProgress"></div>
 <aside aria-hidden="true" class="system-rail">
@@ -86,24 +86,6 @@
 <span class="poster-rec"><i></i> REC</span>
 </div>
 </div>
-</div>
-</section><section aria-label="Audience signal" class="audience-strip">
-<div class="shell">
-<div class="audience-strip-copy">
-<div class="audience-strip-kicker" data-i18n="audienceSignal">Сигнал аудитории</div>
-<div class="audience-strip-title" data-i18n="audienceSignalCopy">Оценка зрителей доступна сразу — полный раздел отзывов открыт отдельно.</div>
-</div>
-<div class="audience-strip-metric">
-<span data-i18n="freshness">Свежесть</span>
-<strong data-stat="freshness">—</strong>
-<small data-i18n="insufficient" data-stat="freshness-label">Недостаточно оценок</small>
-</div>
-<div class="audience-strip-metric">
-<span data-i18n="average">Средняя оценка</span>
-<strong><span data-stat="average">—</span><small>/10</small></strong>
-<small data-stat="count">0 оценок</small>
-</div>
-<a class="button secondary" data-i18n="openReviews" href="reviews.html">Открыть отзывы</a>
 </div>
 </section>
 <section data-system-watermark="DOSSIER" id="about">
@@ -293,24 +275,45 @@
 </div>
 </section>
 
-<section class="faq-section" data-system-watermark="FAQ" id="faq">
+<section class="faq-section" data-system-watermark="QUERY" id="faq">
 <div class="shell">
-<div class="faq-grid">
-<div>
-<div class="section-label" data-i18n="faqLabel">06 / FAQ</div>
+<div class="faq-section-head">
+<div class="section-label" data-i18n="faqLabel">06 / SYSTEM QUERY</div>
 <h2 data-i18n="faqTitle">Часто задаваемые вопросы</h2>
-<p class="faq-intro" data-i18n="faqIntro">Короткие ответы о фильме и этом публичном архиве. Факты о релизе обновляются только после подтверждения командой.</p>
 </div>
-<div class="faq-list">
-<details class="faq-item"><summary data-i18n="faqQ1">Когда выйдет фильм?</summary><div class="faq-answer" data-i18n="faqA1">Точная дата релиза пока не объявлена. Фильм находится в разработке; подтверждённая дата появится на этом сайте.</div></details>
-<details class="faq-item"><summary data-i18n="faqQ2">Где можно будет посмотреть «Хищение»?</summary><div class="faq-answer" data-i18n="faqA2">Площадки появятся в разделе «Где посмотреть» после подтверждения релиза. Сейчас они помечены как ожидающие.</div></details>
-<details class="faq-item"><summary data-i18n="faqQ3">На каком языке трейлер?</summary><div class="faq-answer" data-i18n="faqA3">Оригинальная звуковая дорожка трейлера — на русском. Текст внутри авторских постеров также может оставаться на русском.</div></details>
-<details class="faq-item"><summary data-i18n="faqQ4">Будут ли английские субтитры?</summary><div class="faq-answer" data-i18n="faqA4">Возможность английских субтитров предусмотрена, но публиковать обещание до согласования с автором мы не будем.</div></details>
-<details class="faq-item"><summary data-i18n="faqQ5">Как оставить отзыв?</summary><div class="faq-answer" data-i18n="faqA5">Откройте отдельную вкладку «Отзывы», выберите оценку от 0 до 10 и при желании добавьте текст. Email, телефон и обычная регистрация не нужны.</div></details>
+<div class="faq-console">
+<div aria-label="Список часто задаваемых вопросов" class="faq-query-list" data-i18n-aria="faqListAria" role="listbox">
+<button aria-selected="true" class="faq-query-item is-selected" data-query="QUERY_01" role="option" type="button"><span>QUERY_01</span><strong data-i18n="faqQ1">Когда выйдет фильм?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA1">Точная дата релиза будет объявлена, когда система завершит разработку. Подтверждённая дата появится на этом сайте.</b><b hidden class="faq-source-status" data-i18n="faqStatus1">ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ</b><b hidden class="faq-source-message" data-i18n="faqMessage1">НЕПОДТВЕРЖДЁННЫЕ ДАТЫ НЕ ПУБЛИКУЮТСЯ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_02" role="option" type="button"><span>QUERY_02</span><strong data-i18n="faqQ2">Где можно будет посмотреть фильм?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA2">Площадки появятся в разделе «Где посмотреть» после подтверждения релиза.</b><b hidden class="faq-source-status" data-i18n="faqStatus2">ОЖИДАНИЕ РЕЛИЗА</b><b hidden class="faq-source-message" data-i18n="faqMessage2">СПИСОК ПЛОЩАДОК ПУБЛИКУЕТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_03" role="option" type="button"><span>QUERY_03</span><strong data-i18n="faqQ3">Будут ли английские субтитры?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA3">Английские субтитры можно добавить после согласования с автором. До подтверждения сайт не обещает их наличие.</b><b hidden class="faq-source-status" data-i18n="faqStatus3">ОЖИДАНИЕ РЕШЕНИЯ</b><b hidden class="faq-source-message" data-i18n="faqMessage3">НЕПОДТВЕРЖДЁННЫЕ ФУНКЦИИ НЕ ОБЪЯВЛЯЮТСЯ КАК ГОТОВЫЕ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_04" role="option" type="button"><span>QUERY_04</span><strong data-i18n="faqQ4">Кто работает над фильмом?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA4">Подтверждённые имена режиссёра и актёров публикуются на этом сайте. Состав может дополняться по мере подтверждения материалов.</b><b hidden class="faq-source-status" data-i18n="faqStatus4">ПУБЛИЧНЫЕ ДАННЫЕ</b><b hidden class="faq-source-message" data-i18n="faqMessage4">В ДОСЬЕ ПОПАДАЮТ ТОЛЬКО ПОДТВЕРЖДЁННЫЕ ДАННЫЕ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_05" role="option" type="button"><span>QUERY_05</span><strong data-i18n="faqQ5">Как связаться с проектом?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA5">Официальный публичный контакт автора находится в разделе «Контакты».</b><b hidden class="faq-source-status" data-i18n="faqStatus5">КАНАЛ ДОСТУПЕН</b><b hidden class="faq-source-message" data-i18n="faqMessage5">ИСПОЛЬЗУЙТЕ ОПУБЛИКОВАННЫЙ КАНАЛ СВЯЗИ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_06" role="option" type="button"><span>QUERY_06</span><strong data-i18n="faqQ6">На сайте есть безопасность?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA6">Да. Для профиля отзывов не нужны email, телефон или пароль. Сайт использует технический идентификатор и хранит только данные, необходимые для работы профиля и отзывов.</b><b hidden class="faq-source-status" data-i18n="faqStatus6">ПРОТОКОЛ АКТИВЕН</b><b hidden class="faq-source-message" data-i18n="faqMessage6">МИНИМУМ ДАННЫХ // ЛОКАЛЬНАЯ ПРИВЯЗКА ПРОФИЛЯ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_07" role="option" type="button"><span>QUERY_07</span><strong data-i18n="faqQ7">Почему даты релиза скрыты?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA7">Потому что проект находится в разработке. Сайт не публикует неподтверждённые даты как официальные.</b><b hidden class="faq-source-status" data-i18n="faqStatus7">ДАТА НЕ ПОДТВЕРЖДЕНА</b><b hidden class="faq-source-message" data-i18n="faqMessage7">СИСТЕМА ОЖИДАЕТ ОФИЦИАЛЬНОГО СИГНАЛА</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_08" role="option" type="button"><span>QUERY_08</span><strong data-i18n="faqQ8">Будут ли новости о съёмках?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA8">Подтверждённые обновления можно добавлять на сайт по мере появления новых материалов от автора фильма.</b><b hidden class="faq-source-status" data-i18n="faqStatus8">КАНАЛ ОБНОВЛЕНИЙ</b><b hidden class="faq-source-message" data-i18n="faqMessage8">НОВЫЕ МАТЕРИАЛЫ ПУБЛИКУЮТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_09" role="option" type="button"><span>QUERY_09</span><strong data-i18n="faqQ9">Что за история у «Хищения»?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA9">История разворачивается в 2045 году в системе, где человек должен доказать обществу свою пользу. Подробнее — в разделе «О фильме».</b><b hidden class="faq-source-status" data-i18n="faqStatus9">ДОСЬЕ ОТКРЫТО</b><b hidden class="faq-source-message" data-i18n="faqMessage9">БАЗОВАЯ ИНФОРМАЦИЯ ДОСТУПНА В ПУБЛИЧНОМ АРХИВЕ</b></button>
+<button aria-selected="false" class="faq-query-item" data-query="QUERY_10" role="option" type="button"><span>QUERY_10</span><strong data-i18n="faqQ10">Можно ли поддержать проект?</strong><i aria-hidden="true"></i><b hidden class="faq-source-answer" data-i18n="faqA10">Отдельный официальный способ поддержки проекта пока не опубликован. Если он появится, информация будет размещена на этом сайте.</b><b hidden class="faq-source-status" data-i18n="faqStatus10">КАНАЛ НЕ ОБЪЯВЛЕН</b><b hidden class="faq-source-message" data-i18n="faqMessage10">НЕ ИСПОЛЬЗУЙТЕ НЕПОДТВЕРЖДЁННЫЕ СПОСОБЫ ПОДДЕРЖКИ</b></button>
+</div>
+<aside aria-live="polite" class="faq-response-panel" id="faqResponsePanel">
+<div class="faq-response-header"><span data-i18n="faqResponseHeader">SYSTEM RESPONSE // VERIFIED DATA</span><i></i></div>
+<div class="faq-response-watermark" aria-hidden="true">QUERY</div>
+<div class="faq-response-content">
+<span class="faq-response-code" id="faqResponseCode">QUERY_01 // RELEASE STATUS</span>
+<h3 id="faqResponseQuestion">Когда выйдет фильм?</h3>
+<p id="faqResponseAnswer">Точная дата релиза будет объявлена, когда система завершит разработку. Подтверждённая дата появится на этом сайте.</p>
+</div>
+<div class="faq-system-box">
+<div><span data-i18n="faqStatusLabel">Статус запроса</span><strong id="faqResponseStatus">ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ</strong></div>
+<div><span data-i18n="faqSourceLabel">Источник</span><strong data-i18n="faqSourceValue">ОФИЦИАЛЬНЫЙ КАНАЛ</strong></div>
+<div><span data-i18n="faqMessageLabel">Системное сообщение</span><strong id="faqResponseMessage">НЕПОДТВЕРЖДЁННЫЕ ДАТЫ НЕ ПУБЛИКУЮТСЯ</strong></div>
+<div><span data-i18n="faqUpdateLabel">Последнее обновление</span><strong>—</strong></div>
+</div>
+<div class="faq-response-log"><span id="faqResponseLog">SYSTEM LOG // Q01.RSP</span><span>VERIFIED ◆ SECURE ◆ ENCRYPTED</span></div>
+</aside>
 </div>
 </div>
-</div>
-</section><section data-system-watermark="CONTACT" id="contacts">
+</section>
+<section data-system-watermark="CONTACT" id="contacts">
 <div class="shell contact-box">
 <div>
 <div class="section-label" data-i18n="contactsLabel">07 / CONTACT</div>
@@ -335,7 +338,7 @@
 </div>
 </div>
 <div aria-hidden="true" class="footer-system">THEFT // PUBLIC FILE // 2045</div>
-<div class="build-mark">BUILD // P17 // GLOBAL GRID + AVATARS</div></footer>
+<div class="build-mark">BUILD // P18 // SYSTEM UI</div></footer>
 <div aria-hidden="true" aria-label="Просмотр изображения" aria-modal="true" class="lightbox" data-i18n-aria="lightboxAria" id="lightbox" role="dialog">
 <button aria-label="Закрыть" class="lightbox-button lightbox-close" data-i18n-aria="close" id="lightboxClose" type="button">×</button>
 <button aria-label="Предыдущее изображение" class="lightbox-button lightbox-prev" data-i18n-aria="previousImage" id="lightboxPrev" type="button">←</button>
@@ -345,5 +348,5 @@
 </div>
 
 
-<script src="js/site.js?v=17-grid"></script><script src="js/public-response.js?v=17-grid"></script></body>
+<script src="js/site.js?v=18-system-ui"></script><script src="js/public-response.js?v=18-system-ui"></script></body>
 </html>
