@@ -21,7 +21,7 @@
   </aside>
   <header class="site-header">
     <div class="shell nav">
-      <a class="brand" href="index.html#top" aria-label="ХИЩЕНИЕ / THEFT">ХИЩЕНИЕ <span>/ THEFT</span></a>
+      <a class="brand" href="index.html" aria-label="ХИЩЕНИЕ / THEFT">ХИЩЕНИЕ <span>/ THEFT</span></a>
       <div class="header-slogan" data-i18n="slogan">В системе нет безопасности</div>
       <nav class="nav-links" id="primaryNav" aria-label="Основная навигация" data-i18n-aria="navAria">
         <a href="index.html#about" data-i18n="navAbout">О фильме</a>
@@ -132,14 +132,16 @@
   <footer>
     <strong>ХИЩЕНИЕ / THEFT</strong><br><br>
     <span data-i18n="footer">Официальный сайт фильма · фильм находится в разработке</span>
-    <div class="security-easter-egg">
-      <button id="securityToggle" class="security-toggle" type="button" aria-expanded="false" aria-controls="securityPanel" data-i18n="securityTeaser">SYS // SECURITY: PRESENT</button>
-      <div class="security-panel" id="securityPanel" hidden><strong data-i18n="securityTitle">На сайте есть безопасность</strong><p data-i18n="securityText">Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва, а также ваши реакции и ответы, если вы ими пользуетесь. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.</p></div>
-    </div>
-    <div class="build-mark">BUILD // P18 // SYSTEM UI</div>
+    <div class="build-mark">BUILD // P19 // ARCHIVE + FAQ</div>
   </footer>
 
   <script src="js/site.js?v=18-system-ui"></script>
   <script src="js/public-response.js?v=18-system-ui"></script>
+
+<script>
+(function(){
+  document.querySelectorAll('a.brand').forEach(a=>a.addEventListener('click',function(){ this.setAttribute('href','index.html'); }));
+})();
+</script>
 </body>
 </html>
