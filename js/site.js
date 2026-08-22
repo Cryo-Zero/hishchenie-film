@@ -51,14 +51,14 @@
   const sectionCodes = [
     ['top','00 / ENTRY'], ['about','01 / DOSSIER'], ['materials','02 / ARCHIVE'],
     ['trailer','03 / SIGNAL'], ['watch','04 / ACCESS'], ['cast','05 / SUBJECTS'],
-    ['faq','06 / FAQ'], ['contacts','07 / CONTACT']
+    ['faq','06 / FAQ'], ['contacts','07 / CONTACT'], ['reviewsTop','R / RESPONSE'], ['reviewWorkspace','R1 / FEED']
   ].map(([id, code]) => [document.getElementById(id), code]).filter(([el]) => el);
 
   function updateScrollUI() {
     const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
     const pct = Math.max(0, Math.min(100, scrollY / max * 100));
     if (scrollProgress) scrollProgress.style.width = `${pct}%`;
-    if (railProgress) railProgress.textContent = `${String(Math.round(pct)).padStart(2,'0')}% / 2045`;
+    if (railProgress) railProgress.style.height = `${pct}%`;
     if (railSection && sectionCodes.length) {
       const y = scrollY + innerHeight * .34;
       let active = sectionCodes[0];
@@ -227,7 +227,7 @@
       return;
     }
     const subject = item.dataset.subject || 'SUBJECT';
-    const name = dossierText(item, 'strong');
+    const name = dossierText(item, '.cast-actor-source');
     const role = dossierText(item, 'em');
     dossierSubject.textContent = `${subject} // IDENTIFIED`;
     dossierName.textContent = name;

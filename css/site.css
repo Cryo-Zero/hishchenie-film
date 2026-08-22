@@ -3116,3 +3116,104 @@
   .subject-dossier.is-revealed .dossier-reveal > * { transition: none !important; }
 }
 
+
+
+/* ========================================================================== */
+/* P16 / OPOR GRID + SUBJECTS — external alignment, cast hierarchy, channel  */
+/* ========================================================================== */
+
+/* Restore the moving fill inside the right system rail. */
+.rail-track i { height: 0; will-change: height; box-shadow: 0 0 8px rgba(155,196,199,.28); }
+
+/* SUBJECTS: the heading and the left rail share one guide. The dossier keeps
+   its own size; only the external edges obey the support grid. */
+#cast { --cast-rail: clamp(365px, 31.5vw, 455px); }
+#cast .section-head { width: var(--cast-rail); margin-bottom: 24px; }
+#cast .section-head h2 { font-size: clamp(40px,4.45vw,62px); white-space: nowrap; }
+#cast .cast-console { grid-template-columns: var(--cast-rail) minmax(0,1fr); gap: 24px; align-items: start; }
+#cast .cast-list-item {
+  grid-template-columns: 108px minmax(0,1fr) 18px;
+  gap: 16px;
+  min-height: 58px;
+  padding-left: 14px;
+  padding-right: 15px;
+}
+#cast .cast-list-item > span {
+  color: #557174;
+  font-size: 8px;
+  letter-spacing: 1.45px;
+}
+#cast .cast-list-item em {
+  display: block;
+  color: #86a2a4;
+  font-size: 12px;
+  font-style: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#cast .cast-actor-source { display: none !important; }
+#cast .subject-dossier h3 {
+  margin-top: 18px;
+  font-size: clamp(25px,2.25vw,35px);
+  letter-spacing: -1.1px;
+}
+#cast .dossier-role { font-size: 14px; }
+
+/* Reviews: both columns sit on the same top and bottom guides. */
+.community-hero-grid { align-items: stretch; }
+.community-hero-copy { display: flex; flex-direction: column; min-height: 100%; }
+.community-hero-copy > .section-label { margin-top: 0; }
+.community-hero-copy .community-metrics { margin-top: auto; padding-top: 30px; }
+.audience-pulse { min-height: 100%; height: 100%; align-self: stretch; --pulse-speed: 2.65s; --pulse-density: .45; --pulse-level: .18; }
+.audience-pulse-wave span { animation-duration: var(--pulse-speed); opacity: calc(.26 + var(--pulse-density) * .52); }
+.pulse-live.is-closed { color: #806867; }
+.pulse-live.is-closed b { background:#9a615f; box-shadow:0 0 9px rgba(154,97,95,.32); animation:none; }
+
+/* Feed controls: only New / Old / Popular. Status belongs to the feed itself. */
+.community-feed-toolbar { align-items: flex-start; }
+.community-feed-heading { display: grid; gap: 7px; min-width: 160px; }
+.community-feed-heading .service-badge { margin-top: 5px; width: max-content; max-width: 100%; }
+.review-sort { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-self: center; }
+.review-sort-button {
+  min-height: 38px;
+  padding: 9px 15px;
+  font-size: 8px;
+  letter-spacing: .9px;
+}
+.service-badge.is-closed { color:#9c7471; border-color:#543b3a; background:rgba(36,16,15,.22); }
+.service-badge.is-closed i { background:#9c615e; box-shadow:0 0 8px rgba(156,97,94,.36); }
+.channel-closed .review-composer .score-field,
+.channel-closed .review-composer .review-text-field,
+.channel-closed .review-submit-row { opacity:.52; }
+.channel-closed .review-composer button:disabled,
+.channel-closed .review-composer textarea:disabled { cursor:not-allowed; }
+
+/* The lower workspace keeps equal external shell margins; inner cards may be
+   different sizes by design. */
+.community-layout { width:100%; }
+.community-sidebar, .review-feed { min-width:0; }
+
+@media (max-width:1100px) and (min-width:821px) {
+  #cast { --cast-rail: clamp(310px,38vw,390px); }
+  #cast .section-head h2 { font-size: clamp(38px,5vw,52px); }
+  #cast .cast-list-item { grid-template-columns: 96px minmax(0,1fr) 18px; }
+}
+@media (max-width:820px) {
+  #cast .section-head { width:100%; }
+  #cast .section-head h2 { white-space:normal; }
+  #cast .cast-console { grid-template-columns:1fr; gap:20px; }
+  #cast .cast-list-item { grid-template-columns: 96px minmax(0,1fr) 18px; }
+  .community-hero-copy .community-metrics { margin-top: 0; padding-top: 26px; }
+  .audience-pulse { height:auto; min-height:300px; }
+  .community-feed-toolbar { gap:14px; }
+  .review-sort { justify-content:flex-start; align-self:flex-start; }
+  .review-sort-button { min-height:40px; padding:9px 14px; }
+}
+@media (max-width:520px) {
+  #cast .cast-list-item { grid-template-columns: 88px minmax(0,1fr) 18px; gap:10px; }
+  #cast .cast-list-item > span { font-size:7px; }
+  #cast .cast-list-item em { font-size:11px; }
+  .review-sort { width:100%; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+  .review-sort-button { min-width:0; padding:8px 5px; font-size:7px; }
+}
