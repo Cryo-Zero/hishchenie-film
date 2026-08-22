@@ -6,7 +6,7 @@
   const PROJECT_REF = 'xltwwvutqkpmtmlavngi';
   const SESSION_KEY = `theft-${PROJECT_REF}-auth-v4`;
   const AUTH_LOCK_NAME = `theft-${PROJECT_REF}-auth-lock-v4`;
-  const CLIENT_REVISION = 'P16-grid-subjects';
+  const CLIENT_REVISION = 'P17-global-grid-avatars';
   const REQUEST_TIMEOUT = 18000;
   const AUTH_TIMEOUT = 30000;
   const WRITE_TIMEOUT = 30000;
@@ -260,13 +260,16 @@
     return p;
   }
 
+  const AVATAR_LIBRARY_SIZE = 16;
+
   function avatarSvg(seed, style = 1, size = 72) {
     const n = Math.abs(Number(seed) || 1);
+    // avatar_style intentionally remains 1..6 in the database for backward
+    // compatibility. The seed fans those six stored styles across sixteen
+    // locally hosted cinematic portraits, so no schema migration is needed.
     const s = Math.max(1, Math.min(6, Number(style) || 1));
-    // P14 uses six locally hosted cinematic portraits. The seed still changes
-    // the crop/scan treatment, so rerolls feel varied without external avatar
-    // services, user uploads or additional personal data.
-    const file = `assets/images/avatars/subject-${String(s).padStart(2,'0')}.webp`;
+    const portraitIndex = ((n + (s - 1) * 5) % AVATAR_LIBRARY_SIZE) + 1;
+    const file = `assets/images/avatars/subject-${String(portraitIndex).padStart(2,'0')}.webp`;
     const shiftX = ((n % 9) - 4) * 0.32;
     const shiftY = (((Math.floor(n / 11)) % 7) - 3) * 0.24;
     const scale = 1.01 + (n % 5) * 0.008;
@@ -396,7 +399,7 @@
       const span=$('span',badge);
       if(span){
         const base=next==='online'?t('serviceOnline'):next==='offline'?t('serviceOffline'):next==='closed'?t('serviceClosed'):t('serviceChecking');
-        span.textContent=`${base} · P16`;
+        span.textContent=`${base} · P17`;
         span.title=detail||CLIENT_REVISION;
       }
     }
@@ -425,7 +428,7 @@
 
   async function refreshChannelState(){
     try{const data=await rpcGet('get_public_channel_state_v1'); applyChannelState(data||{});}
-    catch(err){console.warn('[P16/channel]',err); setServiceState('offline',err.code);}
+    catch(err){console.warn('[P17/channel]',err); setServiceState('offline',err.code);}
   }
 
   function pluralRatings(count) {
@@ -480,7 +483,7 @@
     const rc=$('#ratingsCount'); if(rc)rc.textContent=`${total} ${pluralRatings(total)}`;
   }
 
-  async function refreshStats(){ try{const data=await rpcGet('get_public_stats_v2');updateStatsUI(data||{});setServiceState(state.channel?.reviews_enabled===false?'closed':'online');}catch(err){console.error('[P16/stats]',err);setServiceState('offline',err.code);}}
+  async function refreshStats(){ try{const data=await rpcGet('get_public_stats_v2');updateStatsUI(data||{});setServiceState(state.channel?.reviews_enabled===false?'closed':'online');}catch(err){console.error('[P17/stats]',err);setServiceState('offline',err.code);}}
 
   function applyTranslations(){
     document.documentElement.lang=state.lang;
@@ -629,7 +632,7 @@
     if(!$('#reviewsList'))return;
     const seq=++state.feedSeq;state.sort=sort;state.filter='all';filter='all';$$('.review-sort-button').forEach(b=>b.classList.toggle('active',b.dataset.sort===sort));
     try{const rows=await rpcGet('get_public_reviews_v3',{p_sort:sort,p_filter:filter,p_limit:40,p_offset:0});if(seq!==state.feedSeq)return;state.reviews=Array.isArray(rows)?rows:[];renderReviews(state.reviews);setServiceState(state.channel?.reviews_enabled===false?'closed':'online');}
-    catch(err){if(seq!==state.feedSeq)return;console.error('[P16/feed]',err);setServiceState('offline',err.code);const l=$('#reviewsList');if(l)l.replaceChildren(Object.assign(document.createElement('div'),{className:'reviews-empty',textContent:t('loadError')}));}
+    catch(err){if(seq!==state.feedSeq)return;console.error('[P17/feed]',err);setServiceState('offline',err.code);const l=$('#reviewsList');if(l)l.replaceChildren(Object.assign(document.createElement('div'),{className:'reviews-empty',textContent:t('loadError')}));}
   }
 
   function renderReviews(rows){

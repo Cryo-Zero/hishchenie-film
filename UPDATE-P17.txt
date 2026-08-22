@@ -1,0 +1,28 @@
+ХИЩЕНИЕ / THEFT — P17 GLOBAL GRID + AVATARS
+
+UPDATE ONLY. Existing film media is not duplicated.
+
+REPLACE:
+- /index.html
+- /reviews.html
+- /css/site.css
+- /js/public-response.js
+
+ADD:
+- /assets/images/avatars/subject-07.webp ... subject-16.webp
+
+WHAT CHANGED:
+- One symmetric global support grid is now used across desktop pages.
+- Left and right outer page margins are always equal.
+- The hero remains the reference for the global desktop composition.
+- SUBJECTS list/dossier now obey the same global guides while keeping independent widths.
+- SUBJECT labels are more readable; actor names remain only inside the dossier.
+- Reviews/profile workspace is constrained to the same symmetric support grid.
+- Header, archive, main sections and reviews page inherit the same outer grid.
+- Avatar library grows from 6 to 16 locally hosted cinematic portraits.
+- No Supabase schema migration is required for the avatar expansion.
+- Build marker/cache revision updated to P17.
+
+BACKEND:
+- Review channel remains CLOSED in Supabase.
+- No SQL needs to be run for P17.
