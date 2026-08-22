@@ -1,0 +1,43 @@
+HISHCHENIE / THEFT — P21 TRUE DESIGNER EDITION
+================================================
+
+P21 is a full desktop visual rebuild, not a CSS skin over P20.
+
+REPLACE / ADD
+-------------
+/index.html
+/reviews.html
+/css/site.css
+/css/p21-designer.css
+/js/site.js
+/js/public-response.js
+/docs/QA-P21.md
+
+KEEP
+----
+/assets/
+/admin/
+/tools/
+all existing author materials and avatar files
+
+P20 files css/p20-designer.css and js/p20-designer.js are no longer referenced.
+They can be removed after P21 is verified in main, but leaving them in the repo does not affect the site.
+
+NO SQL MIGRATION IS REQUIRED.
+Supabase schema and review permissions are not changed by P21.
+Reviews remain in their current channel state.
+
+P21 DESIGN GOALS
+----------------
+1. One coherent 2045 system interface across the whole site.
+2. Symmetric global desktop gutters left/right.
+3. Film materials remain canonical author files; no generated scenes are presented as film canon.
+4. ARCHIVE is the one intentional exception to the global gutter: its tab protrudes from the left wall and the drawer slides with the tab without shifting the page.
+5. Archive lightbox keeps the drawer open, contains the image instead of stretching it to the entire screen, and provides previous/next navigation and pagination.
+6. About, Trailer, Access, Subjects, Public Response, FAQ and Contact share one visual grammar.
+7. SUBJECT DOSSIER and SYSTEM RESPONSE are stable panels; content changes without layout jumps.
+8. FAQ uses the approved eight questions.
+9. RU/EN and Supabase community logic remain wired through public-response.js.
+10. P21 replaces the P20 overlay approach with an integrated structure + interaction pass.
+
+Suggested branch: p21-true-designer-edition
