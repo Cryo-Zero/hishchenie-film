@@ -1,0 +1,69 @@
+HISHCHENIE / THEFT — P22 MOCKUP MATCH
+=====================================
+
+Purpose
+-------
+P22 is the correction to P21. P21 preserved too much of the previous landing-page composition. P22 deliberately moves the live desktop site toward the approved full-page design board instead of merely restyling individual cards.
+
+Visible changes
+---------------
+1. HERO
+   - Full-bleed author image becomes the visual environment of the first screen.
+   - Title and system status sit over the scene instead of beside a separate poster card.
+   - Desktop composition is denser and more cinematic.
+
+2. GLOBAL SYSTEM
+   - Compact header, quieter typography, thin system lines and a dark industrial grid.
+   - Global left/right gutters remain symmetrical.
+   - Sections are closer together and read as one film interface, not independent landing-page blocks.
+
+3. ABOUT
+   - Public dossier is now a strong horizontal split: text/data at left, author still at right.
+   - The still behaves as a cinematic frame rather than a small card.
+
+4. ARCHIVE / MATERIALS
+   - ARCHIVE remains the one exception allowed to occupy the left wall outside the global gutter.
+   - Drawer comes from the wall and its handle travels with it.
+   - Main material viewer is broad, dark and restrained.
+   - Fullscreen/lightbox keeps the image framed and supports previous/next navigation.
+
+5. TRAILER
+   - Wide SIGNAL frame centered in the same film-system language.
+
+6. WATCH / ACCESS
+   - Compact distribution panel and current signal monitor.
+
+7. SUBJECTS
+   - Left subject directory + permanent dossier at right retained, but composition is denser and aligned to the same interface grid.
+
+8. PUBLIC RESPONSE
+   - Large editorial title and Audience Pulse monitor, matching the full design board.
+
+9. FAQ
+   - Query list + persistent verified response panel retained and visually integrated.
+
+10. CONTACT / FOOTER
+   - Closing cinematic still behind the contact channel.
+   - Compact system footer.
+
+Functionality retained
+----------------------
+- RU / EN
+- burger navigation on smaller screens
+- header rating
+- right scroll rail
+- author archive and material navigation
+- framed image lightbox with pagination
+- subject dossier
+- Audience Pulse / public response integration
+- FAQ system response
+- Supabase review integration and current closed publication state
+
+Database
+--------
+No SQL migration is required.
+
+Install
+-------
+Replace/upload the files from this package while keeping the existing assets/ and admin/ directories.
+Suggested branch: p22-mockup-match
