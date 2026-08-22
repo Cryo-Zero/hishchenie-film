@@ -1,0 +1,23 @@
+ХИЩЕНИЕ / THEFT — P16 GRID + SUBJECTS
+
+REPLACE:
+/index.html
+/reviews.html
+/css/site.css
+/js/site.js
+/js/public-response.js
+
+Supabase:
+P16 public channel-state RPC is already applied to production. Do not run SQL manually.
+
+Main changes:
+- SUBJECTS left rail now shows SUBJECT + character/role only; actor name lives in dossier.
+- SUBJECT label enlarged; dossier actor name reduced.
+- Cast heading/list/dossier aligned to one external support grid.
+- Reviews hero pulse and rating cards share top/bottom support guides.
+- Review service badge moved into PUBLIC FEED.
+- Review controls reduced to New / Old / Popular.
+- Badge dynamically reflects whether review writes are enabled in Supabase.
+- Cross-page HISHCHENIE brand link returns to exact top.
+- Right system rail progress fill restored.
+- Audience Pulse reacts more visibly to average rating and signal count.
