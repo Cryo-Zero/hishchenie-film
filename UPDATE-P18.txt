@@ -1,0 +1,51 @@
+HISHCHENIE / THEFT — P18 SYSTEM UI
+
+UPDATE ONLY. Existing film assets are not duplicated.
+
+REPLACE:
+- index.html
+- reviews.html
+- css/site.css
+- js/site.js
+- js/public-response.js
+
+WHAT CHANGED
+1. MATERIALS
+- Closed ARCHIVE frame now uses the same responsive 16:9 media footprint as the trailer.
+- Lightbox remains full-size.
+- Thumbnails stay below the frame; navigation remains subtle.
+
+2. GLOBAL GRID / ACTORS / REVIEWS
+- Existing global symmetric left/right support grid is preserved.
+- Actors list and SUBJECT DOSSIER start on the same top guide.
+- A fixed visible gap is enforced between the actors rail and dossier.
+- A fixed visible gap is enforced between profile and PUBLIC FEED on reviews.html.
+
+3. HOME AUDIENCE CARD
+- The separate audience-score strip below the hero was removed.
+- Header rating remains the early score indicator.
+
+4. HOME LINK FROM REVIEWS
+- Brand on reviews.html now goes to index.html#top.
+- JS prevents browser scroll restoration from returning to Materials or another old position.
+
+5. FAQ / SYSTEM QUERY
+- FAQ rebuilt as a stable two-column console similar to SUBJECTS.
+- Left: QUERY_01 ... QUERY_10.
+- Right: permanent SYSTEM RESPONSE panel.
+- Selecting a query does not move page geometry.
+- Added system status/source/message fields and additional confirmed-safe questions.
+- RU and EN text included.
+
+6. HEADER
+- Desktop header changed to a calmer two-level layout.
+- Brand/slogan/language/rating remain on the upper row.
+- All existing navigation items remain visible on a separate lower row.
+- Existing mobile burger behavior is preserved.
+
+BACKEND
+- No Supabase migration required.
+- Review channel state remains exactly as configured before P18.
+
+RECOMMENDED BRANCH
+p18-system-ui

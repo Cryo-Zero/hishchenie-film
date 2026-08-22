@@ -6,7 +6,7 @@
   const PROJECT_REF = 'xltwwvutqkpmtmlavngi';
   const SESSION_KEY = `theft-${PROJECT_REF}-auth-v4`;
   const AUTH_LOCK_NAME = `theft-${PROJECT_REF}-auth-lock-v4`;
-  const CLIENT_REVISION = 'P17-global-grid-avatars';
+  const CLIENT_REVISION = 'P18-system-ui';
   const REQUEST_TIMEOUT = 18000;
   const AUTH_TIMEOUT = 30000;
   const WRITE_TIMEOUT = 30000;
@@ -63,12 +63,18 @@
       audienceSignal: 'Сигнал аудитории', audienceSignalCopy: 'Оценка зрителей доступна сразу — полный раздел отзывов открыт отдельно.', openReviews: 'Открыть отзывы',
       audiencePulse: 'Пульс аудитории', audiencePulseAria: 'Пульс аудитории и статистика оценок', pulseSamples: 'Сигналов', pulseAverage: 'Средняя',
       pulsePositive: 'Положительных', pulseState: 'Канал', pulseLive: 'LIVE', pulseFoot: 'PUBLIC RESPONSE // LIVE SIGNAL',
-      faqLabel: '06 / FAQ', faqTitle: 'Часто задаваемые вопросы', faqIntro: 'Короткие ответы о фильме и этом публичном архиве. Факты о релизе обновляются только после подтверждения командой.',
-      faqQ1: 'Когда выйдет фильм?', faqA1: 'Точная дата релиза пока не объявлена. Фильм находится в разработке; подтверждённая дата появится на этом сайте.',
-      faqQ2: 'Где можно будет посмотреть «Хищение»?', faqA2: 'Площадки появятся в разделе «Где посмотреть» после подтверждения релиза. Сейчас они помечены как ожидающие.',
-      faqQ3: 'На каком языке трейлер?', faqA3: 'Оригинальная звуковая дорожка трейлера — на русском. Текст внутри авторских постеров также может оставаться на русском.',
-      faqQ4: 'Будут ли английские субтитры?', faqA4: 'Возможность английских субтитров предусмотрена, но публиковать обещание до согласования с автором мы не будем.',
-      faqQ5: 'Как оставить отзыв?', faqA5: 'Откройте отдельную вкладку «Отзывы», выберите оценку от 0 до 10 и при желании добавьте текст. Email, телефон и обычная регистрация не нужны.',
+      faqLabel: '06 / SYSTEM QUERY', faqTitle: 'Часто задаваемые вопросы', faqIntro: 'Ответы от системы. Публикуются только подтверждённые данные.', faqListAria: 'Список часто задаваемых вопросов',
+      faqQ1: 'Когда выйдет фильм?', faqA1: 'Точная дата релиза будет объявлена, когда система завершит разработку. Подтверждённая дата появится на этом сайте.', faqStatus1: 'ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ', faqMessage1: 'НЕПОДТВЕРЖДЁННЫЕ ДАТЫ НЕ ПУБЛИКУЮТСЯ',
+      faqQ2: 'Где можно будет посмотреть фильм?', faqA2: 'Площадки появятся в разделе «Где посмотреть» после подтверждения релиза.', faqStatus2: 'ОЖИДАНИЕ РЕЛИЗА', faqMessage2: 'СПИСОК ПЛОЩАДОК ПУБЛИКУЕТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ',
+      faqQ3: 'Будут ли английские субтитры?', faqA3: 'Английские субтитры можно добавить после согласования с автором. До подтверждения сайт не обещает их наличие.', faqStatus3: 'ОЖИДАНИЕ РЕШЕНИЯ', faqMessage3: 'НЕПОДТВЕРЖДЁННЫЕ ФУНКЦИИ НЕ ОБЪЯВЛЯЮТСЯ КАК ГОТОВЫЕ',
+      faqQ4: 'Кто работает над фильмом?', faqA4: 'Подтверждённые имена режиссёра и актёров публикуются на этом сайте. Состав может дополняться по мере подтверждения материалов.', faqStatus4: 'ПУБЛИЧНЫЕ ДАННЫЕ', faqMessage4: 'В ДОСЬЕ ПОПАДАЮТ ТОЛЬКО ПОДТВЕРЖДЁННЫЕ ДАННЫЕ',
+      faqQ5: 'Как связаться с проектом?', faqA5: 'Официальный публичный контакт автора находится в разделе «Контакты».', faqStatus5: 'КАНАЛ ДОСТУПЕН', faqMessage5: 'ИСПОЛЬЗУЙТЕ ОПУБЛИКОВАННЫЙ КАНАЛ СВЯЗИ',
+      faqQ6: 'На сайте есть безопасность?', faqA6: 'Да. Для профиля отзывов не нужны email, телефон или пароль. Сайт использует технический идентификатор и хранит только данные, необходимые для работы профиля и отзывов.', faqStatus6: 'ПРОТОКОЛ АКТИВЕН', faqMessage6: 'МИНИМУМ ДАННЫХ // ЛОКАЛЬНАЯ ПРИВЯЗКА ПРОФИЛЯ',
+      faqQ7: 'Почему даты релиза скрыты?', faqA7: 'Потому что проект находится в разработке. Сайт не публикует неподтверждённые даты как официальные.', faqStatus7: 'ДАТА НЕ ПОДТВЕРЖДЕНА', faqMessage7: 'СИСТЕМА ОЖИДАЕТ ОФИЦИАЛЬНОГО СИГНАЛА',
+      faqQ8: 'Будут ли новости о съёмках?', faqA8: 'Подтверждённые обновления можно добавлять на сайт по мере появления новых материалов от автора фильма.', faqStatus8: 'КАНАЛ ОБНОВЛЕНИЙ', faqMessage8: 'НОВЫЕ МАТЕРИАЛЫ ПУБЛИКУЮТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ',
+      faqQ9: 'Что за история у «Хищения»?', faqA9: 'История разворачивается в 2045 году в системе, где человек должен доказать обществу свою пользу. Подробнее — в разделе «О фильме».', faqStatus9: 'ДОСЬЕ ОТКРЫТО', faqMessage9: 'БАЗОВАЯ ИНФОРМАЦИЯ ДОСТУПНА В ПУБЛИЧНОМ АРХИВЕ',
+      faqQ10: 'Можно ли поддержать проект?', faqA10: 'Отдельный официальный способ поддержки проекта пока не опубликован. Если он появится, информация будет размещена на этом сайте.', faqStatus10: 'КАНАЛ НЕ ОБЪЯВЛЕН', faqMessage10: 'НЕ ИСПОЛЬЗУЙТЕ НЕПОДТВЕРЖДЁННЫЕ СПОСОБЫ ПОДДЕРЖКИ',
+      faqResponseHeader: 'SYSTEM RESPONSE // VERIFIED DATA', faqStatusLabel: 'Статус запроса', faqSourceLabel: 'Источник', faqSourceValue: 'ОФИЦИАЛЬНЫЙ КАНАЛ', faqMessageLabel: 'Системное сообщение', faqUpdateLabel: 'Последнее обновление',
       signalLog1: 'Трейлер доступен', signalLog2: 'Публичный архив открыт', signalLog3: 'Релиз ожидает подтверждения', signalNow: 'СЕЙЧАС', signalPending: 'PENDING',
       galleryAlt01: 'Обложка фильма «Хищение»', galleryAlt02: 'Постер фильма «Хищение» — пианино', galleryAlt03: 'Постер фильма «Хищение» — дедушка и ребёнок', galleryAlt04: 'Постер фильма «Хищение» — человек в капюшоне', galleryAlt05: 'Постер фильма «Хищение»', galleryAlt06: 'Постер фильма «Хищение» — герой в разрушенном городе', galleryAlt07: 'Постер фильма «Хищение» — ведущая', galleryAlt08: 'Постер фильма «Хищение» — город', galleryAlt09: 'Постер фильма «Хищение» — Гор', galleryAlt10: 'Кадры из фильма «Хищение»', galleryAlt11: 'Визуальный материал фильма «Хищение»',
       contactsLabel: '07 / CONTACT', contactsTitle: 'Контакты',
@@ -133,12 +139,18 @@
       audienceSignal: 'Audience signal', audienceSignalCopy: 'The audience score is visible early; the full community feed lives on a dedicated reviews page.', openReviews: 'Open reviews',
       audiencePulse: 'Audience pulse', audiencePulseAria: 'Audience pulse and rating statistics', pulseSamples: 'Signals', pulseAverage: 'Average',
       pulsePositive: 'Positive', pulseState: 'Channel', pulseLive: 'LIVE', pulseFoot: 'PUBLIC RESPONSE // LIVE SIGNAL',
-      faqLabel: '06 / FAQ', faqTitle: 'Frequently asked questions', faqIntro: 'Short answers about the film and this public archive. Release facts are updated only after confirmation by the film team.',
-      faqQ1: 'When will the film be released?', faqA1: 'The exact release date has not been announced. The film is in development; a confirmed date will appear on this website.',
-      faqQ2: 'Where will THEFT be available?', faqA2: 'Platforms will appear in the Watch section after the release is confirmed. For now they are marked as pending.',
-      faqQ3: 'What language is the trailer in?', faqA3: 'The trailer uses its original Russian audio. Text embedded in the original poster artwork may also remain in Russian.',
-      faqQ4: 'Will there be English subtitles?', faqA4: 'English subtitles are technically planned for, but we will not promise them publicly until they are confirmed with the author.',
-      faqQ5: 'How do I leave a review?', faqA5: 'Open the dedicated Reviews tab, choose a score from 0 to 10 and optionally add text. No email, phone number or conventional registration is required.',
+      faqLabel: '06 / SYSTEM QUERY', faqTitle: 'Frequently asked questions', faqIntro: 'System responses. Only confirmed information is published.', faqListAria: 'Frequently asked questions list',
+      faqQ1: 'When will the film be released?', faqA1: 'The exact release date will be announced when the system completes development. A confirmed date will appear on this website.', faqStatus1: 'AWAITING CONFIRMATION', faqMessage1: 'UNCONFIRMED DATES ARE NOT PUBLISHED',
+      faqQ2: 'Where will the film be available?', faqA2: 'Platforms will appear in the Watch section after the release is confirmed.', faqStatus2: 'AWAITING RELEASE', faqMessage2: 'PLATFORM LIST IS PUBLISHED AFTER CONFIRMATION',
+      faqQ3: 'Will there be English subtitles?', faqA3: 'English subtitles can be added after approval with the filmmaker. The site will not promise them before confirmation.', faqStatus3: 'AWAITING DECISION', faqMessage3: 'UNCONFIRMED FEATURES ARE NOT ANNOUNCED AS AVAILABLE',
+      faqQ4: 'Who is working on the film?', faqA4: 'Confirmed director and cast names are published on this website. The list can expand as new material is confirmed.', faqStatus4: 'PUBLIC DATA', faqMessage4: 'ONLY CONFIRMED DATA ENTERS THE DOSSIER',
+      faqQ5: 'How can I contact the project?', faqA5: 'The filmmaker’s official public contact is available in the Contacts section.', faqStatus5: 'CHANNEL AVAILABLE', faqMessage5: 'USE THE PUBLISHED CONTACT CHANNEL',
+      faqQ6: 'Is this website secure?', faqA6: 'Yes. The review profile does not require email, phone number or a password. The site uses a technical identifier and stores only data needed for the profile and reviews.', faqStatus6: 'PROTOCOL ACTIVE', faqMessage6: 'MINIMUM DATA // LOCAL PROFILE BINDING',
+      faqQ7: 'Why is the release date hidden?', faqA7: 'Because the project is still in development. The site does not publish unconfirmed dates as official.', faqStatus7: 'DATE UNCONFIRMED', faqMessage7: 'SYSTEM AWAITS AN OFFICIAL SIGNAL',
+      faqQ8: 'Will there be production updates?', faqA8: 'Confirmed updates can be added to the site as new materials are received from the filmmaker.', faqStatus8: 'UPDATE CHANNEL', faqMessage8: 'NEW MATERIAL IS PUBLISHED AFTER CONFIRMATION',
+      faqQ9: 'What is THEFT about?', faqA9: 'The story takes place in 2045, in a system where every person must prove their value to society. More details are in the About section.', faqStatus9: 'DOSSIER OPEN', faqMessage9: 'BASIC INFORMATION IS AVAILABLE IN THE PUBLIC ARCHIVE',
+      faqQ10: 'Can I support the project?', faqA10: 'No separate official support method has been published yet. If one appears, it will be listed on this website.', faqStatus10: 'CHANNEL NOT ANNOUNCED', faqMessage10: 'DO NOT USE UNCONFIRMED SUPPORT METHODS',
+      faqResponseHeader: 'SYSTEM RESPONSE // VERIFIED DATA', faqStatusLabel: 'Query status', faqSourceLabel: 'Source', faqSourceValue: 'OFFICIAL CHANNEL', faqMessageLabel: 'System message', faqUpdateLabel: 'Last update',
       signalLog1: 'Trailer online', signalLog2: 'Public archive open', signalLog3: 'Release awaiting confirmation', signalNow: 'NOW', signalPending: 'PENDING',
       galleryAlt01: 'THEFT film cover', galleryAlt02: 'THEFT poster — piano scene', galleryAlt03: 'THEFT poster — grandfather and child', galleryAlt04: 'THEFT poster — hooded figure', galleryAlt05: 'THEFT film poster', galleryAlt06: 'THEFT poster — protagonist in a ruined city', galleryAlt07: 'THEFT poster — news anchor', galleryAlt08: 'THEFT poster — city', galleryAlt09: 'THEFT poster — Gor', galleryAlt10: 'Frames from THEFT', galleryAlt11: 'THEFT visual material',
       contactsLabel: '07 / CONTACT', contactsTitle: 'Contacts',
