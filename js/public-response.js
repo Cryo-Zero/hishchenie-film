@@ -55,6 +55,8 @@
       privacy: 'Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва, а также ваши реакции и ответы, если вы ими пользуетесь. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.',
       profanityFilter: 'Скрывать грубую лексику', profanityFilterHint: 'Оригинал отзыва не изменяется. Скрытые слова можно показать отдельно.',
       showOriginal: 'Показать оригинал', hideOriginal: 'Скрыть снова', profanityFiltered: 'Часть слов скрыта настройками просмотра.',
+      enterSubmit: 'ENTER — отправить · SHIFT+ENTER — новая строка',
+      rateLimited: 'Слишком много изменений за короткое время. Подождите несколько минут и попробуйте снова.',
       humanCheckNote: 'Перед первой публикацией система попросит пройти короткую проверку пользователя.', humanCheckTitle: 'Проверка пользователя', humanCheckPrompt: 'Решите простой пример, чтобы подтвердить публикацию.', humanCheckCancel: 'Отмена', humanCheckConfirm: 'Подтвердить', humanCheckWrong: 'Ответ неверный. Попробуйте ещё раз.', humanCheckLoading: 'Подготавливаем проверку…', humanCheckExpired: 'Проверка устарела. Запросите новую.',
       liveSync: 'Автообновление',
       latest: 'Новые', highest: 'С высокой оценкой', lowest: 'С низкой оценкой',
@@ -133,6 +135,8 @@
       privacy: 'No email, phone number or password. The site stores only a technical identifier, alias, avatar settings, score and review text, plus your reactions and replies if you use them. The profile is tied to this browser; clearing browser data may remove access to editing the old review.',
       profanityFilter: 'Hide strong language', profanityFilterHint: 'The original review is not changed. Hidden words can be revealed per review.',
       showOriginal: 'Show original', hideOriginal: 'Hide again', profanityFiltered: 'Some words are hidden by your viewing settings.',
+      enterSubmit: 'ENTER — submit · SHIFT+ENTER — new line',
+      rateLimited: 'Too many changes in a short period. Wait a few minutes and try again.',
       humanCheckNote: 'Before the first publication the system will ask for a short human check.', humanCheckTitle: 'Human check', humanCheckPrompt: 'Solve the simple example to confirm publication.', humanCheckCancel: 'Cancel', humanCheckConfirm: 'Confirm', humanCheckWrong: 'That answer is not correct. Try again.', humanCheckLoading: 'Preparing verification…', humanCheckExpired: 'Verification expired. Request a new one.',
       liveSync: 'Auto refresh',
       latest: 'Newest', highest: 'Highest score', lowest: 'Lowest score',
@@ -199,6 +203,9 @@
     profanityFilter: safeStorage.get('theft_profanity_filter') === '1',
     revealedReviews: new Set(),
     revealedReplies: new Set(),
+    replyCache: new Map(),
+    feedSignature: '',
+    feedShapeSignature: '',
     bootReady: false
   };
   const t = key => I18N[state.lang]?.[key] ?? I18N.ru[key] ?? key;
@@ -667,7 +674,8 @@
     }catch(err){
       console.error('[REVIVAL/review/save]',err,diag.events);
       const message=String(err?.message||'');
-      if(/expired|verification/i.test(message)) setStatus(t('humanCheckExpired'),'error');
+      if(/too many review changes|too many verification requests/i.test(message)) setStatus(t('rateLimited'),'error');
+      else if(/expired|verification/i.test(message)) setStatus(t('humanCheckExpired'),'error');
       else setStatus(`${t('saveError')} [${err.code||'SAVE'}]`,'error');
       if(err.status===0||err.status===408||err.status>=500)setServiceState('offline',err.code);
     }
@@ -686,7 +694,9 @@
       const sum=Math.max(0,oldAvg*Number(s.total_ratings||0)-oldRating);
       const positive=Math.max(0,oldPositive-(oldRating>=7?1:0));
       updateStatsUI({total_ratings:total,average_rating:total?sum/total:null,positive_ratings:positive,freshness:total<5?null:Math.round(positive*100/total)});
+      const deletedId=state.ownReview?.id;
       state.ownReview=null;state.selectedRating=null;
+      if(deletedId){state.reviews=state.reviews.filter(r=>r.id!==deletedId);state.openReplies.delete(deletedId);state.replyCache.delete(deletedId);renderReviews(state.reviews);}
       const ta=$('#reviewText');if(ta)ta.value='';
       updateCounter();updateRatingLabel();updateComposerUI();setStatus(t('deleted'),'success');
       announceCommunityChange('review_deleted');
@@ -697,11 +707,31 @@
 
   function formatDate(v){if(!v)return'';return new Intl.DateTimeFormat(state.lang==='ru'?'ru-RU':'en-US',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(v));}
 
+  function feedShapeSignature(rows){
+    return JSON.stringify((rows||[]).map(r=>[r.id,r.rating,r.review_text,r.created_at,r.updated_at,r.alias_code,r.alias_number,r.display_name,r.avatar_seed,r.avatar_style,r.is_official,r.is_pinned]));
+  }
+  function feedFullSignature(rows){
+    return JSON.stringify((rows||[]).map(r=>[r.id,r.like_count,r.reply_count,r.has_official_reply]));
+  }
+  function patchReviewCounters(rows){
+    const list=$('#reviewsList');if(!list)return;
+    (rows||[]).forEach(r=>{
+      const card=list.querySelector(`[data-review-id="${CSS.escape(String(r.id))}"]`);if(!card)return;
+      const like=card.querySelector('[data-review-action="like"] span');if(like)like.textContent=String(Number(r.like_count||0));
+      const replies=card.querySelector('[data-review-action="replies"]');if(replies)replies.textContent=`${t('replies')} · ${Number(r.reply_count||0)}`;
+    });
+  }
   async function loadReviews(sort=state.sort,filter=state.filter){
     if(!$('#reviewsList'))return;
     const seq=++state.feedSeq;state.sort=sort;state.filter='all';filter='all';$$('.review-sort-button').forEach(b=>b.classList.toggle('active',b.dataset.sort===sort));
-    try{const rows=await rpcGet('get_public_reviews_v3',{p_sort:sort,p_filter:filter,p_limit:40,p_offset:0});if(seq!==state.feedSeq)return;state.reviews=Array.isArray(rows)?rows:[];renderReviews(state.reviews);setServiceState(state.channel?.reviews_enabled===false?'closed':'online');}
-    catch(err){if(seq!==state.feedSeq)return;console.error('[P17/feed]',err);setServiceState('offline',err.code);const l=$('#reviewsList');if(l)l.replaceChildren(Object.assign(document.createElement('div'),{className:'reviews-empty',textContent:t('loadError')}));}
+    try{
+      const rowsRaw=await rpcGet('get_public_reviews_v3',{p_sort:sort,p_filter:filter,p_limit:40,p_offset:0});if(seq!==state.feedSeq)return;
+      const rows=Array.isArray(rowsRaw)?rowsRaw:[];
+      const shape=feedShapeSignature(rows),full=feedFullSignature(rows);
+      if(shape===state.feedShapeSignature && $('#reviewsList')?.children.length){state.reviews=rows;if(full!==state.feedSignature)patchReviewCounters(rows);state.feedSignature=full;setServiceState(state.channel?.reviews_enabled===false?'closed':'online');return;}
+      state.reviews=rows;renderReviews(rows);setServiceState(state.channel?.reviews_enabled===false?'closed':'online');
+    }
+    catch(err){if(seq!==state.feedSeq)return;console.error('[REVIVAL/feed]',err);setServiceState('offline',err.code);const l=$('#reviewsList');if(l&&!l.children.length)l.replaceChildren(Object.assign(document.createElement('div'),{className:'reviews-empty',textContent:t('loadError')}));}
   }
 
   // Optional display-only strong-language filter. The database always keeps
@@ -745,9 +775,10 @@
 
   function renderReviews(rows){
     const list=$('#reviewsList');if(!list)return;
+    state.feedShapeSignature=feedShapeSignature(rows);state.feedSignature=feedFullSignature(rows);
     if(!rows.length){list.replaceChildren(Object.assign(document.createElement('div'),{className:'reviews-empty',textContent:t('reviewsEmpty')}));return;}
     const frag=document.createDocumentFragment();rows.forEach(r=>frag.append(renderReviewCard(r)));list.replaceChildren(frag);
-    state.openReplies.forEach(id=>{const c=list.querySelector(`[data-review-id="${CSS.escape(id)}"] .review-replies`);if(c)loadReplies(id,c);});
+    state.openReplies.forEach(id=>{const c=list.querySelector(`[data-review-id="${CSS.escape(id)}"] .review-replies`);if(c){const cached=state.replyCache.get(id);if(cached?.rows)renderReplies(id,cached.rows,c);loadReplies(id,c,{silent:!!cached});}});
   }
 
   function renderReviewCard(r){
@@ -781,8 +812,8 @@
       reveal.addEventListener('click',()=>{revealed?state.revealedReviews.delete(r.id):state.revealedReviews.add(r.id);renderReviews(state.reviews);});
       actions.append(reveal);
     }
-    const like=document.createElement('button');like.type='button';like.className=`review-action-button${state.ownLikes.has(r.id)?' is-active':''}`;like.disabled=state.channel?.likes_enabled===false;like.innerHTML=`♡ <span>${Number(r.like_count||0)}</span> · ${t('useful')}`;like.addEventListener('click',()=>toggleLike(r.id,like));
-    const replies=document.createElement('button');replies.type='button';replies.className='review-action-button';replies.disabled=state.channel?.replies_enabled===false;replies.textContent=`${t('replies')} · ${Number(r.reply_count||0)}`;
+    const like=document.createElement('button');like.type='button';like.dataset.reviewAction='like';like.className=`review-action-button${state.ownLikes.has(r.id)?' is-active':''}`;like.disabled=state.channel?.likes_enabled===false;like.innerHTML=`♡ <span>${Number(r.like_count||0)}</span> · ${t('useful')}`;like.addEventListener('click',()=>toggleLike(r.id,like));
+    const replies=document.createElement('button');replies.type='button';replies.dataset.reviewAction='replies';replies.className='review-action-button';replies.disabled=state.channel?.replies_enabled===false;replies.textContent=`${t('replies')} · ${Number(r.reply_count||0)}`;
     const panel=document.createElement('div');panel.className='review-replies';panel.hidden=true;
     replies.addEventListener('click',()=>{panel.hidden=!panel.hidden;if(!panel.hidden){state.openReplies.add(r.id);loadReplies(r.id,panel);}else state.openReplies.delete(r.id);});
     actions.append(like,replies);card.append(actions,panel);return card;
@@ -791,9 +822,18 @@
   const interactionBusy=new Set();
   async function toggleLike(reviewId,button){if(interactionBusy.has(`like:${reviewId}`))return;interactionBusy.add(`like:${reviewId}`);button.disabled=true;try{await ensureIdentityProfile();const data=await rpcPost('toggle_review_like_v2',{p_review_id:reviewId});data.liked?state.ownLikes.add(reviewId):state.ownLikes.delete(reviewId);const r=state.reviews.find(x=>x.id===reviewId);if(r)r.like_count=Number(data.like_count||0);renderReviews(state.reviews);announceCommunityChange('like_changed');}catch(err){console.error('[REVIVAL/like]',err);}finally{interactionBusy.delete(`like:${reviewId}`);button.disabled=false;}}
 
-  async function loadReplies(reviewId,panel){
-    if(interactionBusy.has(`replies:${reviewId}`))return;interactionBusy.add(`replies:${reviewId}`);panel.hidden=false;panel.textContent=t('serviceChecking');
-    try{const rows=await rpcGet('get_public_replies_v1',{p_review_id:reviewId});renderReplies(reviewId,Array.isArray(rows)?rows:[],panel);}catch(err){panel.textContent=t('loadError');}finally{interactionBusy.delete(`replies:${reviewId}`);}
+  function replySignature(rows){return JSON.stringify((rows||[]).map(r=>[r.id,r.reply_text,r.created_at,r.updated_at,r.alias_code,r.alias_number,r.display_name,r.avatar_seed,r.avatar_style,r.is_official]));}
+  async function loadReplies(reviewId,panel,{silent=false}={}){
+    if(interactionBusy.has(`replies:${reviewId}`))return;
+    const draft=panel.querySelector('textarea');if(silent&&draft&&document.activeElement===draft&&draft.value.trim())return;
+    interactionBusy.add(`replies:${reviewId}`);panel.hidden=false;
+    const cached=state.replyCache.get(reviewId);
+    if(!cached&&!silent)panel.textContent=t('serviceChecking');else panel.classList.add('is-refreshing');
+    try{
+      const rowsRaw=await rpcGet('get_public_replies_v1',{p_review_id:reviewId});const rows=Array.isArray(rowsRaw)?rowsRaw:[];const sig=replySignature(rows);
+      if(!cached||cached.signature!==sig){state.replyCache.set(reviewId,{signature:sig,rows});renderReplies(reviewId,rows,panel);}else state.replyCache.set(reviewId,{signature:sig,rows});
+    }catch(err){if(!cached)panel.textContent=t('loadError');}
+    finally{panel.classList.remove('is-refreshing');interactionBusy.delete(`replies:${reviewId}`);}
   }
   function renderReplies(reviewId,rows,panel){
     panel.replaceChildren();
@@ -826,13 +866,14 @@
   function announceCommunityChange(kind){try{communityBus?.postMessage({kind,t:Date.now()});}catch{} schedulePublicSync(80);}
   function startLiveSync(){
     clearInterval(liveSyncTimer);
-    liveSyncTimer=setInterval(syncPublicData,$('#reviewsList')?8000:30000);
+    liveSyncTimer=setInterval(syncPublicData,$('#reviewsList')?10000:30000);
   }
   if(communityBus)communityBus.onmessage=()=>schedulePublicSync(120);
 
   function bindEvents(){
     $('#langToggle')?.addEventListener('click',()=>setLanguage(state.lang==='ru'?'en':'ru'));
-    $('#rerollName')?.addEventListener('click',rerollName);$('#rerollAvatar')?.addEventListener('click',rerollAvatar);$('#submitReview')?.addEventListener('click',submitReview);$('#deleteReview')?.addEventListener('click',deleteReview);$('#reviewText')?.addEventListener('input',updateCounter);
+    $('#rerollName')?.addEventListener('click',rerollName);$('#rerollAvatar')?.addEventListener('click',rerollAvatar);$('#submitReview')?.addEventListener('click',submitReview);$('#deleteReview')?.addEventListener('click',deleteReview);
+    const reviewText=$('#reviewText');if(reviewText){reviewText.addEventListener('input',updateCounter);reviewText.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();submitReview();}});}
     $$('.rating-button').forEach(b=>b.addEventListener('click',()=>selectRating(b.dataset.rating)));$$('.review-sort-button').forEach(b=>b.addEventListener('click',()=>loadReviews(b.dataset.sort,'all')));
     const lexicon=$('#profanityFilterToggle');if(lexicon){setLexiconToggle();lexicon.addEventListener('change',()=>{state.profanityFilter=lexicon.checked;safeStorage.set('theft_profanity_filter',state.profanityFilter?'1':'0');state.revealedReviews.clear();state.revealedReplies.clear();setLexiconToggle();renderReviews(state.reviews);});}
     $('#securityToggle')?.addEventListener('click',()=>{const p=$('#securityPanel'),b=$('#securityToggle');if(!p||!b)return;const open=p.hidden;p.hidden=!open;b.setAttribute('aria-expanded',String(open));});

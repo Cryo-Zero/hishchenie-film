@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://xltwwvutqkpmtmlavngi.supabase.co" crossorigin>
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://cryo-zero.github.io/hishchenie-film/reviews.html">
-  <link rel="stylesheet" href="css/site.css?v=revival-r1">
+  <link rel="stylesheet" href="css/site.css?v=revival-r2">
 </head>
 <body class="community-page">
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
@@ -21,7 +21,7 @@
   </aside>
   <header class="site-header">
     <div class="shell nav">
-      <a class="brand" href="index.html" aria-label="ХИЩЕНИЕ / THEFT">ХИЩЕНИЕ <span>/ THEFT</span></a>
+      <a class="brand" href="index.html#top" aria-label="ХИЩЕНИЕ / THEFT">ХИЩЕНИЕ <span>/ THEFT</span></a>
       <div class="header-slogan" data-i18n="slogan">В системе нет безопасности</div>
       <nav class="nav-links" id="primaryNav" aria-label="Основная навигация" data-i18n-aria="navAria">
         <a href="index.html#about" data-i18n="navAbout">О фильме</a>
@@ -29,7 +29,7 @@
         <a href="index.html#trailer" data-i18n="navTrailer">Трейлер</a>
         <a href="index.html#watch" data-i18n="navWatch">Где посмотреть</a>
         <a href="index.html#cast" data-i18n="navCast">Актёры</a>
-        <a href="reviews.html" class="active" data-i18n="navReviews">Отзывы</a>
+        <a href="#reviewsTop" class="active" data-i18n="navReviews">Отзывы</a>
         <a href="index.html#faq" data-i18n="navFaq">FAQ</a>
       </nav>
       <div class="header-controls">
@@ -104,6 +104,7 @@
             <div class="review-text-field">
               <div class="field-heading inline-heading"><label for="reviewText"><span data-i18n="reviewLabel">Ваш отзыв</span> <small data-i18n="reviewOptional">необязательно</small></label><span id="reviewCounter">0 / 2000</span></div>
               <textarea id="reviewText" maxlength="2000" rows="7" data-i18n-placeholder="reviewPlaceholder" placeholder="Расскажите о впечатлениях от фильма…"></textarea>
+              <div class="review-enter-hint" data-i18n="enterSubmit">ENTER — отправить · SHIFT+ENTER — новая строка</div>
             </div>
             <div class="review-submit-row"><button class="button" id="submitReview" type="button" data-i18n="publish">Опубликовать</button><button class="button danger-button" id="deleteReview" type="button" hidden data-i18n="deleteReview">Удалить отзыв</button></div>
             <p class="human-check-note" data-i18n="humanCheckNote">Перед первой публикацией система попросит пройти короткую проверку пользователя.</p>
@@ -140,16 +141,11 @@
   <footer>
     <strong>ХИЩЕНИЕ / THEFT</strong><br><br>
     <span data-i18n="footer">Официальный сайт фильма · фильм находится в разработке</span>
-    <div class="build-mark">BUILD // REVIVAL R1 // COMMUNITY + ARCHIVE</div>
+    <div class="build-mark">BUILD // REVIVAL R2 // STABLE SECTIONS + FEED</div>
   </footer>
 
-  <script src="js/site.js?v=revival-r1"></script>
-  <script src="js/public-response.js?v=revival-r1"></script>
+  <script src="js/site.js?v=revival-r2"></script>
+  <script src="js/public-response.js?v=revival-r2"></script>
 
-<script>
-(function(){
-  document.querySelectorAll('a.brand').forEach(a=>a.addEventListener('click',function(){ this.setAttribute('href','index.html'); }));
-})();
-</script>
 </body>
 </html>
