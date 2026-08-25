@@ -1,0 +1,29 @@
+HISHCHENIE / THEFT — REVIVAL R2
+STABLE SECTIONS + FEED
+
+Frontend
+- Unified desktop section-title scale: clamp(36px, 2.75vw, 48px).
+- HERO film logotype remains intentionally independent from section-title scale.
+- Desktop sections use one viewport contract and exact sticky-header landing offsets.
+- Cross-page hash arrivals (including from reviews.html) are re-aligned after load.
+- MATERIALS and TRAILER media size is bounded by viewport height so controls stay inside the section.
+- MATERIALS progress rail stays inside its own bottom controls.
+- Lightbox counter moved away from the bottom progress rail.
+- FAQ response copy gets a fixed vertical slot; system data no longer jumps between questions.
+- FAQ reveal now cascades top-to-bottom like SUBJECT DOSSIER.
+
+Reviews
+- ENTER submits a review; SHIFT+ENTER inserts a new line.
+- Background polling no longer rebuilds an unchanged review feed.
+- Like/reply count-only changes patch in place.
+- Open reply panels use a cache and keep existing content during background refresh.
+- User-facing rate-limit error is explicit instead of a generic save error.
+- After deleting your own review, local UI removes it immediately and the composer returns to new-review state.
+
+Test data
+- 10 synthetic demo reviews, 6 replies and varied likes were seeded directly in the existing Supabase project.
+- Some demo text intentionally contains strong language to verify the optional display filter.
+- Marker: auth.users.raw_user_meta_data.seed = revival_r2_demo
+- Demo data is removable without touching real users.
+
+No advertising code and no full-film player were added.

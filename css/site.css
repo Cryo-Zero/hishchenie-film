@@ -3917,3 +3917,180 @@
   .lexicon-toggle { min-width:0; width:100%; }
   .admin-filterbar { grid-template-columns:1fr; }
 }
+
+/* ========================================================================== */
+/* REVIVAL R2 — VIEWPORT CONTRACT + STABLE QUERY + REVIEW FEED                */
+/* ========================================================================== */
+:root {
+  --section-title-size: clamp(36px, 2.75vw, 48px);
+  --section-space-y: clamp(24px, 3.2vh, 34px);
+}
+
+html { scroll-padding-top: var(--header-h); }
+main > section { scroll-margin-top: var(--header-h); }
+
+/* One visual contract for every desktop section. The film logotype in HERO is
+   intentionally not part of this scale: it is the title mark, not a section heading. */
+@media (min-width: 821px) {
+  #about h2,
+  #materials h2,
+  #trailer h2,
+  #watch h2,
+  #cast .section-head h2,
+  #faq .faq-section-head h2,
+  #contacts h2,
+  .community-hero h1 {
+    font-size: var(--section-title-size) !important;
+    line-height: .98 !important;
+    letter-spacing: -1.45px !important;
+  }
+
+  #about,
+  #materials,
+  #trailer,
+  #watch,
+  #cast,
+  #faq,
+  .community-hero,
+  .community-section {
+    min-height: calc(100svh - var(--header-h)) !important;
+    padding-top: var(--section-space-y) !important;
+    padding-bottom: var(--section-space-y) !important;
+    box-sizing: border-box;
+  }
+
+  #materials > .shell,
+  #trailer > .shell,
+  #cast > .shell,
+  #faq > .shell {
+    min-height: calc(100svh - var(--header-h) - (2 * var(--section-space-y)));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  #materials .section-head,
+  #trailer .section-head,
+  #cast .section-head,
+  #faq .faq-section-head {
+    margin-bottom: 18px !important;
+  }
+
+  /* Media sections share one bounded footprint. JS resolves the precise width
+     from the current viewport height; CSS prevents accidental spillover. */
+  #materials .archive-viewer,
+  #trailer .video-shell {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #materials .archive-stage,
+  #trailer .video-shell video {
+    max-height: calc(100svh - var(--header-h) - 232px) !important;
+  }
+  #materials .archive-stage {
+    min-height: 0 !important;
+  }
+  #materials .archive-bottom-controls {
+    min-height: 34px;
+    margin-top: 8px;
+  }
+  #materials .archive-pagination {
+    position: static !important;
+    transform: none !important;
+    justify-self: end;
+    align-self: center;
+    margin: 0;
+  }
+
+  #trailer .trailer-language-note {
+    margin-top: 9px !important;
+  }
+
+  /* QUERY: eight rows and the response panel fit in the same viewport. */
+  #faq .faq-query-item { min-height: 55px; }
+  #faq .faq-response-panel {
+    height: clamp(456px, calc(100svh - var(--header-h) - 182px), 560px);
+    min-height: 0;
+  }
+}
+
+/* The counter and the progress rail no longer compete for the same pixels in
+   the large image viewer. */
+.lightbox-counter {
+  position: absolute !important;
+  left: clamp(24px, 4vw, 70px) !important;
+  top: clamp(24px, 3.5vw, 54px) !important;
+  bottom: auto !important;
+  transform: none !important;
+  z-index: 4;
+  padding: 7px 10px;
+  border: 1px solid rgba(151,218,226,.12);
+  background: rgba(2,6,7,.48);
+  font: 8px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing: 1.6px;
+}
+.lightbox-pagination {
+  bottom: 24px !important;
+  z-index: 4;
+}
+
+/* FAQ keeps the information frame on one fixed guide regardless of how many
+   lines the answer occupies. Short answers simply leave intentional air. */
+.faq-response-panel { --faq-copy-slot: 196px; }
+.faq-response-content {
+  height: var(--faq-copy-slot);
+  min-height: var(--faq-copy-slot);
+  max-height: var(--faq-copy-slot);
+  overflow: auto;
+  scrollbar-width: thin;
+  padding-right: 8px;
+}
+.faq-system-box { margin-top: 18px !important; flex: 0 0 auto; }
+.faq-response-log { flex: 0 0 auto; }
+
+/* Actor-like staged reveal for SYSTEM RESPONSE. */
+.faq-response-content > *,
+.faq-system-box > div,
+.faq-response-log {
+  transition: opacity .22s ease, transform .34s cubic-bezier(.2,.78,.2,1);
+}
+.faq-response-panel.is-revealing .faq-response-content > *,
+.faq-response-panel.is-revealing .faq-system-box > div,
+.faq-response-panel.is-revealing .faq-response-log {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.faq-response-panel.is-revealed .faq-response-content > *,
+.faq-response-panel.is-revealed .faq-system-box > div,
+.faq-response-panel.is-revealed .faq-response-log {
+  opacity: 1;
+  transform: none;
+}
+.faq-response-panel.is-revealed .faq-response-content > *:nth-child(1) { transition-delay: .025s; }
+.faq-response-panel.is-revealed .faq-response-content > *:nth-child(2) { transition-delay: .065s; }
+.faq-response-panel.is-revealed .faq-response-content > *:nth-child(3) { transition-delay: .105s; }
+.faq-response-panel.is-revealed .faq-system-box > div:nth-child(1) { transition-delay: .14s; }
+.faq-response-panel.is-revealed .faq-system-box > div:nth-child(2) { transition-delay: .18s; }
+.faq-response-panel.is-revealed .faq-system-box > div:nth-child(3) { transition-delay: .22s; }
+.faq-response-panel.is-revealed .faq-system-box > div:nth-child(4) { transition-delay: .26s; }
+.faq-response-panel.is-revealed .faq-response-log { transition-delay: .30s; }
+
+/* Stable feed updates: while background data is reconciled, already rendered
+   replies stay visible instead of collapsing into a loading placeholder. */
+.review-replies.is-refreshing { opacity: .86; }
+.review-enter-hint {
+  margin-top: 7px;
+  color: #52696b;
+  font: 7px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing: 1.15px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 820px) {
+  .faq-response-content {
+    height: auto;
+    min-height: 176px;
+    max-height: none;
+  }
+  .lightbox-counter { left: 16px !important; top: 16px !important; }
+}

@@ -8,6 +8,7 @@
   const menu = $('#menuToggle');
   const nav = $('#primaryNav');
   const headerHeight = () => header?.offsetHeight || 0;
+  const motionReduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function closeNav() {
     body.classList.remove('nav-open');
@@ -29,14 +30,29 @@
     closeNav();
   });
 
-  // A cross-page brand link uses index.html#top. Force the exact origin instead
-  // of letting browser scroll-restoration revive the last position on index.html.
-  function enforceTopHash() {
-    if (location.hash !== '#top') return;
-    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'auto' }));
+  // Every section has an exact landing coordinate. This is used both for
+  // same-page navigation and for index.html#section arrivals from reviews.html.
+  function sectionTop(hash) {
+    if (!hash || hash === '#top') return 0;
+    const target = document.querySelector(hash);
+    if (!target) return null;
+    return Math.max(0, Math.round(target.getBoundingClientRect().top + window.scrollY - headerHeight()));
   }
-  enforceTopHash();
-  addEventListener('pageshow', enforceTopHash);
+  function scrollToHash(hash, behavior = 'auto') {
+    const top = sectionTop(hash);
+    if (top == null) return false;
+    window.scrollTo({ top, behavior });
+    return true;
+  }
+  function enforceInitialHash() {
+    if (!location.hash) return;
+    // Browser restoration can otherwise revive an unrelated position from the
+    // previous page. Two frames allow the sticky two-row header to settle.
+    requestAnimationFrame(() => requestAnimationFrame(() => scrollToHash(location.hash, 'auto')));
+    setTimeout(() => scrollToHash(location.hash, 'auto'), 90);
+  }
+  enforceInitialHash();
+  addEventListener('pageshow', enforceInitialHash);
 
   // Offset hash navigation under the sticky header.
   document.addEventListener('click', event => {
@@ -44,11 +60,9 @@
     if (!link) return;
     const hash = link.getAttribute('href');
     if (!hash || hash === '#') return;
-    const target = document.querySelector(hash);
-    if (!target) return;
+    if (sectionTop(hash) == null) return;
     event.preventDefault();
-    const top = hash === '#top' ? 0 : target.getBoundingClientRect().top + window.scrollY - headerHeight();
-    window.scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    scrollToHash(hash, motionReduced() ? 'auto' : 'smooth');
     history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
     closeNav();
   });
@@ -253,8 +267,10 @@
       if (archiveViewer) archiveViewer.style.removeProperty('--media-frame-width');
       return;
     }
-    const available = Math.max(340, innerHeight - headerHeight() - 215);
-    const width = Math.min(1040, available * 16 / 9);
+    // Reserve enough vertical room for the heading, metadata, pagination and
+    // the next section boundary. This keeps MATERIALS and SIGNAL self-contained.
+    const availableHeight = Math.max(300, Math.min(560, innerHeight - headerHeight() - 260));
+    const width = Math.min(1040, availableHeight * 16 / 9);
     if (videoShell) videoShell.style.width = `${width}px`;
     if (archiveViewer) archiveViewer.style.setProperty('--media-frame-width', `${width}px`);
   }
@@ -288,7 +304,6 @@
   let activeSubject = null;
   let dossierTimer = 0;
 
-  const motionReduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function dossierText(item, selector) {
     return item?.querySelector(selector)?.textContent?.trim() || '???';
@@ -397,14 +412,22 @@
     if (faqMessage) faqMessage.textContent = '???';
     if (faqLog) faqLog.textContent = 'SYSTEM LOG // Q00.STBY';
     faqPanel?.classList.remove('has-response');
-    if (animate && !motionReduced() && faqPanel) {
+    if (faqPanel) {
       faqPanel.classList.remove('is-revealed');
-      requestAnimationFrame(() => requestAnimationFrame(() => faqPanel.classList.add('is-revealed')));
+      if (animate && !motionReduced()) faqPanel.classList.add('is-revealing');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        faqPanel.classList.remove('is-revealing');
+        faqPanel.classList.add('is-revealed');
+      }));
     }
   }
   function renderFaq(item, animate = true) {
     if (!item || !faqPanel) return;
     if (activeFaq === item) { resetFaq(animate); return; }
+    if (animate && !motionReduced()) {
+      faqPanel.classList.remove('is-revealed');
+      faqPanel.classList.add('is-revealing');
+    }
     activeFaq = item;
     faqQueries.forEach(row => {
       const selected = row === item;
@@ -419,9 +442,17 @@
     if (faqMessage) faqMessage.textContent = faqText(item, '.faq-source-message', item.dataset.queryMessage || '—');
     if (faqLog) faqLog.textContent = `SYSTEM LOG // Q${qid.slice(-2)}.RSP`;
     faqPanel.classList.add('has-response');
-    if (!animate || motionReduced()) return;
-    faqPanel.classList.remove('is-revealed');
-    requestAnimationFrame(() => requestAnimationFrame(() => faqPanel.classList.add('is-revealed')));
+    if (!animate || motionReduced()) {
+      faqPanel.classList.remove('is-revealed');
+      faqPanel.classList.remove('is-revealing');
+      faqPanel.classList.add('is-revealed');
+      return;
+    }
+    faqPanel.classList.add('is-revealing');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      faqPanel.classList.remove('is-revealing');
+      faqPanel.classList.add('is-revealed');
+    }));
   }
 
   faqQueries.forEach(item => item.addEventListener('click', () => renderFaq(item, true)));
