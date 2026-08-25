@@ -1,0 +1,10 @@
+OPTIONAL REPOSITORY CLEANUP AFTER THE PATCH IS VERIFIED
+
+The client no longer selects this avatar:
+  assets/images/avatars/subject-09.webp
+
+You may delete that file from GitHub after REVIVAL R1 is confirmed working.
+It is not required for the patch to work; leaving it in the repository does not
+make it selectable because the JS selection pool explicitly excludes 09.
+
+Do not delete any other assets/files as part of this cleanup.

@@ -3765,3 +3765,155 @@
   .faq-response-content p { font-size: 13px; }
   .faq-query-item { grid-template-columns: 70px minmax(0,1fr) 16px; }
 }
+
+/* ========================================================================== */
+/* REVIVAL R1 — COMMUNITY + ARCHIVE                                           */
+/* ========================================================================== */
+
+/* ARCHIVE is the single deliberate exception to the global content grid. */
+#materials { overflow: visible; }
+.archive-viewer--drawer { position: relative; display: grid; gap: 1.25rem; }
+.archive-drawer-shell {
+  --archive-drawer-width: min(320px, 82vw);
+  position: fixed;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: min(70vh, 680px);
+  transform: translateY(-50%);
+  z-index: 95;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s ease;
+}
+.archive-drawer-shell.is-visible,
+.archive-drawer-shell.is-open { opacity: 1; }
+.archive-drawer-shell .archive-drawer,
+.archive-drawer-shell .archive-drawer-toggle { pointer-events: auto; }
+.archive-drawer {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: var(--archive-drawer-width);
+  height: min(70vh, 680px);
+  transform: translate(-100%, -50%);
+  opacity: 0;
+  overflow: auto;
+  padding: 1rem;
+  background: rgba(5, 9, 10, .975);
+  border: 1px solid rgba(151, 218, 226, .18);
+  box-shadow: 28px 0 70px rgba(0,0,0,.42);
+  transition: transform .36s cubic-bezier(.2,.78,.2,1), opacity .24s ease;
+}
+.archive-drawer-shell.is-open .archive-drawer {
+  transform: translate(0, -50%);
+  opacity: 1;
+}
+.archive-drawer-toggle {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  min-height: 126px;
+  padding: .92rem .56rem;
+  writing-mode: vertical-rl;
+  transform: translateY(-50%) rotate(180deg);
+  background: rgba(6, 10, 11, .96);
+  border: 1px solid rgba(151, 218, 226, .25);
+  color: var(--text, #e8f1f1);
+  letter-spacing: .25em;
+  font-size: .7rem;
+  transition: left .36s cubic-bezier(.2,.78,.2,1), border-color .2s ease, background .2s ease;
+}
+.archive-drawer-toggle:hover,
+.archive-drawer-toggle:focus-visible { border-color: rgba(194, 241, 246, .58); background: rgba(10, 18, 20, .98); }
+.archive-drawer-shell.is-open .archive-drawer-toggle { left: var(--archive-drawer-width); }
+.archive-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:.75rem; margin-bottom:1rem; font-size:.67rem; letter-spacing:.2em; }
+.archive-drawer-close { width:34px; height:34px; border:1px solid rgba(151,218,226,.18); background:transparent; color:inherit; }
+.archive-drawer-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.85rem; }
+.archive-drawer-grid .gallery-card { margin:0; padding:.35rem; border:1px solid rgba(151,218,226,.12); background:rgba(255,255,255,.015); cursor:pointer; transition:border-color .2s ease, transform .2s ease; }
+.archive-drawer-grid .gallery-card:hover { border-color:rgba(194,241,246,.32); transform:translateY(-1px); }
+.archive-drawer-grid .gallery-card.is-active { border-color:rgba(194,241,246,.55); box-shadow:0 0 0 1px rgba(194,241,246,.12) inset; }
+.archive-drawer-grid .gallery-card img { display:block; width:100%; aspect-ratio:3/4; object-fit:cover; }
+.archive-drawer-grid .gallery-card::after { content:attr(data-file) " // " attr(data-type); display:block; padding-top:.35rem; font-size:.56rem; letter-spacing:.12em; opacity:.68; }
+
+.archive-stage-wrap { display:grid; grid-template-columns:minmax(42px,54px) minmax(0,1fr) minmax(42px,54px); align-items:stretch; gap:.7rem; }
+.archive-stage { margin:0; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; cursor:zoom-in; }
+.archive-stage img { width:100%; height:100%; object-fit:contain; background:rgba(0,0,0,.13); }
+.gallery-button { min-height:100%; border:1px solid rgba(151,218,226,.08); background:transparent; display:flex; align-items:center; justify-content:center; opacity:.66; transition:opacity .2s ease,border-color .2s ease,background .2s ease; }
+.gallery-button:hover,.gallery-button:focus-visible { opacity:1; border-color:rgba(194,241,246,.28); background:rgba(151,218,226,.025); }
+.gallery-chevron { display:block; width:12px; height:12px; border-left:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:rotate(45deg); }
+.gallery-button.next .gallery-chevron { transform:rotate(225deg); }
+.archive-bottom-controls { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:1rem; }
+.archive-bottom-code { font-size:.69rem; letter-spacing:.23em; opacity:.78; }
+.archive-fullscreen { display:none !important; }
+.archive-pagination { display:flex; justify-content:flex-end; align-items:center; gap:.45rem; min-height:10px; }
+.archive-pagination i,.lightbox-pagination i { display:block; width:14px; height:2px; background:rgba(126,185,192,.18); transition:width .18s ease,background .18s ease; }
+.archive-pagination i.is-active,.lightbox-pagination i.is-active { width:22px; background:rgba(222,250,250,.94); }
+
+/* Large viewer: zoomed presentation, not browser-native fullscreen. */
+.lightbox { padding:clamp(34px,5vw,82px) clamp(56px,7vw,130px) 72px; background:rgba(1,4,5,.965); }
+.lightbox-image { max-width:min(82vw,1500px); max-height:82vh; width:auto; height:auto; object-fit:contain; box-shadow:0 22px 80px rgba(0,0,0,.42); }
+.lightbox-button { width:54px; height:76px; display:flex; align-items:center; justify-content:center; background:rgba(5,10,11,.5); border:1px solid rgba(151,218,226,.16); }
+.lightbox-prev,.lightbox-next { font-size:0; }
+.lightbox-chevron { display:block; width:14px; height:14px; border-left:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:rotate(45deg); }
+.lightbox-next .lightbox-chevron { transform:rotate(225deg); }
+.lightbox-counter { letter-spacing:.18em; }
+.lightbox-pagination { position:absolute; left:50%; bottom:28px; transform:translateX(-50%); display:flex; gap:.48rem; align-items:center; }
+
+/* FAQ: stable panel with an explicit close action. */
+.faq-response-header { position:relative; padding-right:44px; }
+.faq-response-close { position:absolute; right:0; top:-8px; width:34px; height:34px; background:transparent; border:1px solid rgba(151,218,226,.14); color:inherit; opacity:.6; transition:opacity .2s,border-color .2s; }
+.faq-response-close:hover,.faq-response-close:focus-visible { opacity:1; border-color:rgba(194,241,246,.4); }
+.faq-response-panel:not(.has-response) .faq-response-close { opacity:.25; }
+
+/* Community viewing controls. */
+.review-display-settings { display:flex; justify-content:flex-end; margin:.75rem 0 1.15rem; }
+.lexicon-toggle { min-width:min(100%,360px); display:grid; grid-template-columns:1fr auto; gap:1rem; align-items:center; padding:.8rem 1rem; border:1px solid rgba(151,218,226,.12); background:rgba(255,255,255,.012); cursor:pointer; }
+.lexicon-toggle span { display:grid; gap:.25rem; }
+.lexicon-toggle strong { font-size:.76rem; letter-spacing:.05em; font-weight:600; }
+.lexicon-toggle small { font-size:.65rem; line-height:1.45; opacity:.56; }
+.lexicon-toggle input { position:absolute; opacity:0; pointer-events:none; }
+.lexicon-toggle i { position:relative; width:38px; height:20px; border:1px solid rgba(151,218,226,.28); border-radius:999px; transition:background .2s,border-color .2s; }
+.lexicon-toggle i::after { content:""; position:absolute; width:12px; height:12px; left:3px; top:3px; border-radius:50%; background:rgba(193,230,233,.55); transition:transform .2s,background .2s; }
+.lexicon-toggle input:checked + i { background:rgba(79,185,195,.16); border-color:rgba(173,238,242,.55); }
+.lexicon-toggle input:checked + i::after { transform:translateX(18px); background:#c9f5f6; }
+.lexicon-reveal { border-color:rgba(209,235,237,.18); }
+.human-check-note { margin:.7rem 0 0; font-size:.68rem; line-height:1.55; opacity:.55; }
+
+.review-challenge-modal[hidden] { display:none; }
+.review-challenge-modal { position:fixed; inset:0; z-index:220; display:grid; place-items:center; padding:24px; background:rgba(1,4,5,.82); backdrop-filter:blur(8px); }
+.review-challenge-card { width:min(460px,100%); padding:1.4rem; border:1px solid rgba(173,238,242,.25); background:rgba(5,10,11,.985); box-shadow:0 24px 80px rgba(0,0,0,.55); }
+.review-challenge-card h3 { margin:.65rem 0 .35rem; font-size:1.35rem; }
+.review-challenge-card p { margin:0 0 1rem; opacity:.7; line-height:1.55; }
+.review-challenge-question { display:block; padding:1rem; margin:.6rem 0; text-align:center; font-size:1.75rem; letter-spacing:.1em; border:1px solid rgba(151,218,226,.12); }
+.review-challenge-card input { width:100%; padding:.8rem; background:transparent; color:inherit; border:1px solid rgba(151,218,226,.2); font-size:1.05rem; text-align:center; }
+.review-challenge-error { min-height:1.4rem; padding:.5rem 0; color:#d99a9a; font-size:.72rem; }
+.review-challenge-actions { display:flex; justify-content:flex-end; gap:.65rem; }
+.challenge-open { overflow:hidden; }
+
+/* Moderation panel. */
+.admin-filterbar { display:grid; grid-template-columns:minmax(220px,1fr) auto auto auto; gap:.65rem; margin:1rem 0 1.25rem; }
+.admin-filterbar input,.admin-filterbar select { min-height:42px; padding:.65rem .75rem; border:1px solid rgba(151,218,226,.15); background:#071011; color:inherit; }
+.admin-card.is-hidden { opacity:.68; border-style:dashed; }
+.admin-user-id { display:block; margin-top:.4rem; font-size:.62rem; color:rgba(176,215,218,.62); overflow-wrap:anywhere; }
+
+@media (max-width: 980px) {
+  .archive-drawer-shell { --archive-drawer-width:min(300px,84vw); }
+  .archive-stage-wrap { grid-template-columns:38px minmax(0,1fr) 38px; gap:.45rem; }
+  .lightbox { padding:44px 48px 68px; }
+  .lightbox-image { max-width:88vw; max-height:80vh; }
+  .admin-filterbar { grid-template-columns:1fr 1fr; }
+}
+@media (max-width: 700px) {
+  .archive-drawer-shell { --archive-drawer-width:min(286px,86vw); }
+  .archive-drawer-grid { gap:.65rem; }
+  .archive-stage { aspect-ratio:3/4; }
+  .archive-bottom-controls { grid-template-columns:1fr; }
+  .archive-pagination { justify-content:flex-start; }
+  .lightbox { padding:64px 34px 64px; }
+  .lightbox-image { max-width:92vw; max-height:76vh; }
+  .lightbox-button { width:42px; height:62px; }
+  .review-display-settings { justify-content:stretch; }
+  .lexicon-toggle { min-width:0; width:100%; }
+  .admin-filterbar { grid-template-columns:1fr; }
+}
