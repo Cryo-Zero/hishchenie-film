@@ -92,26 +92,50 @@
   }
 
   // ARCHIVE viewer ------------------------------------------------------------
+  const materialsSection = $('#materials');
+  const archiveShell = $('.archive-drawer-shell');
+  const archiveDrawer = $('#archiveDrawer');
+  const archiveToggle = $('#archiveDrawerToggle');
+  const archiveDrawerClose = $('#archiveDrawerClose');
   const stage = $('#archiveStage');
   const mainImage = $('#archiveMainImage');
-  const cards = $$('.archive-thumbs .gallery-card');
+  const cards = $$('#gallery .gallery-card');
   const prev = $('#galleryPrev');
   const next = $('#galleryNext');
   const code = $('#archiveCode');
   const counter = $('#archiveCounter');
+  const archivePagination = $('#archivePagination');
   const lightbox = $('#lightbox');
   const lightboxImage = $('#lightboxImage');
   const lightboxCounter = $('#lightboxCounter');
+  const lightboxPagination = $('#lightboxPagination');
   const lightboxClose = $('#lightboxClose');
   const lightboxPrev = $('#lightboxPrev');
   const lightboxNext = $('#lightboxNext');
   let archiveIndex = 0;
   let touchX = 0;
+  let materialsVisible = false;
 
   const archiveItems = cards.map((card, i) => {
     const img = $('img', card);
-    return { src: img?.getAttribute('src') || '', alt: img?.getAttribute('alt') || '', i18n: img?.dataset.i18nAlt || '', file: card.dataset.file || `MAT_${String(i+1).padStart(3,'0')}` };
+    return {
+      src: img?.getAttribute('src') || '',
+      alt: img?.getAttribute('alt') || '',
+      i18n: img?.dataset.i18nAlt || '',
+      file: card.dataset.file || `MAT_${String(i+1).padStart(3,'0')}`,
+      type: card.dataset.type || 'ARCHIVE'
+    };
   });
+
+  function renderDots(root, active) {
+    if (!root) return;
+    root.replaceChildren();
+    archiveItems.forEach((_, i) => {
+      const dot = document.createElement('i');
+      dot.className = i === active ? 'is-active' : '';
+      root.append(dot);
+    });
+  }
 
   function setArchive(index, focus = false) {
     if (!stage || !mainImage || !archiveItems.length) return;
@@ -121,23 +145,31 @@
     mainImage.alt = item.alt;
     if (item.i18n) mainImage.dataset.i18nAlt = item.i18n;
     stage.style.setProperty('--archive-bg', `url("${item.src.replace(/"/g,'%22')}")`);
-    if (code) code.textContent = `${item.file} // ARCHIVE`;
+    if (code) code.textContent = `${item.file} // ${item.type}`;
     if (counter) counter.textContent = `${String(archiveIndex+1).padStart(2,'0')} / ${String(archiveItems.length).padStart(2,'0')}`;
     cards.forEach((card, i) => {
       card.classList.toggle('is-active', i === archiveIndex);
       card.setAttribute('aria-current', i === archiveIndex ? 'true' : 'false');
     });
-    cards[archiveIndex]?.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'nearest' });
+    renderDots(archivePagination, archiveIndex);
+    if (lightbox?.classList.contains('open')) syncLightbox();
     if (focus) stage.focus({ preventScroll:true });
   }
 
-  function openLightbox(index = archiveIndex) {
-    if (!lightbox || !lightboxImage || !archiveItems.length) return;
-    archiveIndex = (index + archiveItems.length) % archiveItems.length;
+  function syncLightbox() {
+    if (!lightboxImage || !archiveItems.length) return;
     const item = archiveItems[archiveIndex];
     lightboxImage.src = item.src;
     lightboxImage.alt = item.alt;
-    lightboxCounter.textContent = `${archiveIndex+1} / ${archiveItems.length}`;
+    if (lightboxCounter) lightboxCounter.textContent = `${String(archiveIndex+1).padStart(2,'0')} / ${String(archiveItems.length).padStart(2,'0')}`;
+    renderDots(lightboxPagination, archiveIndex);
+  }
+
+  function openLightbox(index = archiveIndex) {
+    if (!lightbox || !archiveItems.length) return;
+    archiveIndex = (index + archiveItems.length) % archiveItems.length;
+    setArchive(archiveIndex);
+    syncLightbox();
     lightbox.classList.add('open');
     lightbox.setAttribute('aria-hidden','false');
     body.classList.add('lightbox-open');
@@ -150,11 +182,23 @@
     body.classList.remove('lightbox-open');
     stage?.focus({ preventScroll:true });
   }
-  function shiftLightbox(delta) { openLightbox(archiveIndex + delta); }
+  function shiftLightbox(delta) { setArchive(archiveIndex + delta); syncLightbox(); }
 
+  function setDrawer(open) {
+    if (!archiveShell || !archiveDrawer || !archiveToggle) return;
+    archiveShell.classList.toggle('is-open', open);
+    archiveDrawer.classList.toggle('is-open', open);
+    archiveDrawer.setAttribute('aria-hidden', String(!open));
+    archiveToggle.setAttribute('aria-expanded', String(open));
+    if (!open && !materialsVisible) archiveShell.classList.remove('is-visible');
+  }
+  function toggleDrawer() { setDrawer(!archiveShell?.classList.contains('is-open')); }
+
+  archiveToggle?.addEventListener('click', toggleDrawer);
+  archiveDrawerClose?.addEventListener('click', () => setDrawer(false));
+  cards.forEach((card, i) => card.addEventListener('click', () => setArchive(i, true)));
   prev?.addEventListener('click', e => { e.stopPropagation(); setArchive(archiveIndex-1); });
   next?.addEventListener('click', e => { e.stopPropagation(); setArchive(archiveIndex+1); });
-  cards.forEach((card, i) => card.addEventListener('click', () => setArchive(i, true)));
   stage?.addEventListener('click', e => { if (!e.target.closest('.gallery-button')) openLightbox(); });
   stage?.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(); }
@@ -168,8 +212,8 @@
   }, { passive:true });
 
   lightboxClose?.addEventListener('click', closeLightbox);
-  lightboxPrev?.addEventListener('click', () => shiftLightbox(-1));
-  lightboxNext?.addEventListener('click', () => shiftLightbox(1));
+  lightboxPrev?.addEventListener('click', e => { e.stopPropagation(); shiftLightbox(-1); });
+  lightboxNext?.addEventListener('click', e => { e.stopPropagation(); shiftLightbox(1); });
   lightbox?.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
   lightbox?.addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, { passive:true });
   lightbox?.addEventListener('touchend', e => {
@@ -177,15 +221,30 @@
     if (Math.abs(d) > 48) shiftLightbox(d < 0 ? 1 : -1);
   }, { passive:true });
   document.addEventListener('keydown', e => {
-    if (!lightbox?.classList.contains('open')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') shiftLightbox(-1);
-    if (e.key === 'ArrowRight') shiftLightbox(1);
+    if (lightbox?.classList.contains('open')) {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') shiftLightbox(-1);
+      if (e.key === 'ArrowRight') shiftLightbox(1);
+      return;
+    }
+    if (e.key === 'Escape' && archiveShell?.classList.contains('is-open')) setDrawer(false);
   });
+
+  // The ARCHIVE control is the deliberate exception to the global grid: while
+  // the materials section is on screen it lives on the physical left viewport wall.
+  if (materialsSection && archiveShell && 'IntersectionObserver' in window) {
+    const archiveObserver = new IntersectionObserver(entries => {
+      const visible = entries.some(entry => entry.isIntersecting);
+      materialsVisible = visible;
+      archiveShell.classList.toggle('is-visible', visible || archiveShell.classList.contains('is-open'));
+      if (!visible && !archiveShell.classList.contains('is-open')) archiveShell.classList.remove('is-visible');
+    }, { rootMargin:'-8% 0px -8% 0px', threshold:.05 });
+    archiveObserver.observe(materialsSection);
+  } else archiveShell?.classList.add('is-visible');
+
   if (archiveItems.length) setArchive(0);
 
   // Trailer and the closed ARCHIVE frame use the same visual media width.
-  // The lightbox remains full-size; only the in-page material viewer is matched.
   const videoShell = $('#videoShell');
   const archiveViewer = $('#archiveViewer');
   function fitMediaFrames() {
@@ -201,6 +260,16 @@
   }
   fitMediaFrames();
   addEventListener('resize', fitMediaFrames);
+
+  // Trailer starts gently. Once a visitor changes the level, remember their choice.
+  const trailerVideo = $('#trailerVideo');
+  if (trailerVideo) {
+    const storedVolume = Number(localStorage.getItem('theft_trailer_volume'));
+    trailerVideo.volume = Number.isFinite(storedVolume) && storedVolume >= 0 && storedVolume <= 1 ? storedVolume : .35;
+    trailerVideo.addEventListener('volumechange', () => {
+      try { localStorage.setItem('theft_trailer_volume', String(trailerVideo.volume)); } catch {}
+    });
+  }
 
   // SUBJECT DOSSIER ------------------------------------------------------------
   // The list never changes its geometry. A permanent panel on the right receives
@@ -299,43 +368,68 @@
   });
 
   // SYSTEM QUERY / FAQ --------------------------------------------------------
-  // Same external logic as SUBJECTS: a stable query rail on the left and one
-  // permanent response panel on the right. No layout jumping on selection.
+  // The question rail always stays visible. Selecting the same question twice
+  // closes the response and restores the neutral STANDBY state.
   const faqQueries = $$('.faq-query-item');
   const faqPanel = $('#faqResponsePanel');
+  const faqClose = $('#faqResponseClose');
   const faqCode = $('#faqResponseCode');
   const faqQuestion = $('#faqResponseQuestion');
   const faqAnswer = $('#faqResponseAnswer');
   const faqStatus = $('#faqResponseStatus');
   const faqMessage = $('#faqResponseMessage');
   const faqLog = $('#faqResponseLog');
-  let activeFaq = faqQueries[0] || null;
+  let activeFaq = null;
 
-  function faqText(item, selector) {
-    return item?.querySelector(selector)?.textContent?.trim() || '—';
+  function faqText(item, selector, fallback='—') {
+    return item?.querySelector(selector)?.textContent?.trim() || fallback;
   }
-
+  function resetFaq(animate = true) {
+    activeFaq = null;
+    faqQueries.forEach(row => {
+      row.classList.remove('is-selected');
+      row.setAttribute('aria-selected','false');
+    });
+    if (faqCode) faqCode.textContent = 'QUERY_00 // STANDBY';
+    if (faqQuestion) faqQuestion.textContent = '???';
+    if (faqAnswer) faqAnswer.textContent = document.documentElement.lang === 'en' ? 'Select a question // awaiting response' : 'Выберите вопрос // ожидание ответа';
+    if (faqStatus) faqStatus.textContent = '???';
+    if (faqMessage) faqMessage.textContent = '???';
+    if (faqLog) faqLog.textContent = 'SYSTEM LOG // Q00.STBY';
+    faqPanel?.classList.remove('has-response');
+    if (animate && !motionReduced() && faqPanel) {
+      faqPanel.classList.remove('is-revealed');
+      requestAnimationFrame(() => requestAnimationFrame(() => faqPanel.classList.add('is-revealed')));
+    }
+  }
   function renderFaq(item, animate = true) {
     if (!item || !faqPanel) return;
+    if (activeFaq === item) { resetFaq(animate); return; }
     activeFaq = item;
     faqQueries.forEach(row => {
       const selected = row === item;
       row.classList.toggle('is-selected', selected);
       row.setAttribute('aria-selected', String(selected));
     });
-    const code = item.dataset.query || 'QUERY_00';
-    if (faqCode) faqCode.textContent = `${code} // ${code === 'QUERY_01' ? 'RELEASE STATUS' : 'VERIFIED RESPONSE'}`;
-    if (faqQuestion) faqQuestion.textContent = faqText(item, 'strong[data-i18n]');
-    if (faqAnswer) faqAnswer.textContent = faqText(item, '.faq-source-answer');
-    if (faqStatus) faqStatus.textContent = faqText(item, '.faq-source-status');
-    if (faqMessage) faqMessage.textContent = faqText(item, '.faq-source-message');
-    if (faqLog) faqLog.textContent = `SYSTEM LOG // Q${code.slice(-2)}.RSP`;
+    const qid = item.dataset.query || 'QUERY_00';
+    if (faqCode) faqCode.textContent = item.dataset.queryCode || `${qid} // VERIFIED RESPONSE`;
+    if (faqQuestion) faqQuestion.textContent = faqText(item, 'strong[data-i18n]', '???');
+    if (faqAnswer) faqAnswer.textContent = faqText(item, '.faq-source-answer', '—');
+    if (faqStatus) faqStatus.textContent = faqText(item, '.faq-source-status', item.dataset.queryStatus || '—');
+    if (faqMessage) faqMessage.textContent = faqText(item, '.faq-source-message', item.dataset.queryMessage || '—');
+    if (faqLog) faqLog.textContent = `SYSTEM LOG // Q${qid.slice(-2)}.RSP`;
+    faqPanel.classList.add('has-response');
     if (!animate || motionReduced()) return;
     faqPanel.classList.remove('is-revealed');
     requestAnimationFrame(() => requestAnimationFrame(() => faqPanel.classList.add('is-revealed')));
   }
 
   faqQueries.forEach(item => item.addEventListener('click', () => renderFaq(item, true)));
-  if (activeFaq) { faqPanel?.classList.add('is-revealed'); renderFaq(activeFaq, false); }
-  addEventListener('theft:language', () => { if (activeFaq) renderFaq(activeFaq, false); });
+  faqClose?.addEventListener('click', () => resetFaq(true));
+  if (faqPanel) { faqPanel.classList.add('is-revealed'); resetFaq(false); }
+  addEventListener('theft:language', () => {
+    if (activeFaq) {
+      const item=activeFaq; activeFaq=null; renderFaq(item, false);
+    } else resetFaq(false);
+  });
 })();

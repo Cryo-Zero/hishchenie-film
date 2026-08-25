@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://xltwwvutqkpmtmlavngi.supabase.co" crossorigin>
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://cryo-zero.github.io/hishchenie-film/reviews.html">
-  <link rel="stylesheet" href="css/site.css?v=18-system-ui">
+  <link rel="stylesheet" href="css/site.css?v=revival-r1">
 </head>
 <body class="community-page">
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
@@ -106,6 +106,7 @@
               <textarea id="reviewText" maxlength="2000" rows="7" data-i18n-placeholder="reviewPlaceholder" placeholder="Расскажите о впечатлениях от фильма…"></textarea>
             </div>
             <div class="review-submit-row"><button class="button" id="submitReview" type="button" data-i18n="publish">Опубликовать</button><button class="button danger-button" id="deleteReview" type="button" hidden data-i18n="deleteReview">Удалить отзыв</button></div>
+            <p class="human-check-note" data-i18n="humanCheckNote">Перед первой публикацией система попросит пройти короткую проверку пользователя.</p>
             <div class="review-status" id="reviewStatus" aria-live="polite"></div>
           </div>
         </aside>
@@ -123,6 +124,13 @@
               <button class="review-sort-button" type="button" data-sort="popular" data-i18n="popular">Популярные</button>
             </div>
           </div>
+          <div class="review-display-settings">
+            <label class="lexicon-toggle" for="profanityFilterToggle">
+              <span><strong data-i18n="profanityFilter">Скрывать грубую лексику</strong><small data-i18n="profanityFilterHint">Оригинал отзыва не изменяется. Скрытые слова можно показать отдельно.</small></span>
+              <input id="profanityFilterToggle" type="checkbox" role="switch" aria-checked="false">
+              <i aria-hidden="true"></i>
+            </label>
+          </div>
           <div class="reviews-list" id="reviewsList"><div class="reviews-empty" data-i18n="reviewsEmpty">Пока нет отзывов. Ваша оценка может стать первой.</div></div>
         </div>
       </div>
@@ -132,11 +140,11 @@
   <footer>
     <strong>ХИЩЕНИЕ / THEFT</strong><br><br>
     <span data-i18n="footer">Официальный сайт фильма · фильм находится в разработке</span>
-    <div class="build-mark">BUILD // P19 // ARCHIVE + FAQ</div>
+    <div class="build-mark">BUILD // REVIVAL R1 // COMMUNITY + ARCHIVE</div>
   </footer>
 
-  <script src="js/site.js?v=18-system-ui"></script>
-  <script src="js/public-response.js?v=18-system-ui"></script>
+  <script src="js/site.js?v=revival-r1"></script>
+  <script src="js/public-response.js?v=revival-r1"></script>
 
 <script>
 (function(){

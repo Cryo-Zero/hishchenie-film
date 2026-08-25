@@ -1,0 +1,54 @@
+HISHCHENIE / THEFT — REVIVAL R1
+COMMUNITY + ARCHIVE
+
+Baseline
+--------
+Built on the restored pre-mockup P19 site. This patch intentionally does not
+redesign the rest of the site and does not include advertising or full-film
+hosting.
+
+Frontend changes
+----------------
+1. Profile avatar subject-09 is excluded from every generated/rerolled avatar.
+   The physical file may remain in the repository, but the client never selects it.
+2. Reviews are open again and use the new write RPC submit_my_review_v5.
+3. First review requires a short server-side human verification challenge.
+4. Duplicate/repeated actions are guarded in the client and rate-limited server-side.
+5. Feed/stats auto-sync across tabs and periodically while the page is visible.
+6. Strong-language filter is optional and display-only. Database text is never altered.
+7. Likes and replies remain available and use their rate-limited v2 write RPCs.
+8. FAQ works like SUBJECT DOSSIER: question list stays visible, same question or X closes response to standby.
+9. Trailer starts at 35% volume unless the visitor has already chosen a volume.
+10. ARCHIVE is attached to the physical left browser wall. Drawer and button move together.
+11. ARCHIVE selection does not close the drawer.
+12. Gallery arrows are single technical chevrons with large hit areas.
+13. Explicit FULLSCREEN button is removed. Clicking the image opens the custom overlay viewer.
+14. Overlay viewer keeps previous/next navigation, counter and thin pagination.
+15. AUTHOR FILES // VERIFIED and thin archive pagination are preserved.
+16. Admin panel gets search, visibility and sort controls and uses admin_get_reviews_v2.
+
+Supabase
+--------
+The required backend migration has ALREADY BEEN APPLIED to the existing project:
+  xltwwvutqkpmtmlavngi
+
+DO NOT run additional SQL for this release.
+
+Public write channel after migration:
+  reviews: enabled
+  likes: enabled
+  replies: enabled
+  human check: first review
+
+Admin panel
+-----------
+/admin/ is ready, but no administrator account has been enrolled yet.
+Create a private email/password Auth user in Supabase first. Then add that user's
+UUID to public.admins. Do not use or share the visitor anonymous account as admin.
+See docs/ADMIN-SETUP-REVIVAL-R1.md.
+
+Not included
+------------
+- Advertising: waiting for the author's requirements.
+- Full film embed / RUTUBE: waiting for the film/publication decision.
+- Any unrelated visual deletion or redesign.

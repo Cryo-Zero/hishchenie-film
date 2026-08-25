@@ -7,11 +7,11 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#040707">
   <title>THEFT // CONTROL PANEL</title>
-  <link rel="stylesheet" href="../css/site.css?v=14-final">
+  <link rel="stylesheet" href="../css/site.css?v=revival-r1">
 </head>
 <body class="admin-page">
   <main class="admin-shell">
-    <div class="admin-brand">THEFT // CONTROL PANEL // P14</div>
+    <div class="admin-brand">THEFT // CONTROL PANEL // REVIVAL R1</div>
 
     <section class="admin-login" id="adminLogin">
       <div class="section-label">ACCESS // RESTRICTED</div>
@@ -29,9 +29,15 @@
         <button class="micro-button" id="adminLogout" type="button">Выйти</button>
       </div>
       <div class="admin-status" id="adminStatus" role="status" aria-live="polite"></div>
+      <div class="admin-filterbar">
+        <input id="adminSearch" type="search" placeholder="Поиск по псевдониму, тексту или ID" autocomplete="off">
+        <select id="adminVisibility" aria-label="Статус отзывов"><option value="all">Все</option><option value="public">Опубликованные</option><option value="hidden">Скрытые</option></select>
+        <select id="adminOrder" aria-label="Сортировка"><option value="new">Новые</option><option value="old">Старые</option><option value="rating_desc">Оценка ↓</option><option value="rating_asc">Оценка ↑</option></select>
+        <button class="micro-button" id="adminRefresh" type="button">Обновить</button>
+      </div>
       <div class="admin-grid" id="adminReviews"></div>
     </section>
   </main>
-  <script src="../js/admin.js?v=14-final"></script>
+  <script src="../js/admin.js?v=revival-r1"></script>
 </body>
 </html>
