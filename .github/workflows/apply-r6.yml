@@ -1,0 +1,66 @@
+name: Apply REVIVAL R6 staged patch
+
+on:
+  push:
+    branches:
+      - revival-r6-profile-safety-report
+    paths:
+      - .github/workflows/apply-r6.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-r6:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rebuild verified R6 patch from reserve
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://raw.githubusercontent.com/Cryo-Zero/hishchenie-film-v2/main/archives/update-packages/r6/staging'
+          : > /tmp/r6.patch
+          for n in 01 02 03 04; do
+            curl --fail --location --retry 5 --retry-delay 2 "$base/part-$n.patch" >> /tmp/r6.patch
+          done
+          echo '61927246e06c3ba3d47e52aea49c9178f435af00a80fd200db632c7ca455fe6d  /tmp/r6.patch' | sha256sum --check --strict
+          git apply --check /tmp/r6.patch
+          git apply /tmp/r6.patch
+
+      - name: Static QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check js/site.js
+          node --check js/public-response.js
+          git diff --check
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          class IDs(HTMLParser):
+              def __init__(self):
+                  super().__init__(); self.ids=[]
+              def handle_starttag(self, tag, attrs):
+                  for k,v in attrs:
+                      if k=='id' and v: self.ids.append(v)
+          for name in ('index.html','reviews.html'):
+              p=IDs(); p.feed(Path(name).read_text(encoding='utf-8'))
+              dup=sorted({x for x in p.ids if p.ids.count(x)>1})
+              if dup: raise SystemExit(f'{name}: duplicate ids: {dup}')
+              print(f'{name}: ids OK ({len(p.ids)})')
+          PY
+
+      - name: Commit verified R6 files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html reviews.html css/site.css js/public-response.js UPDATE-REVIVAL-R6.txt docs/QA-REVIVAL-R6.md docs/PROJECT-STATE-R6.md docs/supabase/REVIVAL-R6_unique_aliases.sql
+          git commit -m 'REVIVAL R6: profile safety, bug report and unique aliases'
+          git push origin HEAD:revival-r6-profile-safety-report
