@@ -1,0 +1,62 @@
+name: Apply R6 curated alias refinement
+
+on:
+  push:
+    branches:
+      - revival-r6-profile-safety-report
+    paths:
+      - .github/workflows/apply-r6-alias-curation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-alias-curation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout R6 branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch verified alias patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 5 --retry-delay 2 \
+            'https://raw.githubusercontent.com/Cryo-Zero/hishchenie-film-v2/main/archives/update-packages/r6/staging/alias-curation.patch' \
+            -o /tmp/alias-curation.patch
+          echo '6e4fe5a90aacd91b329b53c4645e96806e001e0d905b42dd87a5bb1316c4fc5f  /tmp/alias-curation.patch' | sha256sum --check --strict
+          git apply --check /tmp/alias-curation.patch
+          git apply /tmp/alias-curation.patch
+
+      - name: Alias QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check js/public-response.js
+          git diff --check
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('js/public-response.js').read_text(encoding='utf-8')
+          start=s.index('    curated: [')
+          end=s.index('\n    ]\n  };', start)+7
+          pairs=re.findall(r"\['([^']*)','([^']*)'\]", s[start:end])
+          assert len(pairs)==98, len(pairs)
+          assert not any(ru in {'Тот, Кто Ждёт','Тот, Кто Помнит'} for ru,en in pairs)
+          assert max(len(f'{x} 999') for pair in pairs for x in pair) <= 40
+          assert 'const alias_code = `curated_${randomInt(ALIAS.curated.length)}`;' in s
+          assert "alias_code ~ '^(role_|world_|noun_|sr_|node_|gate_|curated_)'" in Path('docs/database/supabase/REVIVAL-R6_unique_aliases.sql').read_text(encoding='utf-8')
+          print('curated aliases OK:', len(pairs))
+          PY
+
+      - name: Commit alias refinement
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add js/public-response.js docs/current/PROJECT-STATE.md docs/database/supabase/REVIVAL-R6_unique_aliases.sql docs/releases/revival/R6/QA.md docs/releases/revival/R6/UPDATE.txt
+          git commit -m 'R6: curate numbered audience aliases'
+          git push origin HEAD:revival-r6-profile-safety-report
