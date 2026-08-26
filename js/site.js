@@ -9,6 +9,7 @@
   const nav = $('#primaryNav');
   const headerHeight = () => header?.offsetHeight || 0;
   const motionReduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (location.hash && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
 
 
   // One staged-reveal engine is shared by SUBJECT DOSSIER and SYSTEM QUERY.
@@ -59,18 +60,34 @@
     if (!target) return null;
     return Math.max(0, Math.round(target.getBoundingClientRect().top + window.scrollY - headerHeight()));
   }
+  function instantScrollTo(top) {
+    const html = document.documentElement;
+    const previous = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    window.scrollTo(0, top);
+    // Restore authored smooth scrolling only after the anchor position is committed.
+    requestAnimationFrame(() => { html.style.scrollBehavior = previous; });
+  }
   function scrollToHash(hash, behavior = 'auto') {
     const top = sectionTop(hash);
     if (top == null) return false;
-    window.scrollTo({ top, behavior });
+    if (behavior === 'auto' || behavior === 'instant') instantScrollTo(top);
+    else window.scrollTo({ top, behavior });
     return true;
   }
+  let anchorBooting = false;
   function enforceInitialHash() {
-    if (!location.hash) return;
+    const hash = location.hash;
+    if (!hash) { anchorBooting = false; return; }
+    anchorBooting = true;
     // Browser restoration can otherwise revive an unrelated position from the
     // previous page. Two frames allow the sticky two-row header to settle.
-    requestAnimationFrame(() => requestAnimationFrame(() => scrollToHash(location.hash, 'auto')));
-    setTimeout(() => scrollToHash(location.hash, 'auto'), 90);
+    requestAnimationFrame(() => requestAnimationFrame(() => scrollToHash(hash, 'auto')));
+    setTimeout(() => {
+      scrollToHash(hash, 'auto');
+      anchorBooting = false;
+      updateScrollUI();
+    }, 90);
   }
   enforceInitialHash();
   addEventListener('pageshow', enforceInitialHash);
@@ -98,6 +115,16 @@
     ['faq','06 / QUERY'], ['contacts','07 / CONTACT'], ['reviewsTop','R / RESPONSE'], ['reviewWorkspace','R1 / FEED']
   ].map(([id, code]) => [document.getElementById(id), code]).filter(([el]) => el);
 
+  function updateCommunityRefreshAnchor() {
+    if (anchorBooting || !body.classList.contains('community-page')) return;
+    const workspace = document.getElementById('reviewWorkspace');
+    const topPanel = document.getElementById('reviewsTop');
+    if (!workspace || !topPanel) return;
+    const probe = scrollY + headerHeight() + Math.min(110, innerHeight * .18);
+    const hash = probe >= workspace.offsetTop ? '#reviewWorkspace' : '#reviewsTop';
+    if (location.hash !== hash) history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
+  }
+
   function updateScrollUI() {
     const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
     const pct = Math.max(0, Math.min(100, scrollY / max * 100));
@@ -109,6 +136,7 @@
       sectionCodes.forEach(item => { if (item[0].offsetTop <= y) active = item; });
       railSection.textContent = active[1];
     }
+    updateCommunityRefreshAnchor();
   }
   updateScrollUI();
   addEventListener('scroll', updateScrollUI, { passive: true });

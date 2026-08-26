@@ -1,0 +1,9 @@
+HISHCHENIE — REVIVAL R5 / STABLE STATE + REFRESH
+
+Changes:
+- Profile alias/avatar changes patch the owner review and cached owner replies instantly.
+- Refresh landing is instant for hash sections; CSS smooth-scroll no longer causes a visible ride from page top.
+- Reviews page remembers whether the outer page is in REVIEWS TOP or REVIEW WORKSPACE via the URL hash.
+- Header audience score has reserved geometry so pending → loaded stats do not shake the header.
+- Score labels 1 and 2 are unique (1 = Ужасно / Terrible, 2 = Очень слабо / Very poor).
+- No Supabase migration required.
