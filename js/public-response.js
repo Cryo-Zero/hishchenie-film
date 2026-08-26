@@ -61,7 +61,7 @@
       liveSync: 'Автообновление',
       latest: 'Новые', highest: 'С высокой оценкой', lowest: 'С низкой оценкой',
       reviewsEmpty: 'Пока нет отзывов. Ваша оценка может стать первой.', noText: 'Оценка без текстового отзыва.',
-      edited: 'изменено', yourBadge: 'ваш отзыв',
+      edited: 'изменено', yourBadge: 'ваш отзыв', editReview: 'Изменить', cancelEdit: 'Отмена', saveInline: 'Сохранить', recordsLive: 'RECORDS // LIVE',
       chooseRating: 'Сначала выберите оценку от 0 до 10.', saving: 'Сохраняем…', saved: 'Отзыв опубликован.', updated: 'Изменения сохранены.', deleted: 'Отзыв удалён.',
       authError: 'Не удалось создать анонимный профиль. Попробуйте ещё раз.', loadError: 'Не удалось загрузить отзывы.', saveError: 'Не удалось сохранить отзыв. Попробуйте ещё раз.', deleteError: 'Не удалось удалить отзыв.', profileError: 'Не удалось обновить профиль.',
       confirmDelete: 'Удалить ваш отзыв? Это действие нельзя отменить.',
@@ -141,7 +141,7 @@
       liveSync: 'Auto refresh',
       latest: 'Newest', highest: 'Highest score', lowest: 'Lowest score',
       reviewsEmpty: 'No reviews yet. Your score can be the first.', noText: 'Rating without a written review.',
-      edited: 'edited', yourBadge: 'your review',
+      edited: 'edited', yourBadge: 'your review', editReview: 'Edit', cancelEdit: 'Cancel', saveInline: 'Save', recordsLive: 'RECORDS // LIVE',
       chooseRating: 'Choose a score from 0 to 10 first.', saving: 'Saving…', saved: 'Review published.', updated: 'Changes saved.', deleted: 'Review deleted.',
       authError: 'Could not create an anonymous profile. Please try again.', loadError: 'Could not load reviews.', saveError: 'Could not save the review. Please try again.', deleteError: 'Could not delete the review.', profileError: 'Could not update the profile.',
       confirmDelete: 'Delete your review? This cannot be undone.',
@@ -508,6 +508,7 @@
     const fs=$('#freshnessState'); if(fs)fs.textContent=freshnessCategory(freshness);
     const ar=$('#averageRating'); if(ar)ar.textContent=avg;
     const rc=$('#ratingsCount'); if(rc)rc.textContent=`${total} ${pluralRatings(total)}`;
+    updateFeedRecords(total);
   }
 
   async function refreshStats(){ try{const data=await rpcGet('get_public_stats_v2');updateStatsUI(data||{});setServiceState(state.channel?.reviews_enabled===false?'closed':'online');}catch(err){console.error('[P17/stats]',err);setServiceState('offline',err.code);}}
@@ -588,7 +589,7 @@
   function setComposerBusy(on){const blocked=on||state.channel?.reviews_enabled===false;$$('.rating-button').forEach(b=>b.disabled=blocked);const ta=$('#reviewText');if(ta)ta.disabled=blocked;const sb=$('#submitReview');if(sb)sb.disabled=blocked;const db=$('#deleteReview');if(db)db.disabled=blocked;setProfileBusy(on);}
   function setStatus(msg,kind=''){const e=$('#reviewStatus');if(!e)return;e.textContent=msg||'';e.className=`review-status${kind?' '+kind:''}`;}
   function updateCounter(){const ta=$('#reviewText'),c=$('#reviewCounter');if(ta&&c)c.textContent=`${ta.value.length} / 2000`;}
-  function updateRatingLabel(){const v=$('#selectedRatingValue'),w=$('#selectedRatingWord');if(state.selectedRating==null){if(v)v.textContent='— / 10';if(w)w.textContent=t('ratingPrompt');return;}if(v)v.textContent=`${state.selectedRating} / 10`;if(w)w.textContent=t('scoreWords')[state.selectedRating]||'';$$('.rating-button').forEach(b=>{const active=Number(b.dataset.rating)===state.selectedRating;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
+  function updateRatingLabel(){const v=$('#selectedRatingValue'),w=$('#selectedRatingWord');if(state.selectedRating==null){if(v)v.textContent='— / 10';if(w)w.textContent=t('ratingPrompt');$$('.rating-button').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});return;}if(v)v.textContent=`${state.selectedRating} / 10`;if(w)w.textContent=t('scoreWords')[state.selectedRating]||'';$$('.rating-button').forEach(b=>{const active=Number(b.dataset.rating)===state.selectedRating;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
   function selectRating(v){if(state.busy)return;state.selectedRating=Number(v);updateRatingLabel();}
   function updateComposerUI(){const b=$('#submitReview'),d=$('#deleteReview');if(b)b.textContent=state.ownReview?t('updateReview'):t('publish');if(d)d.hidden=!state.ownReview;}
 
@@ -707,6 +708,21 @@
 
   function formatDate(v){if(!v)return'';return new Intl.DateTimeFormat(state.lang==='ru'?'ru-RU':'en-US',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(v));}
 
+  function orderReviewsForViewer(rows){
+    const mineId=state.ownReview?.id?String(state.ownReview.id):null;
+    const pinned=[], mine=[], rest=[];
+    (rows||[]).forEach(r=>{
+      if(r?.is_pinned) pinned.push(r);
+      else if(mineId && String(r.id)===mineId) mine.push(r);
+      else rest.push(r);
+    });
+    return [...pinned,...mine,...rest];
+  }
+  function updateFeedRecords(count){
+    const el=$('#feedRecords');
+    if(el) el.textContent=`${Number(count||0)} ${t('recordsLive')}`;
+  }
+
   function feedShapeSignature(rows){
     return JSON.stringify((rows||[]).map(r=>[r.id,r.rating,r.review_text,r.created_at,r.updated_at,r.alias_code,r.alias_number,r.display_name,r.avatar_seed,r.avatar_style,r.is_official,r.is_pinned]));
   }
@@ -726,7 +742,8 @@
     const seq=++state.feedSeq;state.sort=sort;state.filter='all';filter='all';$$('.review-sort-button').forEach(b=>b.classList.toggle('active',b.dataset.sort===sort));
     try{
       const rowsRaw=await rpcGet('get_public_reviews_v3',{p_sort:sort,p_filter:filter,p_limit:40,p_offset:0});if(seq!==state.feedSeq)return;
-      const rows=Array.isArray(rowsRaw)?rowsRaw:[];
+      const rows=orderReviewsForViewer(Array.isArray(rowsRaw)?rowsRaw:[]);
+      updateFeedRecords(Math.max(Number(state.lastStats?.total_ratings||0),rows.length));
       const shape=feedShapeSignature(rows),full=feedFullSignature(rows);
       if(shape===state.feedShapeSignature && $('#reviewsList')?.children.length){state.reviews=rows;if(full!==state.feedSignature)patchReviewCounters(rows);state.feedSignature=full;setServiceState(state.channel?.reviews_enabled===false?'closed':'online');return;}
       state.reviews=rows;renderReviews(rows);setServiceState(state.channel?.reviews_enabled===false?'closed':'online');
@@ -775,6 +792,8 @@
 
   function renderReviews(rows){
     const list=$('#reviewsList');if(!list)return;
+    rows=orderReviewsForViewer(rows||[]);
+    updateFeedRecords(Math.max(Number(state.lastStats?.total_ratings||0),rows.length));
     state.feedShapeSignature=feedShapeSignature(rows);state.feedSignature=feedFullSignature(rows);
     if(!rows.length){list.replaceChildren(Object.assign(document.createElement('div'),{className:'reviews-empty',textContent:t('reviewsEmpty')}));return;}
     const frag=document.createDocumentFragment();rows.forEach(r=>frag.append(renderReviewCard(r)));list.replaceChildren(frag);
@@ -816,7 +835,58 @@
     const replies=document.createElement('button');replies.type='button';replies.dataset.reviewAction='replies';replies.className='review-action-button';replies.disabled=state.channel?.replies_enabled===false;replies.textContent=`${t('replies')} · ${Number(r.reply_count||0)}`;
     const panel=document.createElement('div');panel.className='review-replies';panel.hidden=true;
     replies.addEventListener('click',()=>{panel.hidden=!panel.hidden;if(!panel.hidden){state.openReplies.add(r.id);loadReplies(r.id,panel);}else state.openReplies.delete(r.id);});
-    actions.append(like,replies);card.append(actions,panel);return card;
+    actions.append(like,replies);
+    if(state.ownReview?.id===r.id){
+      const owner=document.createElement('div');owner.className='review-owner-actions';
+      const edit=document.createElement('button');edit.type='button';edit.className='review-action-button review-inline-edit';edit.textContent=t('editReview');edit.addEventListener('click',()=>beginInlineEdit(r,card));
+      const del=document.createElement('button');del.type='button';del.className='review-action-button review-inline-delete';del.textContent=t('deleteReview');del.addEventListener('click',deleteReview);
+      owner.append(edit,del);actions.append(owner);
+    }
+    card.append(actions,panel);return card;
+  }
+
+  function beginInlineEdit(r,card){
+    if(!card||card.classList.contains('is-editing')||state.busy)return;
+    $$('.review-card.is-editing').forEach(c=>cancelInlineEdit(c));
+    card.classList.add('is-editing');
+    const body=card.querySelector('.review-card-text');if(body)body.hidden=true;
+    const edited=card.querySelector('.review-edited');if(edited)edited.hidden=true;
+    const actions=card.querySelector('.review-actions');if(actions)actions.hidden=true;
+    let inlineRating=Number(r.rating);
+    const editor=document.createElement('div');editor.className='review-inline-editor';
+    const rating=document.createElement('div');rating.className='review-inline-rating';rating.setAttribute('role','group');rating.setAttribute('aria-label',t('ratingScaleAria'));
+    for(let n=0;n<=10;n++){const b=document.createElement('button');b.type='button';b.className=`review-inline-rating-button${n===inlineRating?' active':''}`;b.textContent=String(n);b.addEventListener('click',()=>{inlineRating=n;rating.querySelectorAll('button').forEach(x=>x.classList.toggle('active',Number(x.textContent)===n));});rating.append(b);}
+    const ta=document.createElement('textarea');ta.maxLength=2000;ta.value=r.review_text||'';ta.setAttribute('aria-label',t('reviewLabel'));
+    const footer=document.createElement('div');footer.className='review-inline-footer';
+    const count=document.createElement('span');const updateCount=()=>count.textContent=`${ta.value.length} / 2000`;updateCount();ta.addEventListener('input',updateCount);
+    const buttons=document.createElement('div');buttons.className='review-inline-buttons';
+    const cancel=document.createElement('button');cancel.type='button';cancel.className='review-action-button';cancel.textContent=t('cancelEdit');cancel.addEventListener('click',()=>cancelInlineEdit(card));
+    const save=document.createElement('button');save.type='button';save.className='review-action-button is-primary';save.textContent=t('saveInline');save.addEventListener('click',()=>saveInlineReview(r.id,inlineRating,ta.value,save,card));
+    ta.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();cancelInlineEdit(card);}else if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();save.click();}});
+    buttons.append(cancel,save);footer.append(count,buttons);editor.append(rating,ta,footer);
+    card.insertBefore(editor,actions||null);setTimeout(()=>ta.focus(),0);
+  }
+
+  function cancelInlineEdit(card){
+    if(!card)return;card.classList.remove('is-editing');card.querySelector('.review-inline-editor')?.remove();
+    const body=card.querySelector('.review-card-text');if(body)body.hidden=false;
+    const edited=card.querySelector('.review-edited');if(edited)edited.hidden=false;
+    const actions=card.querySelector('.review-actions');if(actions)actions.hidden=false;
+  }
+
+  async function saveInlineReview(reviewId,rating,text,button,card){
+    if(state.busy||!state.ownReview||String(state.ownReview.id)!==String(reviewId))return;
+    const previousReview={...state.ownReview};const p=profileForWrite();state.busy=true;button.disabled=true;button.textContent=t('saving');setComposerBusy(true);
+    try{
+      const session=await getSession(true);state.user=session.user;
+      const data=await rpcPost('submit_my_review_v5',{p_rating:Number(rating),p_review_text:String(text||'').trim(),p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style,p_challenge_id:null,p_challenge_answer:null});
+      state.profile=data.profile;state.pendingProfile=null;state.ownReview=data.review;state.selectedRating=Number(data.review.rating);
+      const composer=$('#reviewText');if(composer)composer.value=data.review.review_text||'';
+      state.reviews=state.reviews.map(x=>String(x.id)===String(reviewId)?{...x,...data.review}:x);
+      renderProfile();updateComposerUI();updateRatingLabel();updateCounter();applyLocalReviewStats(previousReview,data.review);setStatus(t('updated'),'success');
+      cancelInlineEdit(card);renderReviews(state.reviews);announceCommunityChange('review_updated');Promise.allSettled([refreshStats(),loadReviews(state.sort,state.filter)]).catch(()=>{});
+    }catch(err){console.error('[REVIVAL/inline-edit]',err);const message=String(err?.message||'');if(/too many review changes/i.test(message))setStatus(t('rateLimited'),'error');else setStatus(`${t('saveError')} [${err.code||'SAVE'}]`,'error');button.disabled=false;button.textContent=t('saveInline');}
+    finally{state.busy=false;setComposerBusy(false);}
   }
 
   const interactionBusy=new Set();

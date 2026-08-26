@@ -4094,3 +4094,293 @@ main > section { scroll-margin-top: var(--header-h); }
   }
   .lightbox-counter { left: 16px !important; top: 16px !important; }
 }
+
+/* ========================================================================== */
+/* REVIVAL R3 — DESKTOP FEED + INLINE EDIT                                    */
+/* ========================================================================== */
+
+/* SUBJECTS: both columns share the same top and bottom support guides. */
+@media (min-width: 821px) {
+  #cast .cast-console {
+    align-items: stretch !important;
+  }
+  #cast .cast-list,
+  #cast .subject-dossier {
+    height: 100%;
+    min-height: 0 !important;
+  }
+  #cast .subject-dossier {
+    width: 100% !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+  }
+
+  /* FAQ: one fixed geometry for every answer. The lower system log gets its
+     own breathing room instead of being squeezed into the bottom border. */
+  #faq .faq-response-panel {
+    --faq-copy-slot: 166px;
+    height: clamp(540px, calc(100svh - var(--header-h) - 126px), 610px) !important;
+    padding-bottom: 24px !important;
+  }
+  #faq .faq-response-content {
+    height: var(--faq-copy-slot) !important;
+    min-height: var(--faq-copy-slot) !important;
+    max-height: var(--faq-copy-slot) !important;
+    overflow: hidden !important;
+  }
+  #faq .faq-system-box {
+    margin-top: 14px !important;
+    padding: 0 20px !important;
+    display: grid;
+    grid-template-rows: repeat(4, minmax(48px, 1fr));
+    min-height: 210px;
+  }
+  #faq .faq-system-box > div {
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+  #faq .faq-response-log {
+    min-height: 54px !important;
+    margin-top: 16px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+
+  /* MATERIALS: progress rail belongs to the image, not to the full section. */
+  #materials .archive-bottom-controls {
+    position: relative;
+    display: block !important;
+    min-height: 34px;
+  }
+  #materials .archive-bottom-code {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  #materials .archive-pagination {
+    position: absolute !important;
+    left: 50% !important;
+    right: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    justify-content: center !important;
+    margin: 0 !important;
+  }
+
+  /* Reviews workspace is its own desktop screen. The profile/editor remains
+     stationary while only the public records list scrolls. */
+  .community-page #reviewWorkspace {
+    height: calc(100svh - var(--header-h)) !important;
+    min-height: calc(100svh - var(--header-h)) !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    overflow: hidden;
+  }
+  .community-page #reviewWorkspace > .shell,
+  .community-page .community-layout {
+    height: 100%;
+    min-height: 0;
+  }
+  .community-page .community-layout {
+    align-items: stretch !important;
+  }
+  .community-page .community-sidebar {
+    position: static !important;
+    min-height: 0;
+  }
+  .community-page .review-composer,
+  .community-page .review-feed {
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+  }
+  .community-page .review-composer {
+    padding: 18px 20px !important;
+    overflow: hidden;
+  }
+  .community-page .profile-console {
+    margin-top: 12px;
+    padding: 13px;
+  }
+  .community-page .score-field,
+  .community-page .review-text-field {
+    margin-top: 18px;
+  }
+  .community-page #reviewText {
+    min-height: 112px;
+    max-height: 150px;
+  }
+  .community-page .review-submit-row {
+    margin-top: 12px;
+    gap: 8px;
+  }
+  .community-page .review-submit-row .button {
+    min-height: 44px !important;
+    padding: 9px 14px !important;
+    font-size: 10px !important;
+    line-height: 1.15;
+  }
+  .community-page .human-check-note {
+    margin-top: 9px;
+    font-size: .62rem;
+    line-height: 1.4;
+  }
+  .community-page .review-status {
+    margin-top: 6px;
+    min-height: 17px;
+  }
+
+  .community-page .review-feed {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 22px 24px 18px !important;
+  }
+  .community-page .community-feed-toolbar,
+  .community-page .review-display-settings {
+    flex: 0 0 auto;
+  }
+  .community-page .community-feed-toolbar {
+    margin-bottom: 10px;
+  }
+  .community-page .review-display-settings {
+    margin: 8px 0 10px;
+  }
+  .community-page .reviews-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-top: 0 !important;
+    padding-right: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(155,196,199,.34) rgba(8,13,14,.34);
+    overscroll-behavior: contain;
+  }
+  .community-page .reviews-list::-webkit-scrollbar { width: 7px; }
+  .community-page .reviews-list::-webkit-scrollbar-track { background: rgba(8,13,14,.34); }
+  .community-page .reviews-list::-webkit-scrollbar-thumb {
+    background: rgba(155,196,199,.28);
+    border: 2px solid rgba(8,13,14,.34);
+  }
+  .community-page .reviews-list::-webkit-scrollbar-thumb:hover { background: rgba(155,196,199,.48); }
+}
+
+/* The selected score must be unmistakable. JS uses .active; older CSS used
+   .selected, which made the chosen value look unselected. */
+.rating-button.active,
+.rating-button.selected {
+  border-color: var(--accent) !important;
+  background: linear-gradient(180deg, rgba(44,71,73,.58), rgba(19,30,31,.92)) !important;
+  color: #f5ffff !important;
+  box-shadow: inset 0 -2px var(--accent), 0 0 0 1px rgba(155,196,199,.09), 0 0 16px rgba(155,196,199,.08) !important;
+  transform: none !important;
+}
+.rating-button[aria-pressed="true"] { border-color: var(--accent) !important; }
+
+/* Feed status and record counter stay available while the records themselves
+   scroll below. */
+.feed-status-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 8px;
+}
+.feed-status-line .service-badge { margin-top: 0 !important; }
+.feed-records {
+  color: #557174;
+  font: 7px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing: 1.35px;
+  white-space: nowrap;
+}
+
+/* Owner controls live directly on the user's own public record. */
+.review-owner-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+}
+.review-inline-edit { color: #8faeb0; }
+.review-inline-delete { color: #a97171; border-color: rgba(166,93,93,.24); }
+.review-inline-delete:hover { color: #e0a2a2; border-color: rgba(196,105,105,.48); }
+
+.review-inline-editor {
+  margin-top: 14px;
+  padding: 13px;
+  border: 1px solid rgba(155,196,199,.18);
+  background: rgba(5,10,11,.72);
+}
+.review-inline-rating {
+  display: grid;
+  grid-template-columns: repeat(11,minmax(0,1fr));
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.review-inline-rating-button {
+  min-width: 0;
+  height: 30px;
+  border: 1px solid rgba(122,151,153,.18);
+  background: rgba(9,14,15,.9);
+  color: #7e9091;
+  cursor: pointer;
+  font-size: 10px;
+}
+.review-inline-rating-button:hover { border-color: rgba(155,196,199,.48); color: #dce8e8; }
+.review-inline-rating-button.active {
+  border-color: #9bc4c7;
+  color: #f1ffff;
+  background: rgba(45,74,76,.55);
+  box-shadow: inset 0 -2px #9bc4c7;
+}
+.review-inline-editor textarea {
+  width: 100%;
+  min-height: 92px;
+  resize: vertical;
+  padding: 11px 12px;
+  border: 1px solid rgba(122,151,153,.2);
+  outline: none;
+  background: rgba(3,7,8,.85);
+  color: #dbe5e5;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.review-inline-editor textarea:focus { border-color: rgba(155,196,199,.56); }
+.review-inline-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 9px;
+  color: #52696b;
+  font: 7px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing: .9px;
+}
+.review-inline-buttons { display:flex; gap:7px; }
+.review-action-button.is-primary { color:#c7dada; border-color:rgba(155,196,199,.42); }
+.review-card.is-editing { border-color: rgba(155,196,199,.46); }
+
+/* Match SYSTEM RESPONSE reveal timing to SUBJECT DOSSIER. */
+.faq-response-content > *,
+.faq-system-box > div,
+.faq-response-log {
+  transition: opacity .24s ease, transform .34s var(--p15-ease) !important;
+}
+.faq-response-panel.is-revealed .faq-response-content > *:nth-child(1) { transition-delay: 0s !important; }
+.faq-response-panel.is-revealed .faq-response-content > *:nth-child(2) { transition-delay: .035s !important; }
+.faq-response-panel.is-revealed .faq-response-content > *:nth-child(3) { transition-delay: .07s !important; }
+.faq-response-panel.is-revealed .faq-system-box > div:nth-child(1) { transition-delay: .11s !important; }
+.faq-response-panel.is-revealed .faq-system-box > div:nth-child(2) { transition-delay: .15s !important; }
+.faq-response-panel.is-revealed .faq-system-box > div:nth-child(3) { transition-delay: .19s !important; }
+.faq-response-panel.is-revealed .faq-system-box > div:nth-child(4) { transition-delay: .23s !important; }
+.faq-response-panel.is-revealed .faq-response-log { transition-delay: .27s !important; }
+
+@media (max-width: 820px) {
+  /* R3's independent feed scroll is deliberately desktop-only. */
+  .review-owner-actions { margin-left: 0; width: 100%; }
+  .review-inline-rating { grid-template-columns: repeat(6,minmax(0,1fr)); }
+}
