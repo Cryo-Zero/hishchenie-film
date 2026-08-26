@@ -20,7 +20,10 @@
     }
 
     html {
-      scroll-behavior: smooth;
+      /* Native anchor restoration must be instant on refresh. Navigation clicks
+         use explicit JS smooth scrolling, so this prevents the visible ride
+         from page top without removing intentional motion. */
+      scroll-behavior: auto;
     }
 
     body {
@@ -4607,5 +4610,40 @@ main > section { scroll-margin-top: var(--header-h); }
 @media (min-width: 981px) and (max-height: 699px) {
   body main > section:not(.hero) {
     min-height: 0 !important;
+  }
+}
+
+
+/* ==========================================================================
+   REVIVAL R5 — stable refresh anchors + profile instant sync + fixed rating UI
+   ========================================================================== */
+
+/* The header score can change from pending (—) to e.g. 7.1 after the first
+   stats request. Reserve the final geometry so that this never shifts header
+   controls during refresh. */
+@media (min-width: 1181px) {
+  .header-rating {
+    width: 82px !important;
+    min-width: 82px !important;
+    flex: 0 0 82px !important;
+  }
+  .header-rating-copy {
+    width: 35px;
+    min-width: 35px;
+    justify-content: flex-end;
+    font-variant-numeric: tabular-nums;
+  }
+  .header-rating-copy strong {
+    display: inline-block;
+    width: 2.7ch;
+    min-width: 2.7ch;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .header-rating-copy small {
+    display: inline-block;
+    width: 16px;
+    min-width: 16px;
+    text-align: left;
   }
 }

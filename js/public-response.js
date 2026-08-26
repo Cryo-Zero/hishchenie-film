@@ -89,7 +89,7 @@
       footer: 'Официальный сайт фильма · фильм находится в разработке',
       close: 'Закрыть', previousImage: 'Предыдущее изображение', nextImage: 'Следующее изображение', openImage: 'Открыть выбранное изображение', galleryAria: 'Галерея материалов фильма', lightboxAria: 'Просмотр изображения',
       langButton: 'EN',
-      scoreWords: ['Критически', 'Очень слабо', 'Очень слабо', 'Слабо', 'Ниже среднего', 'Средне', 'Неплохо', 'Хорошо', 'Очень хорошо', 'Отлично', 'Выдающееся']
+      scoreWords: ['Критически', 'Ужасно', 'Очень слабо', 'Слабо', 'Ниже среднего', 'Средне', 'Неплохо', 'Хорошо', 'Очень хорошо', 'Отлично', 'Выдающееся']
     },
     en: {
       metaTitle: 'THEFT — ХИЩЕНИЕ | Official Film Website',
@@ -169,7 +169,7 @@
       footer: 'Official film website · the film is in development',
       close: 'Close', previousImage: 'Previous image', nextImage: 'Next image', openImage: 'Open selected image', galleryAria: 'Film materials gallery', lightboxAria: 'Image viewer',
       langButton: 'RU',
-      scoreWords: ['Critical', 'Very poor', 'Very poor', 'Poor', 'Below average', 'Average', 'Fair', 'Good', 'Very good', 'Excellent', 'Outstanding']
+      scoreWords: ['Critical', 'Terrible', 'Very poor', 'Poor', 'Below average', 'Average', 'Fair', 'Good', 'Very good', 'Excellent', 'Outstanding']
     }
   };
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -539,6 +539,41 @@
   }
   function renderProfile(){ const p=state.profile||state.pendingProfile||(state.pendingProfile=generateAliasProfile()); const av=$('#profileAvatar'),name=$('#profileName'); if(av)av.innerHTML=avatarSvg(p.avatar_seed,p.avatar_style,76); if(name)name.textContent=renderAlias(p,state.lang); }
 
+  function applyProfileToLocalCommunity(profile) {
+    if (!profile) return;
+    const patch = {
+      display_name: profile.display_name,
+      alias_code: profile.alias_code,
+      alias_number: profile.alias_number,
+      avatar_seed: profile.avatar_seed,
+      avatar_style: profile.avatar_style,
+      is_official: profile.is_official
+    };
+    const ownReviewId = state.ownReview?.id ? String(state.ownReview.id) : null;
+    if (ownReviewId) {
+      state.reviews = state.reviews.map(r => String(r.id) === ownReviewId ? { ...r, ...patch } : r);
+    }
+
+    const ownReplyIds = new Set(Array.from(state.ownReplies.values()).map(r => String(r?.id || '')).filter(Boolean));
+    if (ownReplyIds.size) {
+      state.replyCache.forEach((cached, reviewId) => {
+        if (!cached?.rows) return;
+        const rows = cached.rows.map(r => ownReplyIds.has(String(r.id)) ? { ...r, ...patch } : r);
+        state.replyCache.set(reviewId, { signature: replySignature(rows), rows });
+      });
+    }
+
+    if ($('#reviewsList')) renderReviews(state.reviews);
+  }
+
+  function commitProfileMutation(saved) {
+    state.profile = saved;
+    state.pendingProfile = null;
+    renderProfile();
+    applyProfileToLocalCommunity(saved);
+    announceCommunityChange('profile_changed');
+  }
+
   async function ensureIdentityProfile(){
     if(state.profile?.id)return state.profile;
     if(identityPromise)return identityPromise;
@@ -571,7 +606,7 @@
     const p={...base,alias_code:fresh.alias_code,alias_number:fresh.alias_number};p.display_name=renderAlias(p,state.lang).slice(0,40);
     if(!state.user&&!loadSession()){state.pendingProfile=p;renderProfile();return;}
     profileMutation=true;setProfileBusy(true);
-    try{await getSession(true);const saved=await rpcPost('update_my_profile_v4',{p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style});state.profile=saved;state.pendingProfile=null;renderProfile();}
+    try{await getSession(true);const saved=await rpcPost('update_my_profile_v4',{p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style});commitProfileMutation(saved);}
     catch(err){console.error('[P14/profile/name]',err);setStatus(`${t('profileError')} [${err.code||'PROFILE'}]`,'error');}
     finally{profileMutation=false;setProfileBusy(false);}
   }
@@ -580,7 +615,7 @@
     const base={...(state.profile||state.pendingProfile||generateAliasProfile())};base.avatar_seed=randomSeed();base.avatar_style=randomInt(6)+1;base.display_name=renderAlias(base,state.lang).slice(0,40);
     if(!state.user&&!loadSession()){state.pendingProfile=base;renderProfile();return;}
     profileMutation=true;setProfileBusy(true);
-    try{await getSession(true);const saved=await rpcPost('update_my_profile_v4',{p_display_name:base.display_name,p_alias_code:base.alias_code,p_alias_number:base.alias_number,p_avatar_seed:base.avatar_seed,p_avatar_style:base.avatar_style});state.profile=saved;state.pendingProfile=null;renderProfile();}
+    try{await getSession(true);const saved=await rpcPost('update_my_profile_v4',{p_display_name:base.display_name,p_alias_code:base.alias_code,p_alias_number:base.alias_number,p_avatar_seed:base.avatar_seed,p_avatar_style:base.avatar_style});commitProfileMutation(saved);}
     catch(err){console.error('[P14/profile/avatar]',err);setStatus(`${t('profileError')} [${err.code||'PROFILE'}]`,'error');}
     finally{profileMutation=false;setProfileBusy(false);}
   }
