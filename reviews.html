@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://xltwwvutqkpmtmlavngi.supabase.co" crossorigin>
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://cryo-zero.github.io/hishchenie-film/reviews.html">
-  <link rel="stylesheet" href="css/site.css?v=revival-r3">
+  <link rel="stylesheet" href="css/site.css?v=revival-r6">
 </head>
 <body class="community-page">
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
@@ -78,7 +78,17 @@
       <div class="shell community-layout">
         <aside class="community-sidebar">
           <div class="review-composer">
-            <div class="composer-label" data-i18n="yourProtocol">Ваш профиль</div>
+            <div class="profile-section-heading"><div class="composer-label" data-i18n="yourProtocol">Ваш профиль</div><button class="profile-help-toggle" id="profileHelpToggle" type="button" aria-expanded="false" aria-controls="profileHelpPanel" data-i18n-aria="profileHelpAria">?</button></div>
+
+            <div class="info-overlay profile-help-panel" id="profileHelpPanel" hidden aria-hidden="true">
+              <div class="info-overlay-card" role="dialog" aria-modal="false" aria-labelledby="profileHelpTitle">
+                <button class="info-overlay-close" id="profileHelpClose" type="button" data-i18n-aria="profileHelpClose">×</button>
+                <div class="composer-label" id="profileHelpTitle" data-i18n="profileHelpTitle">PROFILE ACCESS // LOCAL BINDING</div>
+                <strong data-i18n="profileHelpLead">Профиль привязан к данным этого браузера.</strong>
+                <p data-i18n="profileHelpBody">Если очистить cookies или данные сайта, использовать другой браузер или устройство, доступ к редактированию ранее опубликованного отзыва может быть потерян.</p>
+                <p class="info-overlay-note" data-i18n="profileHelpPrivacy">Email, телефон и пароль не требуются.</p>
+              </div>
+            </div>
             <div class="profile-console">
               <div class="profile-avatar" id="profileAvatar" aria-hidden="true"></div>
               <div class="profile-data">
@@ -141,11 +151,23 @@
   <footer>
     <strong>ХИЩЕНИЕ / THEFT</strong><br><br>
     <span data-i18n="footer">Официальный сайт фильма · фильм находится в разработке</span>
-    <div class="build-mark">BUILD // REVIVAL R5 // STABLE STATE + REFRESH</div>
+    <div class="footer-report"><button class="footer-report-button" id="bugReportToggle" type="button" aria-expanded="false" aria-controls="bugReportPanel"><span>REPORT //</span> <b data-i18n="reportBug">Сообщить о баге</b></button></div>
+    <div class="build-mark">BUILD // REVIVAL R6 // PROFILE SAFETY + REPORT</div>
   </footer>
 
-  <script src="js/site.js?v=revival-r5"></script>
-  <script src="js/public-response.js?v=revival-r5"></script>
+
+  <div class="info-overlay bug-report-panel" id="bugReportPanel" hidden aria-hidden="true">
+    <div class="info-overlay-card bug-report-card" role="dialog" aria-modal="false" aria-labelledby="bugReportTitle">
+      <button class="info-overlay-close" id="bugReportClose" type="button" data-i18n-aria="reportClose">×</button>
+      <div class="composer-label" id="bugReportTitle" data-i18n="reportTitle">REPORT // BUG CHANNEL</div>
+      <p data-i18n="reportLead">Нашли ошибку? Отправьте разработчику краткое описание и, при желании, приложите техническую сводку.</p>
+      <p class="info-overlay-note" data-i18n="reportPrivacy">Диагностика не содержит текста отзывов, псевдонима, UUID или других данных профиля.</p>
+      <div class="bug-report-actions"><button class="micro-button" id="bugReportCopy" type="button" data-i18n="reportCopy">Скопировать диагностику</button><button class="button" id="bugReportOpen" type="button" data-i18n="reportOpen">Написать разработчику</button></div>
+    </div>
+  </div>
+
+  <script src="js/site.js?v=revival-r6"></script>
+  <script src="js/public-response.js?v=revival-r6"></script>
 
 </body>
 </html>
