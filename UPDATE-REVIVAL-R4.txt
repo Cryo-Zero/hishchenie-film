@@ -1,0 +1,13 @@
+HISHCHENIE — REVIVAL R4 / ADAPTIVE DESKTOP UI
+
+Frontend-only patch over REVIVAL R3. No SQL migration is required.
+
+Changes:
+- one-screen section mode is enabled only when a desktop viewport can actually fit the section;
+- short/narrow PC windows fall back to normal flow without shrinking the UI;
+- independent desktop review-feed scrollbar is used only on roomy desktop viewports;
+- ARCHIVE handle is available only while MATERIALS is in view and retracts on section exit;
+- FAQ and SUBJECT DOSSIER now use the same staged-reveal engine;
+- desktop micro typography was audited and raised to a readable floor;
+- nested average-score span no longer collapses to the old 7px label style;
+- PULSE labels, /10 denominators, navigation and system slogan are more legible.

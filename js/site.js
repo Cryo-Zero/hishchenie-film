@@ -10,6 +10,27 @@
   const headerHeight = () => header?.offsetHeight || 0;
   const motionReduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+
+  // One staged-reveal engine is shared by SUBJECT DOSSIER and SYSTEM QUERY.
+  // Keeping one implementation prevents the two interfaces from drifting apart.
+  function stagedReveal(panel, writeValues) {
+    if (!panel) { if (typeof writeValues === 'function') writeValues(); return; }
+    panel.classList.remove('is-revealed');
+    panel.classList.add('is-revealing');
+    if (typeof writeValues === 'function') writeValues();
+    if (motionReduced()) {
+      panel.classList.remove('is-revealing');
+      panel.classList.add('is-revealed');
+      return;
+    }
+    // Force the hidden state to be painted before starting the reveal.
+    void panel.offsetWidth;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      panel.classList.remove('is-revealing');
+      panel.classList.add('is-revealed');
+    }));
+  }
+
   function closeNav() {
     body.classList.remove('nav-open');
     menu?.setAttribute('aria-expanded', 'false');
@@ -250,9 +271,15 @@
     const archiveObserver = new IntersectionObserver(entries => {
       const visible = entries.some(entry => entry.isIntersecting);
       materialsVisible = visible;
-      archiveShell.classList.toggle('is-visible', visible || archiveShell.classList.contains('is-open'));
-      if (!visible && !archiveShell.classList.contains('is-open')) archiveShell.classList.remove('is-visible');
-    }, { rootMargin:'-8% 0px -8% 0px', threshold:.05 });
+      if (visible) {
+        archiveShell.classList.add('is-visible');
+      } else {
+        // ARCHIVE is local to MATERIALS: leaving the section retracts the drawer
+        // into the wall and removes the handle from every other site panel.
+        setDrawer(false);
+        archiveShell.classList.remove('is-visible');
+      }
+    }, { rootMargin:'-12% 0px -12% 0px', threshold:.08 });
     archiveObserver.observe(materialsSection);
   } else archiveShell?.classList.add('is-visible');
 
@@ -276,6 +303,50 @@
   }
   fitMediaFrames();
   addEventListener('resize', fitMediaFrames);
+
+  // ADAPTIVE DESKTOP PANELS ---------------------------------------------------
+  // A panel is kept as a one-viewport "tab" only when the current desktop
+  // viewport can actually hold its natural content. Smaller/shorter desktop
+  // windows fall back to normal document flow instead of shrinking typography.
+  const adaptivePanelIds = ['about','materials','trailer','watch','cast','faq'];
+  const adaptivePanels = adaptivePanelIds.map(id => document.getElementById(id)).filter(Boolean);
+  const reviewWorkspace = document.getElementById('reviewWorkspace');
+  let layoutAuditTimer = 0;
+
+  function auditDesktopPanels() {
+    body.classList.add('adaptive-panel-system');
+    const finePointer = !matchMedia('(pointer: coarse)').matches;
+    const desktopCandidate = innerWidth >= 1180 && innerHeight >= 700 && finePointer;
+    body.classList.toggle('desktop-panel-capable', desktopCandidate);
+    body.classList.toggle('desktop-flow-mode', !desktopCandidate);
+
+    const available = Math.max(320, innerHeight - headerHeight());
+    adaptivePanels.forEach(section => {
+      section.classList.remove('is-screen-panel','is-flow-panel');
+      const shell = section.querySelector(':scope > .shell') || section.firstElementChild;
+      const natural = Math.ceil(shell?.scrollHeight || section.scrollHeight || 0);
+      const fits = desktopCandidate && natural <= Math.max(360, available - 18);
+      section.classList.add(fits ? 'is-screen-panel' : 'is-flow-panel');
+    });
+
+    // Reviews use the independent feed scrollbar only on a genuinely roomy
+    // desktop. On short or narrow PC windows the same content becomes a normal
+    // flow layout so no controls have to be miniaturised.
+    const reviewScreen = !!reviewWorkspace && finePointer && innerWidth >= 1280 && innerHeight >= 760;
+    body.classList.toggle('review-screen-mode', reviewScreen);
+    body.classList.toggle('review-flow-mode', !!reviewWorkspace && !reviewScreen);
+  }
+
+  function scheduleDesktopAudit() {
+    clearTimeout(layoutAuditTimer);
+    layoutAuditTimer = setTimeout(() => {
+      fitMediaFrames();
+      requestAnimationFrame(auditDesktopPanels);
+    }, 45);
+  }
+  auditDesktopPanels();
+  addEventListener('resize', scheduleDesktopAudit);
+  if (document.fonts?.ready) document.fonts.ready.then(scheduleDesktopAudit).catch(() => {});
 
   // Trailer starts gently. Once a visitor changes the level, remember their choice.
   const trailerVideo = $('#trailerVideo');
@@ -346,18 +417,7 @@
   function animateDossier(item) {
     if (!dossier) return;
     clearTimeout(dossierTimer);
-    dossier.classList.remove('is-revealed');
-    dossier.classList.add('is-revealing');
-    setDossierValues(item);
-    if (motionReduced()) {
-      dossier.classList.remove('is-revealing');
-      dossier.classList.add('is-revealed');
-      return;
-    }
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      dossier.classList.remove('is-revealing');
-      dossier.classList.add('is-revealed');
-    }));
+    stagedReveal(dossier, () => setDossierValues(item));
   }
 
   function selectSubject(item) {
@@ -405,54 +465,45 @@
       row.classList.remove('is-selected');
       row.setAttribute('aria-selected','false');
     });
-    if (faqCode) faqCode.textContent = 'QUERY_00 // STANDBY';
-    if (faqQuestion) faqQuestion.textContent = '???';
-    if (faqAnswer) faqAnswer.textContent = document.documentElement.lang === 'en' ? 'Select a question // awaiting response' : 'Выберите вопрос // ожидание ответа';
-    if (faqStatus) faqStatus.textContent = '???';
-    if (faqMessage) faqMessage.textContent = '???';
-    if (faqLog) faqLog.textContent = 'SYSTEM LOG // Q00.STBY';
-    faqPanel?.classList.remove('has-response');
-    if (faqPanel) {
-      faqPanel.classList.remove('is-revealed');
-      if (animate && !motionReduced()) faqPanel.classList.add('is-revealing');
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        faqPanel.classList.remove('is-revealing');
-        faqPanel.classList.add('is-revealed');
-      }));
-    }
+    const writeStandby = () => {
+      if (faqCode) faqCode.textContent = 'QUERY_00 // STANDBY';
+      if (faqQuestion) faqQuestion.textContent = '???';
+      if (faqAnswer) faqAnswer.textContent = document.documentElement.lang === 'en' ? 'Select a question // awaiting response' : 'Выберите вопрос // ожидание ответа';
+      if (faqStatus) faqStatus.textContent = '???';
+      if (faqMessage) faqMessage.textContent = '???';
+      if (faqLog) faqLog.textContent = 'SYSTEM LOG // Q00.STBY';
+      faqPanel?.classList.remove('has-response');
+    };
+    if (!animate) {
+      writeStandby();
+      faqPanel?.classList.remove('is-revealing');
+      faqPanel?.classList.add('is-revealed');
+    } else stagedReveal(faqPanel, writeStandby);
   }
   function renderFaq(item, animate = true) {
     if (!item || !faqPanel) return;
     if (activeFaq === item) { resetFaq(animate); return; }
-    if (animate && !motionReduced()) {
-      faqPanel.classList.remove('is-revealed');
-      faqPanel.classList.add('is-revealing');
-    }
     activeFaq = item;
     faqQueries.forEach(row => {
       const selected = row === item;
       row.classList.toggle('is-selected', selected);
       row.setAttribute('aria-selected', String(selected));
     });
-    const qid = item.dataset.query || 'QUERY_00';
-    if (faqCode) faqCode.textContent = item.dataset.queryCode || `${qid} // VERIFIED RESPONSE`;
-    if (faqQuestion) faqQuestion.textContent = faqText(item, 'strong[data-i18n]', '???');
-    if (faqAnswer) faqAnswer.textContent = faqText(item, '.faq-source-answer', '—');
-    if (faqStatus) faqStatus.textContent = faqText(item, '.faq-source-status', item.dataset.queryStatus || '—');
-    if (faqMessage) faqMessage.textContent = faqText(item, '.faq-source-message', item.dataset.queryMessage || '—');
-    if (faqLog) faqLog.textContent = `SYSTEM LOG // Q${qid.slice(-2)}.RSP`;
-    faqPanel.classList.add('has-response');
-    if (!animate || motionReduced()) {
-      faqPanel.classList.remove('is-revealed');
+    const writeResponse = () => {
+      const qid = item.dataset.query || 'QUERY_00';
+      if (faqCode) faqCode.textContent = item.dataset.queryCode || `${qid} // VERIFIED RESPONSE`;
+      if (faqQuestion) faqQuestion.textContent = faqText(item, 'strong[data-i18n]', '???');
+      if (faqAnswer) faqAnswer.textContent = faqText(item, '.faq-source-answer', '—');
+      if (faqStatus) faqStatus.textContent = faqText(item, '.faq-source-status', item.dataset.queryStatus || '—');
+      if (faqMessage) faqMessage.textContent = faqText(item, '.faq-source-message', item.dataset.queryMessage || '—');
+      if (faqLog) faqLog.textContent = `SYSTEM LOG // Q${qid.slice(-2)}.RSP`;
+      faqPanel.classList.add('has-response');
+    };
+    if (!animate) {
+      writeResponse();
       faqPanel.classList.remove('is-revealing');
       faqPanel.classList.add('is-revealed');
-      return;
-    }
-    faqPanel.classList.add('is-revealing');
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      faqPanel.classList.remove('is-revealing');
-      faqPanel.classList.add('is-revealed');
-    }));
+    } else stagedReveal(faqPanel, writeResponse);
   }
 
   faqQueries.forEach(item => item.addEventListener('click', () => renderFaq(item, true)));
