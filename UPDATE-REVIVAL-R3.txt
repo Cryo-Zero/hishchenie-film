@@ -1,0 +1,56 @@
+HISHCHENIE / THEFT — REVIVAL R3
+DESKTOP FEED + INLINE EDIT
+
+BASE
+- Designed as a direct update over REVIVAL R2.
+- No SQL migration is required for R3.
+- Existing Supabase schema and the 10 marked demo reviews remain unchanged.
+
+CHANGES
+1. SUBJECTS
+- Left subject list and right SUBJECT DOSSIER now share the same top/bottom support guides on desktop.
+- Dossier content is unchanged; only the external panel geometry is stretched.
+
+2. FAQ / SYSTEM QUERY
+- SYSTEM RESPONSE uses a fixed copy slot so short/long answers do not move the system data.
+- Four system-data rows receive equal vertical space.
+- SYSTEM LOG receives its own vertical breathing room.
+- Reveal timing now matches SUBJECT DOSSIER more closely (same opacity/translate rhythm).
+
+3. MATERIALS
+- The thin archive progress rail is centered relative to the image viewer.
+- AUTHOR FILES // VERIFIED remains on the left.
+
+4. REVIEWS — SCORE FEEDBACK
+- Fixed the selected score state. The chosen 0–10 button now has a clear persistent active border/glow.
+
+5. REVIEWS — INLINE OWNER EDIT
+- The user's own public review now contains Edit and Delete controls.
+- Edit opens directly inside the review card: compact 0–10 selector + text editor + Save/Cancel.
+- Enter saves from the inline editor; Shift+Enter inserts a line break; Escape cancels.
+- The large composer controls are still preserved.
+
+6. REVIEWS — DESKTOP WORKSPACE
+- On desktop only, the profile/composer and public feed fit into one review workspace viewport.
+- The left profile/composer remains stationary.
+- Only the public records list receives its own vertical scrollbar.
+- Sorting and strong-language controls stay visible above the scrolling records.
+- Large composer Publish/Delete buttons are reduced without being removed.
+
+7. FEED ORDER
+Desktop viewer precedence:
+  a) pinned records,
+  b) the current user's own review,
+  c) remaining records in the selected New/Old/Popular order.
+This means the user's review stays first unless pinned records exist above it.
+
+8. LIVE COUNTER
+- Added N RECORDS // LIVE next to the service-state badge.
+- Counter uses public statistics rather than the 40-row rendering limit when available.
+
+NOT CHANGED
+- Mobile/tablet interaction model.
+- Advertisement support.
+- Full-film hosting.
+- Supabase schema, CAPTCHA policy, moderation/admin rules.
+- Existing archive, profanity filter, replies, likes and demo data.
