@@ -6,7 +6,7 @@
   const PROJECT_REF = 'xltwwvutqkpmtmlavngi';
   const SESSION_KEY = `theft-${PROJECT_REF}-auth-v4`;
   const AUTH_LOCK_NAME = `theft-${PROJECT_REF}-auth-lock-v4`;
-  const CLIENT_REVISION = 'REVIVAL-R1-community-archive';
+  const CLIENT_REVISION = 'REVIVAL-R6-profile-help-report-unique-alias';
   const REQUEST_TIMEOUT = 18000;
   const AUTH_TIMEOUT = 30000;
   const WRITE_TIMEOUT = 30000;
@@ -48,6 +48,7 @@
       serviceChecking: 'Проверка канала', serviceOnline: 'Отзывы доступны', serviceOffline: 'Отзывы временно недоступны', serviceClosed: 'Канал отзывов закрыт', channelClosedNote: 'Публикация отзывов временно закрыта.',
       average: 'Средняя оценка', ratings: 'оценок', ratingOne: 'оценка', ratingFew: 'оценки', ratingMany: 'оценок',
       yourProtocol: 'Ваш профиль', profileNote: 'Псевдоним и аватар создаются автоматически. Их можно менять сколько угодно.',
+      profileHelpAria: 'Информация о профиле', profileHelpTitle: 'PROFILE ACCESS // LOCAL BINDING', profileHelpLead: 'Профиль привязан к данным этого браузера.', profileHelpBody: 'Если очистить cookies или данные сайта, использовать другой браузер или устройство, доступ к редактированию ранее опубликованного отзыва может быть потерян.', profileHelpPrivacy: 'Email, телефон и пароль не требуются.', profileHelpClose: 'Закрыть',
       rerollName: 'Другой псевдоним', rerollAvatar: 'Другой аватар',
       yourRating: 'Ваша оценка', ratingPrompt: 'Выберите от 0 до 10', ratingScaleAria: 'Оценка от 0 до 10',
       reviewLabel: 'Ваш отзыв', reviewOptional: 'необязательно', reviewPlaceholder: 'Расскажите о впечатлениях от фильма…',
@@ -77,15 +78,16 @@
       faqQ5: 'Что за история у Хищения?', faqA5: 'История разворачивается в 2045 году в системе, где человек должен доказать обществу свою пользу. Подробнее — в разделе «О фильме».', faqStatus5: 'ДОСЬЕ ОТКРЫТО', faqMessage5: 'БАЗОВАЯ ИНФОРМАЦИЯ ДОСТУПНА В РАЗДЕЛЕ «О ФИЛЬМЕ»',
       faqQ6: 'Когда появятся новые материалы?', faqA6: 'Новые материалы публикуются после подтверждения автора и подготовки к публикации.', faqStatus6: 'ОЖИДАНИЕ ОБНОВЛЕНИЯ', faqMessage6: 'НОВЫЕ МАТЕРИАЛЫ ПУБЛИКУЮТСЯ ПОСЛЕ ПОДТВЕРЖДЕНИЯ',
       faqQ7: 'Кто работает над фильмом?', faqA7: 'Подтверждённые имена режиссёра и актёров публикуются на этом сайте. Состав может дополняться по мере подтверждения материалов.', faqStatus7: 'ПОДТВЕРЖДЁННЫЕ ДАННЫЕ', faqMessage7: 'СОСТАВ ОБНОВЛЯЕТСЯ ПО МЕРЕ ПОДТВЕРЖДЕНИЯ',
-      faqQ8: 'На сайте есть безопасность?', faqA8: 'Система позволяет пользователям использовать технический идентификатор без привязки личных данных для работы профиля и отзывов.', faqStatus8: 'ПРОТОКОЛ АКТИВЕН', faqMessage8: 'МИНИМУМ ДАННЫХ // ЛОКАЛЬНАЯ ПРИВЯЗКА ПРОФИЛЯ',
+      faqQ8: 'На сайте есть безопасность?', faqA8: 'Да, но система минималистична: для профиля зрителя не нужны email, телефон или пароль. Используется технический идентификатор и локальные настройки профиля. Профиль привязан к данным этого браузера, поэтому после очистки cookies или данных сайта, смены браузера или устройства доступ к редактированию ранее опубликованного отзыва может быть потерян.', faqStatus8: 'ПРОТОКОЛ АКТИВЕН', faqMessage8: 'МИНИМУМ ДАННЫХ // ЛОКАЛЬНАЯ ПРИВЯЗКА ПРОФИЛЯ',
       faqResponseHeader: 'SYSTEM RESPONSE // VERIFIED DATA', faqStatusLabel: 'Статус запроса', faqSourceLabel: 'Источник', faqSourceValue: 'ОФИЦИАЛЬНЫЙ КАНАЛ', faqMessageLabel: 'Системное сообщение', faqUpdateLabel: 'Последнее обновление',
       signalLog1: 'Трейлер доступен', signalLog2: 'Публичный архив открыт', signalLog3: 'Релиз ожидает подтверждения', signalNow: 'СЕЙЧАС', signalPending: 'PENDING',
       galleryAlt01: 'Обложка фильма «Хищение»', galleryAlt02: 'Постер фильма «Хищение» — пианино', galleryAlt03: 'Постер фильма «Хищение» — дедушка и ребёнок', galleryAlt04: 'Постер фильма «Хищение» — человек в капюшоне', galleryAlt05: 'Постер фильма «Хищение»', galleryAlt06: 'Постер фильма «Хищение» — герой в разрушенном городе', galleryAlt07: 'Постер фильма «Хищение» — ведущая', galleryAlt08: 'Постер фильма «Хищение» — город', galleryAlt09: 'Постер фильма «Хищение» — Гор', galleryAlt10: 'Кадры из фильма «Хищение»', galleryAlt11: 'Визуальный материал фильма «Хищение»',
       contactsLabel: '07 / CONTACT', contactsTitle: 'Контакты',
       contactSignal: 'CONTACT SIGNAL // AUTHOR', contactOpen: 'CHANNEL // OPEN ↗',
       securityTeaser: 'SYS // SECURITY: PRESENT', securityTitle: 'На сайте есть безопасность',
-      securityText: 'Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва, а также ваши реакции и ответы, если вы ими пользуетесь. Профиль привязан к этому браузеру: после очистки данных доступ к редактированию старого отзыва может быть потерян.',
+      securityText: 'Без email, телефона и пароля. Сайт хранит только технический идентификатор, псевдоним, аватар-настройку, оценку и текст отзыва, а также ваши реакции и ответы, если вы ими пользуетесь. Профиль привязан к этому браузеру: после очистки cookies или данных сайта, смены браузера или устройства доступ к редактированию старого отзыва может быть потерян.',
       securityClose: 'Скрыть',
+      reportBug: 'Сообщить о баге', reportTitle: 'REPORT // BUG CHANNEL', reportLead: 'Нашли ошибку? Отправьте разработчику краткое описание и, при желании, приложите техническую сводку.', reportCopy: 'Скопировать диагностику', reportCopied: 'Диагностика скопирована', reportOpen: 'Написать разработчику', reportClose: 'Закрыть', reportPrivacy: 'Диагностика не содержит текста отзывов, псевдонима, UUID или других данных профиля.',
       footer: 'Официальный сайт фильма · фильм находится в разработке',
       close: 'Закрыть', previousImage: 'Предыдущее изображение', nextImage: 'Следующее изображение', openImage: 'Открыть выбранное изображение', galleryAria: 'Галерея материалов фильма', lightboxAria: 'Просмотр изображения',
       langButton: 'EN',
@@ -128,6 +130,7 @@
       serviceChecking: 'Checking channel', serviceOnline: 'Reviews online', serviceOffline: 'Reviews temporarily unavailable', serviceClosed: 'Review channel closed', channelClosedNote: 'Review publishing is temporarily closed.',
       average: 'Average score', ratings: 'ratings', ratingOne: 'rating', ratingFew: 'ratings', ratingMany: 'ratings',
       yourProtocol: 'Your profile', profileNote: 'Your alias and avatar are generated automatically. You can reroll them at any time.',
+      profileHelpAria: 'Profile information', profileHelpTitle: 'PROFILE ACCESS // LOCAL BINDING', profileHelpLead: 'This profile is tied to this browser data.', profileHelpBody: 'Clearing cookies or site data, switching browser, or using another device may remove access to editing a previously published review.', profileHelpPrivacy: 'No email, phone number or password is required.', profileHelpClose: 'Close',
       rerollName: 'New alias', rerollAvatar: 'New avatar',
       yourRating: 'Your score', ratingPrompt: 'Choose from 0 to 10', ratingScaleAria: 'Score from 0 to 10',
       reviewLabel: 'Your review', reviewOptional: 'optional', reviewPlaceholder: 'Tell us what you thought about the film…',
@@ -157,15 +160,16 @@
       faqQ5: 'What is THEFT about?', faqA5: 'The story takes place in 2045, in a system where every person must prove their value to society. More details are in the About section.', faqStatus5: 'DOSSIER OPEN', faqMessage5: 'BASIC INFORMATION IS AVAILABLE IN THE ABOUT SECTION',
       faqQ6: 'When will new materials appear?', faqA6: 'New materials are published after confirmation from the filmmaker and preparation for publication.', faqStatus6: 'AWAITING UPDATE', faqMessage6: 'NEW MATERIAL IS PUBLISHED AFTER CONFIRMATION',
       faqQ7: 'Who is working on the film?', faqA7: 'Confirmed director and cast names are published on this website. The list can expand as new material is confirmed.', faqStatus7: 'VERIFIED DATA', faqMessage7: 'THE LIST UPDATES AS MATERIAL IS CONFIRMED',
-      faqQ8: 'Is this website secure?', faqA8: 'The system lets users use a technical identifier without linking personal data for profile and review functionality.', faqStatus8: 'PROTOCOL ACTIVE', faqMessage8: 'MINIMUM DATA // LOCAL PROFILE BINDING',
+      faqQ8: 'Is this website secure?', faqA8: 'Yes, but the system is intentionally minimal: audience profiles need no email, phone number or password. A technical identifier and local profile settings are used. The profile is tied to this browser data, so clearing cookies or site data, switching browser, or using another device may remove access to editing a previously published review.', faqStatus8: 'PROTOCOL ACTIVE', faqMessage8: 'MINIMUM DATA // LOCAL PROFILE BINDING',
       faqResponseHeader: 'SYSTEM RESPONSE // VERIFIED DATA', faqStatusLabel: 'Query status', faqSourceLabel: 'Source', faqSourceValue: 'OFFICIAL CHANNEL', faqMessageLabel: 'System message', faqUpdateLabel: 'Last update',
       signalLog1: 'Trailer online', signalLog2: 'Public archive open', signalLog3: 'Release awaiting confirmation', signalNow: 'NOW', signalPending: 'PENDING',
       galleryAlt01: 'THEFT film cover', galleryAlt02: 'THEFT poster — piano scene', galleryAlt03: 'THEFT poster — grandfather and child', galleryAlt04: 'THEFT poster — hooded figure', galleryAlt05: 'THEFT film poster', galleryAlt06: 'THEFT poster — protagonist in a ruined city', galleryAlt07: 'THEFT poster — news anchor', galleryAlt08: 'THEFT poster — city', galleryAlt09: 'THEFT poster — Gor', galleryAlt10: 'Frames from THEFT', galleryAlt11: 'THEFT visual material',
       contactsLabel: '07 / CONTACT', contactsTitle: 'Contacts',
       contactSignal: 'CONTACT SIGNAL // AUTHOR', contactOpen: 'CHANNEL // OPEN ↗',
       securityTeaser: 'SYS // SECURITY: PRESENT', securityTitle: 'There is safety on this site',
-      securityText: 'No email, phone number or password. The site stores only a technical identifier, alias, avatar settings, score and review text, plus your reactions and replies if you use them. The profile is tied to this browser; clearing browser data may remove access to editing the old review.',
+      securityText: 'No email, phone number or password. The site stores only a technical identifier, alias, avatar settings, score and review text, plus your reactions and replies if you use them. The profile is tied to this browser; clearing cookies or site data, switching browser, or using another device may remove access to editing the old review.',
       securityClose: 'Hide',
+      reportBug: 'Report a bug', reportTitle: 'REPORT // BUG CHANNEL', reportLead: 'Found a problem? Send the developer a short description and optionally attach the technical summary.', reportCopy: 'Copy diagnostics', reportCopied: 'Diagnostics copied', reportOpen: 'Contact developer', reportClose: 'Close', reportPrivacy: 'Diagnostics never include review text, alias, UUID, or other profile data.',
       footer: 'Official film website · the film is in development',
       close: 'Close', previousImage: 'Previous image', nextImage: 'Next image', openImage: 'Open selected image', galleryAria: 'Film materials gallery', lightboxAria: 'Image viewer',
       langButton: 'RU',
@@ -210,8 +214,9 @@
   };
   const t = key => I18N[state.lang]?.[key] ?? I18N.ru[key] ?? key;
 
-  // Canonical alias parts are aligned RU/EN. We store only a compact alias_code
-  // plus one number and render the language locally — no AI/translation API needed.
+  // Legacy alias tables are frozen because stored alias_code values use their indexes.
+  // New profiles use only the curated numbered bank below: meaningful base + 3-digit number.
+  // RU/EN rendering remains deterministic and local — no translation API needed.
   const ALIAS = {
     adjectives: [
       ['Тихий','Silent'],['Холодный','Cold'],['Скрытый','Hidden'],['Ночной','Night'],['Серый','Grey'],['Забытый','Forgotten'],['Последний','Last'],['Немой','Mute'],['Северный','Northern'],['Пустой','Empty'],['Сломанный','Broken'],['Стёртый','Erased'],['Неизвестный','Unknown'],['Спящий','Sleeping'],['Бледный','Pale'],['Теневой','Shadow'],['Свободный','Free'],['Нулевой','Zero'],['Запретный','Forbidden'],['Потерянный','Lost'],['Безымянный','Nameless'],['Резервный','Reserve'],['Невидимый','Invisible'],['Пограничный','Border'],['Зашифрованный','Encoded'],['Безмолвный','Wordless'],['Брошенный','Abandoned'],['Неподтверждённый','Unconfirmed'],['Переходный','Transit'],['Наблюдаемый','Observed']
@@ -230,6 +235,22 @@
     ],
     phrases: [
       ['Тот, Кто Ждёт','The One Who Waits'],['Лицо Без Архива','Face Without an Archive'],['Голос Из Сектора','Voice from the Sector'],['Человек Из Записи','Person from the Record'],['Тень За Экраном','Shadow Behind the Screen'],['Свидетель Без Номера','Witness Without a Number'],['Тот, Кто Помнит','The One Who Remembers'],['Последний В Очереди','Last in the Line'],['За Пределом Секции','Beyond the Section'],['Вне Зоны Контроля','Outside Control'],['Не Внесён В Реестр','Not in the Register'],['Сигнал Не Принят','Signal Not Received'],['Запись Не Найдена','Record Not Found'],['За Закрытой Дверью','Behind the Sealed Door'],['Из Другого Сектора','From Another Sector'],['Тот, Кто Остался','The One Who Stayed'],['Никем Не Учтён','Unaccounted For'],['Вне Списка','Outside the List'],['Пока Система Спит','While the System Sleeps'],['Неизвестный В Кадре','Unknown in Frame']
+    ],
+    curated: [
+      ['Наблюдатель','Observer'],['Свидетель','Witness'],['Архивист','Archivist'],['Оператор','Operator'],['Инспектор','Inspector'],['Проводник','Guide'],['Хранитель','Keeper'],['Следователь','Investigator'],['Аналитик','Analyst'],['Диспетчер','Dispatcher'],
+      ['Регистратор','Registrar'],['Контролёр','Controller'],['Куратор','Curator'],['Странник','Wanderer'],['Резидент','Resident'],['Кандидат','Candidate'],['Пассажир','Passenger'],['Беглец','Runaway'],['Сканер','Scanner'],
+      ['Сигнал','Signal'],['Контур','Contour'],['Архив','Archive'],['Протокол','Protocol'],['Сектор','Sector'],['Объект','Subject'],['Узел','Node'],['Терминал','Terminal'],['Маркер','Marker'],['Фрагмент','Fragment'],['Вектор','Vector'],
+      ['Канал','Channel'],['Регистр','Register'],['Маяк','Beacon'],['Рубеж','Frontier'],['Порог','Threshold'],['Поток','Stream'],['Кадр','Frame'],['Код','Code'],['Импульс','Pulse'],['Периметр','Perimeter'],['Шлюз','Gateway'],['Резерв','Reserve'],
+      ['След','Trace'],['Голос','Voice'],['Экран','Screen'],['Коридор','Corridor'],['Ключ','Key'],['Разрыв','Rift'],['Шум','Noise'],['Запись','Record'],
+      ['Последний Сигнал','Last Signal'],['Скрытый Контур','Hidden Contour'],['Нулевой Протокол','Zero Protocol'],['Забытый Архив','Forgotten Archive'],['Безымянный Свидетель','Nameless Witness'],['Ночной Наблюдатель','Night Observer'],
+      ['Северный Оператор','Northern Operator'],['Пограничный Узел','Border Node'],['Зашифрованный Маркер','Encoded Marker'],['Потерянный Фрагмент','Lost Fragment'],['Свободный Вектор','Free Vector'],['Неизвестный Объект','Unknown Subject'],
+      ['Резервный Канал','Reserve Channel'],['Невидимый След','Invisible Trace'],['Последний Кадр','Last Frame'],['Сломанный Код','Broken Code'],['Тихий Сигнал','Silent Signal'],['Нулевой Сектор','Zero Sector'],
+      ['Теневой Проводник','Shadow Guide'],['Пустой Коридор','Empty Corridor'],['Забытый Голос','Forgotten Voice'],['Брошенный Маяк','Abandoned Beacon'],['Стёртый Маркер','Erased Marker'],['Запретный Канал','Forbidden Channel'],
+      ['Немой Свидетель','Mute Witness'],['Скрытый Терминал','Hidden Terminal'],['Последний Архивист','Last Archivist'],['Ночной Сканер','Night Scanner'],['Серый Инспектор','Grey Inspector'],['Потерянный Сигнал','Lost Signal'],
+      ['Лицо Без Архива','Face Without an Archive'],['Голос Из Сектора','Voice from the Sector'],['Человек Из Записи','Person from the Record'],['Тень За Экраном','Shadow Behind the Screen'],['Свидетель Без Номера','Witness Without a Number'],
+      ['Последний В Очереди','Last in the Line'],['За Пределом Секции','Beyond the Section'],['Вне Зоны Контроля','Outside Control'],['Не Внесён В Реестр','Not in the Register'],['Сигнал Не Принят','Signal Not Received'],
+      ['Запись Не Найдена','Record Not Found'],['За Закрытой Дверью','Behind the Sealed Door'],['Из Другого Сектора','From Another Sector'],['Тот, Кто Остался','The One Who Stayed'],['Никем Не Учтён','Unaccounted For'],
+      ['Вне Списка','Outside the List'],['Пока Система Спит','While the System Sleeps'],['Неизвестный В Кадре','Unknown in Frame']
     ]
   };
 
@@ -258,6 +279,7 @@
     const code = String(profile.alias_code || '');
     const n = Number(profile.alias_number ?? 0);
     let m;
+    if ((m = code.match(/^curated_(\d+)$/))) return `${pair('curated',+m[1],lang)} ${String(n).padStart(3,'0')}`;
     if ((m = code.match(/^an_(\d+)_(\d+)$/))) return `${pair('adjectives',+m[1],lang)} ${pair('nouns',+m[2],lang)}`;
     if ((m = code.match(/^role_(\d+)$/))) return `${pair('roles',+m[1],lang)} // ${String(n).padStart(2,'0')}`;
     if ((m = code.match(/^wi_(\d+)_(\d+)$/))) return `${pair('worlds',+m[1],lang)} ${pair('images',+m[2],lang)}`;
@@ -267,24 +289,44 @@
     if ((m = code.match(/^noun_(\d+)$/))) return `${pair('nouns',+m[1],lang)} // ${String(n).padStart(3,'0')}`;
     if (code === 'record') return lang === 'ru' ? `Запись ${String(Math.floor(n/100)).padStart(2,'0')}-${String(n%100).padStart(2,'0')}` : `Record ${String(Math.floor(n/100)).padStart(2,'0')}-${String(n%100).padStart(2,'0')}`;
     if ((m = code.match(/^rw_(\d+)_(\d+)$/))) return `${pair('roles',+m[1],lang)} / ${pair('worlds',+m[2],lang)}`;
+    if ((m = code.match(/^sr_(\d+)_(\d+)$/))) return `${pair('worlds',+m[2],lang)}-${String(n).padStart(3,'0')} // ${pair('roles',+m[1],lang)}`;
+    if ((m = code.match(/^signal_(\d+)_(\d+)$/))) return `${lang === 'ru' ? 'Сигнал' : 'Signal'} // ${pair('adjectives',+m[1],lang)} ${pair('nouns',+m[2],lang)}`;
+    if ((m = code.match(/^node_(\d+)$/))) return `${lang === 'ru' ? 'Узел' : 'Node'}-${String(n).padStart(3,'0')} // ${pair('nouns',+m[1],lang)}`;
+    if ((m = code.match(/^trace_(\d+)$/))) return `${lang === 'ru' ? 'След' : 'Trace'} // ${pair('phrases',+m[1],lang)}`;
+    if ((m = code.match(/^gate_(\d+)$/))) return `${lang === 'ru' ? 'Шлюз' : 'Gate'}-${String(n).padStart(3,'0')} / ${pair('worlds',+m[1],lang)}`;
     return profile.display_name || (lang === 'ru' ? 'Неизвестный профиль' : 'Unknown profile');
   }
 
   function generateAliasProfile() {
-    const type = randomInt(9);
-    let alias_code, alias_number = randomInt(1000);
-    if (type === 0) alias_code = `an_${randomInt(ALIAS.adjectives.length)}_${randomInt(ALIAS.nouns.length)}`;
-    else if (type === 1) alias_code = `role_${randomInt(ALIAS.roles.length)}`;
-    else if (type === 2) alias_code = `wi_${randomInt(ALIAS.worlds.length)}_${randomInt(ALIAS.images.length)}`;
-    else if (type === 3) alias_code = `phrase_${randomInt(ALIAS.phrases.length)}`;
-    else if (type === 4) alias_code = `ar_${randomInt(ALIAS.adjectives.length)}_${randomInt(ALIAS.roles.length)}`;
-    else if (type === 5) alias_code = `world_${randomInt(ALIAS.worlds.length)}`;
-    else if (type === 6) alias_code = `noun_${randomInt(ALIAS.nouns.length)}`;
-    else if (type === 7) { alias_code = 'record'; alias_number = randomInt(1000); }
-    else alias_code = `rw_${randomInt(ALIAS.roles.length)}_${randomInt(ALIAS.worlds.length)}`;
+    // New aliases are deliberately curated instead of assembled from arbitrary
+    // adjective/noun pairs. Every newly generated nickname has a visible number.
+    const alias_code = `curated_${randomInt(ALIAS.curated.length)}`;
+    const alias_number = randomInt(1000);
     const p = { alias_code, alias_number, display_name:'', avatar_seed:randomSeed(), avatar_style:randomInt(6)+1, is_official:false };
     p.display_name = renderAlias(p, state.lang).slice(0,40);
     return p;
+  }
+
+  function aliasConflict(err) {
+    const code=String(err?.payload?.code||err?.payload?.error_code||'');
+    const msg=String(err?.message||'');
+    return code==='23505' || /profiles_unique_alias_identity|duplicate key.*alias/i.test(msg);
+  }
+
+  async function saveProfileUnique(profile, attempts=8) {
+    let p={...profile};
+    for(let i=0;i<attempts;i++){
+      p.display_name=renderAlias(p,state.lang).slice(0,40);
+      try {
+        const saved=await rpcPost('update_my_profile_v4',{p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style});
+        return saved;
+      } catch(err) {
+        if(!aliasConflict(err) || i===attempts-1) throw err;
+        const fresh=generateAliasProfile();
+        p={...p,alias_code:fresh.alias_code,alias_number:fresh.alias_number};
+      }
+    }
+    throw new ApiError('Alias allocation failed',409,'ALIAS_EXHAUSTED');
   }
 
   const AVATAR_PORTRAITS = [1,2,3,4,5,6,7,8,10,11,12,13,14,15,16];
@@ -580,7 +622,7 @@
     identityPromise=(async()=>{
       const s=await getSession(true); state.user=s.user;
       const p=profileForWrite();
-      const saved=await rpcPost('update_my_profile_v4',{p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style});
+      const saved=await saveProfileUnique(p);
       state.profile=saved;state.pendingProfile=null;renderProfile();return saved;
     })();
     try{return await identityPromise;}finally{identityPromise=null;}
@@ -606,7 +648,7 @@
     const p={...base,alias_code:fresh.alias_code,alias_number:fresh.alias_number};p.display_name=renderAlias(p,state.lang).slice(0,40);
     if(!state.user&&!loadSession()){state.pendingProfile=p;renderProfile();return;}
     profileMutation=true;setProfileBusy(true);
-    try{await getSession(true);const saved=await rpcPost('update_my_profile_v4',{p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style});commitProfileMutation(saved);}
+    try{await getSession(true);const saved=await saveProfileUnique(p);commitProfileMutation(saved);}
     catch(err){console.error('[P14/profile/name]',err);setStatus(`${t('profileError')} [${err.code||'PROFILE'}]`,'error');}
     finally{profileMutation=false;setProfileBusy(false);}
   }
@@ -615,7 +657,7 @@
     const base={...(state.profile||state.pendingProfile||generateAliasProfile())};base.avatar_seed=randomSeed();base.avatar_style=randomInt(6)+1;base.display_name=renderAlias(base,state.lang).slice(0,40);
     if(!state.user&&!loadSession()){state.pendingProfile=base;renderProfile();return;}
     profileMutation=true;setProfileBusy(true);
-    try{await getSession(true);const saved=await rpcPost('update_my_profile_v4',{p_display_name:base.display_name,p_alias_code:base.alias_code,p_alias_number:base.alias_number,p_avatar_seed:base.avatar_seed,p_avatar_style:base.avatar_style});commitProfileMutation(saved);}
+    try{await getSession(true);const saved=await saveProfileUnique(base);commitProfileMutation(saved);}
     catch(err){console.error('[P14/profile/avatar]',err);setStatus(`${t('profileError')} [${err.code||'PROFILE'}]`,'error');}
     finally{profileMutation=false;setProfileBusy(false);}
   }
@@ -680,6 +722,23 @@
     try{return await challengePromise;}finally{challengePromise=null;}
   }
 
+  async function submitReviewUnique(payload, profile, attempts=8){
+    let p={...profile};
+    for(let i=0;i<attempts;i++){
+      p.display_name=renderAlias(p,state.lang).slice(0,40);
+      try{
+        const data=await rpcPost('submit_my_review_v5',{...payload,p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style});
+        return data;
+      }catch(err){
+        if(!aliasConflict(err) || i===attempts-1)throw err;
+        const fresh=generateAliasProfile();
+        p={...p,alias_code:fresh.alias_code,alias_number:fresh.alias_number};
+        state.pendingProfile=p;renderProfile();
+      }
+    }
+    throw new ApiError('Alias allocation failed',409,'ALIAS_EXHAUSTED');
+  }
+
   async function submitReview(){
     if(state.busy||profileMutation||!state.bootReady)return;
     if(state.channel?.reviews_enabled===false){setStatus(t('channelClosedNote'),'');return;}
@@ -700,7 +759,7 @@
     let unlocked=false;
     try{
       const session=await getSession(true);state.user=session.user;
-      const data=await rpcPost('submit_my_review_v5',{p_rating:rating,p_review_text:text,p_display_name:p.display_name,p_alias_code:p.alias_code,p_alias_number:p.alias_number,p_avatar_seed:p.avatar_seed,p_avatar_style:p.avatar_style,p_challenge_id:challenge?.id||null,p_challenge_answer:challenge?.answer??null});
+      const data=await submitReviewUnique({p_rating:rating,p_review_text:text,p_challenge_id:challenge?.id||null,p_challenge_answer:challenge?.answer??null},p);
       state.profile=data.profile;state.pendingProfile=null;state.ownReview=data.review;state.selectedRating=Number(data.review.rating);
       renderProfile();updateComposerUI();updateRatingLabel();applyLocalReviewStats(previousReview,data.review);
       setStatus(existed?t('updated'):t('saved'),'success');
@@ -975,6 +1034,37 @@
   }
   if(communityBus)communityBus.onmessage=()=>schedulePublicSync(120);
 
+  function setOverlay(open, selector, trigger){
+    const panel=$(selector), button=$(trigger);if(!panel)return;
+    panel.hidden=!open;panel.setAttribute('aria-hidden',String(!open));
+    button?.setAttribute('aria-expanded',String(open));
+    document.body.classList.toggle('info-overlay-open',open);
+    if(open)setTimeout(()=>$('.info-overlay-close',panel)?.focus(),0);
+  }
+  function diagnosticsText(){
+    const vv=window.visualViewport;
+    return [
+      'THEFT // BUG REPORT',
+      `BUILD: REVIVAL R6`,
+      `PAGE: ${location.pathname}${location.hash}`,
+      `LANG: ${state.lang}`,
+      `VIEWPORT: ${Math.round(vv?.width||innerWidth)}x${Math.round(vv?.height||innerHeight)}`,
+      `SCREEN: ${screen.width}x${screen.height}`,
+      `UA: ${navigator.userAgent}`,
+      `ONLINE: ${navigator.onLine?'YES':'NO'}`
+    ].join('\n');
+  }
+  async function copyDiagnostics(){
+    const text=diagnosticsText();
+    try{await navigator.clipboard.writeText(text);}catch{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.append(ta);ta.select();document.execCommand('copy');ta.remove();}
+    const b=$('#bugReportCopy');if(b){const old=b.textContent;b.textContent=t('reportCopied');setTimeout(()=>b.textContent=t('reportCopy'),1600);}
+  }
+  function openDeveloperReport(){
+    const body=`\n\n---\n${diagnosticsText()}`;
+    const url=`https://github.com/Cryo-Zero/hishchenie-film/issues/new?title=${encodeURIComponent('[BUG] ')}&body=${encodeURIComponent(body)}`;
+    window.open(url,'_blank','noopener,noreferrer');
+  }
+
   function bindEvents(){
     $('#langToggle')?.addEventListener('click',()=>setLanguage(state.lang==='ru'?'en':'ru'));
     $('#rerollName')?.addEventListener('click',rerollName);$('#rerollAvatar')?.addEventListener('click',rerollAvatar);$('#submitReview')?.addEventListener('click',submitReview);$('#deleteReview')?.addEventListener('click',deleteReview);
@@ -982,6 +1072,13 @@
     $$('.rating-button').forEach(b=>b.addEventListener('click',()=>selectRating(b.dataset.rating)));$$('.review-sort-button').forEach(b=>b.addEventListener('click',()=>loadReviews(b.dataset.sort,'all')));
     const lexicon=$('#profanityFilterToggle');if(lexicon){setLexiconToggle();lexicon.addEventListener('change',()=>{state.profanityFilter=lexicon.checked;safeStorage.set('theft_profanity_filter',state.profanityFilter?'1':'0');state.revealedReviews.clear();state.revealedReplies.clear();setLexiconToggle();renderReviews(state.reviews);});}
     $('#securityToggle')?.addEventListener('click',()=>{const p=$('#securityPanel'),b=$('#securityToggle');if(!p||!b)return;const open=p.hidden;p.hidden=!open;b.setAttribute('aria-expanded',String(open));});
+    $('#profileHelpToggle')?.addEventListener('click',()=>setOverlay($('#profileHelpPanel')?.hidden!==false,'#profileHelpPanel','#profileHelpToggle'));
+    $('#profileHelpClose')?.addEventListener('click',()=>setOverlay(false,'#profileHelpPanel','#profileHelpToggle'));
+    $('#bugReportToggle')?.addEventListener('click',()=>setOverlay($('#bugReportPanel')?.hidden!==false,'#bugReportPanel','#bugReportToggle'));
+    $('#bugReportClose')?.addEventListener('click',()=>setOverlay(false,'#bugReportPanel','#bugReportToggle'));
+    $('#bugReportCopy')?.addEventListener('click',copyDiagnostics);
+    $('#bugReportOpen')?.addEventListener('click',openDeveloperReport);
+    document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('#profileHelpPanel')?.hidden===false)setOverlay(false,'#profileHelpPanel','#profileHelpToggle');if($('#bugReportPanel')?.hidden===false)setOverlay(false,'#bugReportPanel','#bugReportToggle');});
   }
 
   async function boot(){
