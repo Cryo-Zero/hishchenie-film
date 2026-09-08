@@ -2,13 +2,20 @@
 
 Статический официальный сайт фильма «ХИЩЕНИЕ / THEFT».
 
-## Быстрый вход в проект
+## Project memory / быстрый вход
 
-1. Сначала читать `docs/current/PROJECT-STATE.md` — это канонический текущий статус production, R6, backend и следующего шага.
-2. Затем читать `docs/releases/revival/R6/` — release notes и QA для REVIVAL R6.
-3. Подтверждённое состояние уже применённого R6 backend зафиксировано в `docs/database/supabase/REVIVAL-R6-APPLIED.md`.
-4. Исходный SQL R6 находится в `docs/database/supabase/REVIVAL-R6_unique_aliases.sql`; сам SQL-файл не является доказательством применения миграции.
-5. P20–P22 — отвергнутые исторические редизайны. Они сохранены для истории и не должны использоваться как актуальный UI baseline.
+Future handoff начинается с трёх canonical документов:
+
+1. **Current state** → [`docs/current/PROJECT-STATE.md`](docs/current/PROJECT-STATE.md) — **what is true now**.
+2. **Decisions** → [`docs/current/DECISIONS.md`](docs/current/DECISIONS.md) — **why the project works this way**.
+3. **Backlog** → [`docs/current/BACKLOG.md`](docs/current/BACKLOG.md) — **what we may revisit later; this is not authorization to implement**.
+
+После них при необходимости читать release/database history:
+
+- `docs/releases/revival/R6/` — release notes и QA для REVIVAL R6;
+- `docs/database/supabase/REVIVAL-R6-APPLIED.md` — подтверждённое применённое состояние R6 backend;
+- `docs/database/supabase/REVIVAL-R6_unique_aliases.sql` — source SQL, сам по себе не доказывающий применение migration;
+- P20–P22 — отвергнутые исторические redesigns в `archive/rejected-redesigns/`, не актуальный UI baseline.
 
 ## Рабочая структура
 
@@ -24,7 +31,7 @@
 │  ├─ site.js                 # навигация, архив, актёры, FAQ
 │  ├─ public-response.js      # анонимные профили, оценки, отзывы
 │  └─ admin.js                # существующая админка
-├─ docs/                      # текущее состояние, релизы, БД, admin notes
+├─ docs/                      # current memory, релизы, БД, admin notes
 ├─ archive/                   # исторический код, не используемый runtime
 └─ tools/                     # служебные инструменты
 ```
@@ -32,19 +39,19 @@
 ## Принципы проекта
 
 - RU / EN интерфейс.
-- Анонимные отзывы без email, телефона, пароля и соцсетей.
+- Анонимные отзывы без viewer email, телефона, пароля и соцсетей.
 - Оценка 0–10; 7–10 считается положительной для «Свежести».
 - Один отзыв на один анонимный профиль; свой отзыв можно изменять и удалять.
 - Desktop-сцены и их «сетка мира» считаются утверждённым визуальным контрактом.
-- ARCHIVE намеренно выходит за общую опорную сетку.
-- Ничего исторического не удаляется без отдельного решения: устаревшее переносится в `archive/`.
+- ARCHIVE намеренно может выходить за общую опорную сетку.
+- Ничего исторического не удаляется без отдельного решения: устаревшее хранится как history/archive.
 
 ## История и резерв
 
 Документация релизов хранится в `docs/releases/`. Отвергнутые P20–P22 сохранены в `archive/rejected-redesigns/` и не являются источником текущих UI-требований.
 
-Отдельный резервный репозиторий: `Cryo-Zero/hishchenie-film-v2`. Он используется для recovery snapshots и архива update-пакетов.
+Отдельный резервный репозиторий: `Cryo-Zero/hishchenie-film-v2`. Его существующий `main` хранит recovery/archive history и не должен автоматически переписываться. Актуальное production-зеркало должно поддерживаться отдельно в branch `mirror/hishchenie-film-main` после значимых project-memory updates.
 
 ## Supabase
 
-Рабочий проект: `xltwwvutqkpmtmlavngi`. В репозитории допустимы только публичные клиентские ключи; service-role и другие секреты запрещены. Подтверждения уже применённых backend-состояний хранятся в `docs/database/supabase/*-APPLIED.md`.
+Рабочий project: `xltwwvutqkpmtmlavngi`. В репозитории допустимы только публичные клиентские ключи; service-role и другие секреты запрещены. Подтверждения уже применённых backend-состояний хранятся в `docs/database/supabase/*-APPLIED.md`.

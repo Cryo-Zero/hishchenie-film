@@ -1,49 +1,38 @@
 # HISHCHENIE / THEFT — current project state
 
-Last production/backend verification: **2026-09-09**.
+Last consolidated project-memory backfill: **2026-09-09**.
+
+This file contains facts that are true now or explicitly marked as snapshots/reference points. For rationale and durable rules, see `DECISIONS.md`; for unapproved future ideas, see `BACKLOG.md`.
 
 ## Production
 
-- `main` is still the **REVIVAL R5 production baseline** while PR #17 remains unmerged.
-- R6 frontend is in branch `revival-r6-profile-safety-report`.
-- PR: `#17 — REVIVAL R6 — profile safety, bug report and curated aliases`.
-- The R6 frontend is **not merged or published yet**.
+- Production release: **REVIVAL R6**.
+- PR #17 (`REVIVAL R6 — profile safety, bug report and curated aliases`) has been merged into `main`.
+- Production runtime now includes the R6 profile help, privacy-safe bug-report channel, curated alias generator and its supporting documentation/backend contract.
+- Reference `main` snapshot at the start of this memory-backfill operation: `ddc3542c5d31e544eee1db29b7ea8aa5712e218f`.
+- The SHA above is a **snapshot/reference point, not a permanent latest-main pointer**. Documentation-only commits after that point naturally advance `main` without changing the production runtime.
 
 ## Recovery
 
-- Recovery branch: `backup/revival-r5-before-r6`.
-- Recovery commit: `61bab24b3e0a925e1e2a1591add0e4e13875ac7c`.
-
-## R6 frontend
-
-REVIVAL R6 adds the following without redesigning the approved R5 desktop world/grid contract:
-
-- profile `?` help overlay;
-- explanation that anonymous identity is bound to this browser profile;
-- expanded answer for FAQ `QUERY_08` while keeping its existing joke title;
-- `REPORT // СООБЩИТЬ О БАГЕ` channel;
-- privacy-safe diagnostics without profile UUID, alias or review text;
-- curated bank of exactly 98 meaningful RU/EN nickname bases;
-- every newly generated nickname is `meaningful base + 3-digit number`;
-- legacy alias renderers remain intact for existing stored profiles;
-- new alias collisions are handled by client reroll/retry;
-- approved desktop scene/grid geometry remains the R5 contract.
+- Approved R5 recovery branch: `backup/revival-r5-before-r6`.
+- Approved R5 recovery commit: `61bab24b3e0a925e1e2a1591add0e4e13875ac7c`.
+- This recovery point exists to return to the known R5 baseline if a future release requires rollback.
 
 ## Supabase / R6 backend
 
 - Project: `xltwwvutqkpmtmlavngi` (`hishchenie-film`).
-- Migration `20260908155140_revival_r6_unique_aliases`: **APPLIED**.
-- Index `profiles_unique_alias_identity_idx`: **exists and UNIQUE** on `public.profiles`.
-- Canonical duplicate groups after migration: **0**.
-- The migration did not change user-data rows; it created the unique index and its comment.
-- `official_team`, NULL aliases and empty aliases are intentionally excluded from the index predicate.
+- R6 migration: `20260908155140_revival_r6_unique_aliases` — **APPLIED and VERIFIED**.
+- Index `profiles_unique_alias_identity_idx` exists and is **UNIQUE** on `public.profiles`.
+- Canonical duplicate groups: **0 before migration / 0 after migration**.
+- The migration did not modify user-data rows; it created the uniqueness index and its comment.
+- `official_team`, NULL aliases and empty aliases are intentionally outside the index predicate.
 - New `curated_*` identity includes both `alias_code` and `alias_number`.
 - Source SQL: `docs/database/supabase/REVIVAL-R6_unique_aliases.sql`.
 - Applied-state record: `docs/database/supabase/REVIVAL-R6-APPLIED.md`.
 
-## Current DB snapshot
+### Last verified DB snapshot
 
-Read-only production check on **2026-09-09**:
+Read-only verified snapshot on **2026-09-09**:
 
 - `public.profiles` = **16**
 - `public.reviews` = **11**
@@ -51,46 +40,63 @@ Read-only production check on **2026-09-09**:
 - `public.review_replies` = **6**
 - `public.admins` = **0**
 
-`admins = 0` means admin enrollment is still separate future work. The existing admin frontend is the old **REVIVAL R1** moderation UI; do not treat its presence as proof that an admin account has been enrolled.
+These are **snapshot counts**, not invariants. They can naturally change after normal user/admin activity.
+
+### Operational lesson
+
+The Supabase Free project previously entered `INACTIVE`, was manually resumed, and was then verified `ACTIVE_HEALTHY`.
+
+If reviews/profiles suddenly fail globally, first verify the Supabase project status before assuming the frontend is broken.
+
+## Admin state
+
+- Existing admin UI: `/admin/index.html` + `/js/admin.js` (REVIVAL R1 control panel; no redesign is required for initial activation).
+- Existing authorization path: `email/password → Supabase Auth → auth.users.id → public.admins → is_admin_v1() → admin RPC`.
+- Existing panel supports login/logout, review list/search/filter/sort/refresh, hide/unhide, pin/unpin, delete review and official reply.
+- Admin backend RPC/functions are present.
+- Last verified `public.admins` count: **0**.
+- Last verified suitable email/password Auth users: **0**; existing viewer identities were anonymous users.
+- Planned owner login `zero@hishchenie.invalid` is **not created yet**. Its activation remains the next explicit admin task; password must not be stored in GitHub/docs.
 
 ## Canonical runtime files
 
-- `/index.html` — main public page / section-scene navigation.
+- `/index.html` — main public page / scene navigation.
 - `/reviews.html` — public response workspace.
 - `/css/site.css` — active shared visual system.
-- `/js/site.js` — public page interactions, exact section landing, gallery, cast and FAQ.
-- `/js/public-response.js` — anonymous profile, ratings/reviews, likes/replies, live sync and R6 profile/report UI.
-- `/admin/index.html` + `/js/admin.js` — old REVIVAL R1 moderation frontend.
+- `/js/site.js` — section navigation, archive, actors and FAQ interactions.
+- `/js/public-response.js` — anonymous profiles, ratings/reviews, likes/replies, live sync and R6 profile/report UI.
+- `/admin/index.html` + `/js/admin.js` — existing moderation frontend.
 
-## Important invariants
+## Current release characteristics
 
-- Viewer auth/identity remains anonymous.
-- No viewer email/password/social login.
-- One review per anonymous identity.
-- Deleting a review cascades its replies and likes.
-- Public community writes use the established server-side RPC surface rather than direct raw-table writes.
-- Approved desktop scenes and the shared world/grid contract must not be casually redesigned.
-- ARCHIVE is the deliberate layout exception and may extend outside the common support grid.
-- Historical material must not be deleted without an explicit decision; rejected work belongs in history/archive, not in the active baseline.
+REVIVAL R6 adds without redesigning the approved desktop world/grid contract:
 
-## Operational note
+- profile `?` help overlay and browser-bound identity explanation;
+- expanded FAQ `QUERY_08` answer while keeping the joke title;
+- `REPORT // СООБЩИТЬ О БАГЕ` opening GitHub Issues with privacy-safe diagnostics;
+- curated bank of exactly 98 RU/EN nickname bases;
+- mandatory visible 3-digit number for new nicknames;
+- `curated_*` alias codes and transparent collision reroll/retry;
+- legacy alias rendering retained for existing stored profiles.
 
-The working Supabase project was observed in an `INACTIVE` state and was restored. After restoration it was verified as `ACTIVE_HEALTHY`, and the R6 migration/backend checks completed successfully.
+Detailed R6 release documentation: `docs/releases/revival/R6/`.
 
-If `public-response` suddenly stops working across the site, first verify the Supabase project status before assuming the frontend is broken.
-
-## Release lineage
+## Release lineage / history
 
 - P10–P18: foundations and review/system work.
-- P20–P22: rejected large redesign experiments; historical only.
+- P20–P22: rejected large redesign attempts; historical reference only. Code is preserved in `archive/rejected-redesigns/`.
 - REVIVAL R1–R5: return to the approved direction and stabilization.
-- REVIVAL R5: current production baseline until PR #17 is merged.
-- REVIVAL R6: frontend prepared in PR #17; backend already applied and verified.
+- REVIVAL R5: approved recovery baseline before R6.
+- REVIVAL R6: **current production release**.
 
-## Repository housekeeping rule
+Do not delete historical material without explicit approval. Current-memory files summarize history rather than duplicating full release notes.
 
-Do not remove historical material without explicit approval. Runtime files stay at stable public URLs; documentation belongs under `/docs`, historical code under `/archive`.
+## Current next phase
 
-## Next step
+Current direction:
 
-**R6 backend complete and verified. Next: final frontend/PR verification → mark PR #17 ready → merge only after explicit approval.**
+**Admin activation / admin improvements → responsive/mobile pass**
+
+- First: activate the existing admin path with an explicitly approved owner Auth identity; do not redesign the panel merely to activate it.
+- Then: open a separate responsive/mobile workstream based on the responsive philosophy in `DECISIONS.md`.
+- Fine mobile spacing/pixel-perfect polish can be a later dedicated pass after the first functionally complete mobile release.
