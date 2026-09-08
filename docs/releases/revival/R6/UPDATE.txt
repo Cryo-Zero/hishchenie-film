@@ -12,4 +12,13 @@ Changes:
 - No approved desktop scene/grid behavior is removed or redesigned.
 
 Backend:
-- Apply docs/database/supabase/REVIVAL-R6_unique_aliases.sql before publishing the R6 frontend.
+- Supabase project `xltwwvutqkpmtmlavngi` was verified `ACTIVE_HEALTHY`.
+- Migration `20260908155140_revival_r6_unique_aliases` is applied and verified.
+- `profiles_unique_alias_identity_idx` exists as a verified UNIQUE index on `public.profiles`.
+- Canonical duplicate groups after migration = 0; user-data table counts were unchanged during migration.
+- Backend blocker is cleared.
+
+Release state:
+- R6 frontend remains in `revival-r6-profile-safety-report` / PR #17.
+- Frontend is still not merged or published.
+- Final PR/frontend verification remains before release.

@@ -2,6 +2,14 @@
 
 Статический официальный сайт фильма «ХИЩЕНИЕ / THEFT».
 
+## Быстрый вход в проект
+
+1. Сначала читать `docs/current/PROJECT-STATE.md` — это канонический текущий статус production, R6, backend и следующего шага.
+2. Затем читать `docs/releases/revival/R6/` — release notes и QA для REVIVAL R6.
+3. Подтверждённое состояние уже применённого R6 backend зафиксировано в `docs/database/supabase/REVIVAL-R6-APPLIED.md`.
+4. Исходный SQL R6 находится в `docs/database/supabase/REVIVAL-R6_unique_aliases.sql`; сам SQL-файл не является доказательством применения миграции.
+5. P20–P22 — отвергнутые исторические редизайны. Они сохранены для истории и не должны использоваться как актуальный UI baseline.
+
 ## Рабочая структура
 
 ```text
@@ -39,4 +47,4 @@
 
 ## Supabase
 
-Рабочий проект: `xltwwvutqkpmtmlavngi`. В репозитории допустимы только публичные клиентские ключи; service-role и другие секреты запрещены.
+Рабочий проект: `xltwwvutqkpmtmlavngi`. В репозитории допустимы только публичные клиентские ключи; service-role и другие секреты запрещены. Подтверждения уже применённых backend-состояний хранятся в `docs/database/supabase/*-APPLIED.md`.
