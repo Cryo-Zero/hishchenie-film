@@ -2,103 +2,84 @@
 
 This document stores long-lived decisions and the reasoning/constraints behind them. It is not a release log and not a task list.
 
+For active visual/composition laws, see `VISUAL-SYSTEM.md`. For current factual state, see `PROJECT-STATE.md`. For unapproved future ideas, see `BACKLOG.md`.
+
 ## Workflow / governance
 
-- For substantial visual, architectural or backend-semantic changes, the required flow is: **feedback → explicit approval → implementation**.
+For substantial visual, architectural or backend-semantic changes, the normal flow is:
+
+**feedback → explicit approval → implementation → factual verification**
+
+General rules:
+
 - Do not delete files, history, archive material or project behavior without explicit owner approval.
 - Old ideas are not automatically current tasks.
 - Historical backlog should be remembered, but implementation requires fresh approval.
 - Rejected redesigns must not be revived automatically.
 - Do not invent film-author data, contacts, release facts or other public information that is not actually present/confirmed in the project.
 - When a task says read-only, do not self-fix discovered problems; report them first.
+- BACKLOG presence never means permission to implement.
+
+### Priority of project instructions
+
+When rules conflict, use this priority:
+
+`current explicit owner instruction`
+
+→ `approved scene/task-specific instruction`
+
+→ `current canonical project rules / VISUAL-SYSTEM`
+
+→ `historical context`
+
+→ `BACKLOG`
+
+A newer explicit owner instruction may intentionally change an older general rule. If a prompt appears to conflict with a newer factual state or established rule and the destructive intent is unclear, do not guess: identify the conflict and stop where clarification/approval is required.
+
+## Verification integrity
+
+Never report a backup, mirror, migration, deployment, check or other operation as successful merely because a command/request was sent.
+
+Success means the claimed final state was actually verified.
+
+If the available tool cannot prove the claimed result, report:
+
+**NOT VERIFIED**
+
+and the exact reason.
+
+Do not replace verification with inference. This rule applies to all bridge/tool operations.
+
+The previous exact reserve-mirror attempt is the reference example: it was stopped rather than publishing an incomplete copy when the full binary tree could not be reproduced and verified.
 
 ## Visual / world contract
 
-- Desktop is the primary visual reference for the site.
-- The site is **not** intended as a conventional long landing page. Most major sections behave as distinct scene-like screens/tabs connected by a shared visual/world grid.
-- Preserve bespoke motion, composition and interface character, especially:
-  - Actors;
-  - FAQ;
-  - Archive;
-  - scene navigation.
-- `Материалы / Archive` is an intentional layout exception and may extend beyond the main grid composition.
+The detailed active visual laws live in `VISUAL-SYSTEM.md` and must be read before visual/responsive work.
+
+Durable high-level decisions:
+
+- Desktop is the primary visual reference, not a fixed pixel canvas.
+- The site is not intended as a conventional long landing page; major sections behave as distinct scene-like states connected by a shared world/system language.
+- Preserve bespoke motion, composition and interface character, especially Actors, FAQ, Archive and scene navigation.
+- The world grid is a default contract, not a cage. Explicit approved creative direction for a specific scene may deliberately cross normal grid/alignment boundaries.
+- Materials / Archive is a known intentional exception and may extend beyond the main grid composition.
+- A local grid exception must not automatically redefine the global system for all scenes.
 - Do not redesign the approved desktop composition without a separate reason and explicit approval.
 - P20/P21/P22 are rejected redesign attempts and historical reference only.
 
 ## Responsive philosophy
 
-There is no simple model of **desktop + shrunken desktop**.
+Responsive work creates different representations of the same visual system while preserving identity, meaning and function.
 
-Responsive work should create different representations of the same visual system while preserving identity, meaning and function.
+Do not reduce the model to `desktop + shrunken desktop` or `PC/mobile` only.
 
-### Desktop
+Real target contexts include wide/normal/small desktop, low-height laptops, MacBook-class laptops, portrait desktop monitors, tablet landscape/portrait and phone landscape/portrait.
 
-- Desktop remains the visual benchmark and should not be casually simplified to satisfy mobile constraints.
+Responsive decisions must consider viewport width/height, aspect ratio, orientation, pointer, hover, touch, `dvh`/`svh`, safe-area, browser UI behavior, HiDPI/Retina, scaling and zoom. OS name alone must not determine layout.
 
-### Phones
+A large portrait monitor remains desktop context; tablet landscape should stay close to desktop when space allows; phone layouts may legitimately use sequential/fullscreen/sub-scene interpretations instead of literal geometric compression.
 
-Phone layouts may legitimately use:
-
-- changed composition;
-- element relocation;
-- sequential presentation of content that appears simultaneously on desktop;
-- replacement/reduction of some effects;
-- simplified scene layouts;
-- a different navigation pattern.
-
-This is acceptable if the phone version preserves:
-
-- visual language;
-- atmosphere;
-- typographic hierarchy;
-- system/archive character;
-- meaning and functionality.
-
-Do not literally squeeze complex desktop scenes into 390–430 px. Example: a two-column desktop FAQ does not need to remain two columns on a phone.
-
-### Tablets
-
-- Tablet landscape should remain as close to desktop as practical.
-- Tablet portrait may use stronger adaptation.
-
-### Portrait desktop monitors
-
-- Portrait orientation alone does not mean “phone”. A large portrait monitor with mouse/desktop input remains desktop context.
-
-### Inputs / browser / platform
-
-Responsive decisions must consider more than `width`, including:
-
-- viewport height;
-- aspect ratio;
-- portrait/landscape;
-- `hover` capability;
-- pointer type;
-- touch;
-- `dvh` / `svh`;
-- safe-area insets;
-- browser UI behavior;
-- HiDPI/Retina;
-- browser zoom/scaling.
-
-Real target contexts include Android phones, iPhone/iOS Safari, tablets, Windows desktop/laptop, macOS desktop/MacBook, wide monitors, low-height laptops and portrait monitors.
-
-OS name alone must not determine layout. Viewport geometry, input capabilities and browser behavior matter more.
-
-## First mobile release goal
-
-The first responsive/mobile pass exists mainly so the client and other users can fully use the site from a phone.
-
-First-pass priorities:
-
-- every main scene is accessible;
-- nothing critical collapses or becomes unreachable;
-- text remains readable;
-- controls work with touch;
-- trailer, materials, actors, reviews, FAQ and profile remain accessible;
-- key animations/site character are preserved where reasonable.
-
-Minor spacing and pixel-perfect corrections can be deferred to a separate polish pass.
+The first responsive/mobile pass prioritizes complete usability and preserved identity over pixel-perfect cosmetic polish.
 
 ## Visitor identity / auth / privacy
 
@@ -127,6 +108,8 @@ Implemented durable principles:
 - human-check;
 - official team replies;
 - RU/EN.
+
+Do not restore old public filters such as all/team reply/low-high rating without new explicit approval.
 
 ### Delete-review semantics
 
@@ -195,6 +178,21 @@ Last verified pre-activation state:
 - `public.admins` = `0`;
 - suitable email/password Auth users = `0`.
 
+### Owner Auth creation rule
+
+The connected Supabase bridge currently does **not** expose a documented Auth Admin `create user` action.
+
+Therefore the dedicated owner email/password Auth user must be created manually by the project owner through the Supabase Dashboard using the normal supported Auth management flow.
+
+Do **not** bypass this limitation with:
+
+- direct `INSERT`/`UPDATE` into `auth.users`;
+- temporary Edge Functions;
+- installing HTTP/`pg_net` extensions for this purpose;
+- undocumented HTTP/database workarounds.
+
+After the owner has created the Auth user, a separately authorized bridge operation may read its UUID, add only the approved membership row to `public.admins`, and verify the existing backend authorization path.
+
 ## Planned admin owner identity
 
 The planned technical owner login is:
@@ -203,14 +201,57 @@ The planned technical owner login is:
 
 Decisions:
 
-- It is **not** a public email and is not intended to be a real mailbox.
-- Its purpose is only Supabase Auth login for the owner/admin panel.
-- Create it using the normal Supabase Auth email/password mechanism, then add its `auth.users.id` to `public.admins` with `role = 'owner'`.
-- Password must be long and unique.
+- It is not a public mailbox and exists only as technical Supabase Auth login for the owner/admin panel.
+- The Auth user is **not created yet** at the current canonical state.
+- Create it manually through Supabase Dashboard, then add its `auth.users.id` to `public.admins` with `role = 'owner'` in a separately authorized activation step.
 - Never store the password in GitHub, project documentation or public code.
-- Because the email address does not exist, email password recovery will not work; password recovery/change must be handled through Supabase management/dashboard access.
-- MFA/2FA is not required for the first admin activation, but remains a possible later security improvement.
+- Because the mailbox is intentionally non-real, email password recovery is unavailable by design; password change/recovery must use Supabase management/dashboard access.
+- MFA/2FA is not required for the first activation, but remains a possible later security improvement.
 - Public nickname/official label must never depend on this technical login email.
+
+### Temporary admin test credential policy
+
+During active admin development/testing, the owner explicitly allows the bridge/operator to know and use a temporary test password **only for authorized admin authentication/smoke tests**.
+
+This is a temporary operational policy, not a reason to publish the credential.
+
+The password:
+
+- must not be written to GitHub;
+- must not be written to documentation;
+- must not appear in commit messages;
+- must not be repeated in final reports;
+- must not be stored together with token/session data.
+
+After active admin development/testing, the owner will replace the temporary password with a permanent private credential.
+
+Knowledge of the temporary password by the authorized bridge/operator is not itself considered a security incident under this temporary policy.
+
+## Database backup security
+
+Production database contents and credentials must **never** be copied into public GitHub.
+
+Public GitHub may contain:
+
+- schema definitions;
+- migrations/source SQL;
+- RLS/RPC definitions;
+- applied migration records;
+- recovery documentation;
+- safe aggregate snapshots;
+- anonymized test fixtures when needed.
+
+Public GitHub must not contain:
+
+- full production DB dumps;
+- password hashes;
+- auth sessions/tokens;
+- service-role/secret keys;
+- private keys;
+- real credentials;
+- sensitive Auth data.
+
+Real production data backups must live separately in protected/encrypted storage. A formal Database Recovery Plan remains a future task, not an automatically authorized implementation.
 
 ## Bug-report privacy
 
@@ -226,28 +267,47 @@ Diagnostics must not include:
 - secret keys;
 - application-collected IP address.
 
-## Project memory sync
+## Project memory quality / sync
 
-From this point forward, meaningful new project knowledge should be preserved during future GitHub work, without turning documentation into a transcript.
+Meaningful project knowledge includes not only features/backend/files but also:
+
+- visual laws;
+- composition principles;
+- world-grid rules;
+- deliberate exceptions;
+- responsive philosophy;
+- interaction philosophy;
+- rejected directions;
+- reasons behind important decisions;
+- safety and recovery rules;
+- operational lessons.
+
+If a rule repeatedly influences project work, it may be more valuable to memory than an isolated feature.
 
 Classify meaningful information as:
 
-- **STATE** — a factual project state changed;
-- **DECISION** — a durable rule/choice was accepted;
-- **BACKLOG** — an idea should be remembered but is not approved for implementation.
+- **PROJECT-STATE** — what is true now;
+- **DECISIONS** — accepted long-term rules/reasons;
+- **VISUAL-SYSTEM** — active visual/composition laws;
+- **BACKLOG** — ideas that may be revisited, not implementation approval;
+- **history/releases/archive** — past states and experiments.
 
-Rules:
+Do not record casual conversation, routine chatter, temporary debugging guesses, disproven assumptions or random preferences that never became decisions.
 
-- Do not record empty conversation or routine chatter.
-- Do not record random hypotheses as decisions.
-- Do not turn every sentence into documentation.
-- Backlog presence is never implementation approval.
-- Future bridge prompts may include a `Project memory sync delta`; apply it only when it contains meaningful new STATE/DECISION/BACKLOG information.
-- If there is no meaningful delta, do not change project-memory docs.
+Bridge prompts may be a source of durable project knowledge, but do not copy them verbatim into documentation. Extract only long-lived STATE/DECISION/VISUAL-SYSTEM/BACKLOG/HISTORY information.
 
-After every significant docs/project-memory update, the current production tree should be synchronized again to the reserve repository:
+## Reserve / project-memory safety copy
 
-- repo: `Cryo-Zero/hishchenie-film-v2`;
-- branch: `mirror/hishchenie-film-main`.
+Reserve repository: `Cryo-Zero/hishchenie-film-v2`.
 
-The reserve repository's existing `main`, `archives/`, `snapshots/` and history are separate recovery material and must not be destructively replaced merely to refresh the mirror branch.
+Its existing `main`, archives, snapshots and history are recovery material and must not be destructively replaced merely to synchronize current production documentation.
+
+The attempted exact production runtime mirror is currently **NOT VERIFIED / not created** because the available connector cannot transfer the missing ~22 MB production trailer blob into the reserve object database. This is a tool limitation, not evidence of production file loss.
+
+Do not publish an approximate `mirror/hishchenie-film-main` and do not call reserve an exact runtime mirror unless the complete tree is independently proven identical.
+
+After meaningful current-memory updates, maintain a **project-memory safety copy** at:
+
+`snapshots/project-memory/current/`
+
+containing the four canonical current files. Verify content equality after writing. This copy is documentation/recovery support, not a runtime mirror.

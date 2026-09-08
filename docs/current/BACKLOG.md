@@ -14,24 +14,28 @@ Planned owner identity:
 
 `zero@hishchenie.invalid`
 
+Current blocker: the connected Supabase bridge does not expose a documented Auth Admin create-user action.
+
 Planned sequence:
 
-1. create it as a Supabase email/password Auth user using the normal Auth mechanism;
-2. obtain its `auth.users.id`;
-3. add that UUID to `public.admins` with `role = 'owner'`;
-4. verify the existing admin login/moderation flow.
+1. project owner manually creates the dedicated Supabase email/password Auth user through Supabase Dashboard;
+2. after explicit approval, bridge reads the created `auth.users.id`;
+3. bridge adds only that UUID to `public.admins` with `role = 'owner'`;
+4. verify backend authorization (`is_admin_v1()` and membership);
+5. perform the first real owner admin-panel login / functional smoke check;
+6. sign out after the authorized smoke test.
 
-**Do not perform this as part of documentation/project-memory work.**
+Do not bypass Auth user creation with direct `auth.users` writes, temporary Edge Functions, installed HTTP/`pg_net` workarounds or undocumented mechanisms.
 
-The password must be long, unique and must not be stored in GitHub/docs.
+The temporary admin test password may be used only for explicitly authorized authentication/smoke tests. It must not be stored in GitHub/docs or repeated in reports.
 
 ### Responsive/mobile release
 
-After admin activation, open a separate responsive/mobile branch/workstream.
+After successful admin activation/smoke verification, open a separate responsive/mobile branch/workstream.
 
-First pass goal: a functionally complete phone experience, not mandatory pixel-perfect polish.
+First-pass goal: a functionally complete phone experience, not mandatory pixel-perfect polish.
 
-Follow the responsive philosophy in `DECISIONS.md`: preserve the same visual system and meaning, but allow phone/tablet-specific compositions rather than shrinking desktop literally.
+Follow `VISUAL-SYSTEM.md`: preserve visual identity/meaning while allowing device-specific composition instead of literally shrinking desktop.
 
 ## FUTURE IDEAS
 
@@ -73,6 +77,14 @@ The public wording `Сообщить о баге` is not permanently fixed and m
 MFA/2FA for the admin account may be added later if useful.
 
 It is **not** a blocker for initial admin activation.
+
+### Database Recovery Plan
+
+Create a formal Database Recovery Plan in a future separately approved task.
+
+It should define safe encrypted/private backup storage and recovery procedures without committing production dumps, credentials, password hashes, tokens/sessions or sensitive Auth data to public GitHub.
+
+This is future work only; current repository documentation is not a production-data backup.
 
 ## HISTORICAL IDEAS / revisit only if useful
 

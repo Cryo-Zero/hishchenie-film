@@ -1,16 +1,27 @@
 # HISHCHENIE / THEFT — current project state
 
-Last consolidated project-memory backfill: **2026-09-09**.
+Last consolidated project-memory / visual-contract sync: **2026-09-09**.
 
-This file contains facts that are true now or explicitly marked as snapshots/reference points. For rationale and durable rules, see `DECISIONS.md`; for unapproved future ideas, see `BACKLOG.md`.
+This file contains facts that are true now or explicitly marked as snapshots/reference points. For rationale and durable rules, see `DECISIONS.md`; for active visual/composition laws, see `VISUAL-SYSTEM.md`; for unapproved future ideas, see `BACKLOG.md`.
 
 ## Production
 
 - Production release: **REVIVAL R6**.
 - PR #17 (`REVIVAL R6 — profile safety, bug report and curated aliases`) has been merged into `main`.
-- Production runtime now includes the R6 profile help, privacy-safe bug-report channel, curated alias generator and its supporting documentation/backend contract.
-- Reference `main` snapshot at the start of this memory-backfill operation: `ddc3542c5d31e544eee1db29b7ea8aa5712e218f`.
-- The SHA above is a **snapshot/reference point, not a permanent latest-main pointer**. Documentation-only commits after that point naturally advance `main` without changing the production runtime.
+- Production runtime includes R6 profile help, privacy-safe bug-report channel, curated alias generator and its supporting documentation/backend contract.
+- Reference `main` snapshot at the start of this documentation operation: `45c327b813a53dfb927aba840fdca1f5c5812745`.
+- The SHA above is a **snapshot/reference point, not a permanent latest-main pointer**. Documentation-only commits after that point naturally advance `main` without changing runtime.
+
+## Canonical project memory
+
+Future bridge/developer work starts from:
+
+1. `docs/current/PROJECT-STATE.md` — what is true now;
+2. `docs/current/DECISIONS.md` — accepted long-term rules/reasons;
+3. `docs/current/VISUAL-SYSTEM.md` — active visual/composition laws;
+4. `docs/current/BACKLOG.md` — ideas that may be revisited, not approval.
+
+Before visual/responsive work, `VISUAL-SYSTEM.md` is mandatory reading.
 
 ## Recovery
 
@@ -56,7 +67,25 @@ If reviews/profiles suddenly fail globally, first verify the Supabase project st
 - Admin backend RPC/functions are present.
 - Last verified `public.admins` count: **0**.
 - Last verified suitable email/password Auth users: **0**; existing viewer identities were anonymous users.
-- Planned owner login `zero@hishchenie.invalid` is **not created yet**. Its activation remains the next explicit admin task; password must not be stored in GitHub/docs.
+- Planned owner login `zero@hishchenie.invalid` is **not created yet**.
+- Admin activation is therefore **NOT complete**.
+
+### Current admin blocker / next action
+
+The connected Supabase bridge does not expose a documented Auth Admin create-user action. Previous work correctly stopped rather than using a direct `auth.users` mutation or other workaround.
+
+The owner must create the dedicated email/password Auth user manually through the Supabase Dashboard using the supported Auth management flow.
+
+Do not create the Auth user through:
+
+- direct `INSERT`/`UPDATE` in `auth.users`;
+- temporary Edge Functions;
+- installed HTTP/`pg_net` workarounds;
+- undocumented creation paths.
+
+After the owner manually creates the user, a separately authorized bridge step can obtain its UUID, add the approved `public.admins` membership with `role = 'owner'`, and verify backend authorization.
+
+A temporary admin test password may be known/used by the authorized bridge only for explicitly approved authentication/smoke testing. The password itself is intentionally **not documented** and must never be committed or repeated in final reports.
 
 ## Canonical runtime files
 
@@ -67,7 +96,20 @@ If reviews/profiles suddenly fail globally, first verify the Supabase project st
 - `/js/public-response.js` — anonymous profiles, ratings/reviews, likes/replies, live sync and R6 profile/report UI.
 - `/admin/index.html` + `/js/admin.js` — existing moderation frontend.
 
-## Current release characteristics
+## Current visual/runtime characteristics
+
+The current desktop runtime is the approved visual reference and is governed by `VISUAL-SYSTEM.md`.
+
+Read-only runtime audit on **2026-09-09** confirmed:
+
+- primary navigation remains scene-like across About / Materials / Trailer / Watch / Actors / Reviews / FAQ;
+- Hero is static/poster-based; trailer playback remains in the separate SIGNAL scene;
+- Actors uses a persistent `SUBJECT DOSSIER` model with an unchanged selection-list geometry and `SUBJECT // UNIDENTIFIED` / `???` neutral state;
+- FAQ remains a bespoke `SYSTEM QUERY` presentation with staged response behavior;
+- Archive / Materials contains an intentional viewport-wall exception to the global grid;
+- Reviews/profile remain in the same system language;
+- public review sort controls are New / Old / Popular only;
+- R6 profile help is an overlay over the composer and does not redefine the base scene geometry.
 
 REVIVAL R6 adds without redesigning the approved desktop world/grid contract:
 
@@ -81,6 +123,18 @@ REVIVAL R6 adds without redesigning the approved desktop world/grid contract:
 
 Detailed R6 release documentation: `docs/releases/revival/R6/`.
 
+## Reserve repository / mirror status
+
+Reserve repo: `Cryo-Zero/hishchenie-film-v2`.
+
+- Existing reserve `main`, archives, snapshots and recovery history must be preserved.
+- Exact production runtime mirror is currently **NOT VERIFIED / not created**.
+- The blocker is a connector limitation: the reserve object database lacks production trailer blob `ede5d2d217a9def3dd757261273315e095c4244b` for `assets/video/signal/signal-trailer-ru.mp4`, while the connector does not return transferable bytes for that ~22 MB source object.
+- This is a **tool limitation**, not loss/corruption of the production file.
+- Do not create or advertise an approximate `mirror/hishchenie-film-main`.
+- Current recovery-safe synchronization target is the four canonical current-memory files under reserve `snapshots/project-memory/current/`.
+- That safety copy must be content-verified after writing and is **not** an exact runtime mirror.
+
 ## Release lineage / history
 
 - P10–P18: foundations and review/system work.
@@ -93,10 +147,10 @@ Do not delete historical material without explicit approval. Current-memory file
 
 ## Current next phase
 
-Current direction:
+Current sequence:
 
-**Admin activation / admin improvements → responsive/mobile pass**
+**manual owner Auth user creation in Supabase Dashboard → separately approved owner membership/backend verification → first real admin-panel login / functional smoke check → responsive/mobile pass**
 
-- First: activate the existing admin path with an explicitly approved owner Auth identity; do not redesign the panel merely to activate it.
-- Then: open a separate responsive/mobile workstream based on the responsive philosophy in `DECISIONS.md`.
-- Fine mobile spacing/pixel-perfect polish can be a later dedicated pass after the first functionally complete mobile release.
+- Do not claim admin activation until the Auth user, membership and authorization are actually verified.
+- Do not claim the moderation UI has been fully user-tested until a real owner/admin smoke check occurs.
+- Responsive/mobile implementation is a separate workstream and must follow `VISUAL-SYSTEM.md`; it is not authorized by the existence of backlog notes alone.
