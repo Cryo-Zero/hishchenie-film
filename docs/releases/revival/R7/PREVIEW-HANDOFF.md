@@ -103,3 +103,5 @@ Current required sequence:
 5. update canonical state/release history from PREVIEW to accepted/production truth.
 
 If the owner rejects or changes an R7 choice, preserve the prior direction as history rather than erasing it; rejected/unused ideas may be reconsidered later only with fresh owner approval.
+
+Latest owner-feedback implementation/refinement commits are in the R7 feature branch; treat the current branch head as authoritative preview state rather than any earlier screenshot artifact.
