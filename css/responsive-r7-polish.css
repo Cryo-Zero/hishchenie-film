@@ -1,0 +1,79 @@
+/* ========================================================================== */
+/* REVIVAL R7 — visual QA polish                                              */
+/* Small conflict fixes discovered by actual Chromium screenshot review.      */
+/* ========================================================================== */
+
+/* The legacy desktop Reviews workspace can carry screen-mode/sticky/overflow
+   assumptions. In compact contexts the composer and feed must be ordinary
+   sequential document flow: profile/rating/text/publish first, feed second. */
+@media (max-width: 820px) {
+  body.community-page .community-section,
+  body.community-page .community-layout,
+  body.community-page .community-sidebar,
+  body.community-page .review-composer,
+  body.community-page .review-feed {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  body.community-page .community-layout {
+    display: block !important;
+  }
+
+  body.community-page .community-sidebar {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+  }
+
+  body.community-page .review-feed {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    margin-top: 22px !important;
+  }
+}
+
+body.r7-phone-landscape.community-page .community-section,
+body.r7-phone-landscape.community-page .community-layout,
+body.r7-phone-landscape.community-page .community-sidebar,
+body.r7-phone-landscape.community-page .review-composer,
+body.r7-phone-landscape.community-page .review-feed {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+body.r7-phone-landscape.community-page .community-layout {
+  display: block !important;
+}
+
+body.r7-phone-landscape.community-page .community-sidebar,
+body.r7-phone-landscape.community-page .review-feed {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+}
+
+body.r7-phone-landscape.community-page .review-feed {
+  margin-top: 18px !important;
+}
+
+/* Keep mobile reply/editor controls inside the record instead of inheriting
+   desktop side offsets. */
+@media (max-width: 820px) {
+  body.community-page .review-replies,
+  body.community-page .review-inline-editor {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+body.r7-phone-landscape.community-page .review-replies,
+body.r7-phone-landscape.community-page .review-inline-editor {
+  width: 100% !important;
+  max-width: 100% !important;
+}
