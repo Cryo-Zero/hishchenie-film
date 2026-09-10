@@ -71,7 +71,7 @@ Implemented feedback:
 
 - the top-left `ХИЩЕНИЕ / THEFT` wordmark stays clickable, while the same home destination is repeated inside the mobile burger for discoverability; that repeated entry is intentionally hidden on desktop;
 - mobile Hero now shows the poster as the first meaningful visual, with `Смотреть трейлер` and `О фильме` directly beneath the poster; desktop Hero composition is preserved;
-- the mobile header rating once again includes the numeric score to the left of the circular indicator, inside the same rectangular control;
+- the mobile header rating includes the numeric score to the **right** of the circular indicator, inside the same rectangular control;
 - `REPORT / СООБЩИТЬ О БАГЕ` was removed from the footer presentation and placed after FAQ in navigation: burger on mobile and top navigation on desktop;
 - the Archive physical-wall handle is now constrained to the Materials scene on both PC and mobile; leaving Materials hides it and closes an open drawer;
 - mobile Archive uses the selected asset's actual aspect ratio and available phone width rather than looking like the desktop media frame squeezed into the phone;
@@ -87,6 +87,10 @@ Owner-feedback QA history:
 - an intermediate QA run reported **16 / 17** because its Actors motion assertion incorrectly required a large scroll even when the dossier was already only 7 px from the correct destination; panel placement/back visibility/overflow were all already passing;
 - the corrected final sequential acceptance check then completed with **14 / 14 checks passed**;
 - the final check explicitly verified controlled FAQ and Actors movement, panel placement below the header, visible back commands, no horizontal overflow, no phone JS errors, desktop repeated-home hidden, desktop bug-report entry visible, and fixed Reviews mobile header.
+
+The owner later clarified that the requested mobile rating placement was **number to the right of the ring** (the earlier “left” wording was a typo); the R7 CSS and this handoff were corrected accordingly.
+
+The owner also reported that a branch-level preview did not display the latest correction set on the phone. For subsequent visual review, prefer an immutable **commit-pinned preview URL** so the reviewed HTML/CSS/JS revision cannot drift or resolve to stale branch content.
 
 The owner-feedback round remains part of the draft R7 preview until the owner visually accepts the updated result.
 
