@@ -1,0 +1,87 @@
+name: R7 reviews polish QA
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+
+permissions:
+  contents: write
+
+env:
+  CI: true
+
+jobs:
+  browser-qa:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: revival-r7-responsive-mobile
+
+      - name: Wire polish stylesheet in working tree
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          tag='<link rel="stylesheet" href="css/responsive-r7-polish.css?v=revival-r7">'
+          for name in ('index.html','reviews.html'):
+              p=Path(name)
+              text=p.read_text(encoding='utf-8')
+              if 'responsive-r7-polish.css' not in text:
+                  anchor='<link rel="stylesheet" href="css/responsive-r7-landscape.css?v=revival-r7">'
+                  if anchor not in text:
+                      raise SystemExit(f'missing landscape CSS anchor in {name}')
+                  text=text.replace(anchor,anchor+'\n'+tag,1)
+              p.write_text(text,encoding='utf-8')
+          PY
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run focused Reviews QA
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/r7-http.log 2>&1 &
+          sleep 1
+          node tools/r7-reviews-polish-qa.cjs
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-reviews-polish-qa
+          path: r7-qa-polish/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Commit validated polish wiring and cleanup
+        if: success()
+        shell: bash
+        run: |
+          rm -f .github/workflows/r7-reviews-polish-qa.yml tools/r7-reviews-polish-qa.cjs
+          git config user.name "Cryo-Zero"
+          git config user.email "Bogdan.Vedrentsov@gmail.com"
+          git add index.html reviews.html .github/workflows/r7-reviews-polish-qa.yml tools/r7-reviews-polish-qa.cjs
+          git commit -m "fix: validate R7 mobile reviews flow [skip ci]"
+          git push origin HEAD:revival-r7-responsive-mobile
+
+      - name: Remove failed workflow only
+        if: failure()
+        shell: bash
+        run: |
+          git restore index.html reviews.html
+          rm -f .github/workflows/r7-reviews-polish-qa.yml
+          git config user.name "Cryo-Zero"
+          git config user.email "Bogdan.Vedrentsov@gmail.com"
+          git add .github/workflows/r7-reviews-polish-qa.yml
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: remove failed R7 reviews QA workflow [skip ci]"
+            git push origin HEAD:revival-r7-responsive-mobile
+          fi
