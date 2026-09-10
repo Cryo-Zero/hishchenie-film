@@ -1,0 +1,99 @@
+name: R7 memory checkpoint once
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  sync-docs:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Record active R7 checkpoint
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          state = Path('docs/current/PROJECT-STATE.md')
+          text = state.read_text(encoding='utf-8')
+          start = text.index('## Responsive design workflow state')
+          end = text.index('## Reserve repository / mirror status', start)
+          replacement = '''## Responsive design workflow state
+
+The owner explicitly authorized the planning/review chat to perform the full first responsive/mobile implementation pass directly rather than handing this pass to the separate implementation bridge.
+
+Current responsive development state on **2026-09-10**:
+
+- Production `main` remains **REVIVAL R6**; R7 has **not** been merged or published as production.
+- Protected rollback branch `backup/pre-responsive-mobile-r7` exists at pre-R7 main commit `c50815437a7e6203a4a06f009a97985759458094`.
+- Active feature branch: `revival-r7-responsive-mobile`.
+- Draft PR #18: `REVIVAL R7 — responsive/mobile first pass`.
+- R7 uses additive responsive layers rather than rewriting the approved R6 desktop system: `css/responsive-r7.css`, `css/responsive-r7-landscape.css`, `css/responsive-r7-polish.css`, `js/responsive-r7.js`, plus minimal asset wiring in `index.html` and `reviews.html`.
+- Approved FAQ phone/tablet-portrait direction is implemented as sequential `QUERY INDEX → SYSTEM RESPONSE`; tablet landscape/desktop keep the two-zone model where usable.
+- Approved Actors phone/tablet-portrait direction is implemented as sequential `SUBJECT INDEX → SUBJECT DOSSIER`; tablet landscape/desktop keep the two-zone model where usable.
+- Reviews/Profile mobile flow is implemented as normal sequential document flow: profile → rating → review text/publish → public feed, with touch-sized controls and dedicated phone-landscape handling.
+- Header/navigation, Hero, About, Materials/Archive, Trailer, Watch and Contacts received first-pass responsive treatment while preserving the R6 desktop baseline.
+- Actual Chromium browser QA was run on branch runtime for `390×844`, `844×390`, `430×932`, `932×430`, `768×1024`, `1024×768`, `1366×768`, `1080×1920`.
+- Final general R7 browser audit: **80 checks / 0 failures**.
+- A visual screenshot review exposed a Reviews mobile-flow conflict that the structural checks did not catch; it was fixed and followed by a focused Reviews audit: **24 checks / 0 failures**.
+- Verified browser properties include zero horizontal overflow in the reference contexts, no page JS errors, correct sequential vs desktop context selection, working FAQ/Actors state transitions, mobile Reviews single-column flow, 6-column rating controls, 3-column sorting and 16px review textarea sizing.
+- Browser QA success proves the tested behavior; owner visual acceptance of the complete first pass is still pending. PR #18 must remain unmerged until owner review/approval.
+
+The earlier bridge preflight remains historical design evidence: it did not have rendered browser screenshots. The later direct R7 implementation used GitHub Actions + Chromium to obtain actual browser evidence.
+
+Because this responsive pass was implemented directly in the planning/review chat under explicit owner authorization, the implementation bridge must receive a handoff after the owner review/merge decision so its context does not incorrectly assume it performed R7.
+
+'''
+          state.write_text(text[:start] + replacement + text[end:], encoding='utf-8')
+
+          roadmap = Path('docs/current/ROADMAP.md')
+          r = roadmap.read_text(encoding='utf-8')
+          r = r.replace(
+              '**Status:** ACTIVE NEXT WORKSTREAM / design direction requires owner approval before substantial implementation.',
+              '**Status:** ACTIVE IMPLEMENTATION / R7 draft PR awaiting owner visual review before merge.',
+              1
+          )
+          r = r.replace(
+              '- A full device-responsive reinterpretation has not yet been implemented as the next dedicated release.',
+              '- A first dedicated responsive/mobile pass has been implemented on `revival-r7-responsive-mobile` and opened as draft PR #18; it is not production until owner review/approval and merge.',
+              1
+          )
+          marker = '### History / evidence\n\n- `docs/current/VISUAL-SYSTEM.md`'
+          checkpoint = '''### Active R7 checkpoint — 2026-09-10
+
+- Owner authorized this planning/review chat to perform the first full responsive/mobile pass directly; the implementation bridge was not used for this pass.
+- Pre-R7 rollback branch: `backup/pre-responsive-mobile-r7` at `c50815437a7e6203a4a06f009a97985759458094`.
+- Feature branch: `revival-r7-responsive-mobile`.
+- Draft PR #18 is intentionally unmerged pending owner visual review.
+- Implemented first-pass coverage: header/navigation, Hero, About, Archive/Materials, Trailer, Watch, Actors, FAQ, Contacts, Reviews/Profile, overlays and low-height phone landscape.
+- R7 is additive to the R6 visual/runtime layer rather than a wholesale desktop CSS rewrite.
+- Actual Chromium reference-matrix audit completed with **80/80 checks passing**. Screenshot review then found a Reviews sequencing issue; after correction a focused **24/24** Reviews audit passed, including explicit composer-before-feed geometry checks.
+- Current gate: owner visual review of R7. If accepted, document final visual acceptance, merge/publish through the normal release flow, verify production browser behavior, then notify/handoff the bridge that R7 was implemented in the planning chat without it.
+- If visual changes are requested, continue on the R7 feature branch and repeat browser/screenshot QA before merge.
+
+'''
+          if '### Active R7 checkpoint — 2026-09-10' not in r:
+              if marker not in r:
+                  raise SystemExit('ROADMAP Workstream A history marker not found')
+              r = r.replace(marker, checkpoint + marker, 1)
+          roadmap.write_text(r, encoding='utf-8')
+          PY
+
+      - name: Commit documentation and remove one-time workflow
+        shell: bash
+        run: |
+          rm -f .github/workflows/r7-memory-checkpoint.yml
+          git config user.name "Cryo-Zero"
+          git config user.email "Bogdan.Vedrentsov@gmail.com"
+          git add docs/current/PROJECT-STATE.md docs/current/ROADMAP.md .github/workflows/r7-memory-checkpoint.yml
+          git commit -m "docs: record active R7 responsive checkpoint [skip ci]"
+          git push origin HEAD:main
