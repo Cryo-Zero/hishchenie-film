@@ -129,15 +129,28 @@ Detailed R6 release documentation: `docs/releases/revival/R6/`.
 
 ## Responsive design workflow state
 
-Responsive/mobile implementation has **not** started in this documentation task and no runtime files were changed.
+The owner explicitly authorized the planning/review chat to perform the full first responsive/mobile implementation pass directly rather than handing this pass to the separate implementation bridge.
 
-A responsive design preflight/design plan was prepared from current R6 runtime. Proposed phone/tablet layouts remain **concept direction only** until explicitly approved by the owner.
+Current responsive development state on **2026-09-10**:
 
-For substantial responsive reinterpretations, the intended visual composition should be approved before final implementation whenever practical. A concept/mockup/prototype shows intended direction; an actual browser render proves what the implementation really does. Final acceptance must rely on real browser rendering rather than mockup alone.
+- Production `main` remains **REVIVAL R6**; R7 has **not** been merged or published as production.
+- Protected rollback branch `backup/pre-responsive-mobile-r7` exists at pre-R7 main commit `c50815437a7e6203a4a06f009a97985759458094`.
+- Active feature branch: `revival-r7-responsive-mobile`.
+- Draft PR #18: `REVIVAL R7 — responsive/mobile first pass`.
+- R7 uses additive responsive layers rather than rewriting the approved R6 desktop system: `css/responsive-r7.css`, `css/responsive-r7-landscape.css`, `css/responsive-r7-polish.css`, `js/responsive-r7.js`, plus minimal asset wiring in `index.html` and `reviews.html`.
+- Approved FAQ phone/tablet-portrait direction is implemented as sequential `QUERY INDEX → SYSTEM RESPONSE`; tablet landscape/desktop keep the two-zone model where usable.
+- Approved Actors phone/tablet-portrait direction is implemented as sequential `SUBJECT INDEX → SUBJECT DOSSIER`; tablet landscape/desktop keep the two-zone model where usable.
+- Reviews/Profile mobile flow is implemented as normal sequential document flow: profile → rating → review text/publish → public feed, with touch-sized controls and dedicated phone-landscape handling.
+- Header/navigation, Hero, About, Materials/Archive, Trailer, Watch and Contacts received first-pass responsive treatment while preserving the R6 desktop baseline.
+- Actual Chromium browser QA was run on branch runtime for `390×844`, `844×390`, `430×932`, `932×430`, `768×1024`, `1024×768`, `1366×768`, `1080×1920`.
+- Final general R7 browser audit: **80 checks / 0 failures**.
+- A visual screenshot review exposed a Reviews mobile-flow conflict that the structural checks did not catch; it was fixed and followed by a focused Reviews audit: **24 checks / 0 failures**.
+- Verified browser properties include zero horizontal overflow in the reference contexts, no page JS errors, correct sequential vs desktop context selection, working FAQ/Actors state transitions, mobile Reviews single-column flow, 6-column rating controls, 3-column sorting and 16px review textarea sizing.
+- Browser QA success proves the tested behavior; owner visual acceptance of the complete first pass is still pending. PR #18 must remain unmerged until owner review/approval.
 
-Current screenshot limitation for this bridge run: the available GitHub connector exposes source files but not arbitrary rendered webpage screenshots/viewport capture, and the local Chromium environment could not resolve the public GitHub Pages host. Therefore no current R6 browser screenshots or faithful local visual prototype were produced in this task.
+The earlier bridge preflight remains historical design evidence: it did not have rendered browser screenshots. The later direct R7 implementation used GitHub Actions + Chromium to obtain actual browser evidence.
 
-The persistent scene-by-scene responsive/device plan, including portrait/landscape and rotation contexts, is maintained in `docs/current/ROADMAP.md` rather than being reconstructed from chat history.
+Because this responsive pass was implemented directly in the planning/review chat under explicit owner authorization, the implementation bridge must receive a handoff after the owner review/merge decision so its context does not incorrectly assume it performed R7.
 
 ## Reserve repository / mirror status
 

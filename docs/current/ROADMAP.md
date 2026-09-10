@@ -32,7 +32,7 @@ Canonical documentation-preservation rules in `DECISIONS.md` apply to this file.
 
 ## Workstream A — Responsive / device adaptation
 
-**Status:** ACTIVE NEXT WORKSTREAM / design direction requires owner approval before substantial implementation.
+**Status:** ACTIVE IMPLEMENTATION / R7 draft PR awaiting owner visual review before merge.
 
 ### Goal
 
@@ -56,7 +56,7 @@ The site must account for real combinations of:
 
 - REVIVAL R6 desktop runtime is the approved visual reference.
 - Partial adaptive safeguards already exist: burger navigation, short-desktop fallback, several mobile stacks, coarse-pointer handling and Archive touch/swipe support.
-- A full device-responsive reinterpretation has not yet been implemented as the next dedicated release.
+- A first dedicated responsive/mobile pass has been implemented on `revival-r7-responsive-mobile` and opened as draft PR #18; it is not production until owner review/approval and merge.
 
 ### Accepted direction / decisions
 
@@ -98,6 +98,18 @@ Planned sequence, each substantial visual reinterpretation still subject to owne
 8. Test rotation/orientation changes, short-height windows, scaling/zoom, touch/pointer/hover and safe-area/browser-UI behavior.
 9. Perform actual browser/device render QA; do not substitute source inspection for visual proof.
 10. Only after functional completion, run a separate polish pass if useful.
+
+### Active R7 checkpoint — 2026-09-10
+
+- Owner authorized this planning/review chat to perform the first full responsive/mobile pass directly; the implementation bridge was not used for this pass.
+- Pre-R7 rollback branch: `backup/pre-responsive-mobile-r7` at `c50815437a7e6203a4a06f009a97985759458094`.
+- Feature branch: `revival-r7-responsive-mobile`.
+- Draft PR #18 is intentionally unmerged pending owner visual review.
+- Implemented first-pass coverage: header/navigation, Hero, About, Archive/Materials, Trailer, Watch, Actors, FAQ, Contacts, Reviews/Profile, overlays and low-height phone landscape.
+- R7 is additive to the R6 visual/runtime layer rather than a wholesale desktop CSS rewrite.
+- Actual Chromium reference-matrix audit completed with **80/80 checks passing**. Screenshot review then found a Reviews sequencing issue; after correction a focused **24/24** Reviews audit passed, including explicit composer-before-feed geometry checks.
+- Current gate: owner visual review of R7. If accepted, document final visual acceptance, merge/publish through the normal release flow, verify production browser behavior, then notify/handoff the bridge that R7 was implemented in the planning chat without it.
+- If visual changes are requested, continue on the R7 feature branch and repeat browser/screenshot QA before merge.
 
 ### History / evidence
 
