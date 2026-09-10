@@ -142,9 +142,26 @@ FAQ uses its own `SYSTEM QUERY` presentation and staged response behavior. This 
 
 The desktop multi-zone presentation does not have to remain simultaneous on a phone.
 
-Phone interpretation may legitimately become sequential, for example `QUERY LIST → SELECTED ANSWER`, or use a fullscreen/sub-scene approach.
+### Approved responsive FAQ direction — 2026-09-10
 
-Do not automatically replace FAQ with a generic accordion without a new explicit decision. The exact mobile composition remains subject to owner approval.
+The owner approved the following **composition direction** for the responsive FAQ. This is approved design direction, not proof that a future implementation is correct; final acceptance still requires actual browser rendering.
+
+- **Phone portrait:** sequential scene model `QUERY INDEX → SYSTEM RESPONSE`.
+- **Phone landscape:** use the same sequential interaction model instead of switching back to desktop merely because width is larger; low viewport height is a primary constraint.
+- **Tablet portrait:** use the same sequential interpretation as the default starting direction, with more breathing room where available.
+- **Tablet landscape:** preserve the current two-zone `QUERY LIST | SYSTEM RESPONSE` composition when real fit/render remains usable.
+- **Desktop, including portrait desktop context:** preserve the approved two-zone console model unless a separate viewport-specific problem is proven.
+
+For sequential phone/tablet-portrait behavior:
+
+- entering a question changes the FAQ scene state rather than expanding a generic accordion row;
+- keep `QUERY_xx`, selected state, `SYSTEM RESPONSE`, status/source/message/system-log language, neutral `QUERY_00 // STANDBY`, close/back behavior and staged reveal character;
+- provide a clear return path such as `QUERY INDEX` / equivalent back control;
+- the response should replace/succeed the index within the FAQ scene rather than forcing the visitor to scroll past the full question list to find a response panel below it;
+- phone rotation must not arbitrarily change the conceptual interaction model from sequential to desktop; actual height/aspect/input capability must be considered;
+- do not present this as a modal/generic accordion unless a later explicit owner decision chooses such a variation.
+
+The exact micro-layout, spacing, typography, animation timing and final responsive implementation remain subject to visual/browser QA. The approved principle is the scene-state relationship above.
 
 ## 12. Archive / Materials contract
 
@@ -190,9 +207,9 @@ Approved current direction:
 
 P20 / P21 / P22 are rejected historical redesign attempts.
 
-They are not current design, not approved alternatives, not a source of automatic tasks and not to be revived as the baseline.
+They are not current design, not approved alternatives and not a source of automatic tasks.
 
-Individual ideas from those experiments may only return after a new explicit decision.
+Their historical preservation is intentional: an individual old idea may be reconsidered or restored if it later becomes useful to the project, but only after new explicit owner review/approval. Rejected history is therefore not a permanent ban and not automatic implementation permission.
 
 ## 17. Responsive design approval evidence
 
