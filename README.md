@@ -4,14 +4,15 @@
 
 ## Project memory / быстрый вход
 
-Future handoff и любой новый significant task начинаются с четырёх canonical документов:
+Future handoff и любой новый significant task начинаются с пяти canonical документов:
 
 1. **Current state** → [`docs/current/PROJECT-STATE.md`](docs/current/PROJECT-STATE.md) — **what is true now**.
 2. **Decisions** → [`docs/current/DECISIONS.md`](docs/current/DECISIONS.md) — **why the project works this way**.
 3. **Visual system** → [`docs/current/VISUAL-SYSTEM.md`](docs/current/VISUAL-SYSTEM.md) — **visual laws and composition rules that future changes must preserve**.
-4. **Backlog** → [`docs/current/BACKLOG.md`](docs/current/BACKLOG.md) — **what we may revisit later; this is not authorization to implement**.
+4. **Roadmap** → [`docs/current/ROADMAP.md`](docs/current/ROADMAP.md) — **multi-workstream plan: goals, accepted/rejected directions, history and next actions**.
+5. **Backlog** → [`docs/current/BACKLOG.md`](docs/current/BACKLOG.md) — **what we may revisit later; this is not authorization to implement**.
 
-Перед visual/responsive работой `VISUAL-SYSTEM.md` является обязательным чтением.
+Перед visual/responsive работой `VISUAL-SYSTEM.md` является обязательным чтением. Перед планированием следующего project workstream читать `ROADMAP.md`; наличие пункта в ROADMAP/BACKLOG само по себе не является blanket authorization на реализацию.
 
 После canonical memory при необходимости читать release/database/history:
 
@@ -34,7 +35,7 @@ Future handoff и любой новый significant task начинаются с
 │  ├─ site.js                 # навигация, архив, актёры, FAQ
 │  ├─ public-response.js      # анонимные профили, оценки, отзывы
 │  └─ admin.js                # существующая админка
-├─ docs/                      # canonical memory, релизы, БД, admin notes
+├─ docs/                      # canonical memory, roadmap, релизы, БД, admin notes
 ├─ archive/                   # исторический код, не используемый runtime
 └─ tools/                     # служебные инструменты
 ```
@@ -48,6 +49,7 @@ Future handoff и любой новый significant task начинаются с
 - Desktop-сцены и их world grid считаются утверждённым visual contract, но explicit creative direction может создавать локальные intentional exceptions.
 - ARCHIVE / Materials исторически является deliberate exception и может выходить за общую опорную сетку.
 - Ничего исторического не удаляется без отдельного решения: устаревшее хранится как history/archive.
+- Canonical documentation является защищённой project memory: удаление или смысловое переписывание существующих правил без явного owner approval запрещено; обычное обслуживание документации должно быть additive/clarifying.
 
 ## История и резерв
 
@@ -57,7 +59,7 @@ Future handoff и любой новый significant task начинаются с
 
 Exact production runtime mirror в reserve сейчас **NOT VERIFIED / не создан** из-за ограничения connector на перенос отсутствующего крупного binary blob трейлера. Не называть reserve exact mirror без фактического совпадения полного дерева.
 
-Для project memory используется безопасная documentation copy в `snapshots/project-memory/current/`; это **project-memory safety copy**, а не runtime mirror.
+Для project memory используется безопасная documentation copy в `snapshots/project-memory/current/`; она должна содержать пять canonical current-memory файлов и проверяться после meaningful updates. Это **project-memory safety copy**, а не runtime mirror.
 
 ## Supabase
 
