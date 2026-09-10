@@ -1,0 +1,411 @@
+name: R7 browser QA retry once
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+
+permissions:
+  contents: write
+
+env:
+  CI: true
+
+jobs:
+  browser-qa:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: revival-r7-responsive-mobile
+
+      - name: Complete low-height phone landscape layer in working tree
+        shell: bash
+        run: |
+          if ! grep -q 'R7 PHONE LANDSCAPE COMPLETION' css/responsive-r7.css; then
+            cat >> css/responsive-r7.css <<'CSS'
+
+/* ========================================================================== */
+/* R7 PHONE LANDSCAPE COMPLETION — coarse pointer + low viewport height       */
+/* ========================================================================== */
+
+body.r7-phone-landscape .shell,
+body.r7-phone-landscape .hero-inner {
+  width: min(100% - 28px, var(--max)) !important;
+}
+
+body.r7-phone-landscape main > section:not(.hero)::before {
+  right: 12px !important;
+  top: 18px !important;
+  font-size: 46px !important;
+}
+
+body.r7-phone-landscape .section-head,
+body.r7-phone-landscape .faq-section-head {
+  margin-bottom: 22px !important;
+}
+
+body.r7-phone-landscape h2,
+body.r7-phone-landscape .faq-section-head h2,
+body.r7-phone-landscape #cast .section-head h2 {
+  font-size: clamp(30px, 5.5vw, 42px) !important;
+  white-space: normal !important;
+}
+
+body.r7-phone-landscape #about .info-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin-top: 28px !important;
+}
+
+body.r7-phone-landscape #about .info-card {
+  min-height: 0 !important;
+  padding: 16px !important;
+}
+
+body.r7-phone-landscape #materials .archive-drawer-shell {
+  --archive-drawer-width: min(310px, 72vw);
+  height: min(82dvh, 520px) !important;
+}
+
+body.r7-phone-landscape #materials .archive-drawer {
+  height: min(82dvh, 520px) !important;
+}
+
+body.r7-phone-landscape #materials .archive-stage-wrap {
+  grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+  gap: 4px !important;
+}
+
+body.r7-phone-landscape #materials .archive-stage {
+  height: min(70dvh, 330px) !important;
+  min-height: 220px !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+}
+
+body.r7-phone-landscape #materials .archive-stage-wrap .gallery-button {
+  width: 44px !important;
+  min-width: 44px !important;
+  min-height: 72px !important;
+  opacity: .5 !important;
+}
+
+body.r7-phone-landscape #materials .archive-bottom-controls {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+}
+
+body.r7-phone-landscape .watch-layout {
+  grid-template-columns: 1fr !important;
+  gap: 24px !important;
+}
+
+body.r7-phone-landscape .watch-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+body.r7-phone-landscape .platform {
+  min-width: 0 !important;
+  min-height: 46px !important;
+  padding: 12px 14px !important;
+}
+
+body.r7-phone-landscape .current-signal {
+  min-height: 0 !important;
+  padding: 18px !important;
+}
+
+body.r7-phone-landscape .contact-box {
+  align-items: stretch !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+body.r7-phone-landscape .contact-signal {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Reviews stay a phone workflow in landscape; width alone must not restore
+   the desktop composer/feed split. */
+body.r7-phone-landscape .community-hero-grid,
+body.r7-phone-landscape .community-layout,
+body.r7-phone-landscape .review-workspace {
+  grid-template-columns: 1fr !important;
+}
+
+body.r7-phone-landscape .community-hero-grid {
+  gap: 20px !important;
+}
+
+body.r7-phone-landscape .community-layout,
+body.r7-phone-landscape .review-workspace {
+  width: 100% !important;
+  gap: 18px !important;
+}
+
+body.r7-phone-landscape .community-sidebar,
+body.r7-phone-landscape .review-feed {
+  min-width: 0 !important;
+}
+
+body.r7-phone-landscape .review-composer,
+body.r7-phone-landscape .review-feed {
+  padding: 16px 14px !important;
+}
+
+body.r7-phone-landscape .profile-console {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 14px !important;
+  padding: 14px !important;
+}
+
+body.r7-phone-landscape .profile-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+
+body.r7-phone-landscape .profile-actions .micro-button {
+  min-width: 0 !important;
+  min-height: 40px !important;
+}
+
+body.r7-phone-landscape .rating-scale,
+body.r7-phone-landscape .review-inline-rating {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+
+body.r7-phone-landscape .rating-button,
+body.r7-phone-landscape .review-inline-rating-button {
+  min-width: 0 !important;
+  width: auto !important;
+  height: 42px !important;
+  min-height: 42px !important;
+}
+
+body.r7-phone-landscape .rating-button:last-child,
+body.r7-phone-landscape .review-inline-rating-button:last-child {
+  grid-column: auto !important;
+}
+
+body.r7-phone-landscape #reviewText,
+body.r7-phone-landscape .review-inline-editor textarea {
+  min-height: 110px !important;
+  font-size: 16px !important;
+}
+
+body.r7-phone-landscape .review-enter-hint {
+  display: none !important;
+}
+
+body.r7-phone-landscape .review-submit-row {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+body.r7-phone-landscape .review-submit-row .button {
+  width: 100% !important;
+  min-height: 44px !important;
+}
+
+body.r7-phone-landscape .community-feed-toolbar {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+body.r7-phone-landscape .review-sort {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  justify-content: stretch !important;
+}
+
+body.r7-phone-landscape .review-sort-button {
+  min-width: 0 !important;
+  min-height: 40px !important;
+  padding: 8px 5px !important;
+}
+
+body.r7-phone-landscape .review-display-settings,
+body.r7-phone-landscape .lexicon-toggle {
+  width: 100% !important;
+}
+
+body.r7-phone-landscape .review-card {
+  padding: 14px !important;
+}
+
+body.r7-phone-landscape .review-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+}
+
+body.r7-phone-landscape .review-owner-actions {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+
+body.r7-phone-landscape .review-replies {
+  margin-left: 0 !important;
+}
+CSS
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Chromium harness
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run local site and browser audit
+        id: audit
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/r7-http.log 2>&1 &
+          sleep 1
+          mkdir -p r7-qa/screenshots
+          cat > /tmp/r7-qa.cjs <<'NODE'
+          const { chromium } = require(process.cwd() + '/node_modules/playwright');
+          const fs = require('fs');
+          const path = require('path');
+
+          const targets = [
+            ['390x844', 390, 844], ['844x390', 844, 390],
+            ['430x932', 430, 932], ['932x430', 932, 430],
+            ['768x1024', 768, 1024], ['1024x768', 1024, 768],
+            ['1366x768', 1366, 768], ['1080x1920', 1080, 1920]
+          ];
+          const report = { generated_at: new Date().toISOString(), checks: [], failures: [], screenshots: [] };
+          const add = (name, ok, detail='') => { report.checks.push({name,ok,detail}); if(!ok) report.failures.push({name,detail}); };
+          async function shot(page, name) {
+            const file = path.join('r7-qa','screenshots',name+'.png');
+            await page.screenshot({path:file,fullPage:false,animations:'disabled'});
+            report.screenshots.push(file);
+          }
+
+          const browser = await chromium.launch({headless:true});
+          try {
+            for (const [label,width,height] of targets) {
+              const touch = width <= 960 && height <= 1024;
+              const context = await browser.newContext({viewport:{width,height},isMobile:touch,hasTouch:touch});
+              const page = await context.newPage();
+              const errors=[]; page.on('pageerror',e=>errors.push(String(e)));
+              await page.goto('http://127.0.0.1:4173/index.html',{waitUntil:'domcontentloaded'});
+              await page.waitForTimeout(500);
+              const state = await page.evaluate(()=>({
+                css:[...document.styleSheets].some(s=>String(s.href||'').includes('responsive-r7.css')),
+                js:!!document.querySelector('script[src*="responsive-r7.js"]'),
+                overflow:document.documentElement.scrollWidth-innerWidth,
+                sequential:document.body.classList.contains('r7-sequential-ui'),
+                landscape:document.body.classList.contains('r7-phone-landscape')
+              }));
+              add(`index ${label} assets`,state.css&&state.js,JSON.stringify(state));
+              add(`index ${label} horizontal overflow`,state.overflow<=2,`overflow=${state.overflow}`);
+              add(`index ${label} page errors`,errors.length===0,errors.join(' | '));
+
+              const shouldSequential = (width<=820 && touch) || (touch && width>height && width<=960 && height<=560);
+              add(`index ${label} sequential context`,state.sequential===shouldSequential,JSON.stringify({expected:shouldSequential,...state}));
+
+              if(label==='390x844'||label==='844x390'){
+                await shot(page,`index-${label}-hero`);
+                const actor=page.locator('#cast .cast-list-item').first();
+                await actor.scrollIntoViewIfNeeded(); await actor.click(); await page.waitForTimeout(220);
+                const a=await page.evaluate(()=>({open:document.querySelector('#cast')?.classList.contains('r7-dossier-open'),list:getComputedStyle(document.querySelector('#cast .cast-list')).display,dossier:getComputedStyle(document.querySelector('#subjectDossier')).display,back:!!document.querySelector('#cast .r7-subject-back')}));
+                add(`actors ${label} sequential open`,a.open&&a.list==='none'&&a.dossier!=='none'&&a.back,JSON.stringify(a));
+                await shot(page,`index-${label}-actors-dossier`);
+                await page.locator('#cast .r7-subject-back').click(); await page.waitForTimeout(120);
+
+                const query=page.locator('#faq .faq-query-item').nth(2);
+                await query.scrollIntoViewIfNeeded(); await query.click(); await page.waitForTimeout(220);
+                const q=await page.evaluate(()=>({open:document.querySelector('#faq')?.classList.contains('r7-response-open'),list:getComputedStyle(document.querySelector('#faq .faq-query-list')).display,panel:getComputedStyle(document.querySelector('#faqResponsePanel')).display,back:!!document.querySelector('#faq .r7-query-back'),code:document.querySelector('#faqResponseCode')?.textContent}));
+                add(`faq ${label} sequential open`,q.open&&q.list==='none'&&q.panel!=='none'&&q.back&&/QUERY_03/.test(q.code||''),JSON.stringify(q));
+                await shot(page,`index-${label}-faq-response`);
+              }
+              await context.close();
+            }
+
+            for (const [label,width,height] of targets) {
+              const touch = width <= 960 && height <= 1024;
+              const compact = width<=820 || (touch && width>height && width<=960 && height<=560);
+              const context = await browser.newContext({viewport:{width,height},isMobile:touch,hasTouch:touch});
+              const page = await context.newPage(); const errors=[]; page.on('pageerror',e=>errors.push(String(e)));
+              await page.goto('http://127.0.0.1:4173/reviews.html',{waitUntil:'domcontentloaded'});
+              await page.waitForTimeout(900);
+              const s=await page.evaluate(()=>{
+                const rating=document.querySelector('.rating-scale'),sort=document.querySelector('.review-sort'),layout=document.querySelector('.community-layout');
+                return {overflow:document.documentElement.scrollWidth-innerWidth,css:[...document.styleSheets].some(x=>String(x.href||'').includes('responsive-r7.css')),js:!!document.querySelector('script[src*="responsive-r7.js"]'),ratingColumns:rating?getComputedStyle(rating).gridTemplateColumns.split(' ').filter(Boolean).length:0,sortColumns:sort?getComputedStyle(sort).gridTemplateColumns.split(' ').filter(Boolean).length:0,layoutColumns:layout?getComputedStyle(layout).gridTemplateColumns.split(' ').filter(Boolean).length:0,textareaSize:document.querySelector('#reviewText')?getComputedStyle(document.querySelector('#reviewText')).fontSize:null,landscape:document.body.classList.contains('r7-phone-landscape')};
+              });
+              add(`reviews ${label} assets`,s.css&&s.js,JSON.stringify(s));
+              add(`reviews ${label} horizontal overflow`,s.overflow<=2,`overflow=${s.overflow}`);
+              add(`reviews ${label} page errors`,errors.length===0,errors.join(' | '));
+              if(compact){
+                add(`reviews ${label} single-column workspace`,s.layoutColumns===1,JSON.stringify(s));
+                add(`reviews ${label} six-column rating`,s.ratingColumns===6,JSON.stringify(s));
+                add(`reviews ${label} three-column sort`,s.sortColumns===3,JSON.stringify(s));
+                add(`reviews ${label} textarea 16px`,s.textareaSize==='16px',JSON.stringify(s));
+              }
+              if(label==='390x844'||label==='844x390'){
+                await shot(page,`reviews-${label}-top`);
+                await page.locator('#reviewWorkspace').scrollIntoViewIfNeeded(); await page.waitForTimeout(160);
+                await shot(page,`reviews-${label}-workspace`);
+              }
+              await context.close();
+            }
+          } finally { await browser.close(); }
+
+          fs.writeFileSync('r7-qa/report.json',JSON.stringify(report,null,2));
+          fs.writeFileSync('r7-qa/REPORT.md',[
+            '# REVIVAL R7 — browser QA','',`Generated: ${report.generated_at}`,'',`Checks: ${report.checks.length}`,`Failures: ${report.failures.length}`,'','## Failures',...(report.failures.length?report.failures.map(x=>`- ${x.name}: ${x.detail}`):['- none']),'','## Checks',...report.checks.map(x=>`- ${x.ok?'PASS':'FAIL'} — ${x.name}${x.detail?` — ${x.detail}`:''}`),'','## Screenshots',...report.screenshots.map(x=>`- ${x}`),''
+          ].join('\n'));
+          if(report.failures.length) process.exitCode=2;
+          NODE
+          node /tmp/r7-qa.cjs
+
+      - name: Upload R7 QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-browser-qa-retry
+          path: r7-qa/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Commit validated landscape completion and remove workflow
+        if: success()
+        shell: bash
+        run: |
+          rm -f .github/workflows/r7-browser-qa-retry.yml
+          git config user.name "Cryo-Zero"
+          git config user.email "Bogdan.Vedrentsov@gmail.com"
+          git add css/responsive-r7.css .github/workflows/r7-browser-qa-retry.yml
+          git commit -m "fix: complete R7 phone landscape responsive pass [skip ci]"
+          git push origin HEAD:revival-r7-responsive-mobile
+
+      - name: Remove failed QA workflow without keeping unverified patch
+        if: failure()
+        shell: bash
+        run: |
+          git restore css/responsive-r7.css
+          rm -f .github/workflows/r7-browser-qa-retry.yml
+          git config user.name "Cryo-Zero"
+          git config user.email "Bogdan.Vedrentsov@gmail.com"
+          git add .github/workflows/r7-browser-qa-retry.yml
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: remove failed R7 QA harness [skip ci]"
+            git push origin HEAD:revival-r7-responsive-mobile
+          fi
