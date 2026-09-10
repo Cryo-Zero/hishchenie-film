@@ -2,7 +2,7 @@
 
 Last consolidated project-memory / admin-smoke / responsive-workflow sync: **2026-09-10**.
 
-This file contains facts that are true now or explicitly marked as snapshots/reference points. For rationale and durable rules, see `DECISIONS.md`; for active visual/composition laws, see `VISUAL-SYSTEM.md`; for unapproved future ideas, see `BACKLOG.md`.
+This file contains facts that are true now or explicitly marked as snapshots/reference points. For rationale and durable rules, see `DECISIONS.md`; for active visual/composition laws, see `VISUAL-SYSTEM.md`; for the multi-workstream plan/history/next sequence, see `ROADMAP.md`; for unapproved future ideas, see `BACKLOG.md`.
 
 ## Production
 
@@ -19,9 +19,10 @@ Future bridge/developer work starts from:
 1. `docs/current/PROJECT-STATE.md` — what is true now;
 2. `docs/current/DECISIONS.md` — accepted long-term rules/reasons;
 3. `docs/current/VISUAL-SYSTEM.md` — active visual/composition laws;
-4. `docs/current/BACKLOG.md` — ideas that may be revisited, not approval.
+4. `docs/current/ROADMAP.md` — multi-workstream goals/status, accepted/rejected directions, history references and intended next sequence;
+5. `docs/current/BACKLOG.md` — ideas that may be revisited, not approval.
 
-Before visual/responsive work, `VISUAL-SYSTEM.md` is mandatory reading.
+Before visual/responsive work, `VISUAL-SYSTEM.md` is mandatory reading. Before choosing or resuming a significant workstream, read `ROADMAP.md` as well.
 
 ## Recovery
 
@@ -78,6 +79,7 @@ If reviews/profiles suddenly fail globally, first verify the Supabase project st
 - Admin/site interaction was responsive enough for current functional use.
 - This smoke-test confirms the normal admin login/bootstrap/authorization path works in practice. It is still a focused smoke-test, not an exhaustive QA matrix for every moderation edge case.
 - Admin visual polish is intentionally postponed for the current release sequence because the admin panel is not part of the public visitor experience.
+- The completed admin path, accepted/rejected decisions and possible future expansion are summarized as a persistent workstream history in `docs/current/ROADMAP.md`; older admin roadmap/setup files remain historical evidence and are not current truth by themselves.
 
 ### Temporary admin credential policy
 
@@ -135,6 +137,8 @@ For substantial responsive reinterpretations, the intended visual composition sh
 
 Current screenshot limitation for this bridge run: the available GitHub connector exposes source files but not arbitrary rendered webpage screenshots/viewport capture, and the local Chromium environment could not resolve the public GitHub Pages host. Therefore no current R6 browser screenshots or faithful local visual prototype were produced in this task.
 
+The persistent scene-by-scene responsive/device plan, including portrait/landscape and rotation contexts, is maintained in `docs/current/ROADMAP.md` rather than being reconstructed from chat history.
+
 ## Reserve repository / mirror status
 
 Reserve repo: `Cryo-Zero/hishchenie-film-v2`.
@@ -144,7 +148,7 @@ Reserve repo: `Cryo-Zero/hishchenie-film-v2`.
 - The blocker is a connector limitation: the reserve object database lacks production trailer blob `ede5d2d217a9def3dd757261273315e095c4244b` for `assets/video/signal/signal-trailer-ru.mp4`, while the connector does not return transferable bytes for that ~22 MB source object.
 - This is a **tool limitation**, not loss/corruption of the production file.
 - Do not create or advertise an approximate `mirror/hishchenie-film-main`.
-- Current recovery-safe synchronization target is the four canonical current-memory files under reserve `snapshots/project-memory/current/`.
+- Current recovery-safe synchronization target is the five canonical current-memory files under reserve `snapshots/project-memory/current/`.
 - That safety copy must be content-verified after writing and is **not** an exact runtime mirror.
 
 ## Release lineage / history
@@ -159,12 +163,15 @@ Do not delete historical material without explicit approval. Current-memory file
 
 ## Current next phase
 
+The detailed multi-workstream plan is canonical in `docs/current/ROADMAP.md`.
+
 Current sequence:
 
-**owner review/approval of responsive visual direction → separate responsive feature branch → incremental responsive/mobile implementation → real browser-render QA → mobile polish pass if needed**
+**protect current R6 state/documentation → owner review/approval of responsive visual direction → separate responsive feature branch → incremental responsive/mobile implementation → real browser/device-render QA → mobile polish pass if needed → reassess later admin/review/report/content workstreams by actual need and owner priority**
 
 - Admin functional smoke readiness is sufficient for the current release sequence; admin visual refinement is postponed.
-- Proposed responsive layouts are not approved merely because they are described in a design plan.
+- Proposed responsive layouts are not approved merely because they are described in a design plan/ROADMAP.
 - Before substantial responsive implementation, owner approval of the intended composition is required whenever practical.
 - Responsive implementation must be incremental and preserve the approved desktop visual contract.
+- Device orientation/rotation, width/height/aspect-ratio combinations and real input/browser contexts are part of the responsive plan, not edge cases to ignore.
 - Bug Reports v2 remains future work and is not authorized by this phase.
