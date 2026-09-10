@@ -92,6 +92,10 @@ Explicitly verified in the final follow-up:
 - desktop Actors subject code floor is `10px`;
 - Archive shell is section-anchored on desktop.
 
+### QA hygiene note
+
+A temporary Chromium-QA cleanup once staged generated `node_modules` and screenshot/report evidence into the R7 feature branch. This was detected before owner handoff, removed from the current feature tree, and `.gitignore` now excludes `node_modules/` and `r7-*-evidence/`. Production `main` was never affected. Do not treat generated QA dependencies/evidence as runtime source files.
+
 ## Open decisions — intentionally NOT implemented in this round
 
 ### Strong-language display control
