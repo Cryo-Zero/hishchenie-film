@@ -20,6 +20,20 @@ General rules:
 - When a task says read-only, do not self-fix discovered problems; report them first.
 - BACKLOG presence never means permission to implement.
 
+### Canonical documentation preservation
+
+The canonical documentation is protected project memory and recovery material. Losing it or silently changing its meaning would materially damage future handoff/recovery.
+
+Rules for the assistant/operator/bridge:
+
+- Do not delete any canonical rule, decision, rationale, section or canonical-memory file without explicit owner approval.
+- Do not rewrite, weaken, invert, replace or materially change the meaning of an existing rule or decision by personal discretion. A semantic replacement requires explicit owner approval.
+- Without separate approval, documentation maintenance may be **additive/clarifying only**: improve wording without changing meaning, add evidence/examples/cross-references, record newly verified factual state in the correct file, or add a new rule that is compatible with the existing rules.
+- If new information conflicts with an existing durable rule, do not silently overwrite the old rule. Identify the conflict and obtain owner approval before replacing/superseding it.
+- When an owner-approved rule change supersedes an older rule, preserve useful traceability/history where practical instead of erasing the fact that the previous decision existed.
+- Small details may be recorded when they are genuinely useful for future recovery, handoff, verification, design consistency or understanding of why the project works as it does. Do not preserve routine chatter, temporary guesses, repetitions or disproven assumptions.
+- The purpose of canonical memory is that a future ChatGPT chat or developer can reconstruct the project, its constraints and the reasoning behind important choices without rebuilding the documentation from scratch.
+
 ### Priority of project instructions
 
 When rules conflict, use this priority:
@@ -246,7 +260,13 @@ Bridge prompts may be a source of durable project knowledge, but do not copy the
 
 Reserve repository: `Cryo-Zero/hishchenie-film-v2`.
 
+Maintaining a recoverable reserve is a standing project requirement, not optional cleanup. The reserve exists so the project can be reconstructed if the production site, repository state, current chat/context or documentation is damaged or lost.
+
 Its existing `main`, archives, snapshots and history are recovery material and must not be destructively replaced merely to synchronize current production documentation.
+
+Before substantial high-risk/destructive runtime, architecture or backend work, preserve an appropriate recoverable rollback point when the available tooling allows it — for example a branch/tag/snapshot, verified migration/applied-state record, or protected private data backup depending on the scope. The recovery point must not expose secrets or production-sensitive data.
+
+Do not overwrite the last known-good recovery material merely to make the reserve look current. A backup/reserve is considered useful only when its claimed existence/state can be verified under the Verification integrity rule.
 
 The attempted exact production runtime mirror is **NOT VERIFIED / not created** because the available connector cannot transfer the missing ~22 MB production trailer blob into the reserve object database. This is a tool limitation, not evidence of production file loss.
 
