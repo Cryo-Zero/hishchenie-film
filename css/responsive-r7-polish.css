@@ -120,7 +120,7 @@ body.r7-phone-landscape.community-page .review-inline-editor {
   }
 }
 
-/* Mobile rating: retain the numeric score and put it to the LEFT of the ring,
+/* Mobile rating: retain the numeric score and put it to the RIGHT of the ring,
    both inside the existing rectangular header control. */
 @media (max-width: 820px) {
   .header-rating {
@@ -128,7 +128,7 @@ body.r7-phone-landscape.community-page .review-inline-editor {
     min-width: 78px !important;
     padding: 0 8px !important;
     gap: 7px !important;
-    flex-direction: row-reverse !important;
+    flex-direction: row !important;
   }
   .header-rating-copy {
     position: static !important;
@@ -267,159 +267,169 @@ body.r7-phone-landscape .r7-mobile-hero-actions .button {
     position: absolute !important;
     z-index: 6 !important;
     top: 50% !important;
-    width: 44px !important;
-    min-width: 44px !important;
-    height: 64px !important;
-    min-height: 64px !important;
+    width: 42px !important;
+    height: 58px !important;
+    min-height: 58px !important;
     transform: translateY(-50%) !important;
-    background: rgba(5,9,10,.82) !important;
-    opacity: .58 !important;
   }
-  #materials .archive-stage-wrap .gallery-button.prev {
-    left: 7px !important;
-  }
-  #materials .archive-stage-wrap .gallery-button.next {
-    right: 7px !important;
-  }
+  #materials .archive-stage-wrap .gallery-button.prev { left: 6px !important; }
+  #materials .archive-stage-wrap .gallery-button.next { right: 6px !important; }
 }
 
-body.r7-phone-landscape #materials .archive-stage-wrap {
-  position: relative !important;
-  display: block !important;
-  width: min(100%, 760px) !important;
-  margin: 0 auto !important;
+/* Sequential FAQ / Actors ------------------------------------------------- */
+.r7-sequence-back {
+  display: none;
 }
-body.r7-phone-landscape #materials .archive-stage {
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  aspect-ratio: var(--r7-archive-aspect, 16 / 9) !important;
-}
-body.r7-phone-landscape #materials .archive-stage-wrap .gallery-button {
-  position: absolute !important;
-  z-index: 6 !important;
-  top: 50% !important;
-  width: 44px !important;
-  min-width: 44px !important;
-  height: 64px !important;
-  min-height: 64px !important;
-  transform: translateY(-50%) !important;
-}
-
-/* Sequential FAQ / Actors -------------------------------------------------- */
-/* Keep enough geometry during list→detail replacement to avoid the abrupt
-   browser-anchor feeling. The content reveal is deliberately slower so the
-   scan/staged motion can actually be read. */
-body.r7-sequential-ui #faq.r7-response-open .faq-response-panel,
-body.r7-sequential-ui #cast.r7-dossier-open .subject-dossier {
-  animation: r7SequencePanelIn .48s cubic-bezier(.2,.72,.2,1) both;
-}
-
-@keyframes r7SequencePanelIn {
-  from { opacity: .18; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
-}
-
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-response-content > *,
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-system-box > div,
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-response-log {
-  transition: opacity .42s ease, transform .56s var(--p15-ease) !important;
-}
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-response-content > *:nth-child(1) { transition-delay: 0s !important; }
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-response-content > *:nth-child(2) { transition-delay: .08s !important; }
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-response-content > *:nth-child(3) { transition-delay: .16s !important; }
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-system-box > div:nth-child(1) { transition-delay: .27s !important; }
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-system-box > div:nth-child(2) { transition-delay: .37s !important; }
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-system-box > div:nth-child(3) { transition-delay: .47s !important; }
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-system-box > div:nth-child(4) { transition-delay: .57s !important; }
-body.r7-sequential-ui .faq-response-panel.is-revealed .faq-response-log { transition-delay: .67s !important; }
-body.r7-sequential-ui .faq-response-panel.is-revealed::after {
-  animation-duration: .72s !important;
-}
-
-body.r7-sequential-ui .subject-dossier.is-revealed .dossier-reveal > * {
-  transition: opacity .42s ease, transform .56s var(--p15-ease) !important;
-}
-body.r7-sequential-ui .subject-dossier.is-revealed .dossier-reveal > *:nth-child(2) { transition-delay: .08s !important; }
-body.r7-sequential-ui .subject-dossier.is-revealed .dossier-reveal > *:nth-child(3) { transition-delay: .16s !important; }
-body.r7-sequential-ui .subject-dossier.is-revealed .dossier-reveal > *:nth-child(4) { transition-delay: .27s !important; }
-body.r7-sequential-ui .subject-dossier.is-revealed .dossier-reveal > *:nth-child(5) { transition-delay: .38s !important; }
-
-/* Global legibility pass --------------------------------------------------- */
-/* The original system language is intentionally compact, but 6–8px labels are
-   too small on real phones and unnecessarily tiny on PC. Raise the floor while
-   preserving hierarchy and the terminal/dossier aesthetic. */
-.section-label { font-size: 11px !important; }
-.section-note { font-size: 13px !important; }
-.hero-system-strip { font-size: 10px !important; }
-.poster-hud { font-size: 9px !important; }
-.signal-meta { font-size: 9px !important; }
-.composer-label,
-.metric-kicker { font-size: 11px !important; }
-.service-badge { font-size: 9px !important; }
-.feed-records { font-size: 9px !important; }
-.archive-stage-meta { font-size: 10px !important; }
-.archive-bottom-code { font-size: 10px !important; }
-.dossier-topline { font-size: 9px !important; }
-.dossier-subject { font-size: 10px !important; }
-.dossier-data small { font-size: 8px !important; }
-.dossier-data strong { font-size: 12px !important; }
-.dossier-prompt { font-size: 9px !important; line-height: 1.55 !important; }
-.faq-response-header { font-size: 9px !important; }
-.faq-response-code { font-size: 9px !important; }
-.faq-system-box span { font-size: 9px !important; }
-.faq-system-box strong { font-size: 13px !important; }
-.faq-response-log { font-size: 9px !important; }
-.community-metric span { font-size: 9px !important; }
-.community-metric .freshness-ring-inner span { font-size: 7px !important; }
-.audience-pulse-head { font-size: 9px !important; }
-.audience-pulse-data dt { font-size: 8px !important; }
-.audience-pulse-foot { font-size: 8px !important; }
-.profile-data p { font-size: 13px !important; line-height: 1.55 !important; }
-.field-heading > label { font-size: 13px !important; }
-.field-heading small { font-size: 10px !important; }
-.score-readout span { font-size: 10px !important; }
-.review-sort-button { font-size: 10px !important; }
-.review-action-button { font-size: 10px !important; }
-.review-identity strong { font-size: 14px !important; }
-.review-identity span { font-size: 10px !important; }
-.own-badge,
-.official-badge { font-size: 8px !important; }
-.review-score span { font-size: 10px !important; }
-.review-card-text { font-size: 14px !important; line-height: 1.62 !important; }
-.review-edited { font-size: 9px !important; }
-.reply-head { font-size: 11px !important; }
-.reply-head time { font-size: 9px !important; }
-.review-reply p { font-size: 13px !important; }
-.reply-composer textarea { font-size: 13px !important; }
-.review-inline-footer { font-size: 9px !important; }
-.lexicon-toggle small { font-size: 11px !important; line-height: 1.45 !important; }
-.human-check-note { font-size: 11px !important; line-height: 1.5 !important; }
-.review-status { font-size: 12px !important; }
-.contact-signal-copy span,
-.contact-signal-status { font-size: 8px !important; }
-.footer-system { font-size: 9px !important; }
-.build-mark { font-size: 8px !important; }
-.review-card::before,
-.review-card.is-pinned::before { font-size: 8px !important; }
 
 @media (max-width: 820px) {
-  .section-label { font-size: 10px !important; letter-spacing: 1.8px !important; }
-  .section-note { font-size: 13px !important; line-height: 1.6 !important; }
+  body.r7-sequential-ui #cast.r7-dossier-open .cast-list,
+  body.r7-sequential-ui #faq.r7-response-open .faq-query-list {
+    display: none !important;
+  }
+  body.r7-sequential-ui #cast:not(.r7-dossier-open) .subject-dossier,
+  body.r7-sequential-ui #faq:not(.r7-response-open) .faq-response-panel {
+    display: none !important;
+  }
+  body.r7-sequential-ui .r7-dossier-open .r7-subject-back,
+  body.r7-sequential-ui .r7-response-open .r7-query-back {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    width: fit-content;
+    min-height: 42px;
+    margin: 0 0 14px;
+    padding: 0 11px;
+    border: 1px solid rgba(122,151,153,.20);
+    background: rgba(6,11,12,.64);
+    color: #89a5a7;
+    font: 700 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+    letter-spacing: 1.1px;
+    cursor: pointer;
+  }
+  body.r7-sequential-ui #cast .subject-dossier,
+  body.r7-sequential-ui #faq .faq-response-panel {
+    min-height: 0 !important;
+  }
+  body.r7-sequential-ui #faq .faq-response-content {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  body.r7-sequential-ui #faq .faq-response-panel,
+  body.r7-sequential-ui #cast .subject-dossier {
+    scroll-margin-top: calc(var(--header-h) + 12px);
+  }
+}
+
+/* Slow the shared reveal enough to read as a deliberate transition rather than
+   an anchor jump. Geometry stays reserved while content changes. */
+@media (max-width: 820px) {
+  .subject-dossier.is-revealed .dossier-reveal > *,
+  .faq-response-panel.is-revealed .faq-response-content > *,
+  .faq-response-panel.is-revealed .faq-system-box > div,
+  .faq-response-panel.is-revealed .faq-response-log {
+    transition-duration: .36s, .58s !important;
+  }
+}
+
+/* Legibility pass ---------------------------------------------------------- */
+/* The world can stay restrained without forcing important information into
+   6–8px type. Decorative build marks remain deliberately secondary. */
+.section-note,
+.trailer-language-note,
+.watch-intro {
+  font-size: max(12px, .72rem) !important;
+}
+
+.signal-meta,
+.archive-stage-meta,
+.archive-bottom-code,
+.dossier-topline,
+.dossier-subject,
+.dossier-prompt,
+.faq-response-header,
+.faq-response-code,
+.faq-system-box span,
+.feed-records,
+.service-badge,
+.review-enter-hint,
+.human-check-note,
+.review-action-button,
+.reply-head time,
+.review-edited {
+  font-size: max(9px, .56rem) !important;
+}
+
+.dossier-data small,
+.audience-pulse-data dt,
+.audience-pulse-foot,
+.contact-signal-copy span,
+.contact-signal-status,
+.build-mark,
+.footer-system {
+  font-size: max(8px, .5rem) !important;
+}
+
+.review-card-text,
+.review-reply p,
+.profile-data p,
+.lexicon-toggle small {
+  font-size: max(12px, .75rem) !important;
+}
+
+.review-identity span,
+.reply-head,
+.review-sort-button,
+.micro-button,
+.field-heading small {
+  font-size: max(10px, .625rem) !important;
+}
+
+@media (max-width: 820px) {
+  .section-label,
+  .composer-label,
+  .metric-kicker {
+    font-size: 11px !important;
+  }
   .hero-system-strip,
-  .eyebrow,
-  .mobile-slogan { font-size: 10px !important; line-height: 1.45 !important; }
-  body.r7-sequential-ui #cast .cast-list-item > span,
-  body.r7-sequential-ui #faq .faq-query-item > span { font-size: 9px !important; }
-  body.r7-sequential-ui #cast .cast-list-item em,
-  body.r7-sequential-ui #faq .faq-query-item > strong { font-size: 14px !important; }
-  .r7-sequence-back { font-size: 9px !important; min-height: 44px !important; }
-  body.r7-sequential-ui #faq .faq-response-content p { font-size: 14px !important; }
-  .community-metric span { font-size: 9px !important; line-height: 1.35 !important; }
-  .community-metric .freshness-ring-inner span { font-size: 7px !important; }
-  .review-sort-button { font-size: 10px !important; }
-  .review-action-button { font-size: 10px !important; }
-  .review-card-text { font-size: 14px !important; }
-  .review-identity span { font-size: 10px !important; }
+  .poster-hud,
+  .archive-bottom-code,
+  .signal-meta,
+  .service-badge,
+  .feed-records,
+  .dossier-topline,
+  .dossier-subject,
+  .dossier-data small,
+  .dossier-prompt,
+  .faq-query-item > span,
+  .faq-response-header,
+  .faq-response-code,
+  .faq-system-box span,
+  .audience-pulse-head,
+  .audience-pulse-data dt,
+  .audience-pulse-foot,
+  .review-edited,
+  .review-enter-hint,
+  .human-check-note {
+    font-size: 10px !important;
+    line-height: 1.45 !important;
+  }
+  .profile-data p,
+  .section-note,
+  .community-hero p,
+  .review-card-text,
+  .review-reply p,
+  .lexicon-toggle small {
+    font-size: 13px !important;
+    line-height: 1.58 !important;
+  }
+  .review-identity span,
+  .reply-head,
+  .review-action-button,
+  .micro-button,
+  .review-sort-button,
+  .field-heading small {
+    font-size: 11px !important;
+  }
 }
