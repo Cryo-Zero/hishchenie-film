@@ -1,0 +1,57 @@
+name: R7 wire responsive layer once
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+
+permissions:
+  contents: write
+
+jobs:
+  wire:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: revival-r7-responsive-mobile
+
+      - name: Wire responsive assets into public pages
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          css_tag = '<link rel="stylesheet" href="css/responsive-r7.css?v=revival-r7">'
+          js_tag = '<script src="js/responsive-r7.js?v=revival-r7"></script>'
+
+          for name in ('index.html', 'reviews.html'):
+              path = Path(name)
+              text = path.read_text(encoding='utf-8')
+
+              if 'css/responsive-r7.css' not in text:
+                  pattern = r'(<link\b[^>]*href=["\']css/site\.css\?v=revival-r6["\'][^>]*>)'
+                  text, count = re.subn(pattern, r'\1\n' + css_tag, text, count=1, flags=re.I)
+                  if count != 1:
+                      raise SystemExit(f'Could not find site.css link in {name}')
+
+              if 'js/responsive-r7.js' not in text:
+                  if '</body>' not in text:
+                      raise SystemExit(f'Could not find </body> in {name}')
+                  text = text.replace('</body>', f'{js_tag}\n</body>', 1)
+
+              path.write_text(text, encoding='utf-8')
+
+          Path('.github/workflows/r7-wire-responsive.yml').unlink()
+          PY
+
+      - name: Commit one-time wiring
+        shell: bash
+        run: |
+          git config user.name "Cryo-Zero"
+          git config user.email "Bogdan.Vedrentsov@gmail.com"
+          git add index.html reviews.html .github/workflows/r7-wire-responsive.yml
+          git commit -m "feat: wire R7 responsive layer [skip ci]"
+          git push origin HEAD:revival-r7-responsive-mobile
