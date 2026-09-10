@@ -134,7 +134,30 @@ Preserve these principles:
 
 Do not automatically turn Actors into a generic card grid.
 
-On phone, sequential `subject selection → dossier/detail` is an allowed interpretation, but the exact composition is not approved until owner review.
+### Approved responsive Actors direction — 2026-09-10
+
+The owner approved the following **composition direction** for responsive Actors. This is approved design direction, not proof that the future implementation is correct; final acceptance still requires real browser rendering.
+
+- **Phone portrait:** sequential scene model `SUBJECT INDEX → SUBJECT DOSSIER`.
+- **Phone landscape:** keep the same sequential conceptual interaction instead of automatically switching to the desktop two-pane layout because width is larger; use horizontal space to make the dossier more compact where useful.
+- **Tablet portrait:** use the sequential subject-index/dossier interpretation as the default starting direction, with more breathing room than phone.
+- **Tablet landscape:** preserve the current `SUBJECT LIST | SUBJECT DOSSIER` two-zone composition when actual fit remains usable.
+- **Desktop, including portrait desktop context:** preserve the current two-zone subject-list/dossier model unless a separate viewport-specific problem is proven.
+
+For the sequential phone/tablet-portrait behavior:
+
+- selecting a subject changes the Actors scene into a dossier/file state rather than expanding the selected list row into a generic card;
+- preserve `SUBJECT_xx`, role identity, selected state, `SUBJECT DOSSIER // PUBLIC`, `IDENTIFIED`, `UNIDENTIFIED / ???`, role/status/access/system-record fields and the dossier prompt language;
+- keep the existing staged/scan reveal character so entering a subject feels like opening a system file, not receiving a FAQ response;
+- provide a clear return path such as `SUBJECT INDEX` / equivalent back control;
+- preserve the visitor's selected subject/state through orientation changes where practical instead of unexpectedly resetting to the first subject or standby;
+- on phone portrait, the dossier data may use a compact 2×2 field grid when real rendering remains readable; fall back to a single column when content or language makes 2×2 too cramped;
+- on phone landscape, the dossier may use a more horizontal internal composition to save vertical space while preserving the same sequential state model;
+- names remain dossier information rather than being automatically exposed as the primary content of the compact subject-index rows.
+
+Candidate idea retained for future review, **not approved for the first responsive pass**: previous/next subject controls inside an open dossier could allow browsing adjacent subjects without returning to the index. This may be reconsidered later if real mobile use shows that it improves navigation without turning the scene into a generic gallery.
+
+The exact micro-layout, spacing, typography, scan timing and final browser behavior remain subject to implementation/render QA.
 
 ## 11. FAQ contract
 
