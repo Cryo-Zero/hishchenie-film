@@ -14,15 +14,7 @@ Before visual/responsive work, read this file first.
 
 `World field`, `world grid`, `сетка мира`, `поле мира` describe the shared composition system of the site. This is not merely one `margin`, `max-width` or CSS variable.
 
-On desktop, most scenes intentionally share:
-
-- composition offsets from the viewport;
-- left/right visual boundaries;
-- top/bottom reference lines;
-- visual ceilings;
-- cross-scene alignment lines;
-- internal rhythm;
-- controlled empty space.
+On desktop, most scenes intentionally share composition offsets from the viewport, left/right visual boundaries, top/bottom reference lines, visual ceilings, cross-scene alignment lines, internal rhythm and controlled empty space.
 
 The goal is that separate sections feel like different states of one system/world.
 
@@ -34,15 +26,7 @@ The world grid is the default visual contract, not an absolute prohibition.
 
 ### Intentional exceptions / explicit creative direction
 
-If the owner explicitly approves a scene-specific direction that requires:
-
-- taking an element outside the world field;
-- making a scene wider than the grid;
-- breaking standard margins;
-- crossing normal alignment lines;
-- creating a deliberate visual exception;
-
-that direction is allowed and takes priority over the general grid rule for that scene.
+If the owner explicitly approves a scene-specific direction that requires taking an element outside the world field, making a scene wider than the grid, breaking standard margins, crossing normal alignment lines or creating a deliberate visual exception, that direction is allowed and takes priority over the general grid rule for that scene.
 
 A deliberate local exception is not automatically a layout bug. It must remain local and must not casually destroy the global system of the other scenes.
 
@@ -52,36 +36,15 @@ Current runtime reinforces this: the Archive control is intentionally tied to th
 
 ## 3. Navigation = scenes / tabs
 
-The primary navigation:
-
-- О ФИЛЬМЕ;
-- МАТЕРИАЛЫ;
-- ТРЕЙЛЕР;
-- ГДЕ ПОСМОТРЕТЬ;
-- АКТЁРЫ;
-- ОТЗЫВЫ;
-- FAQ
-
-must be understood as navigation between scene-like compositions/states, not simply anchors in a generic stacked landing page.
+The primary navigation — О ФИЛЬМЕ, МАТЕРИАЛЫ, ТРЕЙЛЕР, ГДЕ ПОСМОТРЕТЬ, АКТЁРЫ, ОТЗЫВЫ, FAQ — must be understood as navigation between scene-like compositions/states, not simply anchors in a generic stacked landing page.
 
 Preserve the feeling of moving between system screens/tabs. Do not automatically convert the whole site into a conventional long vertical landing page.
 
 ## 4. Desktop = visual reference, not fixed canvas
 
-The approved desktop is the primary visual reference.
+The approved desktop is the primary visual reference. It defines composition intent, hierarchy, atmosphere, world/system language, interaction character and functional meaning.
 
-It defines:
-
-- composition intent;
-- hierarchy;
-- atmosphere;
-- world/system language;
-- interaction character;
-- functional meaning.
-
-It does **not** mean that one specific owner monitor resolution is a fixed canvas that every device must reproduce 1:1.
-
-Absolute coordinates and exact geometry may adapt when the viewport requires it.
+It does **not** mean that one specific owner monitor resolution is a fixed canvas that every device must reproduce 1:1. Absolute coordinates and exact geometry may adapt when the viewport requires it.
 
 If viewport height allows, a scene may read as a complete screen. On low-height desktop/laptop viewports, normal document flow is acceptable. Do not crop content or shrink the interface to unreadability merely to preserve an artificial one-screen/100vh composition.
 
@@ -102,21 +65,7 @@ At minimum consider:
 - phone portrait;
 - phone landscape.
 
-Layout decisions should consider the combination of:
-
-- viewport width;
-- viewport height;
-- aspect ratio;
-- orientation;
-- pointer type;
-- hover capability;
-- touch capability;
-- `dvh` / `svh` behavior;
-- safe-area insets;
-- browser chrome;
-- Retina / HiDPI;
-- OS/browser scaling;
-- browser zoom.
+Layout decisions should consider the combination of viewport width, viewport height, aspect ratio, orientation, pointer type, hover capability, touch capability, `dvh`/`svh` behavior, safe-area insets, browser chrome, Retina/HiDPI, OS/browser scaling and browser zoom.
 
 Android/iOS/Windows/macOS matter because browser/platform behavior differs, but OS name alone must not decide the layout.
 
@@ -137,18 +86,7 @@ A tablet is not automatically a large phone.
 
 Phone layouts must not literally compress complex desktop scenes into ~390–430 px.
 
-Allowed adaptations include:
-
-- different layout;
-- sequential presentation;
-- vertical flow;
-- fullscreen/sub-scenes;
-- reordering blocks;
-- different navigation interaction;
-- simplified decorative geometry;
-- reduced/simplified nonessential animation;
-- touch alternatives to hover;
-- reducing the amount of information visible simultaneously.
+Allowed adaptations include different layout, sequential presentation, vertical flow, fullscreen/sub-scenes, reordering blocks, different navigation interaction, simplified decorative geometry, reduced/simplified nonessential animation, touch alternatives to hover and reducing the amount of information visible simultaneously.
 
 Priority order for a phone interpretation:
 
@@ -196,7 +134,7 @@ Preserve these principles:
 
 Do not automatically turn Actors into a generic card grid.
 
-If a historical Actors detail no longer exists in current runtime, do not reintroduce it merely because it appears in old notes.
+On phone, sequential `subject selection → dossier/detail` is an allowed interpretation, but the exact composition is not approved until owner review.
 
 ## 11. FAQ contract
 
@@ -204,24 +142,15 @@ FAQ uses its own `SYSTEM QUERY` presentation and staged response behavior. This 
 
 The desktop multi-zone presentation does not have to remain simultaneous on a phone.
 
-Phone interpretation may legitimately become sequential, for example:
+Phone interpretation may legitimately become sequential, for example `QUERY LIST → SELECTED ANSWER`, or use a fullscreen/sub-scene approach.
 
-`QUERY LIST → SELECTED ANSWER`
-
-or use a fullscreen/sub-scene approach.
-
-Do not automatically replace FAQ with a generic accordion without a new explicit decision.
+Do not automatically replace FAQ with a generic accordion without a new explicit decision. The exact mobile composition remains subject to owner approval.
 
 ## 12. Archive / Materials contract
 
 Archive / Materials is a deliberate exception to the default world grid when needed.
 
-Preserve:
-
-- bespoke archive layout;
-- drawer/viewer character;
-- bespoke transition/animation behavior;
-- the ability for explicit creative direction to take the composition outside the normal world field.
+Preserve bespoke archive layout, drawer/viewer character, bespoke transition/animation behavior and the ability for explicit creative direction to take the composition outside the normal world field.
 
 Do not classify intentional overflow/alignment exceptions as bugs merely because they differ from the default grid.
 
@@ -229,27 +158,19 @@ Do not classify intentional overflow/alignment exceptions as bugs merely because
 
 Reviews/profile are functionally denser than the film scenes but must remain visually part of the same system/world language. Do not automatically restyle them as a generic dashboard/web app.
 
-Current public sorting contract:
+Current public sorting contract: New / Old / Popular.
 
-- New;
-- Old;
-- Popular.
-
-Do not restore old public filters without new approval, including:
-
-- all;
-- team reply;
-- low/high rating.
+Do not restore old public filters without new approval, including all, team reply or low/high rating.
 
 The R6 profile-help UI is an overlay over the composer and must remain overlay-like; it must not create layout reflow that breaks the scene geometry.
+
+Phone adaptation must prioritize readability, touch, composer usability, rating, sorting, replies and profile-help access while preserving the system language.
 
 ## 14. Interaction / touch
 
 Important functionality cannot depend on hover alone.
 
-Touch contexts need a clear equivalent for any important hover interaction.
-
-Interactive controls need usable hit areas.
+Touch contexts need a clear equivalent for any important hover interaction. Interactive controls need usable hit areas.
 
 Potential future improvements such as burger/navigation refinements, larger gallery/pagination hit targets, vertically centered arrows and review-tab touch polish belong in `BACKLOG.md` until explicitly approved.
 
@@ -269,16 +190,28 @@ Approved current direction:
 
 P20 / P21 / P22 are rejected historical redesign attempts.
 
-They are:
-
-- not current design;
-- not approved alternatives;
-- not a source of automatic tasks;
-- not to be revived as the baseline.
+They are not current design, not approved alternatives, not a source of automatic tasks and not to be revived as the baseline.
 
 Individual ideas from those experiments may only return after a new explicit decision.
 
-## 17. How to resolve visual conflicts
+## 17. Responsive design approval evidence
+
+For substantial responsive reinterpretations, approve the intended visual composition before final implementation whenever practical.
+
+Keep two evidence classes separate:
+
+- **Concept / mockup / prototype** — communicates the intended design direction.
+- **Actual browser render** — confirms how the real implementation behaves at a real viewport/device context.
+
+A proposed concept is **not approved design** until the owner explicitly approves it. Concept approval is permission to implement that direction, not proof that implementation is correct.
+
+Final responsive acceptance must be based on actual browser rendering. Do not treat a mockup, source inspection or verbal plan as equivalent to a verified browser result.
+
+If rendering evidence is unavailable, report the limitation explicitly and keep the implementation status `NOT VERIFIED` where appropriate.
+
+Reference viewport sizes such as `390×844`, `844×390`, `430×932`, `932×430`, `768×1024`, `1024×768`, `1366×768` and `1080×1920` are **design/test references**, not hardcoded breakpoint requirements.
+
+## 18. How to resolve visual conflicts
 
 Visual work follows this priority:
 
