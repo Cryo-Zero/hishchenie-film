@@ -1,0 +1,24 @@
+const { chromium } = require('playwright');
+const fs = require('fs');
+const path = require('path');
+(async()=>{
+ const b=await chromium.launch({headless:true});
+ const out='r7-round2-final-evidence'; fs.mkdirSync(path.join(out,'screenshots'),{recursive:true});
+ const r=[]; const ck=(n,o,d='')=>r.push({n,o:!!o,d});
+ const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
+ await p.goto('http://127.0.0.1:4173/index.html',{waitUntil:'networkidle'});
+ const title=await p.locator('.r7-mobile-hero-title').boundingBox(), poster=await p.locator('.hero-poster-frame').boundingBox(), actions=await p.locator('.r7-mobile-hero-actions').boundingBox(), copy=await p.locator('.hero-copy-column .hero-copy').boundingBox();
+ ck('hero title above poster',title&&poster&&title.y+title.height<=poster.y+3,JSON.stringify({title,poster})); ck('hero actions below poster',poster&&actions&&actions.y>=poster.y+poster.height-24); ck('hero synopsis after actions',actions&&copy&&copy.y>actions.y+actions.height+20);
+ ck('trailer note hidden',await p.locator('.trailer-language-note').evaluate(e=>getComputedStyle(e).display==='none'));
+ await p.locator('#cast').scrollIntoViewIfNeeded(); await p.evaluate(()=>scrollBy(0,70)); let y=await p.evaluate(()=>scrollY); await p.locator('#cast .cast-list-item').nth(2).click(); await p.waitForTimeout(180); ck('actors no autoscroll',Math.abs((await p.evaluate(()=>scrollY))-y)<=2);
+ await p.locator('#faq').scrollIntoViewIfNeeded(); await p.evaluate(()=>scrollBy(0,90)); y=await p.evaluate(()=>scrollY); await p.locator('#faq .faq-query-item').nth(5).click(); await p.waitForTimeout(180); ck('faq no autoscroll',Math.abs((await p.evaluate(()=>scrollY))-y)<=2);
+ await p.goto('http://127.0.0.1:4173/reviews.html',{waitUntil:'networkidle'}); await p.waitForTimeout(1500);
+ const ring=await p.locator('#freshnessRing').boundingBox(); ck('freshness physically circular',ring&&Math.abs(ring.width-ring.height)<.6,JSON.stringify(ring));
+ const avg=parseFloat(await p.locator('#averageRating').evaluate(e=>getComputedStyle(e).fontSize)); ck('average score >=24px',avg>=24,avg+'px');
+ const order=await p.evaluate(()=>{const a=document.querySelector('.header-rating-ring').getBoundingClientRect(),c=document.querySelector('.header-rating-copy').getBoundingClientRect();return {ringRight:a.right,copyLeft:c.left}}); ck('header number right of ring',order.copyLeft>=order.ringRight-1,JSON.stringify(order));
+ await p.locator('#profileHelpToggle').scrollIntoViewIfNeeded(); y=await p.evaluate(()=>scrollY); await p.locator('#profileHelpToggle').click(); await p.waitForTimeout(100); ck('profile tooltip no scroll',Math.abs((await p.evaluate(()=>scrollY))-y)<=2); ck('profile tooltip no body lock',!(await p.locator('body').evaluate(e=>e.classList.contains('info-overlay-open')))); await p.locator('#profileHelpClose').click();
+ await p.locator('#reviewsList').scrollIntoViewIfNeeded(); await p.waitForTimeout(500); const cards=p.locator('#reviewsList > .review-card'), total=await cards.count(), vis=await cards.evaluateAll(ns=>ns.filter(n=>getComputedStyle(n).display!=='none').length); ck('mobile reviews capped at 6 when needed',total<=6||vis===6,`${vis}/${total}`); if(total>6) ck('show more visible',await p.locator('.r7-load-more-reviews').evaluate(e=>getComputedStyle(e).display!=='none'));
+ ck('no phone JS errors',errs.length===0,errs.join('; ')); await p.screenshot({path:path.join(out,'screenshots','390-round2-final.png'),fullPage:false});
+ const d=await b.newPage({viewport:{width:1366,height:768}}); await d.goto('http://127.0.0.1:4173/index.html',{waitUntil:'networkidle'}); const f=parseFloat(await d.locator('#cast .cast-list-item').first().locator('span').evaluate(e=>getComputedStyle(e).fontSize)); ck('desktop subject code >=10px',f>=10,f+'px'); ck('desktop archive section-anchored',await d.locator('#materials .archive-drawer-shell').evaluate(e=>getComputedStyle(e).position==='absolute')); await d.close(); await b.close();
+ const pass=r.filter(x=>x.o).length, report=['# R7 owner round2 final QA','',`Passed: ${pass}/${r.length}`,'',...r.map(x=>`- ${x.o?'PASS':'FAIL'} — ${x.n}${x.d?' — '+x.d:''}`)].join('\n'); fs.writeFileSync(path.join(out,'REPORT.md'),report); console.log(report); if(pass!==r.length)process.exit(1);
+})().catch(e=>{console.error(e);process.exit(1)});
