@@ -16,6 +16,7 @@ General rules:
 - Old ideas are not automatically current tasks.
 - Historical backlog should be remembered, but implementation requires fresh approval.
 - Rejected redesigns must not be revived automatically.
+- Rejected, unused or superseded ideas are preserved because they may contain useful project knowledge. They are **not permanently forbidden merely because they were rejected or not used**: an old idea may be reconsidered, adapted or restored later when it becomes useful, but only after a new explicit owner review/approval. Historical preservation is therefore recovery/design memory, not implementation authorization.
 - Do not invent film-author data, contacts, release facts or other public information that is not actually present/confirmed in the project.
 - When a task says read-only, do not self-fix discovered problems; report them first.
 - BACKLOG presence never means permission to implement.
@@ -84,7 +85,7 @@ For substantial responsive reinterpretations, approve the intended visual compos
 
 Two kinds of evidence must remain distinct:
 
-- **Concept / mockup / prototype** — shows an intended design direction. It does not prove that the browser implementation behaves that way.
+- **Concept / mockup / prototype** — shows the intended design direction. It does not prove that the browser implementation behaves that way.
 - **Actual browser render** — proves how the implemented HTML/CSS/JS behaves in a real viewport/device context.
 
 Rules:
