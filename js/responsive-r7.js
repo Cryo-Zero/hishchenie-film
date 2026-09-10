@@ -58,6 +58,13 @@
     }
   }
 
+  function syncInjectedNavVisibility() {
+    const home = $('#primaryNav .r7-nav-home');
+    if (!home) return;
+    if (innerWidth > 980) home.style.setProperty('display', 'none', 'important');
+    else home.style.removeProperty('display');
+  }
+
   // Mobile Hero composition --------------------------------------------------
   // The poster is the first meaningful visual on phone portrait. The action
   // pair is duplicated for the compact representation and placed directly
@@ -269,6 +276,7 @@
     body.classList.toggle('r7-coarse-pointer', isCoarse());
     body.classList.toggle('r7-phone-landscape', isPhoneLandscape());
     body.classList.toggle('r7-sequential-ui', isSequentialContext());
+    syncInjectedNavVisibility();
     syncMaterialsArchiveVisibility();
     syncArchiveAspect();
   }
