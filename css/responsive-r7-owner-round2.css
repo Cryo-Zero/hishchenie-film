@@ -49,22 +49,16 @@
   }
 }
 
-/* Low-height phone landscape keeps its own two-column composition; remove
-   only the extra status strip/slogan there as well. */
 body.r7-phone-landscape .hero-system-strip,
 body.r7-phone-landscape .hero-copy-column > .eyebrow,
 body.r7-phone-landscape .hero-copy-column > .mobile-slogan {
   display: none !important;
 }
 
-/* TRAILER: owner removed the explanatory language note from every layout. */
 .trailer-language-note {
   display: none !important;
 }
 
-/* ARCHIVE: the wall handle is anchored to the Materials section instead of
-   following the viewport. Opening the drawer must not slide the ARCHIVE label
-   away from the left wall. */
 #materials {
   position: relative !important;
 }
@@ -104,7 +98,6 @@ body.r7-phone-landscape .hero-copy-column > .mobile-slogan {
   }
 }
 
-/* REVIEWS SUMMARY: force the Freshness gauge to remain a true circle. */
 .community-metric.freshness-mini,
 .freshness-ring,
 .freshness-ring-inner {
@@ -152,8 +145,21 @@ body.r7-phone-landscape .hero-copy-column > .mobile-slogan {
   }
 }
 
-/* PROFILE HELP: turn the full-page overlay into a real tooltip/popover tied to
-   the question mark. It overlays nearby content without reflow or scroll lock. */
+/* R7's small-phone grid has a 76px first column and an older 72px width rule.
+   Match width and height at the stronger selector so the rendered gauge is
+   physically circular rather than 72x78. */
+@media (max-width: 520px) {
+  .community-metric.freshness-mini .freshness-ring {
+    width: 72px !important;
+    height: 72px !important;
+    min-width: 72px !important;
+    min-height: 72px !important;
+    max-width: 72px !important;
+    max-height: 72px !important;
+    flex: 0 0 72px !important;
+  }
+}
+
 .review-composer {
   position: relative !important;
 }
@@ -214,7 +220,6 @@ body.r7-phone-landscape .hero-copy-column > .mobile-slogan {
   }
 }
 
-/* MOBILE REVIEW PAGING */
 .r7-load-more-reviews {
   display: none;
   width: 100%;
@@ -244,8 +249,6 @@ body.r7-phone-landscape .r7-load-more-reviews.is-visible {
   justify-content: center;
 }
 
-/* LEGIBILITY ROUND 2: raise the floor for information-bearing microcopy on
-   desktop and mobile. Decorative watermark/build atmosphere remains smaller. */
 .cast-list-item > span,
 .faq-query-item > span,
 .signal-meta,
@@ -269,6 +272,11 @@ body.r7-phone-landscape .r7-load-more-reviews.is-visible {
 .audience-pulse-foot {
   font-size: max(10px, .625rem) !important;
   line-height: 1.45 !important;
+}
+
+/* Higher specificity than the legacy #cast rules. */
+#cast .cast-list-item > span {
+  font-size: 10px !important;
 }
 
 .cast-list-item em,
@@ -322,6 +330,11 @@ body.r7-phone-landscape .r7-load-more-reviews.is-visible {
   .audience-pulse-foot {
     font-size: 11px !important;
     line-height: 1.48 !important;
+  }
+
+  body.r7-sequential-ui #cast .cast-list-item > span,
+  body.r7-sequential-ui #faq .faq-query-item > span {
+    font-size: 11px !important;
   }
 
   .cast-list-item em,
