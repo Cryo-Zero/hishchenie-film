@@ -5,7 +5,6 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-  const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isCoarse = () => matchMedia('(pointer: coarse)').matches || Number(navigator.maxTouchPoints || 0) > 0;
   const isPhoneLandscape = () => isCoarse() && innerWidth > innerHeight && innerWidth <= 960 && innerHeight <= 560;
   const isSequentialContext = () => {
@@ -20,9 +19,6 @@
   }
 
   // R7 navigation additions --------------------------------------------------
-  // The compact menu now repeats the brand/home destination so the clickable
-  // top-left wordmark is not the only way back to ENTRY. REPORT is moved from
-  // the footer to the navigation and stays after FAQ on both PC and mobile.
   function installNavigationAdditions() {
     const nav = $('#primaryNav');
     if (!nav) return;
@@ -66,52 +62,31 @@
   }
 
   // Mobile Hero composition --------------------------------------------------
-  // The poster is the first meaningful visual on phone portrait. The action
-  // pair is duplicated for the compact representation and placed directly
-  // under the poster; the original desktop actions remain untouched.
   function installMobileHeroActions() {
     const hero = $('.hero-inner');
-    const original = $('.hero-copy-column .hero-actions', hero || document);
+    const copy = $('.hero-copy-column', hero || document);
+    const originalActions = $('.hero-actions', copy || document);
+    const originalTitle = $('h1', copy || document);
     const poster = $('.hero-poster-frame', hero || document);
-    if (!hero || !original || !poster || $('.r7-mobile-hero-actions', hero)) return;
-    const clone = original.cloneNode(true);
-    clone.classList.add('r7-mobile-hero-actions');
-    clone.setAttribute('aria-label', 'Быстрые действия');
-    poster.insertAdjacentElement('afterend', clone);
-  }
+    if (!hero || !copy || !originalActions || !poster) return;
 
-  let scrollAnimation = 0;
-  function smoothScrollIntoView(node, duration = 620) {
-    if (!node || !isSequentialContext()) return;
-    cancelAnimationFrame(scrollAnimation);
-    const header = $('.site-header');
-    const headerHeight = header?.offsetHeight || 0;
-    const start = scrollY;
-    const target = Math.max(0, Math.round(node.getBoundingClientRect().top + scrollY - headerHeight - 10));
-    const distance = target - start;
-    if (Math.abs(distance) < 2) return;
-    if (reducedMotion()) {
-      scrollTo(0, target);
-      return;
+    if (!$('.r7-mobile-hero-title', hero) && originalTitle) {
+      const title = originalTitle.cloneNode(true);
+      title.classList.add('r7-mobile-hero-title');
+      poster.insertAdjacentElement('beforebegin', title);
     }
-    const started = performance.now();
-    const ease = t => 1 - Math.pow(1 - t, 3);
-    const tick = now => {
-      const t = Math.min(1, (now - started) / duration);
-      scrollTo(0, Math.round(start + distance * ease(t)));
-      if (t < 1) scrollAnimation = requestAnimationFrame(tick);
-    };
-    scrollAnimation = requestAnimationFrame(tick);
+
+    if (!$('.r7-mobile-hero-actions', hero)) {
+      const actions = originalActions.cloneNode(true);
+      actions.classList.add('r7-mobile-hero-actions');
+      actions.setAttribute('aria-label', 'Быстрые действия');
+      poster.insertAdjacentElement('afterend', actions);
+    }
   }
 
-  function settleSequentialPanel(section, panel, selectedItems, duration = 680) {
-    if (!section || !panel || !isSequentialContext()) return;
-    setTimeout(() => {
-      const selected = selectedItems.some(item => item.getAttribute('aria-selected') === 'true');
-      if (selected) smoothScrollIntoView(panel, duration);
-    }, 40);
-  }
-
+  // Sequential FAQ / Actors --------------------------------------------------
+  // Owner rule: changing index/detail state must never move the viewport.
+  // The clicked element changes the local scene only; the visitor controls all scrolling.
   function holdSequentialHeight(section, selector) {
     if (!section || !isSequentialContext()) return;
     const consoleNode = $(selector, section);
@@ -124,6 +99,14 @@
     }, 900);
   }
 
+  function preserveViewportPosition() {
+    if (!isSequentialContext()) return;
+    const x = scrollX;
+    const y = scrollY;
+    requestAnimationFrame(() => scrollTo({ left: x, top: y, behavior: 'auto' }));
+    setTimeout(() => scrollTo({ left: x, top: y, behavior: 'auto' }), 80);
+  }
+
   function makeBackButton(label, className) {
     const button = document.createElement('button');
     button.type = 'button';
@@ -132,7 +115,6 @@
     return button;
   }
 
-  // SUBJECT DOSSIER ---------------------------------------------------------
   const cast = $('#cast');
   if (cast) {
     const items = $$('.cast-list-item', cast);
@@ -146,12 +128,10 @@
       dossier.insertBefore(back, topline || dossier.firstChild);
       back.addEventListener('click', () => {
         holdSequentialHeight(cast, '.cast-console');
+        const target = lastSelected || items[0];
         close?.click();
-        requestAnimationFrame(() => {
-          const target = lastSelected || items[0];
-          smoothScrollIntoView(target || cast, 560);
-          target?.focus({ preventScroll: true });
-        });
+        preserveViewportPosition();
+        requestAnimationFrame(() => target?.focus({ preventScroll: true }));
       });
     }
 
@@ -164,21 +144,21 @@
     items.forEach(item => {
       item.addEventListener('click', () => {
         holdSequentialHeight(cast, '.cast-console');
-        queueMicrotask(() => {
-          syncCast();
-          settleSequentialPanel(cast, dossier, items, 680);
-        });
+        queueMicrotask(syncCast);
+        preserveViewportPosition();
       });
     });
 
-    close?.addEventListener('click', () => queueMicrotask(syncCast));
+    close?.addEventListener('click', () => {
+      queueMicrotask(syncCast);
+      preserveViewportPosition();
+    });
 
     const observer = new MutationObserver(syncCast);
     items.forEach(item => observer.observe(item, { attributes: true, attributeFilter: ['aria-selected', 'class'] }));
     syncCast();
   }
 
-  // SYSTEM QUERY / FAQ ------------------------------------------------------
   const faq = $('#faq');
   if (faq) {
     const items = $$('.faq-query-item', faq);
@@ -192,12 +172,10 @@
       panel.insertBefore(back, header || panel.firstChild);
       back.addEventListener('click', () => {
         holdSequentialHeight(faq, '.faq-console');
+        const target = lastSelected || items[0];
         close?.click();
-        requestAnimationFrame(() => {
-          const target = lastSelected || items[0];
-          smoothScrollIntoView(target || faq, 560);
-          target?.focus({ preventScroll: true });
-        });
+        preserveViewportPosition();
+        requestAnimationFrame(() => target?.focus({ preventScroll: true }));
       });
     }
 
@@ -210,14 +188,15 @@
     items.forEach(item => {
       item.addEventListener('click', () => {
         holdSequentialHeight(faq, '.faq-console');
-        queueMicrotask(() => {
-          syncFaq();
-          settleSequentialPanel(faq, panel, items, 700);
-        });
+        queueMicrotask(syncFaq);
+        preserveViewportPosition();
       });
     });
 
-    close?.addEventListener('click', () => queueMicrotask(syncFaq));
+    close?.addEventListener('click', () => {
+      queueMicrotask(syncFaq);
+      preserveViewportPosition();
+    });
 
     const observer = new MutationObserver(syncFaq);
     items.forEach(item => observer.observe(item, { attributes: true, attributeFilter: ['aria-selected', 'class'] }));
@@ -225,10 +204,93 @@
     syncFaq();
   }
 
+  // PROFILE HELP -------------------------------------------------------------
+  // Turn the R6 full-screen helper into an anchored translucent popover.
+  function installProfileHelpPopover() {
+    const toggle = $('#profileHelpToggle');
+    const panel = $('#profileHelpPanel');
+    const composer = panel?.closest('.review-composer');
+    if (!toggle || !panel || !composer) return;
+
+    const position = () => {
+      if (panel.hidden) return;
+      const parentRect = composer.getBoundingClientRect();
+      const buttonRect = toggle.getBoundingClientRect();
+      const width = Math.min(380, Math.max(260, parentRect.width - 28));
+      const preferredLeft = buttonRect.right - parentRect.left - width;
+      const left = Math.max(10, Math.min(parentRect.width - width - 10, preferredLeft));
+      const arrowRight = Math.max(16, Math.min(width - 20, parentRect.right - buttonRect.right + 13));
+      panel.style.setProperty('--r7-help-top', `${Math.max(44, buttonRect.bottom - parentRect.top + 10)}px`);
+      panel.style.setProperty('--r7-help-left', `${left}px`);
+      panel.style.setProperty('--r7-help-arrow-right', `${arrowRight}px`);
+      body.classList.remove('info-overlay-open');
+    };
+
+    const observer = new MutationObserver(() => {
+      if (!panel.hidden) requestAnimationFrame(position);
+    });
+    observer.observe(panel, { attributes: true, attributeFilter: ['hidden', 'aria-hidden'] });
+    toggle.addEventListener('click', () => setTimeout(position, 0));
+    addEventListener('resize', position, { passive: true });
+    addEventListener('scroll', () => {
+      if (!panel.hidden) position();
+    }, { passive: true });
+  }
+
+  // MOBILE REVIEW PAGING -----------------------------------------------------
+  function installMobileReviewPaging() {
+    const list = $('#reviewsList');
+    if (!list || $('.r7-load-more-reviews')) return;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'r7-load-more-reviews';
+    list.insertAdjacentElement('afterend', button);
+
+    const batch = 6;
+    let visible = batch;
+    let timer = 0;
+
+    const syncLabel = remaining => {
+      const ru = document.documentElement.lang !== 'en';
+      button.textContent = remaining > 0
+        ? `${ru ? 'ПОКАЗАТЬ ЕЩЁ' : 'SHOW MORE'} · ${remaining}`
+        : '';
+    };
+
+    const apply = ({ reset = false } = {}) => {
+      const cards = [...list.children].filter(node => node.classList?.contains('review-card'));
+      const compact = isCompactMediaContext();
+      if (reset) visible = batch;
+      if (!compact) {
+        cards.forEach(card => card.classList.remove('r7-review-hidden'));
+        button.classList.remove('is-visible');
+        syncLabel(0);
+        return;
+      }
+      cards.forEach((card, index) => card.classList.toggle('r7-review-hidden', index >= visible));
+      const remaining = Math.max(0, cards.length - visible);
+      button.classList.toggle('is-visible', remaining > 0);
+      syncLabel(remaining);
+    };
+
+    button.addEventListener('click', () => {
+      visible += batch;
+      apply();
+    });
+
+    new MutationObserver(mutations => {
+      if (!mutations.some(mutation => mutation.type === 'childList')) return;
+      clearTimeout(timer);
+      timer = setTimeout(() => apply({ reset: true }), 40);
+    }).observe(list, { childList: true });
+
+    addEventListener('theft:language', () => apply(), { passive: true });
+    addEventListener('resize', () => apply(), { passive: true });
+    apply({ reset: true });
+  }
+
   // ARCHIVE / MATERIALS -----------------------------------------------------
-  // The physical-wall ARCHIVE handle belongs only to the MATERIALS scene. The
-  // active test uses the visible viewport centre rather than a loose section
-  // intersection, so the handle does not bleed into neighbouring tabs.
   const materials = $('#materials');
   const archiveShell = $('.archive-drawer-shell', materials || document);
   const archiveDrawer = $('#archiveDrawer', materials || document);
@@ -266,9 +328,7 @@
     }
     const width = archiveImage.naturalWidth;
     const height = archiveImage.naturalHeight;
-    if (width > 0 && height > 0) {
-      archiveStage.style.setProperty('--r7-archive-aspect', `${width} / ${height}`);
-    }
+    if (width > 0 && height > 0) archiveStage.style.setProperty('--r7-archive-aspect', `${width} / ${height}`);
   }
 
   if (archiveImage) {
@@ -287,8 +347,6 @@
     syncArchiveAspect();
   }
 
-  // Keep state across device rotation. We only change representation classes;
-  // existing selected FAQ/subject state remains untouched in the DOM.
   let viewportTimer = 0;
   function scheduleViewportSync() {
     clearTimeout(viewportTimer);
@@ -297,6 +355,8 @@
 
   installNavigationAdditions();
   installMobileHeroActions();
+  installProfileHelpPopover();
+  installMobileReviewPaging();
   applyViewportClasses();
   addEventListener('resize', scheduleViewportSync, { passive: true });
   addEventListener('orientationchange', scheduleViewportSync, { passive: true });
