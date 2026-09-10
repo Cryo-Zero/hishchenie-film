@@ -1,0 +1,29 @@
+name: R7 memory checkpoint safe
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  update-memory:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Update canonical memory
+        run: python3 tools/r7-memory-checkpoint.py
+      - name: Commit docs and remove helpers
+        shell: bash
+        run: |
+          rm -f tools/r7-memory-checkpoint.py .github/workflows/r7-memory-checkpoint-safe.yml
+          git config user.name "Cryo-Zero"
+          git config user.email "Bogdan.Vedrentsov@gmail.com"
+          git add docs/current/PROJECT-STATE.md docs/current/ROADMAP.md tools/r7-memory-checkpoint.py .github/workflows/r7-memory-checkpoint-safe.yml
+          git commit -m "docs: record active R7 responsive checkpoint [skip ci]"
+          git push origin HEAD:main
