@@ -81,10 +81,12 @@ Implemented feedback:
 
 Owner-feedback QA history:
 
-- corrected full feedback audit: **31 checks / 0 failures**;
-- after visually reviewing the resulting FAQ screenshot, one additional refinement was made so the beginning of FAQ/Actors detail panels always settles below the fixed header;
-- final dedicated sequential acceptance check after that refinement: **14 checks / 0 failures**;
-- final checks explicitly verified controlled FAQ and Actors movement, panel placement below the header, visible back commands, no horizontal overflow, no phone JS errors, desktop repeated-home hidden, desktop bug-report entry visible, and fixed Reviews mobile header.
+- owner-feedback audit after the first correction set: **31 checks / 0 failures** after correcting the test expectation that stable FAQ scroll is valid;
+- visual review of that evidence identified one remaining composition nuance: an opened FAQ panel could begin slightly above the visible area when the selected query was low in the index;
+- a controlled settle refinement was added for FAQ and Actors so the new detail panel begins below the fixed header;
+- an intermediate QA run reported **16 / 17** because its Actors motion assertion incorrectly required a large scroll even when the dossier was already only 7 px from the correct destination; panel placement/back visibility/overflow were all already passing;
+- the corrected final sequential acceptance check then completed with **14 / 14 checks passed**;
+- the final check explicitly verified controlled FAQ and Actors movement, panel placement below the header, visible back commands, no horizontal overflow, no phone JS errors, desktop repeated-home hidden, desktop bug-report entry visible, and fixed Reviews mobile header.
 
 The owner-feedback round remains part of the draft R7 preview until the owner visually accepts the updated result.
 
