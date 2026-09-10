@@ -104,6 +104,14 @@
     scrollAnimation = requestAnimationFrame(tick);
   }
 
+  function settleSequentialPanel(section, panel, selectedItems, duration = 680) {
+    if (!section || !panel || !isSequentialContext()) return;
+    setTimeout(() => {
+      const selected = selectedItems.some(item => item.getAttribute('aria-selected') === 'true');
+      if (selected) smoothScrollIntoView(panel, duration);
+    }, 40);
+  }
+
   function holdSequentialHeight(section, selector) {
     if (!section || !isSequentialContext()) return;
     const consoleNode = $(selector, section);
@@ -147,26 +155,25 @@
       });
     }
 
-    function syncCast({ allowScroll = false } = {}) {
+    function syncCast() {
       const selected = items.find(item => item.getAttribute('aria-selected') === 'true') || null;
-      const wasOpen = cast.classList.contains('r7-dossier-open');
       cast.classList.toggle('r7-dossier-open', Boolean(selected));
       if (selected) lastSelected = selected;
-      if (allowScroll && selected && !wasOpen && isSequentialContext()) {
-        requestAnimationFrame(() => smoothScrollIntoView(dossier, 680));
-      }
     }
 
     items.forEach(item => {
       item.addEventListener('click', () => {
         holdSequentialHeight(cast, '.cast-console');
-        queueMicrotask(() => syncCast({ allowScroll: true }));
+        queueMicrotask(() => {
+          syncCast();
+          settleSequentialPanel(cast, dossier, items, 680);
+        });
       });
     });
 
-    close?.addEventListener('click', () => queueMicrotask(() => syncCast()));
+    close?.addEventListener('click', () => queueMicrotask(syncCast));
 
-    const observer = new MutationObserver(() => syncCast());
+    const observer = new MutationObserver(syncCast);
     items.forEach(item => observer.observe(item, { attributes: true, attributeFilter: ['aria-selected', 'class'] }));
     syncCast();
   }
@@ -194,26 +201,25 @@
       });
     }
 
-    function syncFaq({ allowScroll = false } = {}) {
+    function syncFaq() {
       const selected = items.find(item => item.getAttribute('aria-selected') === 'true') || null;
-      const wasOpen = faq.classList.contains('r7-response-open');
       faq.classList.toggle('r7-response-open', Boolean(selected));
       if (selected) lastSelected = selected;
-      if (allowScroll && selected && !wasOpen && isSequentialContext()) {
-        requestAnimationFrame(() => smoothScrollIntoView(panel, 700));
-      }
     }
 
     items.forEach(item => {
       item.addEventListener('click', () => {
         holdSequentialHeight(faq, '.faq-console');
-        queueMicrotask(() => syncFaq({ allowScroll: true }));
+        queueMicrotask(() => {
+          syncFaq();
+          settleSequentialPanel(faq, panel, items, 700);
+        });
       });
     });
 
-    close?.addEventListener('click', () => queueMicrotask(() => syncFaq()));
+    close?.addEventListener('click', () => queueMicrotask(syncFaq));
 
-    const observer = new MutationObserver(() => syncFaq());
+    const observer = new MutationObserver(syncFaq);
     items.forEach(item => observer.observe(item, { attributes: true, attributeFilter: ['aria-selected', 'class'] }));
     if (panel) observer.observe(panel, { attributes: true, attributeFilter: ['class'] });
     syncFaq();
@@ -286,9 +292,7 @@
   let viewportTimer = 0;
   function scheduleViewportSync() {
     clearTimeout(viewportTimer);
-    viewportTimer = setTimeout(() => {
-      applyViewportClasses();
-    }, 60);
+    viewportTimer = setTimeout(applyViewportClasses, 60);
   }
 
   installNavigationAdditions();
