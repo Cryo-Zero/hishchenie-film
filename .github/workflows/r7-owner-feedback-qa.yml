@@ -1,0 +1,60 @@
+name: R7 owner feedback QA once
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+
+permissions:
+  contents: write
+
+env:
+  CI: true
+
+jobs:
+  browser-qa:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: revival-r7-responsive-mobile
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Chromium harness
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run owner feedback browser audit
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/r7-owner-http.log 2>&1 &
+          echo $! > /tmp/r7-owner-http.pid
+          sleep 1
+          node scripts/r7-owner-feedback-qa.cjs
+
+      - name: Upload owner feedback evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-owner-feedback-qa
+          path: r7-owner-qa/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Cleanup temporary QA harness
+        if: always()
+        shell: bash
+        run: |
+          rm -f .github/workflows/r7-owner-feedback-qa.yml scripts/r7-owner-feedback-qa.cjs
+          git config user.name "Cryo-Zero"
+          git config user.email "Bogdan.Vedrentsov@gmail.com"
+          git add .github/workflows/r7-owner-feedback-qa.yml scripts/r7-owner-feedback-qa.cjs
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: remove temporary owner feedback QA [skip ci]"
+            git push origin HEAD:revival-r7-responsive-mobile
+          fi
