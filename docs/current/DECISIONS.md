@@ -22,6 +22,20 @@ General rules:
 - ROADMAP presence also does not grant blanket implementation permission: it may contain approved principles, completed history, future stages and unapproved candidate ideas together. Current explicit owner/task approval still governs implementation.
 - When a workstream is completed, preserve a concise history of what was wanted, what was accepted/rejected, what was actually implemented and what remains future work. Do not erase planning context merely because the feature is now complete.
 
+### Planning chat / implementation bridge loop
+
+The normal collaborative workflow may use two separate ChatGPT conversations with different roles:
+
+- the **planning/review chat** is where the owner and assistant discuss goals, compare alternatives, make design/product/technical decisions, review returned results and decide what should happen next;
+- the **implementation bridge chat** receives a bounded implementation task prepared from the currently approved plan and performs the authorized repository/backend work;
+- after bridge work, the owner may return its result, report, diff, screenshots or verification evidence to the planning chat for review before the next substantial decision/implementation step;
+- while a separate bridge task is being worked on, the planning chat may continue exploring later ideas, alternatives and future workstreams. Those discussions remain candidate planning material until explicitly approved and must not silently expand the bridge task already in progress;
+- a bridge task should contain the current approved scope, relevant constraints, preservation/safety rules, required verification and the expected report/handoff so implementation does not depend on unstated chat context;
+- discoveries made during implementation may return to planning as new evidence or candidate ideas. They do not automatically authorize additional unrelated changes;
+- meaningful decisions, accepted/rejected alternatives, useful future ideas, completed results and verification lessons from either chat must be transferred into the appropriate canonical documentation (`PROJECT-STATE`, `DECISIONS`, `VISUAL-SYSTEM`, `ROADMAP`, `BACKLOG`, release/history/database docs) so a failure or loss of either chat does not destroy project knowledge.
+
+This separation is intentional: planning may move ahead conceptually while implementation remains tightly scoped to the last approved bridge task.
+
 ### Canonical documentation preservation
 
 The canonical documentation is protected project memory and recovery material. Losing it or silently changing its meaning would materially damage future handoff/recovery.
