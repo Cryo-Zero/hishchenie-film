@@ -8,30 +8,43 @@ This file remembers future or historical ideas. Before implementing anything her
 
 ## NEXT / near-term
 
-### Admin activation
+### Admin activation / first UI smoke test
 
-Planned owner identity:
+Technical owner identity:
 
 `zero@hishchenie.invalid`
 
-Current blocker: the connected Supabase bridge does not expose a documented Auth Admin create-user action.
+Completed:
 
-Planned sequence:
+1. project owner manually created the dedicated Supabase email/password Auth user through Supabase Dashboard;
+2. bridge verified exactly one matching user, with provider `email`, confirmed email and `is_anonymous = false`;
+3. bridge added that verified Auth UUID to `public.admins` with `role = 'owner'`;
+4. database-level membership/FK was verified; `public.admins = 1` and no other admins were present at verification;
+5. `profiles`, `reviews`, `review_likes` and `review_replies` counts were unchanged by the membership operation.
 
-1. project owner manually creates the dedicated Supabase email/password Auth user through Supabase Dashboard;
-2. after explicit approval, bridge reads the created `auth.users.id`;
-3. bridge adds only that UUID to `public.admins` with `role = 'owner'`;
-4. verify backend authorization (`is_admin_v1()` and membership);
-5. perform the first real owner admin-panel login / functional smoke check;
-6. sign out after the authorized smoke test.
+Not yet verified:
 
-Do not bypass Auth user creation with direct `auth.users` writes, temporary Edge Functions, installed HTTP/`pg_net` workarounds or undocumented mechanisms.
+- ordinary password sign-in through a real user session;
+- `is_admin_v1()` under that actual password-auth session;
+- full admin UI/moderation smoke behavior.
+
+Reason: the connected Supabase toolset does not expose an ordinary password sign-in action. Do not substitute JWT manipulation, service-role impersonation or Auth-internal workarounds as proof of user login.
+
+Next approved verification step:
+
+1. owner opens `/admin/`;
+2. performs the first real ordinary password login;
+3. confirms the existing panel boots normally and `is_admin_v1()` allows access;
+4. performs only the separately approved smoke checks;
+5. signs out when testing is complete.
+
+Do not manually call `admin_ensure_official_profile_v1()` before that normal UI flow. Do not treat this backlog entry as permission to add/redesign admin features or perform moderation actions.
 
 The temporary admin test password may be used only for explicitly authorized authentication/smoke tests. It must not be stored in GitHub/docs or repeated in reports.
 
 ### Responsive/mobile release
 
-After successful admin activation/smoke verification, open a separate responsive/mobile branch/workstream.
+After successful first admin UI smoke verification, open a separate responsive/mobile branch/workstream.
 
 First-pass goal: a functionally complete phone experience, not mandatory pixel-perfect polish.
 

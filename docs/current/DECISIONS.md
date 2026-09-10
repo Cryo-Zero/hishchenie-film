@@ -173,16 +173,18 @@ Existing admin panel capabilities:
 
 Admin backend RPC/functions already exist.
 
-Last verified pre-activation state:
+Historical pre-activation snapshot:
 
 - `public.admins` = `0`;
 - suitable email/password Auth users = `0`.
 
+That snapshot is history, not current state. Current factual admin state is maintained in `PROJECT-STATE.md`.
+
 ### Owner Auth creation rule
 
-The connected Supabase bridge currently does **not** expose a documented Auth Admin `create user` action.
+The connected Supabase bridge does **not** expose a documented Auth Admin `create user` action.
 
-Therefore the dedicated owner email/password Auth user must be created manually by the project owner through the Supabase Dashboard using the normal supported Auth management flow.
+Therefore owner Auth-user creation must use the normal supported Supabase Auth management flow outside bridge work when creation is required. For the current owner account, the project owner completed this manually through Supabase Dashboard before the membership activation step.
 
 Do **not** bypass this limitation with:
 
@@ -191,23 +193,24 @@ Do **not** bypass this limitation with:
 - installing HTTP/`pg_net` extensions for this purpose;
 - undocumented HTTP/database workarounds.
 
-After the owner has created the Auth user, a separately authorized bridge operation may read its UUID, add only the approved membership row to `public.admins`, and verify the existing backend authorization path.
+A separately authorized bridge operation may read a manually created user's UUID, add only an explicitly approved membership row to `public.admins`, and verify the database-level authorization membership.
 
-## Planned admin owner identity
+### Admin owner identity
 
-The planned technical owner login is:
+The technical owner login is:
 
 `zero@hishchenie.invalid`
 
 Decisions:
 
 - It is not a public mailbox and exists only as technical Supabase Auth login for the owner/admin panel.
-- The Auth user is **not created yet** at the current canonical state.
-- Create it manually through Supabase Dashboard, then add its `auth.users.id` to `public.admins` with `role = 'owner'` in a separately authorized activation step.
+- The Auth user was created manually through Supabase Dashboard using the supported email/password Auth management flow.
+- The owner membership is active in `public.admins` with `role = 'owner'`.
 - Never store the password in GitHub, project documentation or public code.
 - Because the mailbox is intentionally non-real, email password recovery is unavailable by design; password change/recovery must use Supabase management/dashboard access.
 - MFA/2FA is not required for the first activation, but remains a possible later security improvement.
 - Public nickname/official label must never depend on this technical login email.
+- Database-level membership activation does not by itself prove the complete password-login/UI moderation flow; that must be verified by a real ordinary user login when the available tool/UI permits it.
 
 ### Temporary admin test credential policy
 
