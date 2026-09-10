@@ -2,7 +2,7 @@
 
 This document stores long-lived decisions and the reasoning/constraints behind them. It is not a release log and not a task list.
 
-For active visual/composition laws, see `VISUAL-SYSTEM.md`. For current factual state, see `PROJECT-STATE.md`. For unapproved future ideas, see `BACKLOG.md`.
+For active visual/composition laws, see `VISUAL-SYSTEM.md`. For current factual state, see `PROJECT-STATE.md`. For the multi-workstream plan/status/history, see `ROADMAP.md`. For unapproved future ideas, see `BACKLOG.md`.
 
 ## Workflow / governance
 
@@ -19,6 +19,8 @@ General rules:
 - Do not invent film-author data, contacts, release facts or other public information that is not actually present/confirmed in the project.
 - When a task says read-only, do not self-fix discovered problems; report them first.
 - BACKLOG presence never means permission to implement.
+- ROADMAP presence also does not grant blanket implementation permission: it may contain approved principles, completed history, future stages and unapproved candidate ideas together. Current explicit owner/task approval still governs implementation.
+- When a workstream is completed, preserve a concise history of what was wanted, what was accepted/rejected, what was actually implemented and what remains future work. Do not erase planning context merely because the feature is now complete.
 
 ### Canonical documentation preservation
 
@@ -242,34 +244,31 @@ Diagnostics must not include UUID/profile ID, auth/session tokens, cookies, loca
 
 ## Project memory quality / sync
 
-Meaningful project knowledge includes not only features/backend/files but also visual laws, composition principles, world-grid rules, deliberate exceptions, responsive philosophy, interaction philosophy, rejected directions, reasons behind important decisions, safety/recovery rules and operational lessons.
+Meaningful project knowledge includes not only features/backend/files but also visual laws, composition principles, world-grid rules, deliberate exceptions, responsive philosophy, interaction philosophy, rejected directions, reasons behind important decisions, safety/recovery rules, roadmap/workstream state and operational lessons.
 
 Classify meaningful information as:
 
 - **PROJECT-STATE** — what is true now;
 - **DECISIONS** — accepted long-term rules/reasons;
 - **VISUAL-SYSTEM** — active visual/composition laws;
+- **ROADMAP** — known workstreams, goals/current status, accepted/rejected directions, candidate ideas, next sequence and history/evidence links;
 - **BACKLOG** — ideas that may be revisited, not implementation approval;
 - **history/releases/archive** — past states and experiments.
 
+Completed workstream planning should not disappear. Keep a concise history capsule in `ROADMAP.md`; retain detailed evidence in release/admin/database/history documents. If old planning detail becomes too large for current memory, move it to `docs/history/` with a reference rather than deleting it without approval.
+
 Do not record casual conversation, routine chatter, temporary debugging guesses, disproven assumptions or random preferences that never became decisions.
 
-Bridge prompts may be a source of durable project knowledge, but do not copy them verbatim into documentation. Extract only long-lived STATE/DECISION/VISUAL-SYSTEM/BACKLOG/HISTORY information.
+Bridge prompts may be a source of durable project knowledge, but do not copy them verbatim into documentation. Extract only long-lived STATE/DECISION/VISUAL-SYSTEM/ROADMAP/BACKLOG/HISTORY information.
 
 ## Reserve / project-memory safety copy
 
 Reserve repository: `Cryo-Zero/hishchenie-film-v2`.
 
-Maintaining a recoverable reserve is a standing project requirement, not optional cleanup. The reserve exists so the project can be reconstructed if the production site, repository state, current chat/context or documentation is damaged or lost.
-
 Its existing `main`, archives, snapshots and history are recovery material and must not be destructively replaced merely to synchronize current production documentation.
-
-Before substantial high-risk/destructive runtime, architecture or backend work, preserve an appropriate recoverable rollback point when the available tooling allows it — for example a branch/tag/snapshot, verified migration/applied-state record, or protected private data backup depending on the scope. The recovery point must not expose secrets or production-sensitive data.
-
-Do not overwrite the last known-good recovery material merely to make the reserve look current. A backup/reserve is considered useful only when its claimed existence/state can be verified under the Verification integrity rule.
 
 The attempted exact production runtime mirror is **NOT VERIFIED / not created** because the available connector cannot transfer the missing ~22 MB production trailer blob into the reserve object database. This is a tool limitation, not evidence of production file loss.
 
 Do not publish an approximate `mirror/hishchenie-film-main` and do not call reserve an exact runtime mirror unless the complete tree is independently proven identical.
 
-After meaningful current-memory updates, maintain a **project-memory safety copy** at `snapshots/project-memory/current/` containing the four canonical current files. Verify content equality after writing. This copy is documentation/recovery support, not a runtime mirror.
+After meaningful current-memory updates, maintain a **project-memory safety copy** at `snapshots/project-memory/current/` containing the five canonical current files: `PROJECT-STATE.md`, `DECISIONS.md`, `VISUAL-SYSTEM.md`, `ROADMAP.md`, and `BACKLOG.md`. Verify content equality after writing. This copy is documentation/recovery support, not a runtime mirror.
