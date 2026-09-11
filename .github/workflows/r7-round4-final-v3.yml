@@ -109,6 +109,7 @@ jobs:
           new='Status: **IMPLEMENTED ON FEATURE BRANCH / FULL BROWSER MATRIX PASSED / EXACT-FINAL-SHA VERIFICATION FOLLOWS THIS COMMIT / OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**'
           if old not in s: raise SystemExit('Round4 status marker not found')
           s=s.replace(old,new,1).replace(marker,report,1)
+          s='\n'.join(line.rstrip() for line in s.splitlines())+'\n'
           p.write_text(s,encoding='utf-8')
           PY
           git config user.name github-actions[bot]
