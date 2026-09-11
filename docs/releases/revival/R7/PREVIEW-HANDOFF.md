@@ -130,3 +130,22 @@ Real Chromium QA covered `390×844`, `430×932`, `844×390`, `932×430`, `1366×
 **Bug Reports v2/backend/admin notifications remain OPEN DISCUSSION and were not implemented in Round3.**
 
 Round3 remains **OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**. Browser QA must not be described as owner visual acceptance.
+
+## Owner feedback round 4 — 2026-09-11
+
+Round4 is another owner visual-review correction pass on the same draft feature branch. Historical Round1–3 records remain above; active Round4 supersedes only the explicitly changed preview rules.
+
+Active Round4 preview:
+- CONTACT signal dot regains **small local reversible X motion** near the fixed right endpoint/diamond; no full-line travel or loop teleport; reduced-motion removes horizontal motion.
+- Mobile SUBJECT DOSSIER `SELECT ANOTHER SUBJECT` prompt is now a second keyboard/touch route to the existing `SUBJECT INDEX` action, with no auto-scroll.
+- CURRENT SIGNAL uses semantic identifiers `SIGNAL_03`, `ARCHIVE`, `RELEASE` and states `ONLINE`, `OPEN`, `PENDING`; no fabricated `14:20` / ambiguous `СЕЙЧАС`.
+- Compact Materials uses a horizontal `ARCHIVE // 11` trigger; desktop retains the wall-handle concept. Round3 compact drawer and stable contained stage remain.
+- Reviews Freshness content is geometrically centred in its true circle.
+- Open profile help highlights `?`; the same anchored popover is slightly more translucent/blurred without scroll lock/reflow.
+- Mobile/compact public-feed controls use a compact sticky/following feed-local dock; Round3 normal-flow-only behavior is historical/superseded.
+- Phone global header uses thresholded down-hide/up-reveal; top/burger/header-interaction/rotation safeguards apply; desktop remains unchanged.
+- Hero synopsis content/placement is untouched in runtime; final mobile placement remains an explicit owner/planning-chat visual question.
+
+Future architecture captured in `OWNER-FEEDBACK-ROUND4.md` and canonical docs includes moderation/template principles, Admin→public-site boundary, Bug Reports v2/admin/Telegram, Russian CAPTCHA preference, privacy/raw-IP minimization, Russian Supabase-compatible hosting research and separate legal/privacy prerequisites. **None of those future backend/product migrations are implemented by Round4.**
+
+Round4 remains **OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**. Do not merge or describe QA as owner acceptance.

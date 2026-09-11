@@ -237,6 +237,164 @@
     }, { passive: true });
   }
 
+  // OWNER FEEDBACK ROUND 4 ---------------------------------------------------
+  // The dossier footer is a second route to the existing SUBJECT INDEX action.
+  // It deliberately clicks the already-installed back control so state/focus/scroll
+  // semantics cannot drift into a parallel navigation model.
+  function installSubjectPromptAction() {
+    const cast = $('#cast');
+    const prompt = $('#dossierPrompt', cast || document);
+    if (!cast || !prompt) return;
+
+    let wasActionable = false;
+    let openScroll = null;
+
+    const sync = () => {
+      const actionable = isSequentialContext() && cast.classList.contains('r7-dossier-open');
+      if (actionable && !wasActionable) openScroll = { x: scrollX, y: scrollY };
+      if (!actionable) openScroll = null;
+      wasActionable = actionable;
+      prompt.classList.toggle('r7-subject-return', actionable);
+      if (actionable) {
+        prompt.setAttribute('role', 'button');
+        prompt.setAttribute('tabindex', '0');
+        prompt.setAttribute('aria-label', document.documentElement.lang === 'en'
+          ? 'Return to subject index'
+          : 'Вернуться к списку субъектов');
+      } else {
+        prompt.removeAttribute('role');
+        prompt.removeAttribute('tabindex');
+        prompt.removeAttribute('aria-label');
+      }
+    };
+
+    const activate = event => {
+      if (!prompt.classList.contains('r7-subject-return')) return;
+      if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+      if (event.type === 'keydown') event.preventDefault();
+
+      const current = { x: scrollX, y: scrollY };
+      const smallIncidentalDrift = openScroll && Math.abs(current.y - openScroll.y) <= 24;
+      const targetScroll = smallIncidentalDrift ? openScroll : current;
+      $('.r7-subject-back', cast)?.click();
+
+      const restore = () => {
+        if (!isSequentialContext()) return;
+        if (Math.abs(scrollX - targetScroll.x) <= .5 && Math.abs(scrollY - targetScroll.y) <= .5) return;
+        scrollTo({ left: targetScroll.x, top: targetScroll.y, behavior: 'auto' });
+      };
+      requestAnimationFrame(() => requestAnimationFrame(restore));
+      setTimeout(restore, 90);
+    };
+
+    prompt.addEventListener('click', activate);
+    prompt.addEventListener('keydown', activate);
+    new MutationObserver(sync).observe(cast, { attributes: true, attributeFilter: ['class'] });
+    addEventListener('theft:language', sync, { passive: true });
+    addEventListener('resize', sync, { passive: true });
+    sync();
+  }
+
+  // Compact/phone Materials gets a horizontal control, but the real drawer keeps
+  // one source of truth: the existing archiveDrawerToggle and its site.js logic.
+  function installMobileArchiveControl() {
+    const mobileToggle = $('#r7MobileArchiveToggle');
+    if (!mobileToggle || !archiveToggle) return;
+
+    const sync = () => {
+      mobileToggle.setAttribute('aria-expanded', archiveToggle.getAttribute('aria-expanded') || 'false');
+    };
+    mobileToggle.addEventListener('click', () => {
+      syncMaterialsArchiveVisibility();
+      archiveToggle.click();
+      sync();
+    });
+    new MutationObserver(sync).observe(archiveToggle, { attributes: true, attributeFilter: ['aria-expanded'] });
+    sync();
+  }
+
+  // Phone-only smart header: direction hysteresis prevents 1–2 px touch noise
+  // from toggling the header. Header interaction and an open burger always reveal it.
+  const header = $('.site-header');
+  const headerControl = $('#menuToggle');
+  const isSmartHeaderContext = () => isCoarse() && (innerWidth <= 560 || isPhoneLandscape());
+  let smartHeaderLastY = Math.max(0, scrollY);
+  let smartHeaderDirection = 0;
+  let smartHeaderTravel = 0;
+  let smartHeaderInteractionUntil = 0;
+  let smartHeaderFrame = 0;
+
+  function revealSmartHeader() {
+    body.classList.remove('r7-header-hidden');
+  }
+
+  function resetSmartHeaderTracking() {
+    smartHeaderLastY = Math.max(0, scrollY);
+    smartHeaderDirection = 0;
+    smartHeaderTravel = 0;
+  }
+
+  function syncSmartHeader(forceVisible = false) {
+    if (!header) return;
+    const enabled = isSmartHeaderContext();
+    body.classList.toggle('r7-smart-header', enabled);
+    if (!enabled) {
+      revealSmartHeader();
+      resetSmartHeaderTracking();
+      return;
+    }
+
+    const y = Math.max(0, scrollY);
+    const interacting = performance.now() < smartHeaderInteractionUntil
+      || body.classList.contains('nav-open')
+      || header.matches(':focus-within');
+
+    if (forceVisible || y <= 28 || interacting) {
+      revealSmartHeader();
+      resetSmartHeaderTracking();
+      return;
+    }
+
+    const delta = y - smartHeaderLastY;
+    smartHeaderLastY = y;
+    if (Math.abs(delta) < 3) return;
+
+    const direction = delta > 0 ? 1 : -1;
+    if (direction !== smartHeaderDirection) {
+      smartHeaderDirection = direction;
+      smartHeaderTravel = 0;
+    }
+    smartHeaderTravel += Math.abs(delta);
+
+    if (direction > 0 && y > 92 && smartHeaderTravel >= 28) {
+      body.classList.add('r7-header-hidden');
+      smartHeaderTravel = 0;
+    } else if (direction < 0 && smartHeaderTravel >= 14) {
+      revealSmartHeader();
+      smartHeaderTravel = 0;
+    }
+  }
+
+  function scheduleSmartHeader() {
+    cancelAnimationFrame(smartHeaderFrame);
+    smartHeaderFrame = requestAnimationFrame(() => syncSmartHeader(false));
+  }
+
+  function installSmartHeader() {
+    if (!header) return;
+    ['pointerdown', 'focusin'].forEach(type => header.addEventListener(type, () => {
+      smartHeaderInteractionUntil = performance.now() + 900;
+      revealSmartHeader();
+      resetSmartHeaderTracking();
+    }, { passive: type === 'pointerdown' }));
+    headerControl?.addEventListener('click', () => {
+      smartHeaderInteractionUntil = performance.now() + 1200;
+      requestAnimationFrame(() => syncSmartHeader(true));
+    });
+    addEventListener('scroll', scheduleSmartHeader, { passive: true });
+    syncSmartHeader(true);
+  }
+
   // MOBILE REVIEW PAGING -----------------------------------------------------
   function installMobileReviewPaging() {
     const list = $('#reviewsList');
@@ -305,7 +463,9 @@
     const headerHeight = $('.site-header')?.offsetHeight || 0;
     const usableHeight = Math.max(1, innerHeight - headerHeight);
     const probe = headerHeight + usableHeight * .48;
-    const active = rect.top <= probe && rect.bottom >= probe;
+    const active = isCompactMediaContext()
+      ? rect.bottom >= headerHeight + 24 && rect.top <= innerHeight - 24
+      : rect.top <= probe && rect.bottom >= probe;
     archiveShell.classList.toggle('r7-materials-active', active);
     if (!active && archiveShell.classList.contains('is-open')) {
       archiveShell.classList.remove('is-open');
@@ -345,6 +505,7 @@
     syncInjectedNavVisibility();
     syncMaterialsArchiveVisibility();
     syncArchiveAspect();
+    syncSmartHeader(true);
   }
 
   let viewportTimer = 0;
@@ -356,6 +517,9 @@
   installNavigationAdditions();
   installMobileHeroActions();
   installProfileHelpPopover();
+  installSubjectPromptAction();
+  installMobileArchiveControl();
+  installSmartHeader();
   installMobileReviewPaging();
   applyViewportClasses();
   addEventListener('resize', scheduleViewportSync, { passive: true });

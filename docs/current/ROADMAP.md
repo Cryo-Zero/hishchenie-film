@@ -422,3 +422,74 @@ Round3 owner corrections implemented and browser-QA'd on `revival-r7-responsive-
 - required phone/landscape/desktop Chromium matrix passed.
 
 Next gate: **owner visual review of Round3 preview**. Do not merge R7, publish mobile, begin Bug Reports v2/admin notifications, or treat browser QA as owner visual acceptance without a separate explicit decision.
+
+## Round 4 planning capture — responsive preview + accepted future architecture
+
+### R7 responsive preview — Round4
+
+**Status:** IMPLEMENTED ON DRAFT FEATURE BRANCH / OWNER VISUAL REVIEW REQUIRED / NOT PRODUCTION.
+
+Round4 active changes:
+- local reversible CONTACT signal motion;
+- interactive Actors “select another subject” alternate return route;
+- semantic Current Signal row identifiers/states;
+- compact horizontal mobile Archive trigger while preserving Round3 stable stage/drawer;
+- centred Freshness content;
+- active/lighter anchored profile help;
+- compact following Reviews control dock;
+- phone smart-hide/reveal global header.
+
+Superseded active preview rules:
+- Round3 fixed CONTACT dot presentation;
+- Round3 normal-flow-only Reviews control behavior;
+- Round3 compact/mobile vertical Archive trigger.
+
+Still preserved:
+- no auto-scroll for mobile Actors/FAQ state changes;
+- Show More batching;
+- profanity explanatory paragraph stays removed;
+- stable Materials stage with undistorted contained assets;
+- approved desktop/R6 foundation.
+
+**Open visual question:** mobile Hero synopsis placement. Keep the approved synopsis text/content and current placement until owner/planning-chat approves a new placement.
+
+### Admin / moderation — accepted future direction
+
+Future admin work may add editable official-reply templates and `ОТКРЫТЬ САЙТ ↗` in a new tab, without exposing admin controls on public pages. Moderation/audit semantics follow `DECISIONS.md`: criticism/low rating is not a violation; severe prohibited text can be system-hidden while genuine rating may remain; obvious fake/spam/manipulation may be removed including score; retain action reason/time/authorized operator/internal history.
+
+### Bug Reports v2 / Telegram — accepted future workstream
+
+Future flow:
+`visitor → Bug Report → server-verified anti-bot when required → safe backend storage → ADMIN / BUG REPORTS → minimum Telegram notification`.
+
+Visitor fields: simple single-choice category, optional details (`Что случилось?`), optional diagnostics checkbox off by default. Planned diagnostics are minimized as defined in `DECISIONS.md`. Admin statuses are exactly `NEW / IN PROGRESS / FIXED / CLOSED`; opening does not mutate status. Telegram is only an alert path and does not carry full report text/diagnostics by default.
+
+No Round4 backend/schema/notification implementation occurred.
+
+### CAPTCHA / anti-bot research
+
+Research Russian-hosted verification, with Yandex SmartCaptcha a preferred candidate to evaluate. Submission-time server verification is the direction for first review on a new anonymous identity and future Bug Reports. No CAPTCHA deployment/migration is authorized by this planning record.
+
+### Russian-hosted backend research
+
+Create a future research phase for a self-hosted Supabase-compatible stack physically hosted in Russia, prioritizing preservation of PostgreSQL/RLS/RPC/application architecture. Compare with a full Russian managed-stack alternative only after compatibility/operations/legal requirements are understood. No provider, migration, production copy, credential or endpoint change is approved yet.
+
+### Legal/privacy prerequisites
+
+Future legal/privacy publication is separate from the artistic FAQ and should cover the personal-data/privacy policy, community rules and any required consent/notice controls.
+
+**Unresolved prerequisite:** likely personal-data operator is the film author, but legal identity/contact are not confirmed. Owner will clarify later. Do not publish guessed operator details; the owner states it is not himself and not an ordinary site-team member, and a lawyer is not automatically the operator.
+
+### Next gate
+
+Owner/planning-chat visual review of Round4 browser evidence. Do not merge R7 or start the future Bug Reports/CAPTCHA/backend/legal implementation work merely because the architecture is documented.
+
+## Privacy-by-design backend/legal follow-up — added 2026-09-12
+
+Future backend migration and privacy-policy work must preserve the active privacy direction in `DECISIONS.md`: Russian-hosted backend direction; no required real names/email/phone for ordinary visitors; no application identity/features built around raw IP; minimum technical review identity; informed consent where legally required; deletion path for user-associated data; data minimization by default.
+
+Before final Privacy Policy publication, confirm the legal identity/contact details of the film author and confirm the actual operator/processor allocation. The current operator assumption (film author) is provisional only. Do not infer or publish legal details from technical ownership or team participation.
+
+Infrastructure providers may technically observe network IP addresses even though the application itself must not use/store raw IP as ordinary product data. The artistic FAQ wording `На сайте есть безопасность?` remains separate from legal privacy documentation.
+
+This addendum does **not** authorize or perform a backend migration, CAPTCHA deployment, Telegram integration, Bug Reports v2 implementation, or Supabase production change in Round 4.

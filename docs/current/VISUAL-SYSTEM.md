@@ -277,3 +277,17 @@ These are owner-directed durable visual rules for the R7 preview; R7 is not prod
 - CONTACT's small endpoint indicator remains physically fixed near the right endpoint/diamond. Signal animation may pulse/fade/glow but must not travel horizontally or visibly teleport on loop.
 - Information-bearing microcopy must stay subordinate **and readable**. Do not solve this with a global font-size increase: target the tiny functional/status/meta class, preserve hierarchy, and verify geometry in browser. Decorative watermarks are not part of this rule.
 - Substantial responsive changes remain subject to direction/concept approval where practical, and final acceptance must use actual browser rendering rather than mockup-only evidence.
+
+## R7 Round 4 preview refinements — owner-directed, not production
+
+These rules supersede only the conflicting Round3 preview rules; the earlier section remains historical traceability until R7 acceptance/release cleanup.
+
+- CONTACT endpoint diamond is fixed. The nearby dot may move only a **short local horizontal distance** with continuous eased reversible motion; no full-line travel, abrupt reset or layout-coordinate animation. Reduced motion has no horizontal travel.
+- Compact Materials keeps Round3 stable stage geometry and centered `object-fit: contain`, but its phone/compact trigger is a horizontal technical `ARCHIVE // 11` control near the stage rather than the vertical wall handle. Desktop wall treatment remains the reference.
+- Sequential Actors keeps no-auto-scroll semantics. `SELECT ANOTHER SUBJECT` is an interactive alternate route to the same `SUBJECT INDEX` transition, with keyboard/touch/focus support.
+- CURRENT SIGNAL must use semantic system identifiers/states rather than fabricated time-like tokens.
+- Freshness ring content is geometrically centred for short, multi-digit and pending/insufficient states; the calculation itself is unchanged.
+- Anchored profile-help remains a popover, not fullscreen. Open `?` visibly communicates active state; popover may be slightly translucent/blurred while keeping readable contrast and zero page reflow/scroll lock.
+- Compact Reviews feed controls follow the reading context through a **small feed-local sticky/following surface**. Do not return to the early oversized sticky block, and do not reduce Round4 to Round3 normal-flow-only behavior.
+- Phone global site header may smart-hide on meaningful downward scroll and reveal on upward scroll, with hysteresis, top visibility, burger/header-interaction safety and rotation recovery. Desktop header behavior is unchanged.
+- Mobile Hero synopsis remains present and unchanged. Its final mobile placement is an **open visual question** requiring owner/planning-chat approval; no bridge implementation may invent a new final placement.
