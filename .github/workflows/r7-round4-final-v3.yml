@@ -103,7 +103,8 @@ jobs:
           s=p.read_text(encoding='utf-8')
           marker='`__ROUND4_QA_EVIDENCE__`'
           if s.count(marker)!=1: raise SystemExit(f'QA marker count={s.count(marker)}')
-          report=Path('/tmp/r7-round4-precommit/REPORT.md').read_text(encoding='utf-8')
+          raw_report=Path('/tmp/r7-round4-precommit/REPORT.md').read_text(encoding='utf-8')
+          report='\n'.join(line.rstrip() for line in raw_report.splitlines())+'\n'
           old='Status: **IMPLEMENTED ON FEATURE BRANCH / BROWSER QA PENDING AT DOCUMENT-CREATION STEP / OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**'
           new='Status: **IMPLEMENTED ON FEATURE BRANCH / FULL BROWSER MATRIX PASSED / EXACT-FINAL-SHA VERIFICATION FOLLOWS THIS COMMIT / OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**'
           if old not in s: raise SystemExit('Round4 status marker not found')
