@@ -1,0 +1,256 @@
+name: R7 Round4 final browser QA
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+
+permissions:
+  contents: write
+
+jobs:
+  round4:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify exact Round3 baseline plus temporary harness only
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=a97faa551aba14df059bec815445fd1200dc8360
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE"..HEAD | sort >/tmp/r7-round4-temp.txt
+          cat >/tmp/r7-round4-expected.txt <<'EOF'
+          .github/workflows/r7-round4-final.yml
+          qa/r7-round4-patch.py
+          qa/r7-round4-qa.cjs
+          EOF
+          diff -u /tmp/r7-round4-expected.txt /tmp/r7-round4-temp.txt
+          git worktree add /tmp/r7-before "$BASE"
+          cp qa/r7-round4-qa.cjs /tmp/r7-round4-qa.cjs
+
+      - name: Apply Round4 runtime and documentation patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 qa/r7-round4-patch.py
+          git diff --check
+          python3 - <<'PY'
+          import subprocess
+          allowed = {
+            'css/responsive-r7-polish.css',
+            'docs/current/BACKLOG.md',
+            'docs/current/DECISIONS.md',
+            'docs/current/ROADMAP.md',
+            'docs/current/VISUAL-SYSTEM.md',
+            'docs/releases/revival/R7/OWNER-FEEDBACK-ROUND4.md',
+            'docs/releases/revival/R7/PREVIEW-HANDOFF.md',
+            'index.html',
+            'js/responsive-r7.js',
+            'reviews.html',
+            '.github/workflows/r7-round4-final.yml',
+            'qa/r7-round4-patch.py',
+            'qa/r7-round4-qa.cjs',
+          }
+          changed=set(subprocess.check_output(['git','status','--porcelain=v1'],text=True).splitlines())
+          paths={line[3:] for line in changed}
+          unexpected=paths-allowed
+          if unexpected:
+              raise SystemExit(f'unexpected Round4 paths: {sorted(unexpected)}')
+          required={
+            'css/responsive-r7-polish.css','index.html','js/responsive-r7.js','reviews.html',
+            'docs/current/BACKLOG.md','docs/current/DECISIONS.md','docs/current/ROADMAP.md','docs/current/VISUAL-SYSTEM.md',
+            'docs/releases/revival/R7/OWNER-FEEDBACK-ROUND4.md','docs/releases/revival/R7/PREVIEW-HANDOFF.md'
+          }
+          missing=required-paths
+          if missing:
+              raise SystemExit(f'missing expected Round4 paths: {sorted(missing)}')
+          PY
+          grep -q 'ARCHIVE // 11' index.html
+          ! grep -q '<time>14:20</time>' index.html
+          grep -q 'SIGNAL_03' index.html
+          grep -q 'r7-review-controls-dock' reviews.html
+          grep -q 'r7ContactLocalSignal' css/responsive-r7-polish.css
+          grep -q 'installSmartHeader' js/responsive-r7.js
+          git diff --quiet a97faa551aba14df059bec815445fd1200dc8360 -- js/public-response.js
+          git diff --quiet a97faa551aba14df059bec815445fd1200dc8360 -- js/site.js
+
+      - name: Apply corrections exposed by first real-browser audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          css=Path('css/responsive-r7-polish.css')
+          s=css.read_text(encoding='utf-8')
+          marker='/* ROUND4 REAL-BROWSER CORRECTIONS */'
+          if marker in s:
+              raise SystemExit('correction marker already present')
+          s += r'''
+
+          /* ROUND4 REAL-BROWSER CORRECTIONS */
+          /* A registered custom property lets the keyframe animate a short transform
+             while the important transform declaration safely overrides Round3's
+             static `transform:none!important` rule. */
+          @property --r7-contact-shift {
+            syntax: '<length>';
+            inherits: false;
+            initial-value: 0px;
+          }
+          .contact-signal-track i {
+            --r7-contact-shift: 0px;
+            transform: translateX(var(--r7-contact-shift)) !important;
+            animation: r7ContactLocalSignalFixed 3.2s ease-in-out infinite alternate !important;
+          }
+          @keyframes r7ContactLocalSignalFixed {
+            0% { --r7-contact-shift: 0px; opacity: .54; box-shadow: 0 0 7px rgba(155,196,199,.38); }
+            100% { --r7-contact-shift: -8px; opacity: .96; box-shadow: 0 0 13px rgba(155,196,199,.68); }
+          }
+
+          /* Round2 stylesheet loads after polish and uses !important. Raise specificity
+             instead of changing the approved popover geometry. */
+          body.community-page #profileHelpPanel.profile-help-panel .info-overlay-card {
+            background: rgba(7,13,14,.84) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+          }
+          body.community-page #profileHelpPanel.profile-help-panel .info-overlay-card::before {
+            background: rgba(7,13,14,.84) !important;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .contact-signal-track i {
+              --r7-contact-shift: 0px;
+              animation: none !important;
+              transform: none !important;
+              opacity: .78 !important;
+              box-shadow: 0 0 9px rgba(155,196,199,.46) !important;
+              will-change: auto;
+            }
+          }
+          '''
+          css.write_text(s,encoding='utf-8')
+
+          qa=Path('/tmp/r7-round4-qa.cjs')
+          q=qa.read_text(encoding='utf-8')
+          old="""async function go(page,url){\n  await page.goto(url,{waitUntil:'domcontentloaded'});\n  await page.waitForTimeout(850);\n}\n"""
+          new="""async function ensureLang(page,target){\n  const current=await page.evaluate(()=>document.documentElement.lang || 'ru');\n  if(current===target) return;\n  const toggle=page.locator('#langToggle');\n  if(await toggle.count()){\n    await toggle.click();\n    await page.waitForTimeout(120);\n  }\n  const after=await page.evaluate(()=>document.documentElement.lang || 'ru');\n  if(after!==target) throw new Error(`Unable to set language ${target}; current=${after}`);\n}\nasync function go(page,url){\n  await page.goto(url,{waitUntil:'domcontentloaded'});\n  await page.waitForTimeout(850);\n  await ensureLang(page,'ru');\n}\n"""
+          if q.count(old)!=1:
+              raise SystemExit(f'go helper match count={q.count(old)}')
+          q=q.replace(old,new,1)
+          old2="""  const y0=await p.evaluate(()=>scrollY);\n  await toggle.click(); await sleep(160);\n"""
+          new2="""  await toggle.scrollIntoViewIfNeeded(); await sleep(100);\n  const y0=await p.evaluate(()=>scrollY);\n  await toggle.click(); await sleep(160);\n"""
+          if q.count(old2)!=1:
+              raise SystemExit(f'profile scroll test match count={q.count(old2)}')
+          q=q.replace(old2,new2,1)
+          qa.write_text(q,encoding='utf-8')
+          PY
+          git diff --check
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7qa
+          cd /tmp/r7qa
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Run pre-commit full browser matrix
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7-round4-precommit
+          python3 -m http.server 4182 --directory /tmp/r7-before >/tmp/r7-before-http.log 2>&1 &
+          echo $! >/tmp/r7-before.pid
+          python3 -m http.server 4183 --directory "$GITHUB_WORKSPACE" >/tmp/r7-after-http.log 2>&1 &
+          echo $! >/tmp/r7-after.pid
+          sleep 1
+          R7_OUT=/tmp/r7-round4-precommit \
+          R7_BASE=http://127.0.0.1:4183 \
+          R7_BEFORE=http://127.0.0.1:4182 \
+          node /tmp/r7-round4-qa.cjs
+
+      - name: Record QA evidence and create final Round4 commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('docs/releases/revival/R7/OWNER-FEEDBACK-ROUND4.md')
+          s=p.read_text(encoding='utf-8')
+          marker='`__ROUND4_QA_EVIDENCE__`'
+          if s.count(marker)!=1:
+              raise SystemExit(f'QA marker count={s.count(marker)}')
+          report=Path('/tmp/r7-round4-precommit/REPORT.md').read_text(encoding='utf-8')
+          s=s.replace(
+              'Status: **IMPLEMENTED ON FEATURE BRANCH / BROWSER QA PENDING AT DOCUMENT-CREATION STEP / OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**',
+              'Status: **IMPLEMENTED ON FEATURE BRANCH / FULL BROWSER MATRIX PASSED / EXACT-FINAL-SHA VERIFICATION FOLLOWS THIS COMMIT / OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**',
+              1
+          )
+          p.write_text(s.replace(marker,report,1),encoding='utf-8')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            css/responsive-r7-polish.css \
+            index.html \
+            js/responsive-r7.js \
+            reviews.html \
+            docs/releases/revival/R7/OWNER-FEEDBACK-ROUND4.md \
+            docs/releases/revival/R7/PREVIEW-HANDOFF.md \
+            docs/current/DECISIONS.md \
+            docs/current/VISUAL-SYSTEM.md \
+            docs/current/ROADMAP.md \
+            docs/current/BACKLOG.md
+          git rm .github/workflows/r7-round4-final.yml qa/r7-round4-patch.py qa/r7-round4-qa.cjs
+          git diff --cached --check
+          git commit -m "REVIVAL R7: owner feedback round 4"
+          git rev-parse HEAD >/tmp/r7-round4-final-sha.txt
+
+      - name: Re-run full browser matrix against exact final SHA
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: |
+          set -euo pipefail
+          FINAL_SHA="$(cat /tmp/r7-round4-final-sha.txt)"
+          test "$(git rev-parse HEAD)" = "$FINAL_SHA"
+          test -z "$(git status --porcelain)"
+          rm -rf /tmp/r7-round4-final-evidence
+          mkdir -p /tmp/r7-round4-final-evidence
+          R7_OUT=/tmp/r7-round4-final-evidence \
+          R7_BASE=http://127.0.0.1:4183 \
+          R7_BEFORE=http://127.0.0.1:4182 \
+          R7_EXACT_SHA="$FINAL_SHA" \
+          node /tmp/r7-round4-qa.cjs
+          test -z "$(git status --porcelain)"
+          cp /tmp/r7-round4-final-sha.txt /tmp/r7-round4-final-evidence/FINAL_SHA.txt
+
+      - name: Push exact verified final commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINAL_SHA="$(cat /tmp/r7-round4-final-sha.txt)"
+          test "$(git rev-parse HEAD)" = "$FINAL_SHA"
+          git push origin HEAD:revival-r7-responsive-mobile
+          REMOTE="$(git ls-remote origin refs/heads/revival-r7-responsive-mobile | cut -f1)"
+          test "$REMOTE" = "$FINAL_SHA"
+          echo "FINAL_SHA=$FINAL_SHA"
+
+      - name: Upload exact-final-SHA Round4 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-round4-exact-final-browser-evidence
+          path: /tmp/r7-round4-final-evidence
+          if-no-files-found: warn
