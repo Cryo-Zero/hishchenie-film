@@ -1,0 +1,558 @@
+name: R7 Round3 browser QA
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+
+permissions:
+  contents: write
+
+jobs:
+  round3:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify exact starting baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=e5a5c26ff9be2ff7d845cbf8f14de77ef5ed83db
+          test "$(git rev-parse HEAD^)" = "$BASE"
+          git worktree add /tmp/r7-before "$BASE"
+
+      - name: Apply owner feedback round 3 in working tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          css_path = Path('css/responsive-r7-polish.css')
+          css = css_path.read_text()
+          marker = '/* OWNER FEEDBACK ROUND 3 — 2026-09-11 */'
+          if marker in css:
+              raise SystemExit('Round3 CSS marker already exists')
+
+          old_reviews = '''/* Reviews header must remain available while reading the long public feed. */
+          @media (max-width: 980px) {
+            body.community-page .site-header {
+              position: fixed !important;
+              inset: 0 0 auto 0 !important;
+              width: 100% !important;
+              z-index: 180 !important;
+            }
+            body.community-page main {
+              padding-top: calc(var(--header-h) + var(--r7-safe-top)) !important;
+            }
+          }
+          '''
+          if old_reviews not in css:
+              raise SystemExit('Expected Round2 Reviews fixed-header block not found')
+          css = css.replace(old_reviews, '''/* Round2 historical note: Reviews once kept a special fixed mobile header.
+             Round3 owner feedback supersedes that behavior; review controls now use normal flow. */
+          ''', 1)
+
+          old_archive = '''/* Mobile media uses the selected asset's own aspect ratio. This prevents the
+             desktop 16:9 media footprint from making portrait posters look tiny. */
+          @media (max-width: 820px) {
+            #materials .archive-stage-wrap {
+              position: relative !important;
+              display: block !important;
+              width: 100% !important;
+            }
+            #materials .archive-stage {
+              width: 100% !important;
+              height: auto !important;
+              min-height: 0 !important;
+              max-height: none !important;
+              aspect-ratio: var(--r7-archive-aspect, 4 / 5) !important;
+            }
+            #materials .archive-stage img {
+              width: 100% !important;
+              height: 100% !important;
+              object-fit: contain !important;
+            }
+            #materials .archive-stage-wrap .gallery-button {
+              position: absolute !important;
+              z-index: 6 !important;
+              top: 50% !important;
+              width: 42px !important;
+              height: 58px !important;
+              min-height: 58px !important;
+              transform: translateY(-50%) !important;
+            }
+            #materials .archive-stage-wrap .gallery-button.prev { left: 6px !important; }
+            #materials .archive-stage-wrap .gallery-button.next { right: 6px !important; }
+          }
+          '''
+          if old_archive not in css:
+              raise SystemExit('Expected Round2 aspect-driven archive block not found')
+          css = css.replace(old_archive, '''/* Round2 historical note: compact Archive stage previously followed each
+             asset's natural aspect ratio. Round3 owner feedback requires stable stage geometry. */
+          @media (max-width: 820px) {
+            #materials .archive-stage-wrap {
+              position: relative !important;
+              display: block !important;
+              width: 100% !important;
+            }
+            #materials .archive-stage {
+              width: 100% !important;
+              height: clamp(320px, 56dvh, 500px) !important;
+              min-height: 0 !important;
+              max-height: 500px !important;
+              aspect-ratio: auto !important;
+            }
+            #materials .archive-stage img {
+              width: 100% !important;
+              height: 100% !important;
+              object-fit: contain !important;
+              object-position: center !important;
+            }
+            #materials .archive-stage-wrap .gallery-button {
+              position: absolute !important;
+              z-index: 6 !important;
+              top: 50% !important;
+              width: 42px !important;
+              height: 58px !important;
+              min-height: 58px !important;
+              transform: translateY(-50%) !important;
+            }
+            #materials .archive-stage-wrap .gallery-button.prev { left: 6px !important; }
+            #materials .archive-stage-wrap .gallery-button.next { right: 6px !important; }
+          }
+          ''', 1)
+
+          css += r'''
+
+          /* OWNER FEEDBACK ROUND 3 — 2026-09-11 */
+
+          /* Reviews: feed controls belong to normal document flow. The global site-header
+             keeps its ordinary R7 sticky behavior; there is no Reviews-only fixed mode. */
+          @media (max-width: 980px) {
+            body.community-page .site-header {
+              position: sticky !important;
+              top: 0 !important;
+              right: auto !important;
+              bottom: auto !important;
+              left: auto !important;
+              width: 100% !important;
+            }
+            body.community-page main { padding-top: 0 !important; }
+            body.community-page .community-feed-toolbar,
+            body.community-page .review-display-settings,
+            body.community-page .review-sort {
+              position: static !important;
+              inset: auto !important;
+              transform: none !important;
+            }
+          }
+
+          /* Owner removed the explanatory profanity-filter hint on every layout/language. */
+          .lexicon-toggle small[data-i18n="profanityFilterHint"] {
+            display: none !important;
+          }
+
+          /* Archive: compact wall drawer with an internally scrollable thumbnail index. */
+          @media (max-width: 820px) {
+            #materials .archive-drawer-shell {
+              --archive-drawer-width: min(76vw, 300px) !important;
+              height: min(58dvh, 560px) !important;
+            }
+            #materials .archive-drawer {
+              height: min(58dvh, 560px) !important;
+              max-height: 58dvh !important;
+              display: flex !important;
+              flex-direction: column !important;
+              overflow: hidden !important;
+            }
+            #materials .archive-drawer-head {
+              flex: 0 0 auto !important;
+              margin-bottom: 10px !important;
+            }
+            #materials .archive-drawer-grid {
+              flex: 1 1 auto !important;
+              min-height: 0 !important;
+              overflow-y: auto !important;
+              overflow-x: hidden !important;
+              overscroll-behavior: contain !important;
+              scrollbar-width: thin;
+            }
+            #materials .archive-drawer-toggle {
+              min-width: 40px !important;
+              min-height: 88px !important;
+            }
+          }
+
+          body.r7-phone-landscape #materials .archive-drawer-shell {
+            --archive-drawer-width: min(70vw, 290px) !important;
+            height: clamp(190px, 56dvh, 250px) !important;
+          }
+          body.r7-phone-landscape #materials .archive-drawer {
+            height: clamp(190px, 56dvh, 250px) !important;
+            max-height: 56dvh !important;
+          }
+          body.r7-phone-landscape #materials .archive-drawer-toggle {
+            min-height: 72px !important;
+            min-width: 38px !important;
+          }
+          body.r7-phone-landscape #materials .archive-stage {
+            height: clamp(220px, 58dvh, 300px) !important;
+            min-height: 0 !important;
+            max-height: 300px !important;
+            aspect-ratio: auto !important;
+          }
+          body.r7-phone-landscape #materials .archive-stage img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+            object-position: center !important;
+          }
+
+          /* Contact: fixed endpoint indicator; signal state is conveyed by a quiet pulse,
+             never by horizontal travel/teleport. */
+          .contact-signal-track i {
+            left: auto !important;
+            right: 12px !important;
+            transform: none !important;
+            animation: r7ContactEndpointPulse 2.8s ease-in-out infinite !important;
+          }
+          @keyframes r7ContactEndpointPulse {
+            0%, 100% { opacity: .42; box-shadow: 0 0 7px rgba(155,196,199,.36); }
+            50% { opacity: 1; box-shadow: 0 0 14px rgba(155,196,199,.72); }
+          }
+
+          /* Information-bearing microcopy readability pass. Keep hierarchy: primary
+             technical labels rise to 11px on desktop, secondary labels to 10px;
+             SIGNAL // STABLE is treated separately. Decorative watermarks are untouched. */
+          .current-signal::after,
+          .signal-log-row time,
+          .signal-log-row b,
+          .signal-data dt,
+          .hero-system-strip,
+          .poster-hud,
+          .signal-meta,
+          .archive-stage-meta,
+          .archive-bottom-code,
+          .archive-drawer-head,
+          .archive-drawer-grid .gallery-card::after,
+          .dossier-topline,
+          .dossier-subject,
+          .dossier-prompt,
+          .faq-query-item > span,
+          .faq-response-header,
+          .faq-response-code,
+          .faq-system-box span,
+          .feed-records,
+          .service-badge,
+          .review-enter-hint,
+          .human-check-note,
+          .reply-head time,
+          .review-edited,
+          .audience-pulse-head {
+            font-size: 11px !important;
+            line-height: 1.4 !important;
+          }
+
+          .dossier-data small,
+          .audience-pulse-data dt,
+          .audience-pulse-foot,
+          .contact-signal-copy span,
+          .contact-signal-status,
+          .footer-system,
+          .build-mark {
+            font-size: 10px !important;
+            line-height: 1.4 !important;
+          }
+
+          .signal-foot {
+            font-size: 11px !important;
+            line-height: 1.4 !important;
+          }
+
+          @media (max-width: 820px) {
+            .current-signal::after,
+            .signal-log-row time,
+            .signal-log-row b { font-size: 9px !important; }
+
+            .signal-data dt,
+            .hero-system-strip,
+            .poster-hud,
+            .signal-meta,
+            .archive-stage-meta,
+            .archive-bottom-code,
+            .archive-drawer-head,
+            .archive-drawer-grid .gallery-card::after,
+            .dossier-topline,
+            .dossier-subject,
+            .dossier-prompt,
+            .faq-query-item > span,
+            .faq-response-header,
+            .faq-response-code,
+            .faq-system-box span,
+            .feed-records,
+            .service-badge,
+            .review-enter-hint,
+            .human-check-note,
+            .reply-head time,
+            .review-edited,
+            .audience-pulse-head { font-size: 11px !important; }
+
+            .dossier-data small,
+            .audience-pulse-data dt,
+            .audience-pulse-foot,
+            .contact-signal-copy span,
+            .contact-signal-status,
+            .footer-system,
+            .build-mark { font-size: 10px !important; }
+
+            .signal-foot { font-size: 8px !important; }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .contact-signal-track i {
+              animation: none !important;
+              opacity: .78 !important;
+              box-shadow: 0 0 9px rgba(155,196,199,.46) !important;
+            }
+          }
+          '''
+          css_path.write_text(css)
+
+          js_path = Path('js/responsive-r7.js')
+          js = js_path.read_text()
+          old_js = '''  const archiveImage = $('#archiveMainImage', materials || document);\n  const archiveStage = $('#archiveStage', materials || document);\n  let archiveFrame = 0;\n'''
+          new_js = '''  let archiveFrame = 0;\n'''
+          if old_js not in js:
+              raise SystemExit('Expected archive aspect refs not found')
+          js = js.replace(old_js, new_js, 1)
+          aspect_block = '''\n  function syncArchiveAspect() {\n    if (!archiveStage || !archiveImage) return;\n    if (!isCompactMediaContext()) {\n      archiveStage.style.removeProperty('--r7-archive-aspect');\n      return;\n    }\n    const width = archiveImage.naturalWidth;\n    const height = archiveImage.naturalHeight;\n    if (width > 0 && height > 0) archiveStage.style.setProperty('--r7-archive-aspect', `${width} / ${height}`);\n  }\n\n  if (archiveImage) {\n    archiveImage.addEventListener('load', syncArchiveAspect);\n    new MutationObserver(syncArchiveAspect).observe(archiveImage, { attributes: true, attributeFilter: ['src'] });\n    syncArchiveAspect();\n  }\n'''
+          if aspect_block not in js:
+              raise SystemExit('Expected syncArchiveAspect block not found')
+          js = js.replace(aspect_block, '\n', 1)
+          if '    syncArchiveAspect();\n' not in js:
+              raise SystemExit('Expected viewport syncArchiveAspect call not found')
+          js = js.replace('    syncArchiveAspect();\n', '', 1)
+          js_path.write_text(js)
+
+          reviews_path = Path('reviews.html')
+          reviews = reviews_path.read_text()
+          hint = '<small data-i18n="profanityFilterHint">Оригинал отзыва не изменяется. Скрытые слова можно показать отдельно.</small>'
+          if reviews.count(hint) != 1:
+              raise SystemExit(f'Expected exactly one visible profanity hint, found {reviews.count(hint)}')
+          reviews_path.write_text(reviews.replace(hint, '', 1))
+          PY
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7qa
+          cd /tmp/r7qa
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Run real Chromium Round3 QA
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7-round3-evidence/screenshots
+          python3 -m http.server 4172 --directory /tmp/r7-before >/tmp/r7-before-http.log 2>&1 &
+          python3 -m http.server 4173 --directory "$GITHUB_WORKSPACE" >/tmp/r7-after-http.log 2>&1 &
+          sleep 1
+          cat >/tmp/r7qa/round3.cjs <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const path = require('path');
+          const OUT='/tmp/r7-round3-evidence';
+          const shots=path.join(OUT,'screenshots');
+          const results=[];
+          const check=(name, ok, detail='')=>results.push({name,ok:!!ok,detail:String(detail||'')});
+          const viewports=[
+            {name:'390x844',width:390,height:844,mobile:true},
+            {name:'430x932',width:430,height:932,mobile:true},
+            {name:'844x390',width:844,height:390,mobile:true},
+            {name:'932x430',width:932,height:430,mobile:true},
+            {name:'1366x768',width:1366,height:768,mobile:false},
+          ];
+          const px=s=>Number.parseFloat(String(s||'0'));
+          const overflow=page=>page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+          async function goto(page,url){await page.goto(url,{waitUntil:'domcontentloaded'});await page.waitForTimeout(900);}
+          async function fontMap(base, vp){
+            const ctx=await browser.newContext({viewport:{width:vp.width,height:vp.height},isMobile:vp.mobile,hasTouch:vp.mobile});
+            const page=await ctx.newPage();
+            await goto(page,base+'/index.html#watch');
+            const index=await page.evaluate(()=>{
+              const g=(sel,pseudo=null)=>{const e=document.querySelector(sel);return e?getComputedStyle(e,pseudo).fontSize:null};
+              return {
+                currentAfter:g('.current-signal','::after'), signalKicker:g('.current-signal .metric-kicker'), signalDataDt:g('.signal-data dt'),
+                signalTime:g('.signal-log-row time'), signalStatus:g('.signal-log-row b'), signalFoot:g('.signal-foot'), signalMeta:g('.signal-meta'),
+                archiveMeta:g('.archive-stage-meta'), archiveBottom:g('.archive-bottom-code'), dossierTop:g('.dossier-topline'), dossierSmall:g('.dossier-data small'),
+                faqCode:g('.faq-response-code'), contactLabel:g('.contact-signal-copy span'), contactStatus:g('.contact-signal-status'),
+                footerSystem:g('.footer-system'), buildMark:g('.build-mark'), heroSystem:g('.hero-system-strip'), posterHud:g('.poster-hud')
+              };
+            });
+            await goto(page,base+'/reviews.html');
+            const reviews=await page.evaluate(()=>{
+              const g=sel=>{const e=document.querySelector(sel);return e?getComputedStyle(e).fontSize:null};
+              return {feedRecords:g('.feed-records'),serviceBadge:g('.service-badge'),reviewEnterHint:g('.review-enter-hint'),humanCheck:g('.human-check-note'),composerLabel:g('.composer-label')};
+            });
+            await ctx.close(); return {...index,...reviews};
+          }
+          let browser;
+          (async()=>{
+            browser=await chromium.launch({headless:true});
+            const before1366=await fontMap('http://127.0.0.1:4172',viewports[4]);
+            const after1366=await fontMap('http://127.0.0.1:4173',viewports[4]);
+            const before390=await fontMap('http://127.0.0.1:4172',viewports[0]);
+            const after390=await fontMap('http://127.0.0.1:4173',viewports[0]);
+            const typography={desktop1366:{before:before1366,after:after1366},mobile390:{before:before390,after:after390}};
+            fs.writeFileSync(path.join(OUT,'TYPOGRAPHY.json'),JSON.stringify(typography,null,2));
+            for(const key of ['currentAfter','signalTime','signalStatus']) check(`desktop typography ${key} increased`,px(after1366[key])>=px(before1366[key])+3.5,`${before1366[key]} -> ${after1366[key]}`);
+            check('desktop SIGNAL STABLE increased',px(after1366.signalFoot)>=px(before1366.signalFoot)+2,`${before1366.signalFoot} -> ${after1366.signalFoot}`);
+            for(const key of ['currentAfter','signalTime','signalStatus']) check(`mobile typography ${key} increased`,px(after390[key])>=px(before390[key])+1.5,`${before390[key]} -> ${after390[key]}`);
+            check('mobile SIGNAL STABLE increased',px(after390.signalFoot)>=px(before390.signalFoot)+0.8,`${before390.signalFoot} -> ${after390.signalFoot}`);
+
+            for(const vp of viewports){
+              const ctx=await browser.newContext({viewport:{width:vp.width,height:vp.height},isMobile:vp.mobile,hasTouch:vp.mobile});
+              const page=await ctx.newPage(); const errs=[]; page.on('pageerror',e=>errs.push(String(e)));
+              await goto(page,'http://127.0.0.1:4173/index.html');
+              check(`${vp.name} index horizontal overflow=0`,Math.abs(await overflow(page))<=1,String(await overflow(page)));
+
+              await page.locator('#materials').scrollIntoViewIfNeeded(); await page.waitForTimeout(250);
+              if(vp.mobile){
+                const heights=[]; const aspects=[]; let allContain=true, allLoaded=true;
+                for(let i=0;i<11;i++){
+                  await page.waitForFunction(()=>{const im=document.querySelector('#archiveMainImage');return im&&im.complete&&im.naturalWidth>0&&im.naturalHeight>0},{timeout:5000});
+                  const sample=await page.evaluate(()=>{const st=document.querySelector('#archiveStage'),im=document.querySelector('#archiveMainImage');return {h:st.getBoundingClientRect().height,nw:im.naturalWidth,nh:im.naturalHeight,fit:getComputedStyle(im).objectFit}});
+                  heights.push(sample.h); aspects.push(Number((sample.nw/sample.nh).toFixed(3))); allContain&&=sample.fit==='contain'; allLoaded&&=sample.nw>0&&sample.nh>0;
+                  if(i<10){await page.locator('#galleryNext').click({force:true});await page.waitForTimeout(120);}
+                }
+                const delta=Math.max(...heights)-Math.min(...heights);
+                check(`${vp.name} all 11 archive stages stable`,delta<=1,`delta=${delta.toFixed(2)} heights=${heights.map(x=>x.toFixed(1)).join(',')}; aspects=${[...new Set(aspects)].join(',')}`);
+                check(`${vp.name} archive images loaded`,allLoaded);
+                check(`${vp.name} archive images object-fit contain`,allContain);
+                await page.locator('#archiveDrawerToggle').click({force:true}); await page.waitForTimeout(180);
+                const drawer=await page.evaluate(()=>{const d=document.querySelector('#archiveDrawer'),g=document.querySelector('#gallery'),c=document.querySelector('#archiveDrawerClose'),t=document.querySelector('#archiveDrawerToggle');const db=d.getBoundingClientRect(),cb=c.getBoundingClientRect(),tb=t.getBoundingClientRect();return {w:db.width,h:db.height,gridOverflow:getComputedStyle(g).overflowY,gridScroll:g.scrollHeight,gridClient:g.clientHeight,closeInside:cb.top>=db.top-1&&cb.bottom<=db.bottom+1,toggleW:tb.width,toggleH:tb.height};});
+                const portrait=vp.height>=vp.width;
+                check(`${vp.name} archive drawer width compact`,drawer.w<=vp.width*(portrait?.77:.72)+2,JSON.stringify(drawer));
+                check(`${vp.name} archive drawer height compact`,drawer.h<=vp.height*(portrait?.60:.58)+2,JSON.stringify(drawer));
+                check(`${vp.name} archive drawer internal scrolling enabled`,['auto','scroll'].includes(drawer.gridOverflow)&&drawer.gridScroll>=drawer.gridClient,JSON.stringify(drawer));
+                check(`${vp.name} archive close accessible`,drawer.closeInside,JSON.stringify(drawer));
+                check(`${vp.name} archive handle compact`,drawer.toggleW<=46&&drawer.toggleH<=96,JSON.stringify(drawer));
+                await page.locator('#watch').scrollIntoViewIfNeeded(); await page.waitForTimeout(250);
+                const local=await page.evaluate(()=>{const s=document.querySelector('#materials .archive-drawer-shell');return {active:s.classList.contains('r7-materials-active'),visibility:getComputedStyle(s).visibility,pointer:getComputedStyle(s).pointerEvents,open:s.classList.contains('is-open')}});
+                check(`${vp.name} ARCHIVE remains Materials-local`,!local.active&&local.pointer==='none'&&!local.open,JSON.stringify(local));
+              }
+
+              await page.locator('#contacts').scrollIntoViewIfNeeded(); await page.waitForTimeout(150);
+              if(vp.name==='390x844'||vp.name==='1366x768'){
+                const x=[]; const card=[];
+                for(let i=0;i<3;i++){const m=await page.evaluate(()=>{const d=document.querySelector('.contact-signal-track i').getBoundingClientRect(),c=document.querySelector('.contact-signal').getBoundingClientRect();return{x:d.x,card:[c.x,c.y,c.width,c.height]}});x.push(m.x);card.push(m.card);await page.waitForTimeout(650);}
+                check(`${vp.name} contact dot X fixed`,Math.max(...x)-Math.min(...x)<=.5,`x=${x.join(',')}`);
+                const shift=Math.max(...card.map(v=>v[0]))-Math.min(...card.map(v=>v[0]))+Math.max(...card.map(v=>v[2]))-Math.min(...card.map(v=>v[2]));
+                check(`${vp.name} contact no layout shift`,shift<=.5,JSON.stringify(card));
+              }
+
+              await goto(page,'http://127.0.0.1:4173/reviews.html');
+              check(`${vp.name} reviews horizontal overflow=0`,Math.abs(await overflow(page))<=1,String(await overflow(page)));
+              const hint=page.locator('[data-i18n="profanityFilterHint"]');
+              check(`${vp.name} RU profanity hint absent`,await hint.count()===0||!(await hint.isVisible()));
+              await page.locator('#langToggle').click(); await page.waitForTimeout(80);
+              check(`${vp.name} EN profanity hint absent`,await hint.count()===0||!(await hint.isVisible()));
+              await page.locator('#langToggle').click();
+
+              if(vp.mobile){
+                await page.evaluate(()=>{const l=document.querySelector('#reviewsList');l.innerHTML='';for(let i=0;i<10;i++){const c=document.createElement('article');c.className='review-card';c.innerHTML=`<div class="review-card-text">QA REVIEW ${i+1}</div>`;l.appendChild(c);}}); await page.waitForTimeout(120);
+                const vis0=await page.locator('#reviewsList > .review-card').evaluateAll(ns=>ns.filter(n=>getComputedStyle(n).display!=='none').length);
+                const more=page.locator('.r7-load-more-reviews');
+                check(`${vp.name} Show More initial cap`,vis0===6,`visible=${vis0}`);
+                check(`${vp.name} Show More visible`,await more.isVisible());
+                await more.click(); await page.waitForTimeout(80);
+                const vis1=await page.locator('#reviewsList > .review-card').evaluateAll(ns=>ns.filter(n=>getComputedStyle(n).display!=='none').length);
+                check(`${vp.name} Show More expands feed`,vis1===10,`visible=${vis1}`);
+
+                await page.locator('.community-feed-toolbar').scrollIntoViewIfNeeded(); await page.waitForTimeout(80);
+                const positions=await page.evaluate(()=>['.community-feed-toolbar','.review-display-settings','.review-sort'].map(s=>({s,pos:getComputedStyle(document.querySelector(s)).position,top:document.querySelector(s).getBoundingClientRect().top})));
+                check(`${vp.name} review controls are not sticky/fixed`,positions.every(x=>!['sticky','fixed'].includes(x.pos)),JSON.stringify(positions));
+                const top0=await page.locator('.community-feed-toolbar').evaluate(e=>e.getBoundingClientRect().top); await page.evaluate(()=>scrollBy(0,Math.min(500,document.documentElement.scrollHeight-innerHeight-scrollY))); await page.waitForTimeout(80); const top1=await page.locator('.community-feed-toolbar').evaluate(e=>e.getBoundingClientRect().top);
+                check(`${vp.name} review toolbar scrolls with document`,top1<top0-80,`${top0.toFixed(1)} -> ${top1.toFixed(1)}`);
+              }
+              check(`${vp.name} JS errors=0`,errs.length===0,errs.join(' | '));
+
+              if(vp.name==='390x844'){
+                await goto(page,'http://127.0.0.1:4173/index.html#watch'); await page.locator('.current-signal').screenshot({path:path.join(shots,'current-signal-after-390x844.png')});
+                await goto(page,'http://127.0.0.1:4173/reviews.html'); await page.locator('.community-feed-toolbar').scrollIntoViewIfNeeded(); await page.screenshot({path:path.join(shots,'reviews-flow-390x844.png'),fullPage:false});
+              }
+              if(vp.name==='430x932'){
+                await goto(page,'http://127.0.0.1:4173/index.html#materials'); await page.locator('#archiveDrawerToggle').click({force:true}); await page.waitForTimeout(150); await page.screenshot({path:path.join(shots,'materials-drawer-430x932.png'),fullPage:false});
+              }
+              if(vp.name==='844x390'){
+                await goto(page,'http://127.0.0.1:4173/index.html#materials'); await page.locator('#archiveDrawerToggle').click({force:true}); await page.waitForTimeout(150); await page.screenshot({path:path.join(shots,'materials-drawer-844x390.png'),fullPage:false});
+              }
+              if(vp.name==='1366x768'){
+                await goto(page,'http://127.0.0.1:4173/index.html#watch'); await page.locator('.current-signal').screenshot({path:path.join(shots,'current-signal-after-1366x768.png')});
+              }
+              await ctx.close();
+            }
+
+            for(const vp of [viewports[0],viewports[4]]){
+              const ctx=await browser.newContext({viewport:{width:vp.width,height:vp.height},isMobile:vp.mobile,hasTouch:vp.mobile,reducedMotion:'reduce'});const p=await ctx.newPage();await goto(p,'http://127.0.0.1:4173/index.html#contacts');const s=await p.evaluate(()=>{const e=document.querySelector('.contact-signal-track i'),c=getComputedStyle(e);return {animation:c.animationName,x:e.getBoundingClientRect().x}});await p.waitForTimeout(500);const x2=await p.locator('.contact-signal-track i').evaluate(e=>e.getBoundingClientRect().x);check(`${vp.name} contact reduced-motion quiet`,s.animation==='none'&&Math.abs(s.x-x2)<=.5,JSON.stringify({...s,x2}));await ctx.close();
+            }
+
+            for(const vp of [viewports[4],viewports[0]]){
+              const ctx=await browser.newContext({viewport:{width:vp.width,height:vp.height},isMobile:vp.mobile,hasTouch:vp.mobile});const p=await ctx.newPage();await goto(p,'http://127.0.0.1:4172/index.html#watch');await p.locator('.current-signal').screenshot({path:path.join(shots,`current-signal-before-${vp.name}.png`)});await ctx.close();
+            }
+
+            await browser.close();
+            const fail=results.filter(x=>!x.ok); const report=['# REVIVAL R7 — Owner Feedback Round 3 browser QA','',`Checks: ${results.length} / Passed: ${results.length-fail.length} / Failed: ${fail.length}`,'',...results.map(x=>`- ${x.ok?'PASS':'FAIL'} — ${x.name}${x.detail?' — '+x.detail:''}`)].join('\n');fs.writeFileSync(path.join(OUT,'REPORT.md'),report);fs.writeFileSync(path.join(OUT,'RESULTS.json'),JSON.stringify(results,null,2));console.log(report);if(fail.length)process.exit(1);
+          })().catch(async e=>{console.error(e);try{await browser?.close()}catch{};process.exit(1)});
+          NODE
+          node /tmp/r7qa/round3.cjs
+
+      - name: Record Round3 documentation and commit passing changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          report = Path('/tmp/r7-round3-evidence/REPORT.md').read_text()
+          typography = json.loads(Path('/tmp/r7-round3-evidence/TYPOGRAPHY.json').read_text())
+          round3 = f'''# REVIVAL R7 — OWNER FEEDBACK ROUND 3\n\nStatus: **IMPLEMENTED ON FEATURE BRANCH / BROWSER QA PASSED / OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**\n\nDate: 2026-09-11\n\n## Owner instructions\n\n- Reviews mobile feed controls (`PUBLIC FEED`, channel/records, New/Old/Popular, profanity toggle) must use normal document flow and leave the viewport while reading long reviews; the previous fixed/sticky Reviews-mobile-header idea is superseded. Global site-header architecture is not redesigned.\n- Remove the visible RU/EN explanatory profanity-filter hint while keeping the `Скрывать грубую лексику` / equivalent heading and toggle.\n- Keep ARCHIVE as a Materials-local left-wall control, but make the open phone drawer compact: roughly 70–76vw max in portrait, about 55–60dvh max, internally scrollable thumbnails and accessible close/control; low-height phone landscape must remain visually readable and non-fullscreen.\n- Supersede the previous image-aspect-driven compact Archive stage height. The stage must have stable geometry across all assets; images preserve source proportions with centered `object-fit: contain`, may have free fields, and must not stretch/crop merely to fill the frame.\n- CONTACT signal dot must stop horizontal travel. It stays near the right endpoint/diamond and communicates state via a quiet pulse/fade/glow; no X/left animation or replacement spectacle.\n- Perform another microtypography readability pass for information-bearing 6–9px-class labels, especially CURRENT // 2045, log times/statuses and analogous metadata. Desktop target is roughly +4px for the tiniest class when geometry permits; mobile roughly +2px. `SIGNAL // STABLE` is a separate, smaller increase. Decorative watermarks are excluded.\n- Browser-render QA is mandatory at 390×844, 430×932, 844×390, 932×430 and 1366×768, including all Archive assets, Show More regression, RU/EN hint removal, Contact X stability/reduced motion, computed typography before→after, overflow and JS errors.\n- Bug Reports v2/backend/admin notifications remain **OPEN DISCUSSION** and are out of scope.\n\n## Implementation\n\n- Removed the Reviews-only fixed-header override and explicitly kept feed toolbar/settings/sort in normal flow on compact layouts.\n- Removed the visible profanity-filter explanatory `<small>` from `reviews.html`; i18n data may remain for compatibility but is no longer rendered.\n- Replaced compact Archive aspect-driven stage sizing with stable viewport-based geometry; removed the now-unused natural-image-aspect synchronizer from `js/responsive-r7.js`.\n- Reduced portrait/landscape Archive drawer dimensions, enabled internal thumbnail scrolling and kept the Materials-local activation contract.\n- Replaced `contactTravel` use with a fixed endpoint pulse and an explicit reduced-motion static state.\n- Raised only information-bearing microcopy groups; decorative watermarks and normal body/display typography were not globally inflated.\n- Show More implementation was not changed.\n\n## Superseded R7 preview behavior\n\nHistorical Round1/Round2 context remains in prior handoff/feedback records, but active Round3 behavior supersedes:\n\n1. **fixed/sticky Reviews mobile presentation while reading the long feed** → review feed controls now scroll in normal document flow;\n2. **image-natural-aspect-driven compact Archive stage height** → compact stage height is stable across assets while each image remains contained without distortion.\n\n## Contact indicator rule\n\nThe CONTACT endpoint dot is spatially fixed near the right endpoint. Animation may change opacity/glow only; horizontal movement (`left`, `translateX`) is not part of the active rule. Reduced motion disables the pulse.\n\n## Readability direction\n\nInformation-bearing terminal/system microcopy must remain visually subordinate but readable. Do not mechanically increase every font. The smallest functional/status/meta class gets a meaningful floor by context; `SIGNAL // STABLE` remains a separate secondary class. Any future adjustment must preserve world-grid geometry and avoid clipping/overflow.\n\n## Computed typography evidence\n\n```json\n{json.dumps(typography, indent=2)}\n```\n\n## Browser QA evidence\n\n{report}\n\nScreenshots are attached to the temporary GitHub Actions artifact for this Round3 QA run. The QA harness/dependencies are temporary and must not remain in the final feature-tree.\n\n## Gate\n\nRound3 is still a **draft R7 preview**. Browser QA passing is implementation evidence, not owner visual acceptance. Owner review is still required before R7 merge/production.\n'''
+          Path('docs/releases/revival/R7/OWNER-FEEDBACK-ROUND3.md').write_text(round3)
+
+          def append_once(path, marker, text):
+              p=Path(path); s=p.read_text()
+              if marker in s: raise SystemExit(f'marker already exists in {path}')
+              p.write_text(s.rstrip()+"\n\n"+text.strip()+"\n")
+
+          append_once('docs/releases/revival/R7/PREVIEW-HANDOFF.md','## Owner feedback round 3 — 2026-09-11',f'''## Owner feedback round 3 — 2026-09-11\n\nRound3 preserves the earlier owner-feedback record as history while superseding two active preview choices:\n\n- the Reviews mobile feed controls no longer remain fixed/sticky while reading; `PUBLIC FEED`, channel/records, sort controls and profanity toggle now leave the viewport in normal document flow;\n- the compact Archive stage no longer follows each selected asset's natural aspect ratio; the stage geometry is stable across the asset set and images remain centered with `object-fit: contain`.\n\nAdditional Round3 changes:\n\n- the visible profanity-filter explanatory hint was removed in RU/EN while keeping the toggle;\n- phone Archive drawer footprint was reduced and its thumbnail area scrolls internally; ARCHIVE remains a Materials-local left-wall control;\n- CONTACT dot is fixed at the right endpoint and uses a calm opacity/glow pulse, with no horizontal travel and a static reduced-motion state;\n- information-bearing microcopy received a second targeted readability pass; decorative watermarks were not globally enlarged;\n- Show More behavior was retained unchanged.\n\nReal Chromium QA at `390×844`, `430×932`, `844×390`, `932×430`, `1366×768` passed the Round3 checks recorded in `OWNER-FEEDBACK-ROUND3.md`, including all 11 Archive assets, stable stage geometry, Reviews flow/Show More, RU/EN hint removal, Contact X stability, typography before→after, horizontal overflow and page JS errors.\n\n**Bug Reports v2/backend/admin notifications remain OPEN DISCUSSION and were not implemented in Round3.**\n\nRound3 remains **OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**. QA evidence must not be described as owner visual acceptance.''')
+
+          append_once('docs/current/VISUAL-SYSTEM.md','## R7 Round 3 preview refinements — owner-directed, not production', '''## R7 Round 3 preview refinements — owner-directed, not production\n\nThese are durable owner-directed rules for the R7 preview; R7 is not production until separately accepted/merged.\n\n- On compact/mobile Reviews, public-feed heading/status/records, New/Old/Popular and profanity toggle belong to normal document flow and must not occupy permanent sticky/fixed space while the user reads the feed.\n- For compact Materials, mixed image aspect ratios must not move the page: the main stage uses stable geometry while assets preserve their own proportions through centered `object-fit: contain`. Free space inside the stable stage is preferable to stretching/cropping.\n- ARCHIVE remains the intentional Materials left-wall exception, but its open phone drawer must be compact/non-fullscreen and internally scrollable, especially in low-height landscape.\n- CONTACT's small endpoint indicator remains physically fixed near the right endpoint/diamond. Signal animation may pulse/fade/glow but must not travel horizontally or visibly teleport on loop.\n- Information-bearing microcopy must stay subordinate **and readable**. Do not solve this with a global font-size increase: target the small functional/status/meta class, preserve hierarchy and verify geometry in browser. Decorative watermarks are not part of this rule.\n- Substantial responsive changes remain subject to concept/direction approval where practical, and final acceptance must use actual browser rendering rather than mockup-only evidence.''')
+
+          append_once('docs/current/ROADMAP.md','### Owner feedback round 3 — implemented on draft R7 branch', '''### Owner feedback round 3 — implemented on draft R7 branch\n\nRound3 owner corrections implemented and browser-QA'd on `revival-r7-responsive-mobile`:\n\n- Reviews compact feed controls return to normal flow; previous fixed/sticky preview choice retained only as history;\n- profanity explanatory hint removed from visible UI;\n- compact Archive drawer reduced; all-asset stage geometry stabilized without image distortion;\n- CONTACT horizontal dot travel replaced by fixed endpoint pulse;\n- targeted information-bearing microcopy readability pass completed;\n- Show More regression retained;\n- required phone/landscape/desktop Chromium matrix passed.\n\nNext gate: **owner visual review of Round3 preview**. Do not merge R7, publish mobile, begin Bug Reports v2/admin notifications, or treat browser QA as owner visual acceptance without a separate explicit decision.''')
+          PY
+          git status --short
+          git add css/responsive-r7-polish.css js/responsive-r7.js reviews.html docs/releases/revival/R7/OWNER-FEEDBACK-ROUND3.md docs/releases/revival/R7/PREVIEW-HANDOFF.md docs/current/VISUAL-SYSTEM.md docs/current/ROADMAP.md
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "REVIVAL R7: owner feedback round 3"
+          git push origin HEAD:revival-r7-responsive-mobile
+          git rev-parse HEAD >/tmp/r7-round3-evidence/FINAL_SHA.txt
+
+      - name: Upload Round3 QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-round3-browser-evidence
+          path: /tmp/r7-round3-evidence
+          if-no-files-found: warn
