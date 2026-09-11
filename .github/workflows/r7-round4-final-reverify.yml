@@ -1,0 +1,101 @@
+name: R7 Round4 exact-final reverify
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+
+permissions:
+  contents: write
+
+jobs:
+  exact-final-reverify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify accidental-only delta and recover QA harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERIFIED=c26677bf8a02051853bb06b6992a8666c624ea2c
+          BASE=a97faa551aba14df059bec815445fd1200dc8360
+          STAGING=d823b3431c58a2140985d85792d64725cb7e220a
+          git merge-base --is-ancestor "$VERIFIED" HEAD
+          test -f does-not-exist
+          git diff --name-only "$VERIFIED"..HEAD | sort >/tmp/r7-accidental-delta.txt
+          cat >/tmp/r7-expected-delta.txt <<'EOF'
+          .github/workflows/r7-round4-final-reverify.yml
+          does-not-exist
+          EOF
+          diff -u /tmp/r7-expected-delta.txt /tmp/r7-accidental-delta.txt
+          git worktree add /tmp/r7-before "$BASE"
+          git show "$STAGING":qa/r7-round4-qa.cjs >/tmp/r7-round4-qa.cjs
+          git show "$STAGING":qa/r7-round4-continuation.py >/tmp/r7-round4-continuation.py
+          python3 /tmp/r7-round4-continuation.py qa /tmp/r7-round4-qa.cjs
+
+      - name: Restore byte-identical verified Round4 tree and create new final SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERIFIED=c26677bf8a02051853bb06b6992a8666c624ea2c
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm does-not-exist .github/workflows/r7-round4-final-reverify.yml
+          git commit -m 'chore: restore verified Round4 tree'
+          git diff --exit-code "$VERIFIED" HEAD
+          git rev-parse HEAD >/tmp/r7-round4-restored-final-sha.txt
+          test -z "$(git status --porcelain)"
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7qa && cd /tmp/r7qa
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Exact-final-SHA full 226-check browser verification
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: |
+          set -euo pipefail
+          FINAL_SHA="$(cat /tmp/r7-round4-restored-final-sha.txt)"
+          test "$(git rev-parse HEAD)" = "$FINAL_SHA"
+          rm -rf /tmp/r7-round4-restored-evidence && mkdir -p /tmp/r7-round4-restored-evidence
+          python3 -m http.server 4182 --directory /tmp/r7-before >/tmp/r7-before-http.log 2>&1 &
+          python3 -m http.server 4183 --directory "$GITHUB_WORKSPACE" >/tmp/r7-final-http.log 2>&1 &
+          sleep 1
+          R7_OUT=/tmp/r7-round4-restored-evidence \
+          R7_BASE=http://127.0.0.1:4183 \
+          R7_BEFORE=http://127.0.0.1:4182 \
+          R7_EXACT_SHA="$FINAL_SHA" \
+          node /tmp/r7-round4-qa.cjs
+          test "$(git rev-parse HEAD)" = "$FINAL_SHA"
+          test -z "$(git status --porcelain)"
+          git diff --exit-code c26677bf8a02051853bb06b6992a8666c624ea2c HEAD
+          printf '%s\n' "$FINAL_SHA" >/tmp/r7-round4-restored-evidence/FINAL_SHA.txt
+
+      - name: Push restored exact verified final SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINAL_SHA="$(cat /tmp/r7-round4-restored-final-sha.txt)"
+          git push origin HEAD:revival-r7-responsive-mobile
+          REMOTE="$(git ls-remote origin refs/heads/revival-r7-responsive-mobile | cut -f1)"
+          test "$REMOTE" = "$FINAL_SHA"
+          echo "FINAL_SHA=$FINAL_SHA"
+
+      - name: Upload restored exact-final evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-round4-restored-exact-final-evidence
+          path: /tmp/r7-round4-restored-evidence
+          if-no-files-found: warn
