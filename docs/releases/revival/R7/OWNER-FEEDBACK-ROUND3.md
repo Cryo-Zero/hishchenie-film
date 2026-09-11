@@ -152,7 +152,7 @@ Information-bearing terminal/system microcopy remains visually subordinate but r
     "after": {
       "currentAfter": "9px",
       "signalKicker": "11px",
-      "signalDataDt": "11px",
+      "signalDataDt": "9px",
       "signalTime": "9px",
       "signalStatus": "9px",
       "signalFoot": "8px",
@@ -215,7 +215,7 @@ Checks: 102 / Passed: 102 / Failed: 0
 - PASS — 390x844 archive handle compact — {"w":296.390625,"h":489.515625,"gridOverflow":"auto","gridScroll":544,"gridClient":416,"closeInside":true,"toggleW":40,"toggleH":76}
 - PASS — 390x844 ARCHIVE remains Materials-local — {"active":false,"visibility":"hidden","pointer":"none","open":false}
 - PASS — 390x844 contact dot X fixed — x=337,337,337
-- PASS — 390x844 contact no layout shift — [[13,470.8297424316406,364,120.39059448242188],[13,470.65625,364,120.390625],[13,470.65625,364,120.390625]]
+- PASS — 390x844 contact no layout shift — [[13,470.6416015625,364,120.390625],[13,470.46875,364,120.390625],[13,470.46875,364,120.390625]]
 - PASS — 390x844 reviews horizontal overflow=0 — 0
 - PASS — 390x844 RU profanity hint absent
 - PASS — 390x844 EN profanity hint absent

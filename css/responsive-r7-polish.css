@@ -593,9 +593,9 @@ body.r7-phone-landscape #materials .archive-stage img {
 @media (max-width: 820px) {
   .current-signal::after,
   .signal-log-row time,
-  .signal-log-row b { font-size: 9px !important; }
+  .signal-log-row b,
+  .signal-data dt { font-size: 9px !important; }
 
-  .signal-data dt,
   .hero-system-strip,
   .poster-hud,
   .signal-meta,
