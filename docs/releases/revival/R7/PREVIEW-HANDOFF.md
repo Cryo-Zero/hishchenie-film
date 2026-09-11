@@ -109,3 +109,24 @@ Current required sequence:
 If the owner rejects or changes an R7 choice, preserve the prior direction as history rather than erasing it; rejected/unused ideas may be reconsidered later only with fresh owner approval.
 
 Latest owner-feedback implementation/refinement commits are in the R7 feature branch; treat the current branch head as authoritative preview state rather than any earlier screenshot artifact.
+
+## Owner feedback round 3 — 2026-09-11
+
+Round3 preserves earlier owner-feedback records as history while superseding two active preview choices:
+
+- Reviews mobile public-feed controls no longer remain fixed/sticky while reading; `PUBLIC FEED`, channel/records, sort controls and profanity toggle now leave the viewport in normal document flow;
+- compact Archive stage no longer follows each selected asset's natural aspect ratio; stage geometry is stable across the asset set and images remain centered with `object-fit: contain`.
+
+Additional owner-directed Round3 changes:
+
+- visible profanity-filter explanatory hint removed in RU/EN while keeping the toggle;
+- phone Archive drawer footprint reduced and thumbnail area made internally scrollable; ARCHIVE remains a Materials-local left-wall control;
+- CONTACT dot fixed at the right endpoint and changed to a calm opacity/glow pulse, with no horizontal travel and a static reduced-motion state;
+- information-bearing microcopy received a second targeted readability pass; decorative watermarks were not globally enlarged;
+- Round2 Show More behavior was retained.
+
+Real Chromium QA covered `390×844`, `430×932`, `844×390`, `932×430`, `1366×768`, including all 11 Archive assets, stable stage geometry, Reviews flow/Show More, RU/EN hint removal, Contact X stability/reduced motion, computed typography before→after, horizontal overflow and page JS errors. Exact results live in `OWNER-FEEDBACK-ROUND3.md`.
+
+**Bug Reports v2/backend/admin notifications remain OPEN DISCUSSION and were not implemented in Round3.**
+
+Round3 remains **OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**. Browser QA must not be described as owner visual acceptance.

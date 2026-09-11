@@ -408,3 +408,17 @@ The current project-level priority is:
 **protect current R6 state/documentation → approve responsive direction → implement responsive/device adaptation incrementally → real browser/device QA → optional polish → then reassess admin/review/report/content expansions based on actual need and owner priority**.
 
 This ordering may be changed by a newer explicit owner instruction, but it must not be silently rewritten by the assistant/operator.
+
+### Owner feedback round 3 — implemented on draft R7 branch
+
+Round3 owner corrections implemented and browser-QA'd on `revival-r7-responsive-mobile`:
+
+- Reviews compact public-feed controls return to normal flow; the previous fixed/sticky preview choice remains only as history;
+- profanity explanatory hint removed from visible UI while preserving the toggle;
+- compact Archive drawer reduced and internally scrollable; all-asset stage geometry stabilized without image distortion;
+- CONTACT horizontal dot travel replaced by a fixed endpoint pulse;
+- targeted information-bearing microcopy readability pass completed;
+- Round2 Show More regression preserved;
+- required phone/landscape/desktop Chromium matrix passed.
+
+Next gate: **owner visual review of Round3 preview**. Do not merge R7, publish mobile, begin Bug Reports v2/admin notifications, or treat browser QA as owner visual acceptance without a separate explicit decision.
