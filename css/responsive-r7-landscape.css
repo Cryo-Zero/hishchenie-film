@@ -1,0 +1,345 @@
+/* ========================================================================== */
+/* REVIVAL R7 — phone landscape completion                                   */
+/* Activated by responsive-r7.js only for coarse/touch low-height landscape. */
+/* ========================================================================== */
+
+body.r7-phone-landscape .shell,
+body.r7-phone-landscape .hero-inner {
+  width: min(100% - 28px, var(--max)) !important;
+}
+
+body.r7-phone-landscape main > section:not(.hero) {
+  padding-top: 38px !important;
+  padding-bottom: 38px !important;
+}
+
+body.r7-phone-landscape main > section:not(.hero)::before {
+  right: 12px !important;
+  top: 18px !important;
+  font-size: 46px !important;
+}
+
+body.r7-phone-landscape .section-head,
+body.r7-phone-landscape .faq-section-head {
+  margin-bottom: 22px !important;
+}
+
+body.r7-phone-landscape h2,
+body.r7-phone-landscape .faq-section-head h2,
+body.r7-phone-landscape #cast .section-head h2 {
+  font-size: clamp(30px, 5.5vw, 42px) !important;
+  line-height: .98 !important;
+  letter-spacing: -1.2px !important;
+  white-space: normal !important;
+}
+
+/* Hero: use width without pretending the phone has desktop height. */
+body.r7-phone-landscape .hero {
+  min-height: auto !important;
+}
+
+body.r7-phone-landscape .hero-inner {
+  grid-template-columns: minmax(0, 1.12fr) minmax(230px, .88fr) !important;
+  align-items: center;
+  gap: 24px !important;
+  padding-top: 20px !important;
+  padding-bottom: 32px !important;
+}
+
+body.r7-phone-landscape .hero-copy-column { order: 1; }
+body.r7-phone-landscape .hero-poster-frame {
+  order: 2 !important;
+  width: 100% !important;
+}
+body.r7-phone-landscape .hero-poster {
+  max-height: calc(100dvh - var(--header-h) - 44px) !important;
+}
+body.r7-phone-landscape h1 { font-size: clamp(44px, 8vw, 66px) !important; }
+body.r7-phone-landscape .english-title { margin-top: 10px !important; }
+body.r7-phone-landscape .hero-copy {
+  margin-top: 14px !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+}
+body.r7-phone-landscape .hero-actions {
+  margin-top: 16px !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+body.r7-phone-landscape .hero-actions .button { min-height: 44px !important; }
+body.r7-phone-landscape .hero-system-strip,
+body.r7-phone-landscape .eyebrow,
+body.r7-phone-landscape .mobile-slogan { font-size: 8px !important; }
+
+/* About */
+body.r7-phone-landscape #about .story {
+  max-width: none !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+}
+body.r7-phone-landscape #about .story p + p { margin-top: 16px !important; }
+body.r7-phone-landscape #about .info-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin-top: 28px !important;
+}
+body.r7-phone-landscape #about .info-card {
+  min-height: 0 !important;
+  padding: 16px !important;
+}
+
+/* Archive / Materials */
+body.r7-phone-landscape #materials .archive-drawer-shell {
+  --archive-drawer-width: min(310px, 72vw);
+  height: min(82dvh, 520px) !important;
+}
+body.r7-phone-landscape #materials .archive-drawer {
+  height: min(82dvh, 520px) !important;
+  padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
+}
+body.r7-phone-landscape #materials .archive-drawer-toggle {
+  min-width: 42px !important;
+  min-height: 108px !important;
+}
+body.r7-phone-landscape #materials .archive-stage-wrap {
+  grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+  gap: 4px !important;
+}
+body.r7-phone-landscape #materials .archive-stage {
+  height: min(70dvh, 330px) !important;
+  min-height: 220px !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+}
+body.r7-phone-landscape #materials .archive-stage-wrap .gallery-button {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: auto !important;
+  min-height: 72px !important;
+  opacity: .5 !important;
+}
+body.r7-phone-landscape #materials .archive-stage-wrap .gallery-button.prev { left: 0 !important; }
+body.r7-phone-landscape #materials .archive-stage-wrap .gallery-button.next { right: 0 !important; }
+body.r7-phone-landscape #materials .archive-bottom-controls {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+}
+body.r7-phone-landscape #materials .archive-pagination { justify-content: flex-end !important; }
+
+/* Trailer / Watch / Contact */
+body.r7-phone-landscape .trailer-section {
+  min-height: auto !important;
+  padding-top: 38px !important;
+  padding-bottom: 38px !important;
+}
+body.r7-phone-landscape .video-shell { width: min(100%, 760px) !important; }
+body.r7-phone-landscape .watch-layout {
+  grid-template-columns: 1fr !important;
+  gap: 24px !important;
+}
+body.r7-phone-landscape .watch-list {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+body.r7-phone-landscape .platform {
+  min-width: 0 !important;
+  min-height: 46px !important;
+  padding: 12px 14px !important;
+}
+body.r7-phone-landscape .current-signal {
+  min-height: 0 !important;
+  padding: 18px !important;
+}
+body.r7-phone-landscape .signal-wave {
+  height: 46px !important;
+  margin: 14px 0 !important;
+}
+body.r7-phone-landscape .signal-data {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+body.r7-phone-landscape .contact-box {
+  align-items: stretch !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+body.r7-phone-landscape .contact-signal {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Actors / FAQ stay sequential even though width resembles a tablet. */
+body.r7-phone-landscape #cast .subject-dossier,
+body.r7-phone-landscape #faq .faq-response-panel { padding: 16px !important; }
+body.r7-phone-landscape #cast .dossier-data {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 0 10px !important;
+}
+body.r7-phone-landscape #faq .faq-system-box {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0 16px !important;
+  margin-top: 16px !important;
+}
+body.r7-phone-landscape #faq .faq-system-box > div {
+  border-top: 1px solid rgba(122,151,153,.15) !important;
+}
+body.r7-phone-landscape #faq .faq-response-content { padding-top: 14px !important; }
+body.r7-phone-landscape #faq .faq-response-content h3 {
+  margin-top: 10px !important;
+  font-size: clamp(22px, 4vw, 30px) !important;
+}
+body.r7-phone-landscape #faq .faq-response-content p { margin-top: 10px !important; }
+body.r7-phone-landscape #faq .faq-response-log { margin-top: 12px !important; }
+
+/* Reviews/Profile: preserve the phone workflow in low-height landscape. */
+body.r7-phone-landscape .community-hero { min-height: auto !important; }
+body.r7-phone-landscape .community-hero .shell {
+  padding-top: 28px !important;
+  padding-bottom: 28px !important;
+}
+body.r7-phone-landscape .community-hero-grid,
+body.r7-phone-landscape .community-layout,
+body.r7-phone-landscape .review-workspace {
+  grid-template-columns: 1fr !important;
+}
+body.r7-phone-landscape .community-hero-grid { gap: 20px !important; }
+body.r7-phone-landscape .community-layout,
+body.r7-phone-landscape .review-workspace {
+  width: 100% !important;
+  gap: 18px !important;
+}
+body.r7-phone-landscape .community-sidebar,
+body.r7-phone-landscape .review-feed { min-width: 0 !important; }
+body.r7-phone-landscape .community-metrics {
+  display: grid !important;
+  grid-template-columns: 84px minmax(0, 1fr) minmax(0, .9fr) !important;
+  gap: 14px !important;
+  align-items: center !important;
+}
+body.r7-phone-landscape .community-metric.freshness-mini .freshness-ring {
+  width: 78px !important;
+  min-width: 78px !important;
+}
+body.r7-phone-landscape .audience-pulse {
+  min-height: 0 !important;
+  padding: 18px !important;
+}
+body.r7-phone-landscape .audience-pulse-wave {
+  height: 52px !important;
+  margin: 14px 0 !important;
+}
+body.r7-phone-landscape .audience-pulse-data {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+body.r7-phone-landscape .review-composer,
+body.r7-phone-landscape .review-feed { padding: 16px 14px !important; }
+body.r7-phone-landscape .profile-console {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 14px !important;
+  padding: 14px !important;
+}
+body.r7-phone-landscape .profile-data > strong {
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+body.r7-phone-landscape .profile-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+body.r7-phone-landscape .profile-actions .micro-button {
+  min-width: 0 !important;
+  min-height: 40px !important;
+  white-space: normal !important;
+}
+body.r7-phone-landscape .rating-scale,
+body.r7-phone-landscape .review-inline-rating {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+body.r7-phone-landscape .rating-button,
+body.r7-phone-landscape .review-inline-rating-button {
+  min-width: 0 !important;
+  width: auto !important;
+  height: 42px !important;
+  min-height: 42px !important;
+}
+body.r7-phone-landscape .rating-button:last-child,
+body.r7-phone-landscape .review-inline-rating-button:last-child { grid-column: auto !important; }
+body.r7-phone-landscape #reviewText,
+body.r7-phone-landscape .review-inline-editor textarea {
+  min-height: 110px !important;
+  font-size: 16px !important;
+}
+body.r7-phone-landscape .review-enter-hint { display: none !important; }
+body.r7-phone-landscape .review-submit-row {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+body.r7-phone-landscape .review-submit-row .button {
+  width: 100% !important;
+  min-height: 44px !important;
+}
+body.r7-phone-landscape .community-feed-toolbar {
+  display: grid !important;
+  gap: 12px !important;
+}
+body.r7-phone-landscape .review-sort {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  justify-content: stretch !important;
+}
+body.r7-phone-landscape .review-sort-button {
+  min-width: 0 !important;
+  min-height: 40px !important;
+  padding: 8px 5px !important;
+}
+body.r7-phone-landscape .review-display-settings,
+body.r7-phone-landscape .lexicon-toggle { width: 100% !important; min-width: 0 !important; }
+body.r7-phone-landscape .review-card { padding: 14px !important; }
+body.r7-phone-landscape .review-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+}
+body.r7-phone-landscape .review-action-button { min-height: 40px !important; }
+body.r7-phone-landscape .review-owner-actions {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+body.r7-phone-landscape .review-owner-actions .review-action-button { width: 100% !important; }
+body.r7-phone-landscape .review-replies { margin-left: 0 !important; }
+body.r7-phone-landscape .review-inline-footer {
+  align-items: stretch !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+body.r7-phone-landscape .review-inline-buttons {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Mobile overlays still respect browser chrome and safe areas in landscape. */
+body.r7-phone-landscape .info-overlay,
+body.r7-phone-landscape .review-challenge-modal {
+  padding:
+    max(12px, env(safe-area-inset-top, 0px))
+    max(14px, env(safe-area-inset-right, 0px))
+    max(12px, env(safe-area-inset-bottom, 0px))
+    max(14px, env(safe-area-inset-left, 0px)) !important;
+}
+body.r7-phone-landscape .info-overlay-card,
+body.r7-phone-landscape .review-challenge-card {
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+  overflow: auto !important;
+}

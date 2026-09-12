@@ -1,0 +1,129 @@
+name: R7 Round5 owner feedback browser QA v5
+
+on:
+  push:
+    branches: [revival-r7-responsive-mobile]
+
+permissions:
+  contents: write
+
+jobs:
+  round5-v5:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard exact Round5 staging state
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=de8603819ada62a07a63d5aa398b356da2cfc750
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE"..HEAD | sort >/tmp/r7-round5-delta.txt
+          cat >/tmp/r7-round5-expected.txt <<'EOF'
+          .github/workflows/r7-round5-owner-feedback-v2.yml
+          .github/workflows/r7-round5-owner-feedback-v3.yml
+          .github/workflows/r7-round5-owner-feedback-v4.yml
+          .github/workflows/r7-round5-owner-feedback-v5.yml
+          .github/workflows/r7-round5-owner-feedback.yml
+          EOF
+          diff -u /tmp/r7-round5-expected.txt /tmp/r7-round5-delta.txt
+          git worktree add /tmp/r7-round5-before "$BASE"
+
+      - name: Reuse scoped Round5 patch and docs scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+          data=yaml.safe_load(Path('.github/workflows/r7-round5-owner-feedback-v4.yml').read_text(encoding='utf-8'))
+          runs={s.get('name'):s.get('run') for s in data['jobs']['round5-v4']['steps'] if s.get('name') and s.get('run')}
+          needed=['Extract scripts and apply scoped Round5 patch','Install Chromium QA runtime']
+          missing=[n for n in needed if n not in runs]
+          if missing: raise SystemExit(f'missing v4 source steps: {missing}')
+          Path('/tmp/r7-v4-extract.sh').write_text(runs['Extract scripts and apply scoped Round5 patch'],encoding='utf-8')
+          Path('/tmp/r7-v4-install.sh').write_text(runs['Install Chromium QA runtime'],encoding='utf-8')
+          PY
+          bash /tmp/r7-v4-extract.sh
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/r7-round5-docs.sh')
+          s=p.read_text(encoding='utf-8')
+          old='git rm .github/workflows/r7-round5-owner-feedback.yml .github/workflows/r7-round5-owner-feedback-v2.yml .github/workflows/r7-round5-owner-feedback-v3.yml .github/workflows/r7-round5-owner-feedback-v4.yml'
+          new=old+' .github/workflows/r7-round5-owner-feedback-v5.yml'
+          if s.count(old)!=1: raise SystemExit(f'docs cleanup marker mismatch: {s.count(old)}')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: bash /tmp/r7-v4-install.sh
+
+      - name: Create robust fail-fast browser QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash /tmp/r7-round5-create-qa.sh
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/r7-round5-qa.cjs')
+          s=p.read_text(encoding='utf-8')
+
+          start=s.find('async function contextFor(')
+          end=s.find('async function pageErrors',start)
+          if start<0 or end<0: raise SystemExit('contextFor boundaries not found')
+          block=s[start:end]
+          rel=block.rfind('return ctx;')
+          if rel<0: raise SystemExit('contextFor return not found')
+          pos=start+rel
+          line_start=s.rfind('\n',0,pos)+1
+          indent=s[line_start:pos]
+          insert=f"ctx.setDefaultTimeout(7000);\n{indent}ctx.setDefaultNavigationTimeout(10000);\n{indent}"
+          s=s[:pos]+insert+s[pos:]
+
+          hidden="await page.locator('.r7-subject-back').click(); await page.waitForTimeout(260);"
+          if s.count(hidden)!=1: raise SystemExit(f'hidden actor-back action mismatch: {s.count(hidden)}')
+          s=s.replace(hidden,'await page.waitForTimeout(80);',1)
+
+          p.write_text("(async () => {\n"+s+"\n})().catch(error => { console.error(error); process.exit(1); });\n",encoding='utf-8')
+          PY
+          node --check /tmp/r7-round5-qa.cjs
+
+      - name: Pre-QA, clean commit, exact-final-QA and verified push
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4190 --directory /tmp/r7-round5-before >/tmp/r7-r5-before.log 2>&1 &
+          PID_BEFORE=$!
+          python3 -m http.server 4191 --directory "$GITHUB_WORKSPACE" >/tmp/r7-r5-after.log 2>&1 &
+          PID_AFTER=$!
+          cleanup() { kill "$PID_BEFORE" "$PID_AFTER" 2>/dev/null || true; wait "$PID_BEFORE" "$PID_AFTER" 2>/dev/null || true; }
+          trap cleanup EXIT
+          sleep 1
+
+          R7_OUT=/tmp/r7-round5-pre R7_BASE=http://127.0.0.1:4191 R7_BEFORE=http://127.0.0.1:4190 R7_EXACT_SHA='WORKTREE PRE-COMMIT' timeout 240s node /tmp/r7-round5-qa.cjs
+
+          bash /tmp/r7-round5-docs.sh
+          FINAL_SHA="$(cat /tmp/r7-round5-final-sha.txt)"
+          test "$(git rev-parse HEAD)" = "$FINAL_SHA"
+          test -z "$(git status --porcelain)"
+
+          R7_OUT=/tmp/r7-round5-final R7_BASE=http://127.0.0.1:4191 R7_BEFORE=http://127.0.0.1:4190 R7_EXACT_SHA="$FINAL_SHA" timeout 240s node /tmp/r7-round5-qa.cjs
+          test "$(git rev-parse HEAD)" = "$FINAL_SHA"
+          test -z "$(git status --porcelain)"
+          printf '%s\n' "$FINAL_SHA" >/tmp/r7-round5-final/FINAL_SHA.txt
+
+          bash /tmp/r7-round5-push.sh
+
+      - name: Upload exact-final browser evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-round5-exact-final-browser-evidence
+          path: /tmp/r7-round5-final

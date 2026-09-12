@@ -1,0 +1,693 @@
+name: R7 Round5 owner feedback browser QA
+
+on:
+  push:
+    branches: [revival-r7-responsive-mobile]
+
+permissions:
+  contents: write
+
+jobs:
+  round5:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard exact Round4 baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=de8603819ada62a07a63d5aa398b356da2cfc750
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE"..HEAD | sort >/tmp/r7-round5-delta.txt
+          printf '%s\n' '.github/workflows/r7-round5-owner-feedback.yml' >/tmp/r7-round5-expected.txt
+          diff -u /tmp/r7-round5-expected.txt /tmp/r7-round5-delta.txt
+          git worktree add /tmp/r7-round5-before "$BASE"
+
+      - name: Apply scoped Round5 runtime patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly one match, got {count}: {old[:80]!r}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          # 1/2/9 — preserve hero synopsis in source, remove Materials explanatory copy,
+          # remove the obsolete public build label from both public pages.
+          replace_once('index.html', '<p class="section-note" data-i18n="materialsNote">Материалы представлены в авторском виде. Текст внутри постеров может оставаться на русском языке.</p>\n', '')
+          replace_once('index.html', '<div class="build-mark">BUILD // REVIVAL R6 // PROFILE SAFETY + REPORT</div>', '')
+          replace_once('reviews.html', '    <div class="build-mark">BUILD // REVIVAL R6 // PROFILE SAFETY + REPORT</div>\n', '    <div aria-hidden="true" class="footer-system">THEFT // PUBLIC FILE // 2045</div>\n')
+
+          # 4 — shared Actors/FAQ content reveal: old content softens first; new content
+          # enters from a partially-visible state, so there is no empty-panel phase.
+          old = '''  function stagedReveal(panel, writeValues) {
+            if (!panel) { if (typeof writeValues === 'function') writeValues(); return; }
+            panel.classList.remove('is-revealed');
+            panel.classList.add('is-revealing');
+            if (typeof writeValues === 'function') writeValues();
+            if (motionReduced()) {
+              panel.classList.remove('is-revealing');
+              panel.classList.add('is-revealed');
+              return;
+            }
+            // Force the hidden state to be painted before starting the reveal.
+            void panel.offsetWidth;
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+              panel.classList.remove('is-revealing');
+              panel.classList.add('is-revealed');
+            }));
+          }
+          '''
+          new = '''  function stagedReveal(panel, writeValues) {
+            if (!panel) { if (typeof writeValues === 'function') writeValues(); return; }
+            clearTimeout(panel._theftRevealTimer);
+            panel.classList.remove('is-revealing', 'is-r7-crossfade-in', 'is-r7-crossfade-out');
+            panel.classList.add('is-revealed');
+            if (motionReduced()) {
+              if (typeof writeValues === 'function') writeValues();
+              return;
+            }
+
+            // Keep the old state visible while it softens. The new state is written
+            // only after that short fade and starts partially visible, avoiding an
+            // empty-panel flash while still reading as one continuous transformation.
+            panel.classList.add('is-r7-crossfade-out');
+            panel._theftRevealTimer = setTimeout(() => {
+              if (typeof writeValues === 'function') writeValues();
+              panel.classList.remove('is-r7-crossfade-out');
+              panel.classList.add('is-r7-crossfade-in');
+              void panel.offsetWidth;
+              requestAnimationFrame(() => requestAnimationFrame(() => {
+                panel.classList.remove('is-r7-crossfade-in');
+                panel.classList.add('is-revealed');
+              }));
+            }, 140);
+          }
+          '''
+          replace_once('js/site.js', old, new)
+
+          # 6 — mobile burger dismissal with tap-vs-scroll discrimination and
+          # fullscreen/lightbox safeguards. Existing link/close behavior remains source of truth.
+          p = Path('js/responsive-r7.js')
+          text = p.read_text(encoding='utf-8')
+          anchor = '  // Mobile Hero composition --------------------------------------------------\n'
+          if text.count(anchor) != 1:
+              raise SystemExit('responsive-r7.js: mobile hero anchor mismatch')
+          addition = r'''  // OWNER FEEDBACK ROUND 5 — burger dismissal -------------------------------
+          // Close on a deliberate outside tap/click, but not merely because a touch
+          // gesture becomes a scroll/swipe. Fullscreen media always clears the burger.
+          function installMobileNavDismissal() {
+            const nav = $('#primaryNav');
+            const toggle = $('#menuToggle');
+            if (!nav || !toggle) return;
+
+            let pointer = null;
+            const outsideMenu = target => target instanceof Node && !nav.contains(target) && !toggle.contains(target);
+
+            document.addEventListener('pointerdown', event => {
+              if (!body.classList.contains('nav-open') || !outsideMenu(event.target)) {
+                pointer = null;
+                return;
+              }
+              pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+            }, true);
+
+            document.addEventListener('pointermove', event => {
+              if (!pointer || event.pointerId !== pointer.id) return;
+              if (Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) > 12) pointer.moved = true;
+            }, true);
+
+            document.addEventListener('pointerup', event => {
+              const start = pointer;
+              pointer = null;
+              if (!start || event.pointerId !== start.id || start.moved) return;
+              if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 12) return;
+              if (body.classList.contains('nav-open') && outsideMenu(event.target)) closeMobileNav();
+            }, true);
+
+            document.addEventListener('pointercancel', () => { pointer = null; }, true);
+            document.addEventListener('fullscreenchange', closeMobileNav);
+            document.addEventListener('webkitfullscreenchange', closeMobileNav);
+            $('#trailerVideo')?.addEventListener('webkitbeginfullscreen', closeMobileNav);
+
+            const syncFullscreenOverlay = () => {
+              if (body.classList.contains('lightbox-open')) closeMobileNav();
+            };
+            new MutationObserver(syncFullscreenOverlay).observe(body, { attributes: true, attributeFilter: ['class'] });
+          }
+
+          '''
+          text = text.replace(anchor, addition + anchor, 1)
+          call_anchor = '  installNavigationAdditions();\n'
+          if text.count(call_anchor) != 1:
+              raise SystemExit('responsive-r7.js: init anchor mismatch')
+          text = text.replace(call_anchor, call_anchor + '  installMobileNavDismissal();\n', 1)
+          p.write_text(text, encoding='utf-8')
+
+          # 1/3/4/5/7/8/9 — additive visual overrides, scoped to approved Round5 changes.
+          p = Path('css/responsive-r7-polish.css')
+          css = p.read_text(encoding='utf-8')
+          if 'OWNER FEEDBACK ROUND 5 — 2026-09-12' in css:
+              raise SystemExit('Round5 CSS already present unexpectedly')
+          css += r'''
+
+          /* ========================================================================== */
+          /* OWNER FEEDBACK ROUND 5 — 2026-09-12                                       */
+          /* Scoped owner corrections on top of the verified Round4 preview.            */
+          /* ========================================================================== */
+
+          /* Mobile Hero keeps the synopsis in source/i18n, but it is not presented in
+             the compact Hero composition. Desktop remains unchanged. */
+          @media (max-width: 820px) {
+            .hero-copy-column .hero-copy { display: none !important; }
+          }
+          body.r7-phone-landscape .hero-copy-column .hero-copy { display: none !important; }
+
+          /* Mobile Materials uses touch/swipe; remove only previous/next arrow buttons.
+             Desktop arrows remain untouched, counters/dots remain informational. */
+          @media (max-width: 820px) {
+            #materials .archive-stage-wrap .gallery-button,
+            .lightbox .lightbox-prev,
+            .lightbox .lightbox-next { display: none !important; }
+          }
+          body.r7-phone-landscape #materials .archive-stage-wrap .gallery-button,
+          body.r7-phone-landscape .lightbox .lightbox-prev,
+          body.r7-phone-landscape .lightbox .lightbox-next { display: none !important; }
+
+          /* Actors / FAQ: one continuous transformation. In sequential contexts the
+             outgoing index and incoming panel overlap briefly instead of switching via
+             a hard display cut; holdSequentialHeight keeps the console geometry stable. */
+          body.r7-sequential-ui #cast .cast-console,
+          body.r7-sequential-ui #faq .faq-console { position: relative !important; }
+
+          body.r7-sequential-ui #cast .cast-list,
+          body.r7-sequential-ui #cast .subject-dossier,
+          body.r7-sequential-ui #faq .faq-query-list,
+          body.r7-sequential-ui #faq .faq-response-panel {
+            transition: opacity .24s ease, transform .34s cubic-bezier(.2,.72,.2,1), visibility 0s linear .24s !important;
+          }
+
+          body.r7-sequential-ui #cast:not(.r7-dossier-open) .subject-dossier,
+          body.r7-sequential-ui #faq:not(.r7-response-open) .faq-response-panel {
+            display: block !important;
+            position: absolute !important;
+            inset: 0 !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            transform: translateY(5px) !important;
+          }
+
+          body.r7-sequential-ui #cast.r7-dossier-open .cast-list,
+          body.r7-sequential-ui #faq.r7-response-open .faq-query-list {
+            display: block !important;
+            position: absolute !important;
+            inset: 0 !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            transform: translateY(-4px) !important;
+          }
+
+          body.r7-sequential-ui #cast.r7-dossier-open .subject-dossier,
+          body.r7-sequential-ui #faq.r7-response-open .faq-response-panel {
+            position: relative !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            transform: none !important;
+          }
+
+          .subject-dossier.is-r7-crossfade-out .dossier-reveal > *,
+          .faq-response-panel.is-r7-crossfade-out .faq-response-content > *,
+          .faq-response-panel.is-r7-crossfade-out .faq-system-box > div,
+          .faq-response-panel.is-r7-crossfade-out .faq-response-log {
+            opacity: .38 !important;
+            transform: translateY(2px) !important;
+            transition: opacity .14s ease, transform .14s ease !important;
+          }
+
+          .subject-dossier.is-r7-crossfade-in .dossier-reveal > *,
+          .faq-response-panel.is-r7-crossfade-in .faq-response-content > *,
+          .faq-response-panel.is-r7-crossfade-in .faq-system-box > div,
+          .faq-response-panel.is-r7-crossfade-in .faq-response-log {
+            opacity: .38 !important;
+            transform: translateY(4px) !important;
+            transition: none !important;
+          }
+
+          .subject-dossier.is-revealed .dossier-reveal > *,
+          .faq-response-panel.is-revealed .faq-response-content > *,
+          .faq-response-panel.is-revealed .faq-system-box > div,
+          .faq-response-panel.is-revealed .faq-response-log {
+            transition-duration: .42s, .54s !important;
+            transition-timing-function: ease, cubic-bezier(.2,.72,.2,1) !important;
+          }
+          .subject-dossier.is-revealed .dossier-reveal > *:nth-child(2),
+          .faq-response-panel.is-revealed .faq-response-content > *:nth-child(2) { transition-delay: .035s !important; }
+          .subject-dossier.is-revealed .dossier-reveal > *:nth-child(3),
+          .faq-response-panel.is-revealed .faq-response-content > *:nth-child(3) { transition-delay: .07s !important; }
+
+          /* CONTACT: the endpoint beacon itself is fixed. A short local light streak
+             runs only within the final ~24px of the line; there is no travelling ball. */
+          .contact-signal-track i {
+            left: auto !important;
+            right: 12px !important;
+            width: 4px !important;
+            height: 4px !important;
+            transform: none !important;
+            animation: r7Round5ContactBeacon 3.6s ease-in-out infinite !important;
+            will-change: opacity, box-shadow !important;
+          }
+          .contact-signal-track i::after {
+            content: "";
+            position: absolute;
+            top: 1px;
+            right: 2px;
+            width: 24px;
+            height: 1px;
+            pointer-events: none;
+            background: linear-gradient(90deg, transparent 0%, rgba(155,196,199,.12) 22%, rgba(184,225,229,.72) 70%, transparent 100%);
+            transform-origin: right center;
+            animation: r7Round5ContactImpulse 3.6s cubic-bezier(.2,.7,.2,1) infinite;
+          }
+          @keyframes r7Round5ContactBeacon {
+            0%, 58%, 100% { opacity: .48; box-shadow: 0 0 7px rgba(155,196,199,.30); }
+            78% { opacity: .92; box-shadow: 0 0 12px rgba(155,196,199,.58); }
+          }
+          @keyframes r7Round5ContactImpulse {
+            0%, 58% { opacity: 0; transform: translateX(-15px) scaleX(.28); }
+            68% { opacity: .18; transform: translateX(-13px) scaleX(.38); }
+            80% { opacity: .78; transform: translateX(-4px) scaleX(.96); }
+            92%, 100% { opacity: 0; transform: translateX(2px) scaleX(.52); }
+          }
+
+          /* Burger REPORT link: remove the inherited underline/corner protrusion only. */
+          .site-header .nav-links .r7-nav-report::after {
+            content: none !important;
+            display: none !important;
+          }
+
+          /* Profile help: quiet rest state, clearly active open state, clean rectangle.
+             Match the profile console/composer width instead of a small floating shard. */
+          .profile-help-toggle:not([aria-expanded="true"]) {
+            border-color: rgba(157,205,211,.22) !important;
+            background: rgba(5,12,14,.28) !important;
+            color: rgba(198,218,220,.72) !important;
+            box-shadow: none !important;
+            transform: none !important;
+          }
+          .profile-help-toggle:not([aria-expanded="true"]):hover,
+          .profile-help-toggle:not([aria-expanded="true"]):focus-visible {
+            border-color: rgba(189,232,237,.48) !important;
+            background: rgba(17,31,33,.48) !important;
+            color: #edf5f5 !important;
+            box-shadow: none !important;
+          }
+          .profile-help-toggle[aria-expanded="true"] {
+            border-color: rgba(189,232,237,.82) !important;
+            background: rgba(27,51,54,.78) !important;
+            color: #fff !important;
+            box-shadow: 0 0 12px rgba(155,196,199,.18) !important;
+          }
+          body.community-page #profileHelpPanel.profile-help-panel {
+            left: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+          }
+          body.community-page #profileHelpPanel.profile-help-panel .info-overlay-card {
+            width: 100% !important;
+            max-width: none !important;
+            border: 1px solid rgba(155,196,199,.34) !important;
+            background: rgba(7,13,14,.97) !important;
+            box-shadow: 0 16px 40px rgba(0,0,0,.40) !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+          }
+          body.community-page #profileHelpPanel.profile-help-panel .info-overlay-card::before,
+          body.community-page #profileHelpPanel.profile-help-panel .info-overlay-card::after {
+            content: none !important;
+            display: none !important;
+          }
+
+          /* BUILD is no longer public UI. Markup is removed from both public pages;
+             this fallback prevents accidental presentation if legacy markup returns. */
+          .build-mark { display: none !important; }
+
+          @media (prefers-reduced-motion: reduce) {
+            .contact-signal-track i,
+            .contact-signal-track i::after { animation: none !important; }
+            .contact-signal-track i { opacity: .72 !important; box-shadow: 0 0 8px rgba(155,196,199,.38) !important; }
+            .contact-signal-track i::after { opacity: 0 !important; }
+            .subject-dossier .dossier-reveal > *,
+            .faq-response-panel .faq-response-content > *,
+            .faq-response-panel .faq-system-box > div,
+            .faq-response-panel .faq-response-log,
+            body.r7-sequential-ui #cast .cast-list,
+            body.r7-sequential-ui #cast .subject-dossier,
+            body.r7-sequential-ui #faq .faq-query-list,
+            body.r7-sequential-ui #faq .faq-response-panel { transition: none !important; }
+          }
+          '''
+          p.write_text(css, encoding='utf-8')
+
+          # Scope assertions: no business-logic files are touched.
+          for untouched in ('js/public-response.js', 'js/admin.js'):
+              if Path(untouched).read_bytes() != Path('/tmp/r7-round5-before', untouched).read_bytes():
+                  raise SystemExit(f'unexpected mutation: {untouched}')
+          PY
+
+          git diff --check
+          git diff --name-only de8603819ada62a07a63d5aa398b356da2cfc750 -- | sort
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7qa && cd /tmp/r7qa
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Create Round5 browser QA script
+        shell: bash
+        run: |
+          cat >/tmp/r7-round5-qa.cjs <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const path = require('path');
+          const out = process.env.R7_OUT || '/tmp/r7-round5-evidence';
+          const base = process.env.R7_BASE || 'http://127.0.0.1:4191';
+          const before = process.env.R7_BEFORE || 'http://127.0.0.1:4190';
+          const exactSha = process.env.R7_EXACT_SHA || 'WORKTREE PRE-COMMIT';
+          fs.rmSync(out, { recursive:true, force:true });
+          fs.mkdirSync(out, { recursive:true });
+
+          const results = [];
+          const pass = (name, detail='') => results.push({ ok:true, name, detail });
+          const fail = (name, detail='') => results.push({ ok:false, name, detail });
+          const check = (name, condition, detail='') => condition ? pass(name, detail) : fail(name, detail);
+          const approx = (a,b,t=1) => Math.abs(a-b) <= t;
+          const box = async (page, sel) => page.locator(sel).boundingBox();
+          const viewports = [
+            [390,844],[430,932],[844,390],[932,430],[768,1024],[1024,768],[1366,768]
+          ];
+
+          async function contextFor(browser,w,h,reduced=false){
+            const ctx = await browser.newContext({ viewport:{width:w,height:h}, hasTouch:w<=1024, isMobile:false, reducedMotion: reduced ? 'reduce' : 'no-preference' });
+            await ctx.route('https://xltwwvutqkpmtmlavngi.supabase.co/**', route => route.abort());
+            return ctx;
+          }
+          async function pageErrors(page){
+            const errors=[]; page.on('pageerror',e=>errors.push(String(e.message||e))); return errors;
+          }
+          async function settle(page){ await page.waitForTimeout(260); }
+          async function overflow(page){ return page.evaluate(()=>Math.max(0,document.documentElement.scrollWidth-innerWidth)); }
+          async function touchSwipe(page, selector, startX, endX){
+            return page.evaluate(({selector,startX,endX})=>{
+              const el=document.querySelector(selector); if(!el) return false;
+              const start=new Event('touchstart',{bubbles:true,cancelable:true});
+              Object.defineProperty(start,'changedTouches',{value:[{clientX:startX}]});
+              el.dispatchEvent(start);
+              const end=new Event('touchend',{bubbles:true,cancelable:true});
+              Object.defineProperty(end,'changedTouches',{value:[{clientX:endX}]});
+              el.dispatchEvent(end); return true;
+            },{selector,startX,endX});
+          }
+          async function setLangRu(page){
+            const lang=await page.locator('html').getAttribute('lang');
+            if(lang==='en') { await page.locator('#langToggle').click(); await settle(page); }
+          }
+
+          const browser = await chromium.launch({headless:true});
+          try {
+            // Desktop regression geometry against verified Round4 baseline.
+            {
+              const ctxA=await contextFor(browser,1366,768), ctxB=await contextFor(browser,1366,768);
+              const a=await ctxA.newPage(), b=await ctxB.newPage();
+              await Promise.all([a.goto(before+'/index.html'),b.goto(base+'/index.html')]); await Promise.all([settle(a),settle(b)]);
+              for(const sel of ['.hero-poster-frame','#cast .cast-console','#faq .faq-console','.contact-box']){
+                const [ba,bb]=await Promise.all([box(a,sel),box(b,sel)]);
+                const d=Math.max(Math.abs(ba.x-bb.x),Math.abs(ba.width-bb.width),Math.abs(ba.height-bb.height));
+                check(`1366 desktop ${sel} geometry preserved`,d<=1.1,JSON.stringify({before:ba,after:bb,maxDelta:d}));
+              }
+              const [ma,mb]=await Promise.all([box(a,'#materials .archive-stage-wrap'),box(b,'#materials .archive-stage-wrap')]);
+              check('1366 desktop Materials stage size preserved',approx(ma.width,mb.width,1.1)&&approx(ma.height,mb.height,1.1),JSON.stringify({before:ma,after:mb}));
+              await ctxA.close(); await ctxB.close();
+            }
+
+            for(const [w,h] of viewports){
+              const label=`${w}x${h}`;
+              const ctx=await contextFor(browser,w,h); const page=await ctx.newPage(); const errors=await pageErrors(page);
+              await page.goto(base+'/index.html'); await settle(page); await setLangRu(page);
+              check(`${label} index horizontal overflow=0`,(await overflow(page))===0,String(await overflow(page)));
+              check(`${label} index JS errors=0`,errors.length===0,errors.join(' | '));
+
+              const hero=page.locator('.hero-copy-column .hero-copy');
+              const heroText=(await hero.textContent()||'').trim();
+              const heroDisplay=await hero.evaluate(el=>getComputedStyle(el).display);
+              const compact=w<=820 || (w>h && w<=960 && h<=560);
+              check(`${label} Hero synopsis source preserved`,heroText.length>30,heroText.slice(0,90));
+              check(`${label} Hero synopsis presentation`,compact ? heroDisplay==='none' : heroDisplay!=='none',heroDisplay);
+              check(`${label} Materials explanatory note removed`,await page.locator('[data-i18n="materialsNote"]').count()===0);
+              check(`${label} BUILD label absent on main`,await page.locator('.build-mark').count()===0);
+              check(`${label} main PUBLIC FILE signature present`,(await page.locator('footer .footer-system').textContent())?.includes('THEFT // PUBLIC FILE // 2045'));
+
+              const normalPrev=page.locator('#galleryPrev'), normalNext=page.locator('#galleryNext');
+              const normalPrevDisplay=await normalPrev.evaluate(el=>getComputedStyle(el).display);
+              const normalNextDisplay=await normalNext.evaluate(el=>getComputedStyle(el).display);
+              if(compact){
+                check(`${label} Materials mobile prev arrow hidden`,normalPrevDisplay==='none',normalPrevDisplay);
+                check(`${label} Materials mobile next arrow hidden`,normalNextDisplay==='none',normalNextDisplay);
+                const beforeCounter=(await page.locator('#archiveCounter').textContent()||'').trim();
+                await touchSwipe(page,'#archiveStage',320,90); await page.waitForTimeout(90);
+                const afterCounter=(await page.locator('#archiveCounter').textContent()||'').trim();
+                check(`${label} Materials stage swipe still navigates`,beforeCounter!==afterCounter,`${beforeCounter}->${afterCounter}`);
+
+                await page.evaluate(()=>document.getElementById('archiveStage').click()); await page.waitForTimeout(80);
+                check(`${label} Materials lightbox opens`,await page.locator('#lightbox').evaluate(el=>el.classList.contains('open')));
+                const lp=await page.locator('#lightboxPrev').evaluate(el=>getComputedStyle(el).display);
+                const ln=await page.locator('#lightboxNext').evaluate(el=>getComputedStyle(el).display);
+                check(`${label} fullscreen Materials prev arrow hidden`,lp==='none',lp);
+                check(`${label} fullscreen Materials next arrow hidden`,ln==='none',ln);
+                const lightBefore=(await page.locator('#lightboxCounter').textContent()||'').trim();
+                await touchSwipe(page,'#lightbox',320,80); await page.waitForTimeout(90);
+                const lightAfter=(await page.locator('#lightboxCounter').textContent()||'').trim();
+                check(`${label} fullscreen Materials swipe still navigates`,lightBefore!==lightAfter,`${lightBefore}->${lightAfter}`);
+                await page.locator('#lightboxClose').click();
+              } else {
+                check(`${label} desktop Materials prev arrow preserved`,normalPrevDisplay!=='none',normalPrevDisplay);
+                check(`${label} desktop Materials next arrow preserved`,normalNextDisplay!=='none',normalNextDisplay);
+              }
+
+              // Sequential Actors/FAQ: no page-scroll jump; transition is not a hard display cut.
+              if(compact){
+                await page.locator('#cast').scrollIntoViewIfNeeded(); await page.waitForTimeout(80);
+                const castY=await page.evaluate(()=>scrollY);
+                await page.locator('#cast .cast-list-item').first().click(); await page.waitForTimeout(55);
+                const castMid=await page.evaluate(()=>({
+                  y:scrollY,
+                  list:getComputedStyle(document.querySelector('#cast .cast-list')).opacity,
+                  panel:getComputedStyle(document.querySelector('#cast .subject-dossier')).opacity
+                }));
+                check(`${label} Actors transition keeps viewport`,Math.abs(castMid.y-castY)<=1,`${castY}->${castMid.y}`);
+                check(`${label} Actors has soft overlapping transition`,Number(castMid.list)<1 || Number(castMid.panel)<1,JSON.stringify(castMid));
+                await page.waitForTimeout(520);
+                check(`${label} Actors detail settles visible`,Number(await page.locator('#cast .subject-dossier').evaluate(el=>getComputedStyle(el).opacity))>.98);
+
+                await page.locator('.r7-subject-back').click(); await page.waitForTimeout(260);
+                await page.locator('#faq').scrollIntoViewIfNeeded(); await page.waitForTimeout(80);
+                const faqY=await page.evaluate(()=>scrollY);
+                await page.locator('#faq .faq-query-item').first().click(); await page.waitForTimeout(55);
+                const faqMid=await page.evaluate(()=>({
+                  y:scrollY,
+                  list:getComputedStyle(document.querySelector('#faq .faq-query-list')).opacity,
+                  panel:getComputedStyle(document.querySelector('#faq .faq-response-panel')).opacity
+                }));
+                check(`${label} FAQ transition keeps viewport`,Math.abs(faqMid.y-faqY)<=1,`${faqY}->${faqMid.y}`);
+                check(`${label} FAQ has soft overlapping transition`,Number(faqMid.list)<1 || Number(faqMid.panel)<1,JSON.stringify(faqMid));
+                await page.waitForTimeout(520);
+                check(`${label} FAQ detail settles visible`,Number(await page.locator('#faq .faq-response-panel').evaluate(el=>getComputedStyle(el).opacity))>.98);
+              }
+
+              // Burger gesture/fullscreen checks on phone-class contexts only.
+              const phone=(w<=560)||(w>h&&w<=960&&h<=560);
+              if(phone){
+                const menu=page.locator('#menuToggle');
+                await menu.click();
+                check(`${label} burger opens`,await page.locator('body').evaluate(el=>el.classList.contains('nav-open')));
+                await page.evaluate(()=>{
+                  const body=document.body;
+                  const down=new PointerEvent('pointerdown',{bubbles:true,pointerId:71,pointerType:'touch',clientX:20,clientY:500});
+                  const move=new PointerEvent('pointermove',{bubbles:true,pointerId:71,pointerType:'touch',clientX:20,clientY:590});
+                  const up=new PointerEvent('pointerup',{bubbles:true,pointerId:71,pointerType:'touch',clientX:20,clientY:590});
+                  body.dispatchEvent(down); body.dispatchEvent(move); body.dispatchEvent(up);
+                });
+                check(`${label} scroll gesture does not close burger`,await page.locator('body').evaluate(el=>el.classList.contains('nav-open')));
+                await page.evaluate(()=>{
+                  const body=document.body;
+                  body.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:72,pointerType:'touch',clientX:20,clientY:500}));
+                  body.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:72,pointerType:'touch',clientX:22,clientY:502}));
+                });
+                check(`${label} outside tap closes burger`,!(await page.locator('body').evaluate(el=>el.classList.contains('nav-open'))));
+
+                await menu.click();
+                await page.locator('#primaryNav a[href="#about"]').click(); await page.waitForTimeout(80);
+                check(`${label} burger menu item closes burger`,!(await page.locator('body').evaluate(el=>el.classList.contains('nav-open'))));
+
+                await menu.click();
+                await page.evaluate(()=>document.dispatchEvent(new Event('fullscreenchange')));
+                check(`${label} fullscreen video event closes burger`,!(await page.locator('body').evaluate(el=>el.classList.contains('nav-open'))));
+
+                await menu.click();
+                await page.evaluate(()=>document.getElementById('archiveStage').click()); await page.waitForTimeout(70);
+                check(`${label} fullscreen Materials closes burger`,!(await page.locator('body').evaluate(el=>el.classList.contains('nav-open'))));
+                await page.locator('#lightboxClose').click();
+
+                const reportPseudo=await page.locator('.r7-nav-report').evaluate(el=>({display:getComputedStyle(el,'::after').display,content:getComputedStyle(el,'::after').content}));
+                check(`${label} burger REPORT protrusion removed`,reportPseudo.display==='none'||reportPseudo.content==='none',JSON.stringify(reportPseudo));
+              }
+
+              // CONTACT endpoint must stay physically fixed; the local pseudo impulse animates.
+              if(w===390 || w===1366){
+                await page.locator('#contacts').scrollIntoViewIfNeeded(); await page.waitForTimeout(80);
+                const xs=[]; for(let i=0;i<5;i++){ xs.push((await box(page,'.contact-signal-track i')).x); await page.waitForTimeout(180); }
+                const range=Math.max(...xs)-Math.min(...xs);
+                check(`${label} CONTACT endpoint beacon X fixed`,range<=.5,`range=${range.toFixed(2)} xs=${xs.join(',')}`);
+                const pseudo=await page.locator('.contact-signal-track i').evaluate(el=>({name:getComputedStyle(el,'::after').animationName,width:getComputedStyle(el,'::after').width}));
+                check(`${label} CONTACT local impulse active`,pseudo.name.includes('r7Round5ContactImpulse'),JSON.stringify(pseudo));
+              }
+
+              if(w===390) await page.screenshot({path:path.join(out,'mobile-index-390x844.png'),fullPage:true});
+              if(w===1366) await page.screenshot({path:path.join(out,'desktop-index-1366x768.png'),fullPage:true});
+              await ctx.close();
+
+              // Reviews page: footer/build/help only; production Supabase is blocked.
+              const rctx=await contextFor(browser,w,h); const reviews=await rctx.newPage(); const rerrors=await pageErrors(reviews);
+              await reviews.goto(base+'/reviews.html'); await settle(reviews);
+              check(`${label} Reviews horizontal overflow=0`,(await overflow(reviews))===0,String(await overflow(reviews)));
+              check(`${label} Reviews JS errors=0`,rerrors.length===0,rerrors.join(' | '));
+              check(`${label} Reviews BUILD label absent`,await reviews.locator('.build-mark').count()===0);
+              check(`${label} Reviews PUBLIC FILE signature present`,(await reviews.locator('footer .footer-system').textContent())?.includes('THEFT // PUBLIC FILE // 2045'));
+
+              if(w===390 || w===1366){
+                const toggle=reviews.locator('#profileHelpToggle');
+                const rest=await toggle.evaluate(el=>({bg:getComputedStyle(el).backgroundColor,shadow:getComputedStyle(el).boxShadow,aria:el.getAttribute('aria-expanded')}));
+                check(`${label} help ? calm at rest`,rest.aria==='false' && rest.shadow==='none',JSON.stringify(rest));
+                await toggle.click(); await reviews.waitForTimeout(80);
+                const active=await toggle.evaluate(el=>({bg:getComputedStyle(el).backgroundColor,shadow:getComputedStyle(el).boxShadow,aria:el.getAttribute('aria-expanded')}));
+                check(`${label} help ? visibly active when open`,active.aria==='true' && active.shadow!=='none',JSON.stringify(active));
+                const ratio=await reviews.evaluate(()=>{
+                  const card=document.querySelector('#profileHelpPanel .info-overlay-card').getBoundingClientRect();
+                  const profile=document.querySelector('.profile-console').getBoundingClientRect();
+                  return {ratio:card.width/profile.width,card:card.width,profile:profile.width,after:getComputedStyle(document.querySelector('#profileHelpPanel .info-overlay-card'),'::after').content,before:getComputedStyle(document.querySelector('#profileHelpPanel .info-overlay-card'),'::before').content};
+                });
+                check(`${label} help panel matches profile block width`,ratio.ratio>=.90 && ratio.ratio<=1.08,JSON.stringify(ratio));
+                check(`${label} help panel stray corner pseudo removed`,ratio.after==='none' && ratio.before==='none',JSON.stringify(ratio));
+                if(w===390) await reviews.screenshot({path:path.join(out,'reviews-help-390x844.png'),fullPage:true});
+                await reviews.locator('#profileHelpClose').click();
+              }
+              if(w===1366) await reviews.screenshot({path:path.join(out,'desktop-reviews-1366x768.png'),fullPage:true});
+              await rctx.close();
+            }
+
+            // Reduced-motion CONTACT: no beacon/pseudo animation.
+            {
+              const ctx=await contextFor(browser,390,844,true); const page=await ctx.newPage(); await page.goto(base+'/index.html'); await settle(page);
+              const s=await page.locator('.contact-signal-track i').evaluate(el=>({self:getComputedStyle(el).animationName,pseudo:getComputedStyle(el,'::after').animationName}));
+              check('reduced-motion CONTACT animations disabled',s.self==='none' && s.pseudo==='none',JSON.stringify(s));
+              await ctx.close();
+            }
+          } finally { await browser.close(); }
+
+          const passed=results.filter(r=>r.ok).length, failed=results.length-passed;
+          const summary={exactSha,checks:results.length,passed,failed,results};
+          fs.writeFileSync(path.join(out,'RESULTS.json'),JSON.stringify(summary,null,2));
+          const lines=[`# REVIVAL R7 — Owner Feedback Round 5 browser QA`,``,`Exact tested SHA: ${exactSha}`,`Checks: ${results.length} / Passed: ${passed} / Failed: ${failed}`,``,...results.map(r=>`- ${r.ok?'PASS':'FAIL'} — ${r.name}${r.detail?` — ${r.detail}`:''}`)];
+          fs.writeFileSync(path.join(out,'REPORT.md'),lines.join('\n')+'\n');
+          console.log(lines.join('\n'));
+          if(failed) process.exit(1);
+          NODE
+
+      - name: Pre-commit full browser matrix
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4190 --directory /tmp/r7-round5-before >/tmp/r7-r5-before.log 2>&1 &
+          python3 -m http.server 4191 --directory "$GITHUB_WORKSPACE" >/tmp/r7-r5-after.log 2>&1 &
+          sleep 1
+          R7_OUT=/tmp/r7-round5-pre R7_BASE=http://127.0.0.1:4191 R7_BEFORE=http://127.0.0.1:4190 R7_EXACT_SHA='WORKTREE PRE-COMMIT' node /tmp/r7-round5-qa.cjs
+
+      - name: Write additive Round5 documentation and clean QA harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          data=json.loads(Path('/tmp/r7-round5-pre/RESULTS.json').read_text())
+          qa=f"{data['checks']}/{data['passed']} PASS"
+          doc=Path('docs/releases/revival/R7/OWNER-FEEDBACK-ROUND5.md')
+          if doc.exists(): raise SystemExit('Round5 doc already exists unexpectedly')
+          doc.write_text(f'''# REVIVAL R7 — OWNER FEEDBACK ROUND 5\n\nStatus: **IMPLEMENTED ON FEATURE BRANCH / BROWSER QA PASSED / OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**\n\nDate: 2026-09-12\nStarting verified Round4 head: `de8603819ada62a07a63d5aa398b356da2cfc750`\n\n## Owner-directed changes\n\n- Mobile Hero synopsis stays in source/i18n but is not rendered in the compact Hero composition; desktop copy is preserved.\n- Materials explanatory note `Материалы представлены в авторском виде…` is removed from public presentation on all devices.\n- Mobile/compact Materials previous/next arrows are hidden in normal stage and fullscreen lightbox; existing touch/swipe remains the navigation mechanism. Desktop arrows remain.\n- Actors and FAQ transitions are softened into one continuous transformation: outgoing content fades, incoming content begins partially visible and settles with a short stagger; there is no intentional empty-panel phase. Existing structure/state model is preserved.\n- CONTACT uses a fixed endpoint beacon plus a short local light impulse near the endpoint; no travelling ball crosses the line. Reduced motion disables the impulse.\n- Burger closes on close/menu selection/deliberate outside tap and fullscreen entry, but touch movement/scroll gestures alone do not close it.\n- The small inherited underline/protrusion beneath the burger `СООБЩИТЬ О БАГЕ` entry is removed; the entry itself remains.\n- Profile help `?` is quiet when closed, visibly active when open; the panel is aligned to roughly the profile-console width and inherited corner-marker remnants are removed.\n- Public `BUILD // REVIVAL R6 // PROFILE SAFETY + REPORT` is removed from main and Reviews UI.\n- `THEFT // PUBLIC FILE // 2045` remains on main and is added to the Reviews footer without creating a new large section.\n\n## Preservation / safety\n\nNo Supabase schema/RLS/Auth/profile/review/rating/moderation business logic was changed. `js/public-response.js` and admin runtime were not modified. Desktop-only pagination and the approved R6 desktop foundation remain intact except for owner-authorized global removals/transition refinement.\n\n## Browser QA\n\nPre-commit browser matrix: **{qa}**. Required contexts cover `390×844`, `430×932`, `844×390`, `932×430`, `768×1024`, `1024×768`, `1366×768`; exact-final-SHA verification is required after the clean commit and is reported separately by the workflow evidence.\n\nQA covers Hero visibility/source preservation, Materials note removal, mobile normal/fullscreen arrows + swipe, Actors/FAQ viewport stability/soft transition, burger tap-vs-scroll/fullscreen behavior, CONTACT fixed endpoint/local impulse/reduced motion, help-panel states/geometry, build-label removal, Reviews footer signature, horizontal overflow, JS errors and desktop regression sanity.\n''',encoding='utf-8')
+
+          additions={
+          'docs/releases/revival/R7/PREVIEW-HANDOFF.md':f'''\n\n## Owner feedback Round 5 — 2026-09-12\n\nRound5 is implemented on the R7 feature branch and remains **NOT PRODUCTION / OWNER VISUAL REVIEW PENDING**. It hides (without deleting from source) the compact Hero synopsis, removes the Materials explanatory note and mobile Materials arrows, softens Actors/FAQ transitions, replaces CONTACT travel with a fixed endpoint/local impulse, adds tap-vs-scroll-aware burger dismissal/fullscreen safeguards, cleans the burger REPORT contour and profile-help geometry/state, removes the public BUILD label, and adds `THEFT // PUBLIC FILE // 2045` to Reviews.\n\nRound5 preserves Supabase/reviews/profile/auth business logic and desktop-only Materials pagination. Browser QA pre-commit result: **{qa}**; final acceptance still depends on exact-final-SHA browser evidence and owner visual review.\n''',
+          'docs/current/VISUAL-SYSTEM.md':'''\n\n## R7 Round 5 preview refinements — owner-directed, not production\n\nThese rules supersede only conflicting R7 preview behavior and remain feature-branch preview rules until owner acceptance/release.\n\n- Compact/mobile Hero keeps the synopsis text in project source/i18n but does not present it in the current mobile Hero composition; desktop Hero copy remains part of the approved reference.\n- Materials no longer presents the authorial-format explanatory note. On compact/mobile, previous/next arrow buttons are not shown in stage or fullscreen; touch/swipe is the primary navigation, while desktop arrows remain.\n- Actors and FAQ state changes should read as one continuous transformation: outgoing content softens, incoming content crossfades/reveals without a deliberate empty-panel phase, and the scene container must not jump.\n- CONTACT keeps the main line and endpoint/diamond. The visible signal is local to the endpoint area: fixed beacon plus a short subdued light impulse, never a long-distance travelling ball or flashing effect.\n- Mobile burger dismissal distinguishes deliberate outside tap/click from scroll/swipe movement; fullscreen content must not retain the open burger above it.\n- Profile help `?` is quiet at rest and clearly active only while its anchored panel is open; the panel contour is complete/clean and approximately follows the profile block width.\n- Public build/debug labels are not visitor-facing UI. `THEFT // PUBLIC FILE // 2045` remains the public footer signature and is shared by main and Reviews.\n''',
+          'docs/current/ROADMAP.md':'''\n\n## R7 Round 5 feature-branch history — 2026-09-12\n\n**Status:** IMPLEMENTED ON RESPONSIVE FEATURE BRANCH / OWNER VISUAL ACCEPTANCE PENDING / NOT PRODUCTION.\n\nOwner Round5 focuses on final public responsive interaction/polish rather than new product/backend scope: mobile Hero synopsis presentation, Materials copy/arrows, softer Actors/FAQ transitions, local CONTACT signal, robust burger dismissal/fullscreen behavior, burger REPORT contour cleanup, profile-help state/geometry, removal of public BUILD text and consistent PUBLIC FILE footer signature.\n\nNo Supabase/auth/review business-logic expansion is part of this round. Continue to require real browser evidence and explicit owner visual acceptance before R7 production/merge.\n'''
+          }
+          for name,add in additions.items():
+              p=Path(name); text=p.read_text(encoding='utf-8')
+              marker=add.strip().splitlines()[0]
+              if marker in text: raise SystemExit(f'duplicate documentation marker in {name}')
+              p.write_text(text.rstrip()+add+'\n',encoding='utf-8')
+          PY
+
+          git rm .github/workflows/r7-round5-owner-feedback.yml
+          git add index.html reviews.html js/site.js js/responsive-r7.js css/responsive-r7-polish.css docs/releases/revival/R7/OWNER-FEEDBACK-ROUND5.md docs/releases/revival/R7/PREVIEW-HANDOFF.md docs/current/VISUAL-SYSTEM.md docs/current/ROADMAP.md
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'REVIVAL R7: owner feedback round 5'
+          git rev-parse HEAD >/tmp/r7-round5-final-sha.txt
+          test -z "$(git status --porcelain)"
+
+      - name: Exact-final-SHA full browser verification
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: |
+          set -euo pipefail
+          FINAL_SHA="$(cat /tmp/r7-round5-final-sha.txt)"
+          test "$(git rev-parse HEAD)" = "$FINAL_SHA"
+          R7_OUT=/tmp/r7-round5-final R7_BASE=http://127.0.0.1:4191 R7_BEFORE=http://127.0.0.1:4190 R7_EXACT_SHA="$FINAL_SHA" node /tmp/r7-round5-qa.cjs
+          test "$(git rev-parse HEAD)" = "$FINAL_SHA"
+          test -z "$(git status --porcelain)"
+          printf '%s\n' "$FINAL_SHA" >/tmp/r7-round5-final/FINAL_SHA.txt
+
+      - name: Push exact verified final SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINAL_SHA="$(cat /tmp/r7-round5-final-sha.txt)"
+          git push origin HEAD:revival-r7-responsive-mobile
+          REMOTE="$(git ls-remote origin refs/heads/revival-r7-responsive-mobile | cut -f1)"
+          test "$REMOTE" = "$FINAL_SHA"
+          echo "FINAL_SHA=$FINAL_SHA"
+
+      - name: Upload Round5 exact-final browser evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-round5-exact-final-browser-evidence
+          path: /tmp/r7-round5-final

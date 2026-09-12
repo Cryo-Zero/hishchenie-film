@@ -11,6 +11,10 @@
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://cryo-zero.github.io/hishchenie-film/reviews.html">
   <link rel="stylesheet" href="css/site.css?v=revival-r6">
+<link rel="stylesheet" href="css/responsive-r7.css?v=r7-owner-20260911a">
+<link rel="stylesheet" href="css/responsive-r7-landscape.css?v=r7-owner-20260911a">
+<link rel="stylesheet" href="css/responsive-r7-polish.css?v=r7-owner-20260911a">
+<link rel="stylesheet" href="css/responsive-r7-owner-round2.css?v=r7-owner-20260911a">
 </head>
 <body class="community-page">
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
@@ -123,24 +127,26 @@
         </aside>
 
         <div class="review-feed">
-          <div class="community-feed-toolbar">
-            <div class="community-feed-heading">
-              <div class="composer-label">PUBLIC FEED // 2045</div>
-              <h2 data-i18n="reviewsTitle">Отзывы зрителей</h2>
-              <div class="feed-status-line"><div class="service-badge is-checking" id="reviewServiceBadge" role="status" aria-live="polite"><i></i><span data-i18n="serviceChecking">Проверка канала</span></div><span class="feed-records" id="feedRecords">0 RECORDS // LIVE</span></div>
+          <div class="r7-review-controls-dock" id="reviewControlsDock">
+            <div class="community-feed-toolbar">
+              <div class="community-feed-heading">
+                <div class="composer-label">PUBLIC FEED // 2045</div>
+                <h2 data-i18n="reviewsTitle">Отзывы зрителей</h2>
+                <div class="feed-status-line"><div class="service-badge is-checking" id="reviewServiceBadge" role="status" aria-live="polite"><i></i><span data-i18n="serviceChecking">Проверка канала</span></div><span class="feed-records" id="feedRecords">0 RECORDS // LIVE</span></div>
+              </div>
+              <div class="review-sort" role="group" aria-label="Review sorting">
+                <button class="review-sort-button active" type="button" data-sort="new" data-i18n="latest">Новые</button>
+                <button class="review-sort-button" type="button" data-sort="old" data-i18n="oldSort">Старые</button>
+                <button class="review-sort-button" type="button" data-sort="popular" data-i18n="popular">Популярные</button>
+              </div>
             </div>
-            <div class="review-sort" role="group" aria-label="Review sorting">
-              <button class="review-sort-button active" type="button" data-sort="new" data-i18n="latest">Новые</button>
-              <button class="review-sort-button" type="button" data-sort="old" data-i18n="oldSort">Старые</button>
-              <button class="review-sort-button" type="button" data-sort="popular" data-i18n="popular">Популярные</button>
+            <div class="review-display-settings">
+              <label class="lexicon-toggle" for="profanityFilterToggle">
+                <span><strong data-i18n="profanityFilter">Скрывать грубую лексику</strong></span>
+                <input id="profanityFilterToggle" type="checkbox" role="switch" aria-checked="false">
+                <i aria-hidden="true"></i>
+              </label>
             </div>
-          </div>
-          <div class="review-display-settings">
-            <label class="lexicon-toggle" for="profanityFilterToggle">
-              <span><strong data-i18n="profanityFilter">Скрывать грубую лексику</strong><small data-i18n="profanityFilterHint">Оригинал отзыва не изменяется. Скрытые слова можно показать отдельно.</small></span>
-              <input id="profanityFilterToggle" type="checkbox" role="switch" aria-checked="false">
-              <i aria-hidden="true"></i>
-            </label>
           </div>
           <div class="reviews-list" id="reviewsList"><div class="reviews-empty" data-i18n="reviewsEmpty">Пока нет отзывов. Ваша оценка может стать первой.</div></div>
         </div>
@@ -169,5 +175,6 @@
   <script src="js/site.js?v=revival-r6"></script>
   <script src="js/public-response.js?v=revival-r6"></script>
 
+<script src="js/responsive-r7.js?v=r7-owner-20260911a"></script>
 </body>
 </html>

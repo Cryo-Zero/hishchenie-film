@@ -1,0 +1,352 @@
+name: R7 Round5 owner feedback browser QA v6
+
+on:
+  push:
+    branches: [revival-r7-responsive-mobile]
+
+permissions:
+  contents: write
+
+jobs:
+  round5-v6:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard exact Round5 staging state
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=de8603819ada62a07a63d5aa398b356da2cfc750
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE"..HEAD | sort >/tmp/r7-round5-delta.txt
+          cat >/tmp/r7-round5-expected.txt <<'EOF'
+          .github/workflows/r7-round5-owner-feedback-v2.yml
+          .github/workflows/r7-round5-owner-feedback-v3.yml
+          .github/workflows/r7-round5-owner-feedback-v4.yml
+          .github/workflows/r7-round5-owner-feedback-v5.yml
+          .github/workflows/r7-round5-owner-feedback-v6.yml
+          .github/workflows/r7-round5-owner-feedback.yml
+          EOF
+          diff -u /tmp/r7-round5-expected.txt /tmp/r7-round5-delta.txt
+          git worktree add /tmp/r7-round5-before "$BASE"
+
+      - name: Reuse exact scoped Round5 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+          data=yaml.safe_load(Path('.github/workflows/r7-round5-owner-feedback-v5.yml').read_text(encoding='utf-8'))
+          runs={s.get('name'):s.get('run') for s in data['jobs']['round5-v5']['steps'] if s.get('name') and s.get('run')}
+          reuse=runs.get('Reuse scoped Round5 patch and docs scripts')
+          install=runs.get('Install Chromium QA runtime')
+          if not reuse or not install: raise SystemExit('v5 source steps missing')
+          Path('/tmp/r7-v5-reuse.sh').write_text(reuse,encoding='utf-8')
+          Path('/tmp/r7-v5-install.sh').write_text(install,encoding='utf-8')
+          PY
+          bash /tmp/r7-v5-reuse.sh
+          git diff --check
+          echo 'ROUND5_PATCHED_FILES'
+          git diff --name-only de8603819ada62a07a63d5aa398b356da2cfc750 -- | sort
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: bash /tmp/r7-v5-install.sh
+
+      - name: Create Materials A-B diagnostic probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat >/tmp/r7-materials-probe.cjs <<'NODE'
+          const { chromium } = require('playwright');
+
+          const label = process.env.PROBE_LABEL || 'UNKNOWN';
+          const url = process.env.PROBE_URL;
+          const action = process.env.PROBE_ACTION || 'click';
+          const limitBodyObserver = process.env.PROBE_LIMIT_BODY_OBSERVER === '1';
+          const navOpen = process.env.PROBE_NAV_OPEN === '1';
+          const actionTimeout = Number(process.env.PROBE_ACTION_TIMEOUT || 1800);
+
+          function out(type, data={}) {
+            console.log('DIAG', JSON.stringify({ label, action, type, at: Date.now(), ...data }));
+          }
+          const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+          async function bounded(name, promise, ms) {
+            let timer;
+            try {
+              return await Promise.race([
+                promise,
+                new Promise((_, reject) => { timer=setTimeout(() => reject(new Error(`${name}_TIMEOUT_${ms}`)), ms); })
+              ]);
+            } finally { clearTimeout(timer); }
+          }
+
+          (async () => {
+            out('WORKER_START', { url, limitBodyObserver, navOpen });
+            const browser = await chromium.launch({ headless:true });
+            const context = await browser.newContext({ viewport:{width:390,height:844}, hasTouch:true, isMobile:false, reducedMotion:'no-preference' });
+            await context.route('https://xltwwvutqkpmtmlavngi.supabase.co/**', route => route.abort());
+            await context.route('**/*.mp4', route => route.abort());
+
+            const page = await context.newPage();
+            const consoleErrors=[];
+            const pageErrors=[];
+            page.on('console', msg => {
+              const text=msg.text();
+              if (msg.type()==='error') consoleErrors.push(text);
+              if (text.startsWith('R7DIAG ')) console.log(text);
+            });
+            page.on('pageerror', error => pageErrors.push(String(error.message || error)));
+
+            await page.addInitScript(({ limitBodyObserver }) => {
+              const diag = window.__R7DIAG = { events:[], bodyObserverCallbacks:0, limitBodyObserver };
+              const stamp = (type, detail={}) => {
+                const event = {
+                  type,
+                  t: Number(performance.now().toFixed(3)),
+                  bodyClass: document.body?.className || '',
+                  active: document.activeElement ? (document.activeElement.id || document.activeElement.tagName) : '',
+                  ...detail
+                };
+                if (diag.events.length < 240) diag.events.push(event);
+                console.log('R7DIAG '+JSON.stringify(event));
+              };
+              window.__r7diagStamp = stamp;
+
+              const nativeAdd = EventTarget.prototype.addEventListener;
+              EventTarget.prototype.addEventListener = function(type, listener, options) {
+                if (this && this.id === 'archiveStage' && (type === 'click' || type === 'keydown') && typeof listener === 'function') {
+                  const wrapped = function(event) {
+                    stamp(type === 'click' ? 'STAGE_CLICK_HANDLER_ENTER' : 'STAGE_KEY_HANDLER_ENTER', { key:event.key || '' });
+                    try { return listener.call(this, event); }
+                    finally { stamp(type === 'click' ? 'STAGE_CLICK_HANDLER_EXIT' : 'STAGE_KEY_HANDLER_EXIT', { key:event.key || '' }); }
+                  };
+                  return nativeAdd.call(this, type, wrapped, options);
+                }
+                return nativeAdd.call(this, type, listener, options);
+              };
+
+              const NativeMO = window.MutationObserver;
+              window.__R7DIAG_NATIVE_MO = NativeMO;
+              window.MutationObserver = class DiagnosticMutationObserver {
+                constructor(callback) {
+                  this._bodyClass = false;
+                  this._count = 0;
+                  this._inner = new NativeMO((records) => {
+                    if (this._bodyClass) {
+                      this._count += 1;
+                      diag.bodyObserverCallbacks += 1;
+                      if (this._count <= 12) stamp('APP_BODY_MO_ENTER', { count:this._count, records:records.length });
+                      if (diag.limitBodyObserver && this._count > 1) {
+                        if (this._count <= 12) stamp('APP_BODY_MO_SUPPRESSED', { count:this._count });
+                        return;
+                      }
+                    }
+                    try { return callback(records, this); }
+                    finally {
+                      if (this._bodyClass && this._count <= 12) stamp('APP_BODY_MO_EXIT', { count:this._count });
+                    }
+                  });
+                }
+                observe(target, options) {
+                  if (target === document.body && options?.attributes && (!options.attributeFilter || options.attributeFilter.includes('class'))) {
+                    this._bodyClass = true;
+                    stamp('APP_BODY_MO_REGISTERED');
+                  }
+                  return this._inner.observe(target, options);
+                }
+                disconnect() { return this._inner.disconnect(); }
+                takeRecords() { return this._inner.takeRecords(); }
+              };
+
+              nativeAdd.call(document, 'pointerdown', e => stamp('POINTER_DOWN', { target:e.target?.id || e.target?.className || e.target?.tagName || '' }), true);
+              nativeAdd.call(document, 'pointerup', e => stamp('POINTER_UP', { target:e.target?.id || e.target?.className || e.target?.tagName || '' }), true);
+              nativeAdd.call(document, 'click', e => stamp('CLICK_CAPTURE', { target:e.target?.id || e.target?.className || e.target?.tagName || '' }), true);
+              nativeAdd.call(document, 'click', e => stamp('CLICK_BUBBLE', { target:e.target?.id || e.target?.className || e.target?.tagName || '' }), false);
+              nativeAdd.call(document, 'focusin', e => stamp('FOCUS_IN', { target:e.target?.id || e.target?.tagName || '' }), true);
+              nativeAdd.call(document, 'focusout', e => stamp('FOCUS_OUT', { target:e.target?.id || e.target?.tagName || '' }), true);
+            }, { limitBodyObserver });
+
+            await page.goto(url, { waitUntil:'domcontentloaded', timeout:10000 });
+            await page.waitForTimeout(300);
+            out('PAGE_LOADED', { href:page.url() });
+
+            const stage = page.locator('#archiveStage');
+            const count = await stage.count();
+            out('STAGE_EXISTS', { count });
+            if (!count) throw new Error('archiveStage missing');
+
+            if (navOpen) {
+              await page.evaluate(() => {
+                document.body.classList.add('nav-open');
+                document.getElementById('menuToggle')?.setAttribute('aria-expanded','true');
+              });
+              out('NAV_OPEN_PRIMED');
+            }
+
+            const beforeBox = await stage.boundingBox();
+            const computed = await page.evaluate(() => {
+              const el=document.getElementById('archiveStage');
+              const cs=getComputedStyle(el);
+              return { pointerEvents:cs.pointerEvents, visibility:cs.visibility, display:cs.display, opacity:cs.opacity, zIndex:cs.zIndex };
+            });
+            out('BEFORE_GEOMETRY', { box:beforeBox, computed });
+
+            if (beforeBox) {
+              const center={ x:beforeBox.x+beforeBox.width/2, y:beforeBox.y+beforeBox.height/2 };
+              const hit = await page.evaluate(({x,y}) => {
+                const el=document.elementFromPoint(x,y);
+                return el ? { id:el.id || '', tag:el.tagName, className:String(el.className || '') } : null;
+              }, center);
+              out('ELEMENT_FROM_POINT_BEFORE_SCROLL', { center, hit });
+            }
+
+            out('SCROLL_INTO_VIEW_BEFORE');
+            try {
+              await stage.scrollIntoViewIfNeeded({ timeout:1500 });
+              out('SCROLL_INTO_VIEW_AFTER', { ok:true });
+            } catch (error) {
+              out('SCROLL_INTO_VIEW_AFTER', { ok:false, error:String(error.message || error) });
+            }
+
+            const box = await stage.boundingBox();
+            let hit=null;
+            if (box) {
+              const center={ x:box.x+box.width/2, y:box.y+box.height/2 };
+              hit=await page.evaluate(({x,y}) => {
+                const el=document.elementFromPoint(x,y);
+                return el ? { id:el.id || '', tag:el.tagName, className:String(el.className || '') } : null;
+              }, center);
+            }
+            out('AFTER_SCROLL_GEOMETRY', { box, hit });
+
+            await page.evaluate(() => {
+              const stamp=window.__r7diagStamp;
+              const lightbox=document.getElementById('lightbox');
+              const NativeMO=window.__R7DIAG_NATIVE_MO;
+              if (lightbox && NativeMO) {
+                new NativeMO(() => {
+                  if (lightbox.classList.contains('open')) stamp('LIGHTBOX_CLASS_OPEN', { ariaHidden:lightbox.getAttribute('aria-hidden') });
+                }).observe(lightbox,{attributes:true,attributeFilter:['class','aria-hidden']});
+              }
+              if (NativeMO) {
+                new NativeMO(() => {
+                  if (document.body.classList.contains('lightbox-open')) stamp('BODY_LIGHTBOX_OPEN');
+                }).observe(document.body,{attributes:true,attributeFilter:['class']});
+              }
+            });
+
+            const beforeState = await page.evaluate(() => ({
+              bodyClass:document.body.className,
+              lightboxClass:document.getElementById('lightbox')?.className || '',
+              ariaHidden:document.getElementById('lightbox')?.getAttribute('aria-hidden') || '',
+              active:document.activeElement ? (document.activeElement.id || document.activeElement.tagName) : '',
+              scrollX, scrollY
+            }));
+            out('BEFORE_ACTION', { state:beforeState });
+
+            let result='UNKNOWN';
+            let errorText='';
+            try {
+              if (action === 'click') {
+                await stage.click({ timeout:actionTimeout });
+              } else if (action === 'enter') {
+                await stage.focus({ timeout:actionTimeout });
+                await stage.press('Enter', { timeout:actionTimeout });
+              } else if (action === 'js-click') {
+                await bounded('JS_CLICK', page.evaluate(() => document.getElementById('archiveStage').click()), actionTimeout);
+              } else if (action === 'dispatch') {
+                await bounded('DISPATCH', page.evaluate(() => document.getElementById('archiveStage').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window}))), actionTimeout);
+              } else if (action === 'bodyclass') {
+                await bounded('BODYCLASS', page.evaluate(() => document.body.classList.add('lightbox-open')), actionTimeout);
+              } else {
+                throw new Error(`unknown action ${action}`);
+              }
+              result='RESOLVED';
+              out('ACTION_RESOLVED');
+            } catch (error) {
+              result=String(error.message || error).includes('Timeout') || String(error.message || error).includes('_TIMEOUT_') ? 'TIMEOUT' : 'ERROR';
+              errorText=String(error.message || error);
+              out('ACTION_FAILED', { result, error:errorText });
+            }
+
+            let afterState=null;
+            try {
+              afterState=await bounded('AFTER_STATE', page.evaluate(() => ({
+                bodyClass:document.body.className,
+                lightboxClass:document.getElementById('lightbox')?.className || '',
+                ariaHidden:document.getElementById('lightbox')?.getAttribute('aria-hidden') || '',
+                active:document.activeElement ? (document.activeElement.id || document.activeElement.tagName) : '',
+                scrollX, scrollY,
+                diag:window.__R7DIAG
+              })), 900);
+              out('AFTER_STATE', { state:afterState });
+            } catch (error) {
+              out('AFTER_STATE_UNAVAILABLE', { error:String(error.message || error) });
+            }
+
+            out('ERRORS', { consoleErrors, pageErrors });
+            out('WORKER_RESULT', { result, error:errorText, afterStateAvailable:Boolean(afterState) });
+            try { await bounded('BROWSER_CLOSE', browser.close(), 1000); } catch (_) {}
+            process.exit(0);
+          })().catch(error => {
+            out('WORKER_FATAL', { error:String(error.stack || error) });
+            process.exit(0);
+          });
+          NODE
+          node --check /tmp/r7-materials-probe.cjs
+
+      - name: Run controlled Round4 vs Round5 Materials diagnostic
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7-materials-diagnostic
+          python3 -m http.server 4190 --directory /tmp/r7-round5-before >/tmp/r7-r4-server.log 2>&1 &
+          PID_BEFORE=$!
+          python3 -m http.server 4191 --directory "$GITHUB_WORKSPACE" >/tmp/r7-r5-server.log 2>&1 &
+          PID_AFTER=$!
+          cleanup() { kill "$PID_BEFORE" "$PID_AFTER" 2>/dev/null || true; wait "$PID_BEFORE" "$PID_AFTER" 2>/dev/null || true; }
+          trap cleanup EXIT
+          sleep 1
+
+          run_probe() {
+            local label="$1" url="$2" action="$3" limit="${4:-0}" nav="${5:-0}"
+            echo "===== PROBE $label $action limit=$limit nav=$nav =====" | tee -a /tmp/r7-materials-diagnostic/report.log
+            set +e
+            PROBE_LABEL="$label" PROBE_URL="$url" PROBE_ACTION="$action" PROBE_LIMIT_BODY_OBSERVER="$limit" PROBE_NAV_OPEN="$nav" PROBE_ACTION_TIMEOUT=1800 \
+              timeout --signal=KILL 10s node /tmp/r7-materials-probe.cjs 2>&1 | tee -a /tmp/r7-materials-diagnostic/report.log
+            local code=${PIPESTATUS[0]}
+            set -e
+            echo "PROBE_EXIT $label $action $code" | tee -a /tmp/r7-materials-diagnostic/report.log
+            pkill -9 -f 'chromium.*--headless' 2>/dev/null || true
+            sleep .2
+          }
+
+          for action in click enter js-click dispatch bodyclass; do
+            run_probe ROUND4 http://127.0.0.1:4190/index.html#materials "$action"
+          done
+          for action in click enter js-click dispatch bodyclass; do
+            run_probe ROUND5 http://127.0.0.1:4191/index.html#materials "$action"
+          done
+
+          # Diagnostic-only intervention: suppress re-entrant callbacks AFTER the first
+          # body-class observer callback. This is not a proposed final repair.
+          run_probe ROUND5_OBSERVER_CAP http://127.0.0.1:4191/index.html#materials click 1 0
+          run_probe ROUND5_OBSERVER_CAP_NAVOPEN http://127.0.0.1:4191/index.html#materials click 1 1
+          run_probe ROUND5_OBSERVER_CAP_BODYCLASS http://127.0.0.1:4191/index.html#materials bodyclass 1 0
+
+          echo '===== DIAGNOSTIC COMPLETE =====' | tee -a /tmp/r7-materials-diagnostic/report.log
+
+      - name: Upload Materials diagnostic evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-round5-materials-ab-diagnostic
+          path: /tmp/r7-materials-diagnostic

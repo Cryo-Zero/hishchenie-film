@@ -1,0 +1,125 @@
+name: R7 Round5 owner feedback browser QA v2
+
+on:
+  push:
+    branches: [revival-r7-responsive-mobile]
+
+permissions:
+  contents: write
+
+jobs:
+  round5-v2:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard Round5 staging state
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=de8603819ada62a07a63d5aa398b356da2cfc750
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE"..HEAD | sort >/tmp/r7-round5-delta.txt
+          cat >/tmp/r7-round5-expected.txt <<'EOF'
+          .github/workflows/r7-round5-owner-feedback-v2.yml
+          .github/workflows/r7-round5-owner-feedback.yml
+          EOF
+          diff -u /tmp/r7-round5-expected.txt /tmp/r7-round5-delta.txt
+          git worktree add /tmp/r7-round5-before "$BASE"
+
+      - name: Extract verified Round5 scripts and repair matcher only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          old_workflow = Path('.github/workflows/r7-round5-owner-feedback.yml')
+          data = yaml.safe_load(old_workflow.read_text(encoding='utf-8'))
+          steps = data['jobs']['round5']['steps']
+          runs = {step.get('name'): step.get('run') for step in steps if step.get('name') and step.get('run')}
+
+          needed = [
+              'Apply scoped Round5 runtime patch',
+              'Install Chromium QA runtime',
+              'Create Round5 browser QA script',
+              'Pre-commit full browser matrix',
+              'Write additive Round5 documentation and clean QA harness',
+              'Exact-final-SHA full browser verification',
+              'Push exact verified final SHA',
+          ]
+          missing = [name for name in needed if name not in runs]
+          if missing:
+              raise SystemExit(f'missing source workflow steps: {missing}')
+
+          apply = runs['Apply scoped Round5 runtime patch']
+          needle = "replace_once('js/site.js', old, new)"
+          if apply.count(needle) != 1:
+              raise SystemExit(f'expected one site.js replacement call, got {apply.count(needle)}')
+          resilient = """p = Path('js/site.js')
+          site = p.read_text(encoding='utf-8')
+          start = site.find('  function stagedReveal(panel, writeValues) {')
+          end = site.find('\\n  function closeNav()', start)
+          if start < 0 or end < 0:
+              raise SystemExit('js/site.js: stagedReveal boundaries not found')
+          p.write_text(site[:start] + new + site[end:], encoding='utf-8')"""
+          apply = apply.replace(needle, resilient, 1)
+          Path('/tmp/r7-round5-apply.sh').write_text(apply, encoding='utf-8')
+
+          Path('/tmp/r7-round5-install.sh').write_text(runs['Install Chromium QA runtime'], encoding='utf-8')
+          Path('/tmp/r7-round5-create-qa.sh').write_text(runs['Create Round5 browser QA script'], encoding='utf-8')
+          Path('/tmp/r7-round5-pre.sh').write_text(runs['Pre-commit full browser matrix'], encoding='utf-8')
+
+          docs = runs['Write additive Round5 documentation and clean QA harness']
+          rm_old = 'git rm .github/workflows/r7-round5-owner-feedback.yml'
+          rm_both = 'git rm .github/workflows/r7-round5-owner-feedback.yml .github/workflows/r7-round5-owner-feedback-v2.yml'
+          if docs.count(rm_old) != 1:
+              raise SystemExit('documentation cleanup git rm marker mismatch')
+          docs = docs.replace(rm_old, rm_both, 1)
+          Path('/tmp/r7-round5-docs.sh').write_text(docs, encoding='utf-8')
+
+          Path('/tmp/r7-round5-exact.sh').write_text(runs['Exact-final-SHA full browser verification'], encoding='utf-8')
+          Path('/tmp/r7-round5-push.sh').write_text(runs['Push exact verified final SHA'], encoding='utf-8')
+          PY
+
+      - name: Apply scoped Round5 runtime patch
+        shell: bash
+        run: bash /tmp/r7-round5-apply.sh
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: bash /tmp/r7-round5-install.sh
+
+      - name: Create Round5 browser QA script
+        shell: bash
+        run: bash /tmp/r7-round5-create-qa.sh
+
+      - name: Pre-commit full browser matrix
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: bash /tmp/r7-round5-pre.sh
+
+      - name: Write docs, remove both temporary workflows, create clean final commit
+        shell: bash
+        run: bash /tmp/r7-round5-docs.sh
+
+      - name: Exact-final-SHA full browser verification
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: bash /tmp/r7-round5-exact.sh
+
+      - name: Push exact verified final SHA
+        shell: bash
+        run: bash /tmp/r7-round5-push.sh
+
+      - name: Upload Round5 exact-final browser evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-round5-exact-final-browser-evidence
+          path: /tmp/r7-round5-final

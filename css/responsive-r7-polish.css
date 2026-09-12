@@ -1,0 +1,945 @@
+/* ========================================================================== */
+/* REVIVAL R7 — visual QA polish                                              */
+/* Small conflict fixes discovered by actual Chromium screenshot review.      */
+/* ========================================================================== */
+
+/* The legacy desktop Reviews workspace can carry screen-mode/sticky/overflow
+   assumptions. In compact contexts the composer and feed must be ordinary
+   sequential document flow: profile/rating/text/publish first, feed second. */
+@media (max-width: 820px) {
+  body.community-page .community-section,
+  body.community-page .community-layout,
+  body.community-page .community-sidebar,
+  body.community-page .review-composer,
+  body.community-page .review-feed {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  body.community-page .community-layout {
+    display: block !important;
+  }
+
+  body.community-page .community-sidebar {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+  }
+
+  body.community-page .review-feed {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    margin-top: 22px !important;
+  }
+}
+
+body.r7-phone-landscape.community-page .community-section,
+body.r7-phone-landscape.community-page .community-layout,
+body.r7-phone-landscape.community-page .community-sidebar,
+body.r7-phone-landscape.community-page .review-composer,
+body.r7-phone-landscape.community-page .review-feed {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+body.r7-phone-landscape.community-page .community-layout {
+  display: block !important;
+}
+
+body.r7-phone-landscape.community-page .community-sidebar,
+body.r7-phone-landscape.community-page .review-feed {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+}
+
+body.r7-phone-landscape.community-page .review-feed {
+  margin-top: 18px !important;
+}
+
+/* Keep mobile reply/editor controls inside the record instead of inheriting
+   desktop side offsets. */
+@media (max-width: 820px) {
+  body.community-page .review-replies,
+  body.community-page .review-inline-editor {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+body.r7-phone-landscape.community-page .review-replies,
+body.r7-phone-landscape.community-page .review-inline-editor {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* ========================================================================== */
+/* OWNER FEEDBACK PASS — 2026-09-10                                           */
+/* ========================================================================== */
+
+/* Navigation --------------------------------------------------------------- */
+/* Repeat HOME in the burger for discoverability; keep the desktop wordmark
+   itself clickable. REPORT lives after FAQ in the navigation on every device. */
+.r7-nav-home {
+  display: none !important;
+}
+
+.r7-nav-report {
+  color: #9abfc1 !important;
+}
+
+.footer-report {
+  display: none !important;
+}
+
+@media (max-width: 980px) {
+  .site-header .nav-links .r7-nav-home,
+  .site-header .nav-links .r7-nav-report {
+    display: flex !important;
+    min-height: 50px !important;
+    align-items: center !important;
+  }
+
+  .site-header .nav-links .r7-nav-home {
+    color: #d9e5e5 !important;
+    border-bottom-color: rgba(155,196,199,.24) !important;
+  }
+}
+
+@media (min-width: 981px) {
+  .site-header .nav-links .r7-nav-report {
+    display: flex !important;
+  }
+  .site-header .nav-links {
+    font-size: 9px !important;
+  }
+}
+
+/* Mobile rating: retain the numeric score and put it to the RIGHT of the ring,
+   both inside the existing rectangular header control. */
+@media (max-width: 820px) {
+  .header-rating {
+    width: auto !important;
+    min-width: 78px !important;
+    padding: 0 8px !important;
+    gap: 7px !important;
+    flex-direction: row !important;
+  }
+  .header-rating-copy {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    clip-path: none !important;
+    display: flex !important;
+  }
+  .header-rating-copy strong {
+    font-size: 13px !important;
+  }
+  .header-rating-copy small {
+    font-size: 8px !important;
+  }
+}
+
+/* Round2 historical note: Reviews once kept a special fixed mobile header.
+   Round3 owner feedback supersedes that behavior; feed controls now use normal flow. */
+
+/* Hero -------------------------------------------------------------------- */
+.r7-mobile-hero-actions {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  .hero-inner {
+    align-items: start !important;
+  }
+  .hero-poster-frame {
+    order: 1 !important;
+    width: min(100%, 470px) !important;
+    margin-top: 0 !important;
+  }
+  .r7-mobile-hero-actions {
+    order: 2 !important;
+    width: min(100%, 470px) !important;
+    justify-self: center;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin-top: -20px !important;
+  }
+  .r7-mobile-hero-actions .button {
+    width: 100% !important;
+    min-height: 48px !important;
+  }
+  .hero-copy-column {
+    order: 3 !important;
+  }
+  .hero-copy-column > .hero-actions {
+    display: none !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .r7-mobile-hero-actions {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+body.r7-phone-landscape .hero-inner {
+  grid-template-areas:
+    "copy poster"
+    "copy actions" !important;
+  align-items: start !important;
+}
+body.r7-phone-landscape .hero-copy-column {
+  grid-area: copy !important;
+  order: initial !important;
+}
+body.r7-phone-landscape .hero-poster-frame {
+  grid-area: poster !important;
+  order: initial !important;
+}
+body.r7-phone-landscape .r7-mobile-hero-actions {
+  grid-area: actions !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap: 7px !important;
+  margin-top: 8px !important;
+}
+body.r7-phone-landscape .hero-copy-column > .hero-actions {
+  display: none !important;
+}
+body.r7-phone-landscape .r7-mobile-hero-actions .button {
+  min-height: 44px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+/* Archive / Materials ------------------------------------------------------ */
+/* The handle is a MATERIALS-local control, not a persistent site control. */
+#materials .archive-drawer-shell:not(.r7-materials-active) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+#materials .archive-drawer-shell.r7-materials-active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Round2 historical note: compact Archive stage previously followed each
+   asset's natural aspect ratio. Round3 owner feedback requires stable stage geometry. */
+@media (max-width: 820px) {
+  #materials .archive-stage-wrap {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+  }
+  #materials .archive-stage {
+    width: 100% !important;
+    height: clamp(320px, 56dvh, 500px) !important;
+    min-height: 0 !important;
+    max-height: 500px !important;
+    aspect-ratio: auto !important;
+  }
+  #materials .archive-stage img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+  #materials .archive-stage-wrap .gallery-button {
+    position: absolute !important;
+    z-index: 6 !important;
+    top: 50% !important;
+    width: 42px !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    transform: translateY(-50%) !important;
+  }
+  #materials .archive-stage-wrap .gallery-button.prev { left: 6px !important; }
+  #materials .archive-stage-wrap .gallery-button.next { right: 6px !important; }
+}
+
+/* Sequential FAQ / Actors ------------------------------------------------- */
+.r7-sequence-back {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  body.r7-sequential-ui #cast.r7-dossier-open .cast-list,
+  body.r7-sequential-ui #faq.r7-response-open .faq-query-list {
+    display: none !important;
+  }
+  body.r7-sequential-ui #cast:not(.r7-dossier-open) .subject-dossier,
+  body.r7-sequential-ui #faq:not(.r7-response-open) .faq-response-panel {
+    display: none !important;
+  }
+  body.r7-sequential-ui .r7-dossier-open .r7-subject-back,
+  body.r7-sequential-ui .r7-response-open .r7-query-back {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    width: fit-content;
+    min-height: 42px;
+    margin: 0 0 14px;
+    padding: 0 11px;
+    border: 1px solid rgba(122,151,153,.20);
+    background: rgba(6,11,12,.64);
+    color: #89a5a7;
+    font: 700 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+    letter-spacing: 1.1px;
+    cursor: pointer;
+  }
+  body.r7-sequential-ui #cast .subject-dossier,
+  body.r7-sequential-ui #faq .faq-response-panel {
+    min-height: 0 !important;
+  }
+  body.r7-sequential-ui #faq .faq-response-content {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  body.r7-sequential-ui #faq .faq-response-panel,
+  body.r7-sequential-ui #cast .subject-dossier {
+    scroll-margin-top: calc(var(--header-h) + 12px);
+  }
+}
+
+/* Slow the shared reveal enough to read as a deliberate transition rather than
+   an anchor jump. Geometry stays reserved while content changes. */
+@media (max-width: 820px) {
+  .subject-dossier.is-revealed .dossier-reveal > *,
+  .faq-response-panel.is-revealed .faq-response-content > *,
+  .faq-response-panel.is-revealed .faq-system-box > div,
+  .faq-response-panel.is-revealed .faq-response-log {
+    transition-duration: .36s, .58s !important;
+  }
+}
+
+/* Legibility pass ---------------------------------------------------------- */
+/* The world can stay restrained without forcing important information into
+   6–8px type. Decorative build marks remain deliberately secondary. */
+.section-note,
+.trailer-language-note,
+.watch-intro {
+  font-size: max(12px, .72rem) !important;
+}
+
+.signal-meta,
+.archive-stage-meta,
+.archive-bottom-code,
+.dossier-topline,
+.dossier-subject,
+.dossier-prompt,
+.faq-response-header,
+.faq-response-code,
+.faq-system-box span,
+.feed-records,
+.service-badge,
+.review-enter-hint,
+.human-check-note,
+.review-action-button,
+.reply-head time,
+.review-edited {
+  font-size: max(9px, .56rem) !important;
+}
+
+.dossier-data small,
+.audience-pulse-data dt,
+.audience-pulse-foot,
+.contact-signal-copy span,
+.contact-signal-status,
+.build-mark,
+.footer-system {
+  font-size: max(8px, .5rem) !important;
+}
+
+.review-card-text,
+.review-reply p,
+.profile-data p,
+.lexicon-toggle small {
+  font-size: max(12px, .75rem) !important;
+}
+
+.review-identity span,
+.reply-head,
+.review-sort-button,
+.micro-button,
+.field-heading small {
+  font-size: max(10px, .625rem) !important;
+}
+
+@media (max-width: 820px) {
+  .section-label,
+  .composer-label,
+  .metric-kicker {
+    font-size: 11px !important;
+  }
+  .hero-system-strip,
+  .poster-hud,
+  .archive-bottom-code,
+  .signal-meta,
+  .service-badge,
+  .feed-records,
+  .dossier-topline,
+  .dossier-subject,
+  .dossier-data small,
+  .dossier-prompt,
+  .faq-query-item > span,
+  .faq-response-header,
+  .faq-response-code,
+  .faq-system-box span,
+  .audience-pulse-head,
+  .audience-pulse-data dt,
+  .audience-pulse-foot,
+  .review-edited,
+  .review-enter-hint,
+  .human-check-note {
+    font-size: 10px !important;
+    line-height: 1.45 !important;
+  }
+  .profile-data p,
+  .section-note,
+  .community-hero p,
+  .review-card-text,
+  .review-reply p,
+  .lexicon-toggle small {
+    font-size: 13px !important;
+    line-height: 1.58 !important;
+  }
+  .review-identity span,
+  .reply-head,
+  .review-action-button,
+  .micro-button,
+  .review-sort-button,
+  .field-heading small {
+    font-size: 11px !important;
+  }
+}
+
+
+/* OWNER FEEDBACK ROUND 3 — 2026-09-11 */
+
+/* Reviews: public-feed controls leave the viewport in normal document flow.
+   The global R7 site header keeps its ordinary sticky behavior; there is no
+   Reviews-only fixed header mode. */
+@media (max-width: 980px) {
+  body.community-page .site-header {
+    position: sticky !important;
+    top: 0 !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    width: 100% !important;
+  }
+  body.community-page main { padding-top: 0 !important; }
+  body.community-page .community-feed-toolbar,
+  body.community-page .review-display-settings,
+  body.community-page .review-sort {
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+  }
+}
+
+/* Keep the profanity toggle, remove only its explanatory copy from presentation. */
+.lexicon-toggle small[data-i18n="profanityFilterHint"] { display: none !important; }
+
+/* Compact Materials-local Archive drawer. */
+@media (max-width: 820px) {
+  #materials .archive-drawer-shell {
+    --archive-drawer-width: min(76vw, 300px) !important;
+    height: min(58dvh, 560px) !important;
+  }
+  #materials .archive-drawer {
+    height: min(58dvh, 560px) !important;
+    max-height: 58dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+  #materials .archive-drawer-head {
+    flex: 0 0 auto !important;
+    margin-bottom: 10px !important;
+  }
+  #materials .archive-drawer-grid {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    scrollbar-width: thin;
+  }
+  #materials .archive-drawer-toggle {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 76px !important;
+    min-height: 76px !important;
+    max-height: 76px !important;
+  }
+}
+
+/* Phone landscape is width-wide but height-starved, so it needs its own drawer
+   constraints rather than inheriting portrait max-width rules. */
+body.r7-phone-landscape #materials .archive-drawer-shell {
+  --archive-drawer-width: min(70vw, 290px) !important;
+  height: clamp(190px, 56dvh, 250px) !important;
+}
+body.r7-phone-landscape #materials .archive-drawer {
+  height: clamp(190px, 56dvh, 250px) !important;
+  max-height: 56dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+body.r7-phone-landscape #materials .archive-drawer-head {
+  flex: 0 0 auto !important;
+  margin-bottom: 8px !important;
+}
+body.r7-phone-landscape #materials .archive-drawer-grid {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+  scrollbar-width: thin;
+}
+body.r7-phone-landscape #materials .archive-drawer-toggle {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 72px !important;
+  min-height: 72px !important;
+  max-height: 72px !important;
+}
+body.r7-phone-landscape #materials .archive-stage {
+  height: clamp(220px, 58dvh, 300px) !important;
+  min-height: 0 !important;
+  max-height: 300px !important;
+  aspect-ratio: auto !important;
+}
+body.r7-phone-landscape #materials .archive-stage img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+}
+
+/* CONTACT: fixed endpoint dot; only opacity/glow pulse, no X travel. */
+.contact-signal-track i {
+  left: auto !important;
+  right: 12px !important;
+  transform: none !important;
+  animation: r7ContactEndpointPulse 2.8s ease-in-out infinite !important;
+}
+@keyframes r7ContactEndpointPulse {
+  0%, 100% { opacity: .42; box-shadow: 0 0 7px rgba(155,196,199,.36); }
+  50% { opacity: 1; box-shadow: 0 0 14px rgba(155,196,199,.72); }
+}
+
+/* Targeted information-bearing microcopy readability pass. */
+.current-signal::after,
+.signal-log-row time,
+.signal-log-row b,
+.signal-data dt,
+.hero-system-strip,
+.poster-hud,
+.signal-meta,
+.archive-stage-meta,
+.archive-bottom-code,
+.archive-drawer-head,
+.archive-drawer-grid .gallery-card::after,
+.dossier-topline,
+.dossier-subject,
+.dossier-prompt,
+.faq-query-item > span,
+.faq-response-header,
+.faq-response-code,
+.faq-system-box span,
+.feed-records,
+.service-badge,
+.review-enter-hint,
+.human-check-note,
+.reply-head time,
+.review-edited,
+.audience-pulse-head {
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+}
+
+.dossier-data small,
+.audience-pulse-data dt,
+.audience-pulse-foot,
+.contact-signal-copy span,
+.contact-signal-status,
+.footer-system,
+.build-mark {
+  font-size: 10px !important;
+  line-height: 1.4 !important;
+}
+
+.signal-foot {
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+}
+
+@media (max-width: 820px) {
+  .current-signal::after,
+  .signal-log-row time,
+  .signal-log-row b,
+  .signal-data dt { font-size: 9px !important; }
+
+  .hero-system-strip,
+  .poster-hud,
+  .signal-meta,
+  .archive-stage-meta,
+  .archive-bottom-code,
+  .archive-drawer-head,
+  .archive-drawer-grid .gallery-card::after,
+  .dossier-topline,
+  .dossier-subject,
+  .dossier-prompt,
+  .faq-query-item > span,
+  .faq-response-header,
+  .faq-response-code,
+  .faq-system-box span,
+  .feed-records,
+  .service-badge,
+  .review-enter-hint,
+  .human-check-note,
+  .reply-head time,
+  .review-edited,
+  .audience-pulse-head { font-size: 11px !important; }
+
+  .dossier-data small,
+  .audience-pulse-data dt,
+  .audience-pulse-foot,
+  .contact-signal-copy span,
+  .contact-signal-status,
+  .footer-system,
+  .build-mark { font-size: 10px !important; }
+
+  .signal-foot { font-size: 8px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-signal-track i {
+    animation: none !important;
+    opacity: .78 !important;
+    box-shadow: 0 0 9px rgba(155,196,199,.46) !important;
+  }
+}
+
+
+/* ========================================================================== */
+/* OWNER FEEDBACK ROUND 4 — 2026-09-11                                       */
+/* Later owner direction intentionally supersedes selected Round3 preview      */
+/* behavior while leaving historical rules above intact for traceability.      */
+/* ========================================================================== */
+
+.contact-signal-track i {
+  left: auto !important;
+  right: 12px !important;
+  transform: translateX(0) !important;
+  animation: r7ContactLocalSignal 3.2s ease-in-out infinite alternate !important;
+  will-change: transform, opacity, box-shadow;
+}
+@keyframes r7ContactLocalSignal {
+  0% { transform: translateX(0); opacity: .54; box-shadow: 0 0 7px rgba(155,196,199,.38); }
+  100% { transform: translateX(-8px); opacity: .96; box-shadow: 0 0 13px rgba(155,196,199,.68); }
+}
+
+body.r7-sequential-ui #cast.r7-dossier-open .dossier-prompt.r7-subject-return {
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: center;
+  width: 100%;
+  padding: 8px 10px !important;
+  border: 1px solid rgba(122,151,153,.18);
+  background: rgba(7,13,14,.38);
+  color: #9bb1b3;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color .18s ease, background .18s ease, color .18s ease;
+}
+body.r7-sequential-ui #cast.r7-dossier-open .dossier-prompt.r7-subject-return:hover,
+body.r7-sequential-ui #cast.r7-dossier-open .dossier-prompt.r7-subject-return:focus-visible {
+  border-color: rgba(189,232,237,.58);
+  background: rgba(21,38,40,.58);
+  color: #e3eded;
+  outline: 1px solid rgba(189,232,237,.24);
+  outline-offset: 2px;
+}
+
+.signal-log-row .signal-log-id {
+  color: #4f6668;
+  font: 500 11px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing: 1.1px;
+  margin-top: 0;
+}
+
+.r7-mobile-archive-toggle { display: none; }
+@media (max-width: 820px) {
+  #materials .archive-drawer-toggle { display: none !important; }
+  #materials .r7-mobile-archive-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    justify-self: start;
+    width: auto;
+    min-width: 148px;
+    min-height: 44px;
+    margin: 0 0 -2px;
+    padding: 0 14px;
+    border: 1px solid rgba(122,151,153,.26);
+    border-radius: 0;
+    background: linear-gradient(90deg, rgba(13,23,24,.84), rgba(8,13,14,.62));
+    color: #a8bfc1;
+    font: 700 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  #materials .r7-mobile-archive-toggle:hover,
+  #materials .r7-mobile-archive-toggle:focus-visible,
+  #materials .r7-mobile-archive-toggle[aria-expanded="true"] {
+    border-color: rgba(189,232,237,.58);
+    color: #e5eeee;
+    background: linear-gradient(90deg, rgba(23,42,44,.88), rgba(10,18,19,.74));
+    outline: none;
+  }
+}
+body.r7-phone-landscape #materials .archive-drawer-toggle { display: none !important; }
+body.r7-phone-landscape #materials .r7-mobile-archive-toggle {
+  display: inline-flex !important;
+  align-items: center;
+  min-height: 40px;
+  margin: 0 0 -4px;
+  padding: 0 12px;
+  border: 1px solid rgba(122,151,153,.26);
+  border-radius: 0;
+  background: rgba(9,16,17,.78);
+  color: #a8bfc1;
+  font: 700 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+}
+
+.community-metric.freshness-mini .freshness-ring {
+  position: relative !important;
+  display: block !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+}
+.community-metric.freshness-mini .freshness-ring-inner {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px;
+  padding: 8px !important;
+  text-align: center !important;
+  transform: none !important;
+}
+.community-metric.freshness-mini .freshness-ring-inner strong,
+.community-metric.freshness-mini .freshness-ring-inner span {
+  margin: 0 !important;
+  text-align: center !important;
+  max-width: 100% !important;
+}
+.community-metric.freshness-mini .freshness-ring-inner span { line-height: 1.22 !important; }
+
+.profile-help-toggle[aria-expanded="true"] {
+  border-color: rgba(189,232,237,.78) !important;
+  background: rgba(26,48,51,.68) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+.profile-help-panel .info-overlay-card {
+  background: rgba(7,13,14,.84) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+.profile-help-panel .info-overlay-card::before { background: rgba(7,13,14,.84) !important; }
+
+.r7-review-controls-dock { display: contents; }
+@media (max-width: 820px) {
+  body.community-page .r7-review-controls-dock {
+    position: sticky;
+    z-index: 46;
+    top: calc(var(--header-h) + var(--r7-safe-top) + 6px);
+    display: grid;
+    gap: 7px;
+    margin: 0 0 14px;
+    padding: 9px 10px;
+    border: 1px solid rgba(122,151,153,.20);
+    background: rgba(7,11,12,.91);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 10px 26px rgba(0,0,0,.24);
+    transition: top .24s ease, background .24s ease, box-shadow .24s ease;
+  }
+  body.community-page.r7-header-hidden .r7-review-controls-dock { top: 6px; }
+  body.community-page .r7-review-controls-dock .community-feed-toolbar {
+    margin: 0 !important;
+    display: grid !important;
+    gap: 7px !important;
+  }
+  body.community-page .r7-review-controls-dock .community-feed-heading { gap: 3px; }
+  body.community-page .r7-review-controls-dock .community-feed-toolbar h2 {
+    font-size: 17px !important;
+    line-height: 1.05 !important;
+  }
+  body.community-page .r7-review-controls-dock .feed-status-line { gap: 8px; }
+  body.community-page .r7-review-controls-dock .review-sort {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 5px !important;
+  }
+  body.community-page .r7-review-controls-dock .review-sort-button {
+    min-height: 34px !important;
+    padding: 6px 7px !important;
+    font-size: 10px !important;
+  }
+  body.community-page .r7-review-controls-dock .review-display-settings {
+    margin: 0 !important;
+    padding-top: 7px;
+    border-top: 1px solid rgba(122,151,153,.13);
+  }
+  body.community-page .r7-review-controls-dock .lexicon-toggle { min-height: 34px; }
+}
+body.r7-phone-landscape.community-page .r7-review-controls-dock {
+  position: sticky;
+  z-index: 46;
+  top: calc(var(--header-h) + var(--r7-safe-top) + 4px);
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 6px 10px;
+  margin: 0 0 12px;
+  padding: 7px 9px;
+  border: 1px solid rgba(122,151,153,.20);
+  background: rgba(7,11,12,.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: top .2s ease;
+}
+body.r7-phone-landscape.community-page.r7-header-hidden .r7-review-controls-dock { top: 4px; }
+body.r7-phone-landscape.community-page .r7-review-controls-dock .community-feed-toolbar { display: contents !important; }
+body.r7-phone-landscape.community-page .r7-review-controls-dock .community-feed-heading { gap: 2px; }
+body.r7-phone-landscape.community-page .r7-review-controls-dock .community-feed-toolbar h2 { font-size: 15px !important; }
+body.r7-phone-landscape.community-page .r7-review-controls-dock .review-sort {
+  display: grid !important;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px !important;
+  align-self: center;
+}
+body.r7-phone-landscape.community-page .r7-review-controls-dock .review-sort-button {
+  min-height: 32px !important;
+  padding: 5px 7px !important;
+  font-size: 9px !important;
+}
+body.r7-phone-landscape.community-page .r7-review-controls-dock .review-display-settings {
+  grid-column: 1 / -1;
+  margin: 0 !important;
+  padding-top: 5px;
+  border-top: 1px solid rgba(122,151,153,.13);
+}
+
+@media (max-width: 820px) {
+  body.r7-smart-header .site-header {
+    transition: transform .26s cubic-bezier(.2,.72,.2,1), opacity .2s ease !important;
+    will-change: transform, opacity;
+  }
+  body.r7-smart-header.r7-header-hidden:not(.nav-open) .site-header {
+    transform: translateY(calc(-100% - 2px)) !important;
+    opacity: .02;
+    pointer-events: none;
+  }
+  body.r7-smart-header.nav-open .site-header {
+    transform: none !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+}
+body.r7-phone-landscape.r7-smart-header .site-header {
+  transition: transform .22s cubic-bezier(.2,.72,.2,1), opacity .18s ease !important;
+  will-change: transform, opacity;
+}
+body.r7-phone-landscape.r7-smart-header.r7-header-hidden:not(.nav-open) .site-header {
+  transform: translateY(calc(-100% - 2px)) !important;
+  opacity: .02;
+  pointer-events: none;
+}
+body.r7-phone-landscape.r7-smart-header.nav-open .site-header {
+  transform: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+@media (max-width: 820px) {
+  .signal-log-row .signal-log-id { font-size: 9px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-signal-track i {
+    animation: none !important;
+    transform: none !important;
+    opacity: .78 !important;
+    box-shadow: 0 0 9px rgba(155,196,199,.46) !important;
+    will-change: auto;
+  }
+  body.r7-smart-header .site-header,
+  body.r7-phone-landscape.r7-smart-header .site-header,
+  body.community-page .r7-review-controls-dock,
+  body.r7-phone-landscape.community-page .r7-review-controls-dock {
+    transition-duration: .01ms !important;
+  }
+}
+
+
+/* ROUND4 REAL-BROWSER CORRECTIONS */
+@property --r7-contact-shift {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+.contact-signal-track i {
+  --r7-contact-shift: 0px;
+  transform: translateX(var(--r7-contact-shift)) !important;
+  animation: r7ContactLocalSignalFixed 3.2s ease-in-out infinite alternate !important;
+}
+@keyframes r7ContactLocalSignalFixed {
+  0% { --r7-contact-shift: 0px; opacity: .54; box-shadow: 0 0 7px rgba(155,196,199,.38); }
+  100% { --r7-contact-shift: -8px; opacity: .96; box-shadow: 0 0 13px rgba(155,196,199,.68); }
+}
+body.community-page #profileHelpPanel.profile-help-panel .info-overlay-card {
+  background: rgba(7,13,14,.84) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+body.community-page #profileHelpPanel.profile-help-panel .info-overlay-card::before {
+  background: rgba(7,13,14,.84) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-signal-track i {
+    --r7-contact-shift: 0px;
+    animation: none !important;
+    transform: none !important;
+    opacity: .78 !important;
+    box-shadow: 0 0 9px rgba(155,196,199,.46) !important;
+    will-change: auto;
+  }
+}
