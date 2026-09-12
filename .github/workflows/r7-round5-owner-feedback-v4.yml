@@ -1,0 +1,126 @@
+name: R7 Round5 owner feedback browser QA v4
+
+on:
+  push:
+    branches: [revival-r7-responsive-mobile]
+
+permissions:
+  contents: write
+
+jobs:
+  round5-v4:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard Round5 staging state
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=de8603819ada62a07a63d5aa398b356da2cfc750
+          git merge-base --is-ancestor "$BASE" HEAD
+          git diff --name-only "$BASE"..HEAD | sort >/tmp/r7-round5-delta.txt
+          cat >/tmp/r7-round5-expected.txt <<'EOF'
+          .github/workflows/r7-round5-owner-feedback-v2.yml
+          .github/workflows/r7-round5-owner-feedback-v3.yml
+          .github/workflows/r7-round5-owner-feedback-v4.yml
+          .github/workflows/r7-round5-owner-feedback.yml
+          EOF
+          diff -u /tmp/r7-round5-expected.txt /tmp/r7-round5-delta.txt
+          git worktree add /tmp/r7-round5-before "$BASE"
+
+      - name: Extract scripts and apply scoped Round5 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          data = yaml.safe_load(Path('.github/workflows/r7-round5-owner-feedback.yml').read_text(encoding='utf-8'))
+          steps = data['jobs']['round5']['steps']
+          runs = {step.get('name'): step.get('run') for step in steps if step.get('name') and step.get('run')}
+          needed = [
+              'Apply scoped Round5 runtime patch','Install Chromium QA runtime','Create Round5 browser QA script',
+              'Pre-commit full browser matrix','Write additive Round5 documentation and clean QA harness',
+              'Exact-final-SHA full browser verification','Push exact verified final SHA'
+          ]
+          missing=[n for n in needed if n not in runs]
+          if missing: raise SystemExit(f'missing source workflow steps: {missing}')
+
+          apply=runs['Apply scoped Round5 runtime patch']
+          needle="replace_once('js/site.js', old, new)"
+          if apply.count(needle)!=1: raise SystemExit('site.js replacement marker mismatch')
+          resilient="""p = Path('js/site.js')
+          site = p.read_text(encoding='utf-8')
+          start = site.find('  function stagedReveal(panel, writeValues) {')
+          end = site.find('\\n  function closeNav()', start)
+          if start < 0 or end < 0:
+              raise SystemExit('js/site.js: stagedReveal boundaries not found')
+          p.write_text(site[:start] + new + site[end:], encoding='utf-8')"""
+          Path('/tmp/r7-round5-apply.sh').write_text(apply.replace(needle,resilient,1),encoding='utf-8')
+          Path('/tmp/r7-round5-install.sh').write_text(runs['Install Chromium QA runtime'],encoding='utf-8')
+          Path('/tmp/r7-round5-create-qa.sh').write_text(runs['Create Round5 browser QA script'],encoding='utf-8')
+
+          docs=runs['Write additive Round5 documentation and clean QA harness']
+          old='git rm .github/workflows/r7-round5-owner-feedback.yml'
+          new='git rm .github/workflows/r7-round5-owner-feedback.yml .github/workflows/r7-round5-owner-feedback-v2.yml .github/workflows/r7-round5-owner-feedback-v3.yml .github/workflows/r7-round5-owner-feedback-v4.yml'
+          if docs.count(old)!=1: raise SystemExit('documentation cleanup marker mismatch')
+          Path('/tmp/r7-round5-docs.sh').write_text(docs.replace(old,new,1),encoding='utf-8')
+          Path('/tmp/r7-round5-push.sh').write_text(runs['Push exact verified final SHA'],encoding='utf-8')
+          PY
+          bash /tmp/r7-round5-apply.sh
+
+      - name: Install Chromium QA runtime
+        shell: bash
+        run: bash /tmp/r7-round5-install.sh
+
+      - name: Create valid async Round5 browser QA script
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash /tmp/r7-round5-create-qa.sh
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/r7-round5-qa.cjs')
+          s=p.read_text(encoding='utf-8')
+          p.write_text("(async () => {\n"+s+"\n})().catch(error => { console.error(error); process.exit(1); });\n",encoding='utf-8')
+          PY
+          node --check /tmp/r7-round5-qa.cjs
+
+      - name: Managed pre-QA, clean final commit, exact-final-QA and push
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4190 --directory /tmp/r7-round5-before >/tmp/r7-r5-before.log 2>&1 &
+          PID_BEFORE=$!
+          python3 -m http.server 4191 --directory "$GITHUB_WORKSPACE" >/tmp/r7-r5-after.log 2>&1 &
+          PID_AFTER=$!
+          cleanup() { kill "$PID_BEFORE" "$PID_AFTER" 2>/dev/null || true; wait "$PID_BEFORE" "$PID_AFTER" 2>/dev/null || true; }
+          trap cleanup EXIT
+          sleep 1
+
+          R7_OUT=/tmp/r7-round5-pre R7_BASE=http://127.0.0.1:4191 R7_BEFORE=http://127.0.0.1:4190 R7_EXACT_SHA='WORKTREE PRE-COMMIT' node /tmp/r7-round5-qa.cjs
+
+          bash /tmp/r7-round5-docs.sh
+          FINAL_SHA="$(cat /tmp/r7-round5-final-sha.txt)"
+          test "$(git rev-parse HEAD)" = "$FINAL_SHA"
+
+          R7_OUT=/tmp/r7-round5-final R7_BASE=http://127.0.0.1:4191 R7_BEFORE=http://127.0.0.1:4190 R7_EXACT_SHA="$FINAL_SHA" node /tmp/r7-round5-qa.cjs
+          test "$(git rev-parse HEAD)" = "$FINAL_SHA"
+          test -z "$(git status --porcelain)"
+          printf '%s\n' "$FINAL_SHA" >/tmp/r7-round5-final/FINAL_SHA.txt
+
+          bash /tmp/r7-round5-push.sh
+
+      - name: Upload Round5 exact-final browser evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-round5-exact-final-browser-evidence
+          path: /tmp/r7-round5-final
