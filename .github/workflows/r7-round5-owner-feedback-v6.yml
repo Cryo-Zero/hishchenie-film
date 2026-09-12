@@ -94,6 +94,14 @@ jobs:
           if s.count(hidden)!=1: raise SystemExit(f'hidden actor-back action mismatch: {s.count(hidden)}')
           s=s.replace(hidden,'await page.waitForTimeout(80);',1)
 
+          raw_stage_click="await page.evaluate(()=>document.getElementById('archiveStage').click()); await page.waitForTimeout(80);"
+          if s.count(raw_stage_click)!=1: raise SystemExit(f'normal Materials stage-click anchor mismatch: {s.count(raw_stage_click)}')
+          s=s.replace(raw_stage_click,"await page.locator('#archiveStage').click(); await page.waitForTimeout(80);",1)
+
+          burger_stage_click="await page.evaluate(()=>document.getElementById('archiveStage').click()); await page.waitForTimeout(70);"
+          if s.count(burger_stage_click)!=1: raise SystemExit(f'burger Materials stage-click anchor mismatch: {s.count(burger_stage_click)}')
+          s=s.replace(burger_stage_click,"await page.locator('#archiveStage').press('Enter'); await page.waitForTimeout(70);",1)
+
           marker='const label=`${w}x${h}`;'
           if s.count(marker)!=1: raise SystemExit(f'viewport marker mismatch: {s.count(marker)}')
           s=s.replace(marker,marker+"\n      console.log('ROUND5_QA_VIEWPORT', label);",1)
