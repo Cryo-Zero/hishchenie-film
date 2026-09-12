@@ -79,7 +79,7 @@ jobs:
         shell: bash
         run: bash /tmp/r7-round5-install.sh
 
-      - name: Create valid async Round5 browser QA script
+      - name: Create fail-fast async Round5 browser QA script
         shell: bash
         run: |
           set -euo pipefail
@@ -88,6 +88,19 @@ jobs:
           from pathlib import Path
           p=Path('/tmp/r7-round5-qa.cjs')
           s=p.read_text(encoding='utf-8')
+          old_ctx="""            await ctx.route('https://xltwwvutqkpmtmlavngi.supabase.co/**', route => route.abort());
+            return ctx;"""
+          new_ctx="""            await ctx.route('https://xltwwvutqkpmtmlavngi.supabase.co/**', route => route.abort());
+            ctx.setDefaultTimeout(7000);
+            ctx.setDefaultNavigationTimeout(10000);
+            return ctx;"""
+          if s.count(old_ctx) != 1:
+              raise SystemExit(f'QA context timeout anchor mismatch: {s.count(old_ctx)}')
+          s=s.replace(old_ctx,new_ctx,1)
+          hidden_back="                await page.locator('.r7-subject-back').click(); await page.waitForTimeout(260);"
+          if s.count(hidden_back) != 1:
+              raise SystemExit(f'QA hidden back anchor mismatch: {s.count(hidden_back)}')
+          s=s.replace(hidden_back,"                await page.waitForTimeout(80);",1)
           p.write_text("(async () => {\n"+s+"\n})().catch(error => { console.error(error); process.exit(1); });\n",encoding='utf-8')
           PY
           node --check /tmp/r7-round5-qa.cjs
@@ -106,13 +119,13 @@ jobs:
           trap cleanup EXIT
           sleep 1
 
-          R7_OUT=/tmp/r7-round5-pre R7_BASE=http://127.0.0.1:4191 R7_BEFORE=http://127.0.0.1:4190 R7_EXACT_SHA='WORKTREE PRE-COMMIT' node /tmp/r7-round5-qa.cjs
+          R7_OUT=/tmp/r7-round5-pre R7_BASE=http://127.0.0.1:4191 R7_BEFORE=http://127.0.0.1:4190 R7_EXACT_SHA='WORKTREE PRE-COMMIT' timeout 240s node /tmp/r7-round5-qa.cjs
 
           bash /tmp/r7-round5-docs.sh
           FINAL_SHA="$(cat /tmp/r7-round5-final-sha.txt)"
           test "$(git rev-parse HEAD)" = "$FINAL_SHA"
 
-          R7_OUT=/tmp/r7-round5-final R7_BASE=http://127.0.0.1:4191 R7_BEFORE=http://127.0.0.1:4190 R7_EXACT_SHA="$FINAL_SHA" node /tmp/r7-round5-qa.cjs
+          R7_OUT=/tmp/r7-round5-final R7_BASE=http://127.0.0.1:4191 R7_BEFORE=http://127.0.0.1:4190 R7_EXACT_SHA="$FINAL_SHA" timeout 240s node /tmp/r7-round5-qa.cjs
           test "$(git rev-parse HEAD)" = "$FINAL_SHA"
           test -z "$(git status --porcelain)"
           printf '%s\n' "$FINAL_SHA" >/tmp/r7-round5-final/FINAL_SHA.txt
