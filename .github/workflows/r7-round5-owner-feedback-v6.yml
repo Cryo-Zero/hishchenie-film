@@ -65,6 +65,29 @@ jobs:
           if s.count(old)!=1: raise SystemExit(f'focused observer repair anchor mismatch: {s.count(old)}')
           p.write_text(s.replace(old,new,1),encoding='utf-8')
 
+          # Remaining owner blocker: on desktop the absolute help panel was spanning
+          # the review-composer padding box, while the profile card spans its content
+          # box. Inset by the existing 20px desktop composer padding only; mobile stays
+          # unchanged because its geometry already passes.
+          p=Path('css/responsive-r7-polish.css')
+          s=p.read_text(encoding='utf-8')
+          help_anchor="""body.community-page #profileHelpPanel.profile-help-panel {
+            left: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+          }
+          """
+          help_repair=help_anchor+"""@media (min-width: 981px) {
+            body.community-page #profileHelpPanel.profile-help-panel {
+              left: 20px !important;
+              right: 20px !important;
+              width: auto !important;
+            }
+          }
+          """
+          if s.count(help_anchor)!=1: raise SystemExit(f'help geometry repair anchor mismatch: {s.count(help_anchor)}')
+          p.write_text(s.replace(help_anchor,help_repair,1),encoding='utf-8')
+
           # Final cleanup must remove v6 along with all earlier temporary Round5 workflows.
           p=Path('/tmp/r7-round5-docs.sh')
           s=p.read_text(encoding='utf-8')
