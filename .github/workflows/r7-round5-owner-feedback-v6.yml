@@ -89,12 +89,18 @@ jobs:
           p.write_text(s.replace(help_anchor,help_repair,1),encoding='utf-8')
 
           # Final cleanup must remove v6 along with all earlier temporary Round5 workflows.
+          # Normalize the generated documentation append to one blank separator and one
+          # final newline so git diff --cached --check can gate the clean final commit.
           p=Path('/tmp/r7-round5-docs.sh')
           s=p.read_text(encoding='utf-8')
           old_rm='git rm .github/workflows/r7-round5-owner-feedback.yml .github/workflows/r7-round5-owner-feedback-v2.yml .github/workflows/r7-round5-owner-feedback-v3.yml .github/workflows/r7-round5-owner-feedback-v4.yml .github/workflows/r7-round5-owner-feedback-v5.yml'
           new_rm=old_rm+' .github/workflows/r7-round5-owner-feedback-v6.yml'
+          old_append="p.write_text(text.rstrip()+add+'\\n',encoding='utf-8')"
+          new_append="p.write_text(text.rstrip()+'\\n\\n'+add.strip()+'\\n',encoding='utf-8')"
           if s.count(old_rm)!=1: raise SystemExit(f'v6 cleanup marker mismatch: {s.count(old_rm)}')
-          p.write_text(s.replace(old_rm,new_rm,1),encoding='utf-8')
+          if s.count(old_append)!=1: raise SystemExit(f'docs append marker mismatch: {s.count(old_append)}')
+          s=s.replace(old_rm,new_rm,1).replace(old_append,new_append,1)
+          p.write_text(s,encoding='utf-8')
           PY
 
           git diff --check
