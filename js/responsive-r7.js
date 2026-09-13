@@ -61,6 +61,49 @@
     else home.style.removeProperty('display');
   }
 
+  // OWNER FEEDBACK ROUND 5 — burger dismissal -------------------------------
+// Close on a deliberate outside tap/click, but not merely because a touch
+// gesture becomes a scroll/swipe. Fullscreen media always clears the burger.
+function installMobileNavDismissal() {
+  const nav = $('#primaryNav');
+  const toggle = $('#menuToggle');
+  if (!nav || !toggle) return;
+
+  let pointer = null;
+  const outsideMenu = target => target instanceof Node && !nav.contains(target) && !toggle.contains(target);
+
+  document.addEventListener('pointerdown', event => {
+    if (!body.classList.contains('nav-open') || !outsideMenu(event.target)) {
+      pointer = null;
+      return;
+    }
+    pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+  }, true);
+
+  document.addEventListener('pointermove', event => {
+    if (!pointer || event.pointerId !== pointer.id) return;
+    if (Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) > 12) pointer.moved = true;
+  }, true);
+
+  document.addEventListener('pointerup', event => {
+    const start = pointer;
+    pointer = null;
+    if (!start || event.pointerId !== start.id || start.moved) return;
+    if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 12) return;
+    if (body.classList.contains('nav-open') && outsideMenu(event.target)) closeMobileNav();
+  }, true);
+
+  document.addEventListener('pointercancel', () => { pointer = null; }, true);
+  document.addEventListener('fullscreenchange', closeMobileNav);
+  document.addEventListener('webkitfullscreenchange', closeMobileNav);
+  $('#trailerVideo')?.addEventListener('webkitbeginfullscreen', closeMobileNav);
+
+  const syncFullscreenOverlay = () => {
+    if (body.classList.contains('lightbox-open') && body.classList.contains('nav-open')) closeMobileNav();
+  };
+  new MutationObserver(syncFullscreenOverlay).observe(body, { attributes: true, attributeFilter: ['class'] });
+}
+
   // Mobile Hero composition --------------------------------------------------
   function installMobileHeroActions() {
     const hero = $('.hero-inner');
@@ -515,6 +558,7 @@
   }
 
   installNavigationAdditions();
+  installMobileNavDismissal();
   installMobileHeroActions();
   installProfileHelpPopover();
   installSubjectPromptAction();

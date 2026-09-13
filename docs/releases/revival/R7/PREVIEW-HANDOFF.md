@@ -149,3 +149,9 @@ Active Round4 preview:
 Future architecture captured in `OWNER-FEEDBACK-ROUND4.md` and canonical docs includes moderation/template principles, Admin→public-site boundary, Bug Reports v2/admin/Telegram, Russian CAPTCHA preference, privacy/raw-IP minimization, Russian Supabase-compatible hosting research and separate legal/privacy prerequisites. **None of those future backend/product migrations are implemented by Round4.**
 
 Round4 remains **OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**. Do not merge or describe QA as owner acceptance.
+
+## Owner feedback Round 5 — 2026-09-12
+
+Round5 is implemented on the R7 feature branch and remains **NOT PRODUCTION / OWNER VISUAL REVIEW PENDING**. It hides (without deleting from source) the compact Hero synopsis, removes the Materials explanatory note and mobile Materials arrows, softens Actors/FAQ transitions, replaces CONTACT travel with a fixed endpoint/local impulse, adds tap-vs-scroll-aware burger dismissal/fullscreen safeguards, cleans the burger REPORT contour and profile-help geometry/state, removes the public BUILD label, and adds `THEFT // PUBLIC FILE // 2045` to Reviews.
+
+Round5 preserves Supabase/reviews/profile/auth business logic and desktop-only Materials pagination. Browser QA pre-commit result: **192/192 PASS**; final acceptance still depends on exact-final-SHA browser evidence and owner visual review.

@@ -493,3 +493,11 @@ Before final Privacy Policy publication, confirm the legal identity/contact deta
 Infrastructure providers may technically observe network IP addresses even though the application itself must not use/store raw IP as ordinary product data. The artistic FAQ wording `На сайте есть безопасность?` remains separate from legal privacy documentation.
 
 This addendum does **not** authorize or perform a backend migration, CAPTCHA deployment, Telegram integration, Bug Reports v2 implementation, or Supabase production change in Round 4.
+
+## R7 Round 5 feature-branch history — 2026-09-12
+
+**Status:** IMPLEMENTED ON RESPONSIVE FEATURE BRANCH / OWNER VISUAL ACCEPTANCE PENDING / NOT PRODUCTION.
+
+Owner Round5 focuses on final public responsive interaction/polish rather than new product/backend scope: mobile Hero synopsis presentation, Materials copy/arrows, softer Actors/FAQ transitions, local CONTACT signal, robust burger dismissal/fullscreen behavior, burger REPORT contour cleanup, profile-help state/geometry, removal of public BUILD text and consistent PUBLIC FILE footer signature.
+
+No Supabase/auth/review business-logic expansion is part of this round. Continue to require real browser evidence and explicit owner visual acceptance before R7 production/merge.

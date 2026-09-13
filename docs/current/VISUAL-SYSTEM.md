@@ -291,3 +291,15 @@ These rules supersede only the conflicting Round3 preview rules; the earlier sec
 - Compact Reviews feed controls follow the reading context through a **small feed-local sticky/following surface**. Do not return to the early oversized sticky block, and do not reduce Round4 to Round3 normal-flow-only behavior.
 - Phone global site header may smart-hide on meaningful downward scroll and reveal on upward scroll, with hysteresis, top visibility, burger/header-interaction safety and rotation recovery. Desktop header behavior is unchanged.
 - Mobile Hero synopsis remains present and unchanged. Its final mobile placement is an **open visual question** requiring owner/planning-chat approval; no bridge implementation may invent a new final placement.
+
+## R7 Round 5 preview refinements — owner-directed, not production
+
+These rules supersede only conflicting R7 preview behavior and remain feature-branch preview rules until owner acceptance/release.
+
+- Compact/mobile Hero keeps the synopsis text in project source/i18n but does not present it in the current mobile Hero composition; desktop Hero copy remains part of the approved reference.
+- Materials no longer presents the authorial-format explanatory note. On compact/mobile, previous/next arrow buttons are not shown in stage or fullscreen; touch/swipe is the primary navigation, while desktop arrows remain.
+- Actors and FAQ state changes should read as one continuous transformation: outgoing content softens, incoming content crossfades/reveals without a deliberate empty-panel phase, and the scene container must not jump.
+- CONTACT keeps the main line and endpoint/diamond. The visible signal is local to the endpoint area: fixed beacon plus a short subdued light impulse, never a long-distance travelling ball or flashing effect.
+- Mobile burger dismissal distinguishes deliberate outside tap/click from scroll/swipe movement; fullscreen content must not retain the open burger above it.
+- Profile help `?` is quiet at rest and clearly active only while its anchored panel is open; the panel contour is complete/clean and approximately follows the profile block width.
+- Public build/debug labels are not visitor-facing UI. `THEFT // PUBLIC FILE // 2045` remains the public footer signature and is shared by main and Reviews.
