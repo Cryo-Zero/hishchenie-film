@@ -287,3 +287,70 @@ The attempted exact production runtime mirror is **NOT VERIFIED / not created** 
 Do not publish an approximate `mirror/hishchenie-film-main` and do not call reserve an exact runtime mirror unless the complete tree is independently proven identical.
 
 After meaningful current-memory updates, maintain a **project-memory safety copy** at `snapshots/project-memory/current/` containing the five canonical current files: `PROJECT-STATE.md`, `DECISIONS.md`, `VISUAL-SYSTEM.md`, `ROADMAP.md`, and `BACKLOG.md`. Verify content equality after writing. This copy is documentation/recovery support, not a runtime mirror.
+
+## Round 4 durable planning decisions — 2026-09-11
+
+### Workflow reconfirmed
+
+The existing planning/review → explicit owner approval → bounded bridge task → bridge report → independent verification → owner visual review loop remains authoritative. Planning discussion that happens while a bridge is working does not silently expand that bridge scope.
+
+### Community moderation / official replies
+
+- Official/team replies are authored from the admin panel, not from public visitor UI.
+- Future reply templates are composer helpers: selecting one inserts editable text and never posts automatically.
+- Normal negative criticism remains public; low score alone is never moderation grounds.
+- Severe rule-breaking text/replies may be hidden or replaced with a clear system moderation marker while preserving a genuine viewer score where appropriate.
+- Obvious bot/spam/manipulated/fake review may be removed completely, including its score.
+- Moderation history should preserve reason, timestamp, authorized actor and internal note/history.
+
+### Admin/public boundary
+
+A future admin `ОТКРЫТЬ САЙТ ↗` shortcut may open the public site in a new tab for inspection. Public pages remain visitor-facing and do not expose moderation controls or an intentional “admin mode.” Authentication/authorization remains an admin-panel/backend concern.
+
+### Bug Reports v2 product direction — future, not current implementation
+
+Bug Reports v2 is accepted as future architecture: visitor form → server-side safe storage → admin `BUG REPORTS` workflow → optional minimum Telegram alert. Four admin statuses only: `NEW`, `IN PROGRESS`, `FIXED`, `CLOSED`; opening a report never automatically advances status.
+
+Optional diagnostics are consented per report and minimized to build, page/section, UI language, browser family+major, OS family and viewport/orientation. Do not store raw IP, physical screen resolution by default, full raw User-Agent, technical profile UUID, cookies/localStorage, review/reply contents, phone model or unrelated profile data in the report. Report submission remains possible when optional diagnostics are unchecked.
+
+Telegram is notification-only, not source of truth, and default alerts contain minimum metadata rather than full report text/diagnostics. Delivery failure must not affect stored report integrity.
+
+### Anti-bot / CAPTCHA direction — future
+
+Prefer researching a Russian-hosted CAPTCHA/human-verification solution such as Yandex SmartCaptcha. Verification must be server-checked; a decorative local checkbox is insufficient. First review by each new anonymous identity requires verification; clearing local identity creates a new identity that must verify again. Editing an owned existing review normally should not repeat CAPTCHA absent abuse. Bug Reports use server-verified anti-bot/rate-limit protection. Raw IP storage is not the primary anti-bot model.
+
+### Privacy minimization / raw IP
+
+The product follows privacy-by-design/minimization:
+- application tables do not intentionally store raw IP for reviews/bug reports;
+- admin UI does not expose raw IP;
+- product identity/features are not built around IP;
+- this may change only after explicit future approval with legal/technical justification.
+
+Infrastructure/service providers can technically observe connection IPs while delivering network service; public copy must not make the false absolute claim that nobody can ever see an IP.
+
+### Russian backend research direction
+
+Before considering a total rewrite, first research whether the current Supabase-compatible architecture can be self-hosted on infrastructure physically located in Russia while preserving PostgreSQL, RLS, RPC and existing application/admin/community logic. No provider is approved. A full Russian managed stack remains an alternative if compatibility is unsuitable. Research does not authorize migration, production data copy, endpoint/credential changes or production Supabase changes.
+
+### FAQ wordplay and legal/privacy separation
+
+`На сайте есть безопасность?` remains intentional artistic wordplay and must stay. It is not the legal privacy notice. Future privacy/personal-data policy, community rules and legally required consent/notices are separate documents/surfaces; do not replace the FAQ joke with legal boilerplate or add fear-inducing review disclaimers without a concrete requirement.
+
+## Privacy by design — active direction addendum — 2026-09-12
+
+This is an active project direction and a documentation decision, not a claim that a final Privacy Policy has already been legally approved or published.
+
+- Move toward a Russian-hosted backend as the intended infrastructure direction.
+- Do not require real visitor names.
+- Do not require visitor email addresses or phone numbers for ordinary public participation.
+- Raw IP addresses must not be used or stored as ordinary product/application data and must not become a user identity or product-feature primitive.
+- Infrastructure/network providers may still technically observe network IP addresses; project documentation must not claim that this can never happen.
+- Keep only the minimum technical identity required for review ownership/editing and related abuse-prevention integrity.
+- Use clear, informed consent where legally required.
+- Provide a practical way to delete user-associated data.
+- Continue data minimization by default.
+
+**Personal-data operator — provisional assumption only:** the film author is the current working assumption. This is not yet a final legal publication. The author's legal identity/details/contact have not been confirmed for publication, and the actual operator/processor allocation must be confirmed before a final Privacy Policy is published. Do not publish guessed legal details. Ordinary team members or the technical developer are not automatically designated the operator merely because they implement or maintain the system.
+
+The FAQ item `На сайте есть безопасность?` remains untouched as intentional artistic wordplay. It is not the legal Privacy Policy and must not be treated as one.

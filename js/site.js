@@ -15,22 +15,30 @@
   // One staged-reveal engine is shared by SUBJECT DOSSIER and SYSTEM QUERY.
   // Keeping one implementation prevents the two interfaces from drifting apart.
   function stagedReveal(panel, writeValues) {
-    if (!panel) { if (typeof writeValues === 'function') writeValues(); return; }
-    panel.classList.remove('is-revealed');
-    panel.classList.add('is-revealing');
+  if (!panel) { if (typeof writeValues === 'function') writeValues(); return; }
+  clearTimeout(panel._theftRevealTimer);
+  panel.classList.remove('is-revealing', 'is-r7-crossfade-in', 'is-r7-crossfade-out');
+  panel.classList.add('is-revealed');
+  if (motionReduced()) {
     if (typeof writeValues === 'function') writeValues();
-    if (motionReduced()) {
-      panel.classList.remove('is-revealing');
-      panel.classList.add('is-revealed');
-      return;
-    }
-    // Force the hidden state to be painted before starting the reveal.
+    return;
+  }
+
+  // Keep the old state visible while it softens. The new state is written
+  // only after that short fade and starts partially visible, avoiding an
+  // empty-panel flash while still reading as one continuous transformation.
+  panel.classList.add('is-r7-crossfade-out');
+  panel._theftRevealTimer = setTimeout(() => {
+    if (typeof writeValues === 'function') writeValues();
+    panel.classList.remove('is-r7-crossfade-out');
+    panel.classList.add('is-r7-crossfade-in');
     void panel.offsetWidth;
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      panel.classList.remove('is-revealing');
+      panel.classList.remove('is-r7-crossfade-in');
       panel.classList.add('is-revealed');
     }));
-  }
+  }, 140);
+}
 
   function closeNav() {
     body.classList.remove('nav-open');

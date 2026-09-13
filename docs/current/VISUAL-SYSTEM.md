@@ -266,3 +266,40 @@ Visual work follows this priority:
 → `BACKLOG idea`
 
 A newer explicit owner direction may intentionally override a more general older rule. BACKLOG never authorizes implementation.
+
+## R7 Round 3 preview refinements — owner-directed, not production
+
+These are owner-directed durable visual rules for the R7 preview; R7 is not production until separately accepted and merged.
+
+- On compact/mobile Reviews, public-feed heading/status/records, New/Old/Popular and profanity toggle belong to normal document flow and must not occupy permanent sticky/fixed space while the user reads the feed.
+- For compact Materials, mixed image aspect ratios must not move the page: the main stage uses stable geometry while assets preserve their own proportions through centered `object-fit: contain`. Free space inside the stage is preferable to stretching/cropping.
+- ARCHIVE remains the intentional Materials left-wall exception, but its open phone drawer must be compact/non-fullscreen and internally scrollable, especially in low-height landscape.
+- CONTACT's small endpoint indicator remains physically fixed near the right endpoint/diamond. Signal animation may pulse/fade/glow but must not travel horizontally or visibly teleport on loop.
+- Information-bearing microcopy must stay subordinate **and readable**. Do not solve this with a global font-size increase: target the tiny functional/status/meta class, preserve hierarchy, and verify geometry in browser. Decorative watermarks are not part of this rule.
+- Substantial responsive changes remain subject to direction/concept approval where practical, and final acceptance must use actual browser rendering rather than mockup-only evidence.
+
+## R7 Round 4 preview refinements — owner-directed, not production
+
+These rules supersede only the conflicting Round3 preview rules; the earlier section remains historical traceability until R7 acceptance/release cleanup.
+
+- CONTACT endpoint diamond is fixed. The nearby dot may move only a **short local horizontal distance** with continuous eased reversible motion; no full-line travel, abrupt reset or layout-coordinate animation. Reduced motion has no horizontal travel.
+- Compact Materials keeps Round3 stable stage geometry and centered `object-fit: contain`, but its phone/compact trigger is a horizontal technical `ARCHIVE // 11` control near the stage rather than the vertical wall handle. Desktop wall treatment remains the reference.
+- Sequential Actors keeps no-auto-scroll semantics. `SELECT ANOTHER SUBJECT` is an interactive alternate route to the same `SUBJECT INDEX` transition, with keyboard/touch/focus support.
+- CURRENT SIGNAL must use semantic system identifiers/states rather than fabricated time-like tokens.
+- Freshness ring content is geometrically centred for short, multi-digit and pending/insufficient states; the calculation itself is unchanged.
+- Anchored profile-help remains a popover, not fullscreen. Open `?` visibly communicates active state; popover may be slightly translucent/blurred while keeping readable contrast and zero page reflow/scroll lock.
+- Compact Reviews feed controls follow the reading context through a **small feed-local sticky/following surface**. Do not return to the early oversized sticky block, and do not reduce Round4 to Round3 normal-flow-only behavior.
+- Phone global site header may smart-hide on meaningful downward scroll and reveal on upward scroll, with hysteresis, top visibility, burger/header-interaction safety and rotation recovery. Desktop header behavior is unchanged.
+- Mobile Hero synopsis remains present and unchanged. Its final mobile placement is an **open visual question** requiring owner/planning-chat approval; no bridge implementation may invent a new final placement.
+
+## R7 Round 5 preview refinements — owner-directed, not production
+
+These rules supersede only conflicting R7 preview behavior and remain feature-branch preview rules until owner acceptance/release.
+
+- Compact/mobile Hero keeps the synopsis text in project source/i18n but does not present it in the current mobile Hero composition; desktop Hero copy remains part of the approved reference.
+- Materials no longer presents the authorial-format explanatory note. On compact/mobile, previous/next arrow buttons are not shown in stage or fullscreen; touch/swipe is the primary navigation, while desktop arrows remain.
+- Actors and FAQ state changes should read as one continuous transformation: outgoing content softens, incoming content crossfades/reveals without a deliberate empty-panel phase, and the scene container must not jump.
+- CONTACT keeps the main line and endpoint/diamond. The visible signal is local to the endpoint area: fixed beacon plus a short subdued light impulse, never a long-distance travelling ball or flashing effect.
+- Mobile burger dismissal distinguishes deliberate outside tap/click from scroll/swipe movement; fullscreen content must not retain the open burger above it.
+- Profile help `?` is quiet at rest and clearly active only while its anchored panel is open; the panel contour is complete/clean and approximately follows the profile block width.
+- Public build/debug labels are not visitor-facing UI. `THEFT // PUBLIC FILE // 2045` remains the public footer signature and is shared by main and Reviews.

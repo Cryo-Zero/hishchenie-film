@@ -134,3 +134,14 @@ P20, P21 and P22 are rejected redesign attempts preserved as historical referenc
 - Individual ideas may only be reconsidered if they become useful again and are explicitly approved.
 
 Historical code is preserved under `archive/rejected-redesigns/`.
+
+### Round 4 — accepted future items requiring separate implementation authorization
+
+The older Bug Reports v2 sketch above remains historical. The more specific planning direction below supersedes conflicting details such as the old candidate `CHECKING` status; this is still **future work, not permission to implement now**.
+
+- Bug Reports v2: simple category + optional `Что случилось?` details + optional diagnostics opt-in; server-side safe storage; admin `BUG REPORTS`; statuses exactly `NEW / IN PROGRESS / FIXED / CLOSED`; minimum Telegram alert; no automatic status advance on open.
+- Anti-bot: evaluate Russian-hosted server-verified solutions, with Yandex SmartCaptcha a preferred research candidate; no fake local-only “I am not a robot” control.
+- Admin moderation: editable reply templates that never auto-post, audit/history, and optional `ОТКРЫТЬ САЙТ ↗` shortcut without public admin mode.
+- Russian backend research: first evaluate self-hosted Supabase compatibility on infrastructure physically in Russia; full Russian managed stack remains an alternative. No provider/migration is approved.
+- Legal/privacy: separate personal-data/privacy policy + community rules/required consent surfaces; preserve FAQ `На сайте есть безопасность?` as artistic content.
+- Legal prerequisite: confirm the actual personal-data operator identity/contact before publication; current “film author” assumption is provisional only.
