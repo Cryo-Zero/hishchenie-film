@@ -2,7 +2,8 @@ name: R7 post-Round5 owner feedback browser QA
 
 on:
   push:
-    branches: [revival-r7-responsive-mobile]
+    branches:
+      - revival-r7-responsive-mobile
 
 permissions:
   contents: write
@@ -22,200 +23,17 @@ jobs:
           set -euo pipefail
           BASE=4197adc13cc91cbad395e6d2819e0fbb23278449
           git merge-base --is-ancestor "$BASE" HEAD
-          git diff --name-only "$BASE"..HEAD | sort >/tmp/r7-round6-delta.txt
-          printf '%s\n' '.github/workflows/r7-owner-feedback-round6.yml' >/tmp/r7-round6-expected.txt
-          diff -u /tmp/r7-round6-expected.txt /tmp/r7-round6-delta.txt
+          git diff --name-only "$BASE"..HEAD | sort >/tmp/actual
+          printf '%s\n' \
+            '.github/workflows/r7-owner-feedback-round6.yml' \
+            'scripts/r7_round6_apply.py' \
+            'scripts/r7_round6_finalize.py' \
+            'scripts/r7_round6_qa.cjs' | sort >/tmp/expected
+          diff -u /tmp/expected /tmp/actual
           git worktree add /tmp/r7-round6-baseline "$BASE"
 
-      - name: Apply scoped owner-feedback runtime patch
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-
-          # Trailer audio: deterministic application-owned initial state.
-          p = Path('js/site.js')
-          s = p.read_text(encoding='utf-8')
-          old = '''  // Trailer starts gently. Once a visitor changes the level, remember their choice.\n  const trailerVideo = $('#trailerVideo');\n  if (trailerVideo) {\n    const storedVolume = Number(localStorage.getItem('theft_trailer_volume'));\n    trailerVideo.volume = Number.isFinite(storedVolume) && storedVolume >= 0 && storedVolume <= 1 ? storedVolume : .35;\n    trailerVideo.addEventListener('volumechange', () => {\n      try { localStorage.setItem('theft_trailer_volume', String(trailerVideo.volume)); } catch {}\n    });\n  }\n'''
-          new = '''  // Trailer audio is deterministic and user-safe: no autoplay, explicit unmuted\n  // application state, and a restrained 30% starting level on each page entry.\n  // Native controls may change volume/mute for the current page session; we do not\n  // fight those user changes while playback is active.\n  const trailerVideo = $('#trailerVideo');\n  if (trailerVideo) {\n    const resetTrailerAudio = () => {\n      trailerVideo.removeAttribute('autoplay');\n      trailerVideo.autoplay = false;\n      trailerVideo.defaultMuted = false;\n      trailerVideo.muted = false;\n      trailerVideo.volume = .30;\n    };\n    resetTrailerAudio();\n    addEventListener('pageshow', event => { if (event.persisted) resetTrailerAudio(); });\n  }\n'''
-          if s.count(old) != 1:
-              raise SystemExit(f'js/site.js trailer block mismatch: {s.count(old)}')
-          p.write_text(s.replace(old, new, 1), encoding='utf-8')
-
-          # Keep JS popover geometry aligned with the new compact help width.
-          p = Path('js/responsive-r7.js')
-          s = p.read_text(encoding='utf-8')
-          old = '      const width = Math.min(380, Math.max(260, parentRect.width - 28));'
-          new = '      const width = Math.min(360, Math.max(260, parentRect.width - 28));'
-          if s.count(old) != 1:
-              raise SystemExit(f'js/responsive-r7.js help-width mismatch: {s.count(old)}')
-          p.write_text(s.replace(old, new, 1), encoding='utf-8')
-
-          # Additive visual/interaction overrides only for this owner round.
-          p = Path('css/responsive-r7-polish.css')
-          s = p.read_text(encoding='utf-8')
-          marker = 'OWNER FEEDBACK ROUND 6 — 2026-09-16'
-          if marker in s:
-              raise SystemExit('Round6 CSS already present unexpectedly')
-          add = r'''
-
-/* ========================================================================== */
-/* OWNER FEEDBACK ROUND 6 — 2026-09-16                                       */
-/* Post-Round5 visual review corrections. R7 remains preview / not production. */
-/* ========================================================================== */
-
-/* Desktop CONTACT: restore deliberate point travel. The fixed diamond receives
-   the point with one restrained fill/glow near arrival; no chaotic flashing. */
-@media (min-width: 821px) {
-  .contact-signal-track i {
-    left: 0 !important;
-    right: auto !important;
-    width: 5px !important;
-    height: 5px !important;
-    transform: none !important;
-    animation: r7Round6ContactTravel 4.4s cubic-bezier(.45,0,.24,1) infinite !important;
-    will-change: left, opacity, box-shadow !important;
-  }
-  .contact-signal-track i::after {
-    content: none !important;
-    display: none !important;
-    animation: none !important;
-  }
-  .contact-signal-track b {
-    animation: r7Round6ContactReceive 4.4s ease-in-out infinite !important;
-    will-change: background-color, border-color, box-shadow !important;
-  }
-}
-@keyframes r7Round6ContactTravel {
-  0%, 7% { left: 0; opacity: 0; box-shadow: 0 0 5px rgba(155,196,199,.20); }
-  14% { opacity: .84; }
-  76% { left: calc(100% - 18px); opacity: .88; }
-  82% { left: calc(100% - 7px); opacity: 1; box-shadow: 0 0 12px rgba(155,196,199,.62); }
-  88%, 100% { left: calc(100% - 7px); opacity: 0; box-shadow: 0 0 4px rgba(155,196,199,.12); }
-}
-@keyframes r7Round6ContactReceive {
-  0%, 76%, 100% { background-color: transparent; border-color: rgba(155,196,199,.52); box-shadow: none; }
-  82% { background-color: rgba(181,226,230,.72); border-color: rgba(220,249,250,.88); box-shadow: 0 0 13px rgba(155,196,199,.42); }
-  90% { background-color: rgba(155,196,199,.08); border-color: rgba(155,196,199,.58); box-shadow: 0 0 5px rgba(155,196,199,.12); }
-}
-
-/* Materials enlarged mode: use the viewport decisively on desktop, while the
-   normal Materials stage stays unchanged. Controls are geometrically clean. */
-.lightbox .lightbox-close {
-  width: 48px !important;
-  height: 48px !important;
-  min-width: 48px !important;
-  min-height: 48px !important;
-  padding: 0 !important;
-}
-@media (min-width: 821px) {
-  .lightbox {
-    padding: clamp(18px, 2.8vh, 30px) clamp(58px, 5.2vw, 86px) 54px !important;
-  }
-  .lightbox-image {
-    width: auto !important;
-    height: auto !important;
-    max-width: calc(100vw - 132px) !important;
-    max-height: calc(100dvh - 76px) !important;
-  }
-  .lightbox .lightbox-prev,
-  .lightbox .lightbox-next {
-    width: 50px !important;
-    height: 50px !important;
-    min-width: 50px !important;
-    min-height: 50px !important;
-    padding: 0 !important;
-  }
-}
-
-/* Profile help: compact, button-related popover rather than a heavy composer-wide
-   overlay. Text/content is untouched. */
-body.community-page #profileHelpPanel.profile-help-panel {
-  top: var(--r7-help-top, 52px) !important;
-  left: var(--r7-help-left, 10px) !important;
-  right: auto !important;
-  bottom: auto !important;
-  width: min(360px, calc(100% - 20px)) !important;
-  max-width: 360px !important;
-  padding: 0 !important;
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-body.community-page #profileHelpPanel.profile-help-panel .info-overlay-card {
-  width: 100% !important;
-  max-width: 360px !important;
-  margin: 0 !important;
-  padding: 20px 22px 19px !important;
-  background: rgba(7,13,14,.985) !important;
-  box-shadow: 0 14px 34px rgba(0,0,0,.42) !important;
-}
-
-/* Sequential mobile scene shells get a slower overlap. Internal staged reveal
-   remains intact; no empty-screen phase and no desktop change. */
-body.r7-sequential-ui #cast .cast-list,
-body.r7-sequential-ui #cast .subject-dossier,
-body.r7-sequential-ui #faq .faq-query-list,
-body.r7-sequential-ui #faq .faq-response-panel {
-  transition: opacity .38s ease, transform .48s cubic-bezier(.2,.72,.2,1), visibility 0s linear .38s !important;
-}
-
-/* Burger: keep the page scrollable while the menu is open. The existing pointer
-   classifier still closes deliberate outside taps and ignores movement gestures. */
-@media (max-width: 980px) {
-  body.nav-open {
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-  }
-  body.nav-open .nav-links {
-    padding-bottom: var(--r7-safe-bottom, 0px) !important;
-    overscroll-behavior-y: auto !important;
-    touch-action: pan-y !important;
-  }
-  body.nav-open .nav-links .r7-nav-report {
-    margin-bottom: 0 !important;
-  }
-}
-
-/* Smart header keeps the existing thresholds/safeguards; only the visual hide/
-   reveal interpolation is softened. */
-@media (max-width: 820px) {
-  body.r7-smart-header .site-header {
-    transition: transform .40s cubic-bezier(.22,.72,.18,1), opacity .32s ease !important;
-  }
-}
-body.r7-phone-landscape.r7-smart-header .site-header {
-  transition: transform .36s cubic-bezier(.22,.72,.18,1), opacity .28s ease !important;
-}
-
-@media (min-width: 821px) and (prefers-reduced-motion: reduce) {
-  .contact-signal-track i {
-    left: auto !important;
-    right: 12px !important;
-    animation: none !important;
-    transform: none !important;
-    opacity: .72 !important;
-    will-change: auto !important;
-  }
-  .contact-signal-track b {
-    animation: none !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
-    will-change: auto !important;
-  }
-}
-'''
-          p.write_text(s.rstrip() + add + '\n', encoding='utf-8')
-
-          # Scope assertion: no business-logic / base desktop rewrite.
-          allowed = {'js/site.js','js/responsive-r7.js','css/responsive-r7-polish.css'}
-          import subprocess
-          changed = set(subprocess.check_output(['git','diff','--name-only']).decode().splitlines())
-          if changed != allowed:
-              raise SystemExit(f'unexpected runtime patch paths: {sorted(changed)}')
-          PY
-          git diff --check
+      - name: Apply scoped runtime patch
+        run: python3 scripts/r7_round6_apply.py
 
       - name: Install Chromium QA runtime
         shell: bash
@@ -227,252 +45,12 @@ body.r7-phone-landscape.r7-smart-header .site-header {
           npm install --silent playwright@1.55.0
           npx playwright install --with-deps chromium >/dev/null
 
-      - name: Create full browser QA
+      - name: Prepare browser QA
         shell: bash
         run: |
           set -euo pipefail
-          cat >/tmp/r7-round6-qa.cjs <<'EOF'
-          const { chromium } = require('playwright');
-          const fs = require('fs');
-          const path = require('path');
-
-          const TARGET = process.env.TARGET_URL;
-          const BASELINE = process.env.BASELINE_URL;
-          const OUT = process.env.EVIDENCE_DIR;
-          fs.mkdirSync(OUT, { recursive: true });
-          const viewports = [
-            {name:'390x844', w:390,h:844,touch:true,phone:true},
-            {name:'430x932', w:430,h:932,touch:true,phone:true},
-            {name:'844x390', w:844,h:390,touch:true,phone:true},
-            {name:'932x430', w:932,h:430,touch:true,phone:true},
-            {name:'768x1024',w:768,h:1024,touch:true,phone:false},
-            {name:'1024x768',w:1024,h:768,touch:true,phone:false},
-            {name:'1366x768',w:1366,h:768,touch:false,phone:false},
-          ];
-          let pass = 0;
-          const fails = [];
-          const details = [];
-          const check = (cond, name, detail='') => {
-            if (cond) pass++; else fails.push({name, detail});
-            details.push({ok:Boolean(cond), name, detail});
-          };
-          const num = v => Number.parseFloat(v || '0') || 0;
-          const maxDuration = s => Math.max(...String(s).split(',').map(x => num(x) * (x.includes('ms') ? .001 : 1)), 0);
-
-          const browser = await chromium.launch({headless:true});
-          async function contextFor(v, reducedMotion='no-preference') {
-            const ctx = await browser.newContext({
-              viewport:{width:v.w,height:v.h},
-              hasTouch:v.touch,
-              isMobile:v.phone,
-              reducedMotion,
-            });
-            await ctx.route('**/*.mp4', r => r.fulfill({status:204,contentType:'video/mp4',body:''}));
-            await ctx.route(/https:\/\/[^/]*\.supabase\.co\/.*/, r => r.abort());
-            return ctx;
-          }
-          async function openPage(ctx, url) {
-            const page = await ctx.newPage();
-            const errors=[];
-            page.on('pageerror', e => errors.push(String(e)));
-            await page.goto(url, {waitUntil:'domcontentloaded',timeout:15000});
-            await page.waitForTimeout(180);
-            return {page,errors};
-          }
-          async function swipe(el) {
-            await el.evaluate(node => {
-              const emit=(type,x)=>{ const e=new Event(type,{bubbles:true,cancelable:true}); Object.defineProperty(e,'changedTouches',{value:[{clientX:x,clientY:120}]}); node.dispatchEvent(e); };
-              emit('touchstart',310); emit('touchend',90);
-            });
-          }
-          async function geometry(url) {
-            const v=viewports.at(-1); const ctx=await contextFor(v); const {page}=await openPage(ctx,url+'/index.html');
-            const sels=['.hero-poster-frame','#about .story','#materials .archive-stage','#trailer .video-shell','#cast .cast-console','#faq .faq-console'];
-            const out={};
-            for (const s of sels) out[s]=await page.locator(s).evaluate(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};});
-            await ctx.close(); return out;
-          }
-
-          for (const v of viewports) {
-            const ctx=await contextFor(v);
-            const {page,errors}=await openPage(ctx, TARGET+'/index.html?round6='+v.name);
-            const tag='['+v.name+']';
-
-            const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
-            check(Math.abs(overflow)<=1, tag+' index horizontal overflow = 0', String(overflow));
-
-            // Trailer: no autoplay, explicit app mute state, 30% level, stable after reload.
-            let audio=await page.locator('#trailerVideo').evaluate(v=>({autoplay:v.autoplay,muted:v.muted,defaultMuted:v.defaultMuted,volume:v.volume,controls:v.controls}));
-            check(audio.autoplay===false && audio.controls===true, tag+' trailer no autoplay + controls', JSON.stringify(audio));
-            check(audio.muted===false && audio.defaultMuted===false && Math.abs(audio.volume-.30)<.001, tag+' trailer initial audio = unmuted 30%', JSON.stringify(audio));
-            await page.locator('#trailerVideo').evaluate(v=>{v.volume=.83;v.muted=true;});
-            await page.reload({waitUntil:'domcontentloaded',timeout:15000}); await page.waitForTimeout(120);
-            audio=await page.locator('#trailerVideo').evaluate(v=>({autoplay:v.autoplay,muted:v.muted,defaultMuted:v.defaultMuted,volume:v.volume}));
-            check(audio.autoplay===false && audio.muted===false && Math.abs(audio.volume-.30)<.001, tag+' trailer refresh deterministic', JSON.stringify(audio));
-
-            if (v.w===1366) {
-              // CONTACT real cycle and diamond reaction.
-              const contact=await page.evaluate(()=>{
-                const p=document.querySelector('.contact-signal-track i'); const d=document.querySelector('.contact-signal-track b');
-                const pa=p.getAnimations()[0], da=d.getAnimations()[0];
-                pa.pause(); da.pause();
-                pa.currentTime=350; const a=parseFloat(getComputedStyle(p).left)||0;
-                pa.currentTime=3600; const b=parseFloat(getComputedStyle(p).left)||0;
-                da.currentTime=350; const bg0=getComputedStyle(d).backgroundColor, sh0=getComputedStyle(d).boxShadow;
-                da.currentTime=3600; const bg1=getComputedStyle(d).backgroundColor, sh1=getComputedStyle(d).boxShadow;
-                return {a,b,bg0,bg1,sh0,sh1,pointAnim:getComputedStyle(p).animationName,diamondAnim:getComputedStyle(d).animationName};
-              });
-              check(contact.b-contact.a>100, tag+' CONTACT point travels toward diamond', JSON.stringify(contact));
-              check(contact.bg0!==contact.bg1 || contact.sh0!==contact.sh1, tag+' CONTACT diamond receives signal', JSON.stringify(contact));
-
-              // Enlarged Materials is materially larger; controls are clean squares.
-              await page.waitForFunction(()=>document.querySelector('#archiveMainImage')?.complete);
-              const normal=await page.locator('#archiveStage').boundingBox();
-              await page.locator('#archiveStage').focus(); await page.locator('#archiveStage').press('Enter');
-              await page.waitForSelector('#lightbox.open'); await page.waitForTimeout(120);
-              const large=await page.locator('#lightboxImage').boundingBox();
-              const ratio=Math.max(large.height/normal.height,large.width/normal.width);
-              check(ratio>=1.15, tag+' Materials lightbox visibly larger', JSON.stringify({normal,large,ratio}));
-              for (const [sel,label] of [['#lightboxClose','close'],['#lightboxPrev','prev'],['#lightboxNext','next']]) {
-                const r=await page.locator(sel).boundingBox(); check(Math.abs(r.width-r.height)<=3, tag+' lightbox '+label+' geometry clean', JSON.stringify(r));
-              }
-              await page.keyboard.press('Escape');
-              await page.screenshot({path:path.join(OUT,'desktop-materials-contact.png'),fullPage:false});
-            }
-
-            if (v.phone || v.w===768) {
-              // Mobile Materials: arrows stay hidden; swipe remains navigation.
-              const stagePrev=await page.locator('#galleryPrev').evaluate(el=>getComputedStyle(el).display);
-              const stageNext=await page.locator('#galleryNext').evaluate(el=>getComputedStyle(el).display);
-              check(stagePrev==='none'&&stageNext==='none', tag+' mobile stage arrows hidden', stagePrev+'/'+stageNext);
-              const before=await page.locator('#archiveCounter').textContent();
-              await swipe(page.locator('#archiveStage')); await page.waitForTimeout(70);
-              const after=await page.locator('#archiveCounter').textContent();
-              check(before!==after, tag+' Materials stage swipe navigates', before+' -> '+after);
-              await page.locator('#archiveStage').focus(); await page.locator('#archiveStage').press('Enter');
-              await page.waitForSelector('#lightbox.open');
-              const lp=await page.locator('#lightboxPrev').evaluate(el=>getComputedStyle(el).display);
-              const ln=await page.locator('#lightboxNext').evaluate(el=>getComputedStyle(el).display);
-              const closeBox=await page.locator('#lightboxClose').boundingBox();
-              check(lp==='none'&&ln==='none', tag+' mobile lightbox arrows hidden', lp+'/'+ln);
-              check(Math.abs(closeBox.width-closeBox.height)<=3, tag+' mobile lightbox close square', JSON.stringify(closeBox));
-              const lb0=await page.locator('#lightboxCounter').textContent(); await swipe(page.locator('#lightbox')); await page.waitForTimeout(70); const lb1=await page.locator('#lightboxCounter').textContent();
-              check(lb0!==lb1, tag+' mobile lightbox swipe navigates', lb0+' -> '+lb1);
-              await page.keyboard.press('Escape');
-
-              // Actors / FAQ shell transition is deliberately soft and viewport-stable.
-              for (const spec of [
-                {section:'#cast',item:'#cast .cast-list-item',panel:'#subjectDossier',console:'#cast .cast-console',name:'Actors'},
-                {section:'#faq',item:'#faq .faq-query-item',panel:'#faqResponsePanel',console:'#faq .faq-console',name:'FAQ'}
-              ]) {
-                await page.locator(spec.section).scrollIntoViewIfNeeded(); await page.waitForTimeout(80);
-                const y0=await page.evaluate(()=>scrollY); const h0=(await page.locator(spec.console).boundingBox()).height;
-                await page.locator(spec.item).nth(1).click(); await page.waitForTimeout(60);
-                const trans=await page.locator(spec.panel).evaluate(el=>getComputedStyle(el).transitionDuration);
-                check(maxDuration(trans)>=.38, tag+' '+spec.name+' panel shell transition softened', trans);
-                await page.waitForTimeout(460);
-                const y1=await page.evaluate(()=>scrollY); const h1=(await page.locator(spec.console).boundingBox()).height;
-                const visible=await page.locator(spec.panel).evaluate(el=>getComputedStyle(el).visibility==='visible'&&parseFloat(getComputedStyle(el).opacity)>.95);
-                check(visible, tag+' '+spec.name+' detail reaches visible state');
-                check(Math.abs(y1-y0)<=1.5, tag+' '+spec.name+' no auto-scroll jump', String(y0)+' -> '+String(y1));
-                check(Math.abs(h1-h0)<=4 || h1>0, tag+' '+spec.name+' container remains valid', String(h0)+' -> '+String(h1));
-                const back=spec.name==='Actors'?'.r7-subject-back':'.r7-query-back'; await page.locator(back).click(); await page.waitForTimeout(90);
-              }
-            }
-
-            if (v.phone) {
-              // Burger: no body scroll lock, movement keeps it open, deliberate outside tap closes.
-              await page.evaluate(()=>scrollTo(0,0)); await page.waitForTimeout(80);
-              await page.locator('#menuToggle').click(); await page.waitForSelector('body.nav-open');
-              const bodyOverflow=await page.evaluate(()=>getComputedStyle(document.body).overflowY);
-              check(bodyOverflow!=='hidden', tag+' burger does not lock body scroll', bodyOverflow);
-              const report=page.locator('#primaryNav .r7-nav-report'); await report.waitFor({state:'visible'});
-              const navBox=await page.locator('#primaryNav').boundingBox(), reportBox=await report.boundingBox();
-              const gap=Math.max(0,navBox.y+navBox.height-(reportBox.y+reportBox.height));
-              check(gap<=4, tag+' burger no residual gap below report', String(gap));
-              const point={x:Math.max(8,v.w-12),y:Math.min(v.h-18,Math.max(12,navBox.y+navBox.height+35))};
-              await page.mouse.move(point.x,point.y); await page.mouse.wheel(0,420); await page.waitForTimeout(100);
-              const scrolled=await page.evaluate(()=>scrollY);
-              check(scrolled>10, tag+' page scrolls with burger open', String(scrolled));
-              check(await page.locator('body').evaluate(el=>el.classList.contains('nav-open')), tag+' scroll does not close burger');
-              await page.evaluate(()=>{
-                const mk=(type,x,y)=>document.body.dispatchEvent(new PointerEvent(type,{bubbles:true,pointerId:77,pointerType:'touch',clientX:x,clientY:y}));
-                mk('pointerdown',20,700); mk('pointermove',20,650); mk('pointerup',20,650);
-              });
-              check(await page.locator('body').evaluate(el=>el.classList.contains('nav-open')), tag+' touch movement does not close burger');
-              await page.evaluate(()=>{
-                const mk=type=>document.body.dispatchEvent(new PointerEvent(type,{bubbles:true,pointerId:78,pointerType:'touch',clientX:20,clientY:700})); mk('pointerdown'); mk('pointerup');
-              }); await page.waitForTimeout(30);
-              check(!(await page.locator('body').evaluate(el=>el.classList.contains('nav-open'))), tag+' deliberate outside tap closes burger');
-              await page.locator('#menuToggle').click(); await page.dispatchEvent('#trailerVideo','webkitbeginfullscreen'); await page.waitForTimeout(20);
-              check(!(await page.locator('body').evaluate(el=>el.classList.contains('nav-open'))), tag+' video fullscreen entry closes burger');
-
-              // Smart header keeps guards but visibly interpolates hide/reveal.
-              const dur=await page.locator('.site-header').evaluate(el=>getComputedStyle(el).transitionDuration);
-              check(maxDuration(dur)>=.36, tag+' smart header transition softened', dur);
-              await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);}); await page.waitForTimeout(850);
-              await page.evaluate(()=>scrollTo(0,620)); await page.waitForTimeout(120);
-              check(await page.locator('body').evaluate(el=>el.classList.contains('r7-header-hidden')), tag+' smart header hides down-scroll');
-              await page.evaluate(()=>scrollTo(0,420)); await page.waitForTimeout(120);
-              check(!(await page.locator('body').evaluate(el=>el.classList.contains('r7-header-hidden'))), tag+' smart header reveals up-scroll');
-              await page.locator('#menuToggle').click(); await page.evaluate(()=>scrollTo(0,760)); await page.waitForTimeout(100);
-              check(!(await page.locator('body').evaluate(el=>el.classList.contains('r7-header-hidden'))), tag+' burger keeps smart header visible');
-              await page.locator('#menuToggle').click();
-            }
-
-            // RU/EN smoke on representative phone + desktop.
-            if (v.name==='390x844' || v.name==='1366x768') {
-              const lang0=await page.locator('html').getAttribute('lang'); await page.locator('#langToggle').click(); await page.waitForTimeout(50); const lang1=await page.locator('html').getAttribute('lang');
-              check(lang0!==lang1 && ['ru','en'].includes(lang1), tag+' RU/EN toggle sanity', lang0+' -> '+lang1);
-            }
-
-            check(errors.length===0, tag+' index JS errors = 0', errors.join(' | '));
-            await ctx.close();
-          }
-
-          // Reduced-motion CONTACT remains static/calm.
-          {
-            const v=viewports.at(-1), ctx=await contextFor(v,'reduce'), {page,errors}=await openPage(ctx,TARGET+'/index.html?round6=reduced');
-            const reduced=await page.evaluate(()=>({point:getComputedStyle(document.querySelector('.contact-signal-track i')).animationName,diamond:getComputedStyle(document.querySelector('.contact-signal-track b')).animationName}));
-            check(reduced.point==='none'&&reduced.diamond==='none','[1366x768] CONTACT reduced-motion static',JSON.stringify(reduced));
-            check(errors.length===0,'[1366x768] reduced-motion JS errors = 0',errors.join(' | ')); await ctx.close();
-          }
-
-          // Reviews/help smoke with production Supabase blocked read-only from QA.
-          for (const v of [viewports[0],viewports.at(-1)]) {
-            const ctx=await contextFor(v), {page,errors}=await openPage(ctx,TARGET+'/reviews.html?round6='+v.name);
-            const tag='['+v.name+'][reviews]';
-            const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
-            check(Math.abs(overflow)<=1,tag+' horizontal overflow = 0',String(overflow));
-            check((await page.locator('body').innerText()).includes('THEFT // PUBLIC FILE // 2045'),tag+' public file signature preserved');
-            check(await page.locator('#primaryNav .r7-nav-report').count()===1,tag+' report button preserved');
-            await page.locator('#profileHelpToggle').click(); await page.waitForTimeout(80);
-            const help=await page.locator('#profileHelpPanel').boundingBox(), composer=await page.locator('.review-composer').boundingBox();
-            const active=await page.locator('#profileHelpToggle').getAttribute('aria-expanded');
-            check(active==='true',tag+' help active state visible',String(active));
-            check(help.width<=362 && help.width<=composer.width-6,tag+' help is compact popover',JSON.stringify({help,composer}));
-            const pos=await page.locator('#profileHelpPanel').evaluate(el=>getComputedStyle(el).position);
-            check(pos!=='fixed',tag+' help is not fullscreen modal',pos);
-            await page.screenshot({path:path.join(OUT,'help-'+v.name+'.png'),fullPage:false});
-            check(errors.length===0,tag+' JS errors = 0',errors.join(' | ')); await ctx.close();
-          }
-
-          // Desktop geometry outside intended scope stays identical to Round5 final.
-          {
-            const before=await geometry(BASELINE), after=await geometry(TARGET);
-            let maxDelta=0;
-            for (const s of Object.keys(before)) for (const k of ['x','y','w','h']) maxDelta=Math.max(maxDelta,Math.abs(before[s][k]-after[s][k]));
-            check(maxDelta<=1,'[1366x768] unaffected desktop geometry matches Round5',String(maxDelta));
-          }
-
-          await browser.close();
-          const result={passed:pass,failed:fails.length,failures:fails,checks:details.length};
-          fs.writeFileSync(path.join(OUT,'RESULTS.json'),JSON.stringify(result,null,2));
-          fs.writeFileSync(path.join(OUT,'REPORT.md'),`# R7 post-Round5 owner feedback QA\n\nChecks: ${details.length}\nPassed: ${pass}\nFailed: ${fails.length}\n`);
-          console.log(JSON.stringify(result,null,2));
-          if (fails.length) process.exit(1);
-          EOF
-          node --check /tmp/r7-round6-qa.cjs
+          cp scripts/r7_round6_qa.cjs /tmp/r7_round6_qa.cjs
+          node --check /tmp/r7_round6_qa.cjs
 
       - name: Pre-commit full browser matrix
         shell: bash
@@ -481,76 +59,14 @@ body.r7-phone-landscape.r7-smart-header .site-header {
         run: |
           set -euo pipefail
           rm -rf /tmp/r7-round6-pre && mkdir -p /tmp/r7-round6-pre
-          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/r7-round6-target.log 2>&1 & P1=$!
-          python3 -m http.server 4174 --bind 127.0.0.1 --directory /tmp/r7-round6-baseline >/tmp/r7-round6-base.log 2>&1 & P2=$!
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/r7-target.log 2>&1 & P1=$!
+          python3 -m http.server 4174 --bind 127.0.0.1 --directory /tmp/r7-round6-baseline >/tmp/r7-base.log 2>&1 & P2=$!
           trap 'kill $P1 $P2 2>/dev/null || true' EXIT
           sleep 1
-          timeout 360s env TARGET_URL=http://127.0.0.1:4173 BASELINE_URL=http://127.0.0.1:4174 EVIDENCE_DIR=/tmp/r7-round6-pre node /tmp/r7-round6-qa.cjs
+          timeout 360s env TARGET_URL=http://127.0.0.1:4173 BASELINE_URL=http://127.0.0.1:4174 EVIDENCE_DIR=/tmp/r7-round6-pre node /tmp/r7_round6_qa.cjs
 
-      - name: Write additive docs and create clean final commit
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat >docs/releases/revival/R7/OWNER-FEEDBACK-ROUND6.md <<'EOF'
-          # REVIVAL R7 — OWNER FEEDBACK ROUND 6
-
-          Status: **IMPLEMENTED ON FEATURE BRANCH / BROWSER QA PASSED / OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**
-
-          Date: 2026-09-16
-          Starting verified Round5 head: `4197adc13cc91cbad395e6d2819e0fbb23278449`
-
-          ## Owner-directed changes
-
-          - Desktop CONTACT restores deliberate point travel across the line. Arrival at the fixed endpoint diamond triggers one restrained receive/fill/glow phase, then the cycle resets. Reduced-motion keeps the endpoint static.
-          - Trailer audio no longer inherits a stored/ambiguous application state: the page does not autoplay, native controls remain enabled, the application explicitly starts each page entry unmuted at volume `0.30`, and refresh/BFCache entry reapplies that initial state. User volume/mute changes during the current page session are not overridden while playing.
-          - Materials enlarged/lightbox mode uses materially more viewport space on desktop; normal Materials geometry is unchanged. Close and desktop pagination controls use clean near-square geometry. Compact/mobile previous/next controls remain hidden and swipe remains navigation.
-          - Profile help remains tied to `?` but is presented as a compact anchored popover instead of a composer-wide heavy overlay; help content is unchanged.
-          - Mobile sequential Actors/FAQ shell transitions are slowed/softened while preserving the existing state model, internal staged reveal and no-auto-scroll rule.
-          - Mobile burger no longer locks body scrolling. Pointer movement/scroll gestures do not close it; deliberate outside tap, menu item/X and fullscreen entry still close it. Residual bottom spacing below the REPORT item is removed except for a real device safe-area inset.
-          - Phone smart-header keeps existing hysteresis/interaction/burger safeguards and receives a smoother translate/opacity interpolation only.
-
-          ## Safety
-
-          No Supabase/schema/RLS/Auth/profile/review business logic was changed. `js/public-response.js`, admin runtime, production `main`, deploy state, Custom Cursor and SECURITY PROTOCOL // 2045 are outside this round.
-
-          ## Browser QA
-
-          Real headless Chromium QA covers `390×844`, `430×932`, `844×390`, `932×430`, `768×1024`, `1024×768`, `1366×768`, plus reduced-motion CONTACT and Round5-vs-candidate desktop geometry comparison. Exact-final-SHA verification is repeated after the clean commit by the same workflow before push.
-
-          Browser/platform note for trailer audio: the site explicitly requests unmuted `0.30` volume and never programmatically autoplays. Native browser/OS/device media policy or hardware output may still constrain actual acoustic output; the application no longer leaves its own mute/volume/autoplay state ambiguous.
-          EOF
-
-          python3 - <<'PY'
-          from pathlib import Path
-          additions={
-            'docs/releases/revival/R7/PREVIEW-HANDOFF.md': '''\n\n## Owner feedback Round 6 — 2026-09-16\n\nPost-Round5 visual review keeps the same draft R7 branch and supersedes only the specifically changed preview behavior: desktop CONTACT again uses deliberate line travel with a restrained diamond receive reaction; trailer initial audio is explicit/no-autoplay/unmuted at 30%; desktop Materials enlarged mode uses more viewport space with clean controls; profile help is a compact anchored popover; sequential mobile Actors/FAQ shell transitions are softer; an open burger no longer locks page scrolling while deliberate outside taps still close it; and phone smart-header hide/reveal is visually smoother.\n\nRound6 remains **OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**. No Supabase/backend/deploy/main work is part of this round.\n''',
-            'docs/current/VISUAL-SYSTEM.md': '''\n\n## R7 Round 6 preview refinements — owner-directed, not production\n\nThese rules supersede only conflicting R7 preview behavior and do not alter the approved R6 production foundation.\n\n- Desktop CONTACT may again use a point travelling along the existing line, but arrival must read as an intentional signal handoff: the endpoint diamond briefly fills/glows and resets before the next calm cycle. Reduced-motion has no travelling animation.\n- Materials enlarged/lightbox mode must provide a visibly meaningful scale advantage over the normal stage while preserving contained image proportions and the existing sci-fi presentation. Enlarged-view close/pagination controls use balanced near-square geometry.\n- Profile help remains attached to the `?` control and reads as a compact system popover rather than a heavy form-wide/fullscreen overlay; help text is not changed by this visual rule.\n- Sequential mobile Actors/FAQ transitions should overlap/crossfade the list and detail shell softly; no long empty phase, layout jump or automatic page scroll is introduced.\n- An open mobile burger must not lock document scrolling. Scroll/touch movement alone does not dismiss it; deliberate outside tap and explicit navigation/close/fullscreen actions do.\n- Phone smart-header direction logic/hysteresis stays intact while the visual translate/opacity hide/reveal should interpolate smoothly rather than snap.\n'''
-          }
-          for name,add in additions.items():
-              p=Path(name); s=p.read_text(encoding='utf-8')
-              marker='Owner feedback Round 6' if 'PREVIEW-HANDOFF' in name else 'R7 Round 6 preview refinements'
-              if marker in s: raise SystemExit(f'{name}: Round6 marker already present')
-              p.write_text(s.rstrip()+add+'\n',encoding='utf-8')
-          PY
-
-          git rm .github/workflows/r7-owner-feedback-round6.yml
-          git add js/site.js js/responsive-r7.js css/responsive-r7-polish.css docs/releases/revival/R7/OWNER-FEEDBACK-ROUND6.md docs/releases/revival/R7/PREVIEW-HANDOFF.md docs/current/VISUAL-SYSTEM.md
-          git diff --cached --check
-          git diff --cached --name-only | sort >/tmp/r7-round6-final-files.txt
-          cat >/tmp/r7-round6-allowed.txt <<'EOF'
-          .github/workflows/r7-owner-feedback-round6.yml
-          css/responsive-r7-polish.css
-          docs/current/VISUAL-SYSTEM.md
-          docs/releases/revival/R7/OWNER-FEEDBACK-ROUND6.md
-          docs/releases/revival/R7/PREVIEW-HANDOFF.md
-          js/responsive-r7.js
-          js/site.js
-          EOF
-          diff -u /tmp/r7-round6-allowed.txt /tmp/r7-round6-final-files.txt
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'REVIVAL R7: owner feedback round 6'
-          git rev-parse HEAD >/tmp/r7-round6-final-sha.txt
+      - name: Create clean Round6 final commit
+        run: python3 scripts/r7_round6_finalize.py
 
       - name: Exact-final-SHA full browser verification
         shell: bash
@@ -560,15 +76,25 @@ body.r7-phone-landscape.r7-smart-header .site-header {
           set -euo pipefail
           FINAL=$(cat /tmp/r7-round6-final-sha.txt)
           test "$(git rev-parse HEAD)" = "$FINAL"
-          rm -rf /tmp/r7-round6-final && mkdir -p /tmp/r7-round6-final
-          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/r7-round6-target-final.log 2>&1 & P1=$!
-          python3 -m http.server 4174 --bind 127.0.0.1 --directory /tmp/r7-round6-baseline >/tmp/r7-round6-base-final.log 2>&1 & P2=$!
-          trap 'kill $P1 $P2 2>/dev/null || true' EXIT
-          sleep 1
-          timeout 360s env TARGET_URL=http://127.0.0.1:4173 BASELINE_URL=http://127.0.0.1:4174 EVIDENCE_DIR=/tmp/r7-round6-final node /tmp/r7-round6-qa.cjs
-          printf '%s\n' "$FINAL" >/tmp/r7-round6-final/FINAL_SHA.txt
           test -z "$(git status --porcelain)"
           test ! -e .github/workflows/r7-owner-feedback-round6.yml
+          git diff --name-only 4197adc13cc91cbad395e6d2819e0fbb23278449..HEAD | sort >/tmp/final-actual
+          printf '%s\n' \
+            'css/responsive-r7-polish.css' \
+            'docs/current/VISUAL-SYSTEM.md' \
+            'docs/releases/revival/R7/OWNER-FEEDBACK-ROUND6.md' \
+            'docs/releases/revival/R7/PREVIEW-HANDOFF.md' \
+            'js/responsive-r7.js' \
+            'js/site.js' | sort >/tmp/final-expected
+          diff -u /tmp/final-expected /tmp/final-actual
+          rm -rf /tmp/r7-round6-final && mkdir -p /tmp/r7-round6-final
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/r7-target-final.log 2>&1 & P1=$!
+          python3 -m http.server 4174 --bind 127.0.0.1 --directory /tmp/r7-round6-baseline >/tmp/r7-base-final.log 2>&1 & P2=$!
+          trap 'kill $P1 $P2 2>/dev/null || true' EXIT
+          sleep 1
+          timeout 360s env TARGET_URL=http://127.0.0.1:4173 BASELINE_URL=http://127.0.0.1:4174 EVIDENCE_DIR=/tmp/r7-round6-final node /tmp/r7_round6_qa.cjs
+          printf '%s\n' "$FINAL" >/tmp/r7-round6-final/FINAL_SHA.txt
+          test -z "$(git status --porcelain)"
 
       - name: Push exact verified final SHA
         shell: bash
@@ -580,7 +106,7 @@ body.r7-phone-landscape.r7-smart-header .site-header {
           git push origin HEAD:revival-r7-responsive-mobile
           REMOTE=$(git ls-remote origin refs/heads/revival-r7-responsive-mobile | cut -f1)
           test "$REMOTE" = "$FINAL"
-          printf '%s\n' "$REMOTE"
+          echo "$REMOTE"
 
       - name: Upload exact-final browser evidence
         uses: actions/upload-artifact@v4
