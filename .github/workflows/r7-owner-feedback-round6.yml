@@ -36,16 +36,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          cp scripts/r7_round6_apply.py /tmp/r7_round6_apply.py
           python3 - <<'PY'
           from pathlib import Path
-          p=Path('scripts/r7_round6_apply.py')
+          p=Path('/tmp/r7_round6_apply.py')
           s=p.read_text(encoding='utf-8')
           old="p.write_text(s.rstrip() + add + '\\n', encoding='utf-8')"
           new="p.write_text(s.rstrip() + add.rstrip() + '\\n', encoding='utf-8')"
           if s.count(old)!=1: raise SystemExit(f'apply packaging marker mismatch: {s.count(old)}')
           p.write_text(s.replace(old,new,1),encoding='utf-8')
           PY
-          python3 scripts/r7_round6_apply.py
+          python3 /tmp/r7_round6_apply.py
 
       - name: Install Chromium QA runtime
         shell: bash
