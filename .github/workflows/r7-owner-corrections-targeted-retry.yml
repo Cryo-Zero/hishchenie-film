@@ -1,0 +1,121 @@
+name: R7 owner corrections targeted retry
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+    paths:
+      - .github/workflows/r7-owner-corrections-targeted-retry.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-targeted:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: revival-r7-responsive-mobile
+
+      - name: Restore payloads and apply bounded owner corrections
+        id: product
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=56c8e1f18f79749687b32d57ea34775880f825c9
+          git merge-base --is-ancestor "$BASE" HEAD
+          test -z "$(git diff --name-only "$BASE"..HEAD -- index.html reviews.html admin assets css js supabase migrations | sed -n '1p')"
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,base64,gzip
+          source=Path('.github/workflows/r7-owner-corrections-apply-targeted.yml').read_text(encoding='utf-8')
+          targets=[
+            (r"echo '([^']+)' \| base64 -d \| gzip -d > css/r7-owner-corrections\.css", Path('css/r7-owner-corrections.css')),
+            (r"echo '([^']+)' \| base64 -d \| gzip -d > js/r7-owner-corrections\.js", Path('js/r7-owner-corrections.js')),
+          ]
+          for pat,p in targets:
+            m=re.search(pat,source)
+            if not m: raise SystemExit(f'payload missing for {p}')
+            p.write_bytes(gzip.decompress(base64.b64decode(m.group(1))))
+          idx=Path('index.html'); s=idx.read_text(encoding='utf-8')
+          css_marker='<link rel="stylesheet" href="css/responsive-r7-owner-round2.css?v=r7-owner-20260911a">'
+          css_new=css_marker+'\n<link rel="stylesheet" href="css/r7-owner-corrections.css?v=r7-owner-20260916b">'
+          if s.count(css_marker)!=1 or 'r7-owner-corrections.css' in s: raise SystemExit('index CSS marker mismatch')
+          s=s.replace(css_marker,css_new,1)
+          js_marker='<script src="js/responsive-r7.js?v=r7-owner-20260911a"></script>'
+          js_new=js_marker+'\n<script src="js/r7-owner-corrections.js?v=r7-owner-20260916b"></script>'
+          if s.count(js_marker)!=1 or 'r7-owner-corrections.js' in s: raise SystemExit('index JS marker mismatch')
+          idx.write_text(s.replace(js_marker,js_new,1),encoding='utf-8')
+          rev=Path('reviews.html'); s=rev.read_text(encoding='utf-8')
+          if s.count(css_marker)!=1 or 'r7-owner-corrections.css' in s: raise SystemExit('reviews CSS marker mismatch')
+          rev.write_text(s.replace(css_marker,css_new,1),encoding='utf-8')
+          PY
+          node --check js/r7-owner-corrections.js
+          git add -N css/r7-owner-corrections.css js/r7-owner-corrections.js
+          git diff --check
+          echo '--- bounded runtime diff ---'
+          git diff --stat
+          git diff --name-only
+          expected=$(git diff --name-only | sort | tr '\n' ' ')
+          test "$expected" = "css/r7-owner-corrections.css index.html js/r7-owner-corrections.js reviews.html "
+          test -z "$(git diff --name-only | grep -E '^(supabase/|migrations/|admin/)' || true)"
+          git config user.name 'Cryo-Zero'
+          git config user.email 'Bogdan.Vedrentsov@gmail.com'
+          git add css/r7-owner-corrections.css js/r7-owner-corrections.js index.html reviews.html
+          git commit -m 'feat: apply final R7 owner visual corrections'
+          PRODUCT_SHA=$(git rev-parse HEAD)
+          echo "product_sha=$PRODUCT_SHA" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$PRODUCT_SHA" >/tmp/R7_OWNER_PRODUCT_SHA.txt
+          git push origin HEAD:revival-r7-responsive-mobile
+          git worktree add /tmp/r7-owner-product "$PRODUCT_SHA"
+
+      - name: Install targeted browser runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7qa && cd /tmp/r7qa
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          npx playwright install --with-deps chromium firefox webkit >/dev/null 2>&1
+
+      - name: Run targeted owner-correction regression
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+          PRODUCT_SHA: ${{ steps.product.outputs.product_sha }}
+        run: |
+          set -euo pipefail
+          OUT=/tmp/r7-owner-targeted-evidence
+          rm -rf "$OUT" && mkdir -p "$OUT"
+          cp /tmp/R7_OWNER_PRODUCT_SHA.txt "$OUT/PRODUCT_SHA.txt"
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,base64,gzip
+          source=Path('.github/workflows/r7-owner-corrections-apply-targeted.yml').read_text(encoding='utf-8')
+          m=re.search(r"echo '([^']+)' \| base64 -d \| gzip -d >/tmp/r7-owner-targeted\.cjs",source)
+          if not m: raise SystemExit('targeted harness payload missing')
+          Path('/tmp/r7-owner-targeted.cjs').write_bytes(gzip.decompress(base64.b64decode(m.group(1))))
+          PY
+          cp /tmp/r7-owner-targeted.cjs "$OUT/HARNESS-SOURCE.cjs"
+          node --check /tmp/r7-owner-targeted.cjs
+          python3 -m http.server 4175 --bind 127.0.0.1 --directory /tmp/r7-owner-product >/tmp/r7-owner-targeted-server.log 2>&1 & SERVER=$!
+          trap 'kill $SERVER 2>/dev/null || true' EXIT
+          sleep 1
+          set +e
+          timeout 1200s env BASE_URL=http://127.0.0.1:4175 PRODUCT_SHA="$PRODUCT_SHA" EVIDENCE_DIR="$OUT" node /tmp/r7-owner-targeted.cjs
+          STATUS=$?
+          set -e
+          printf '%s\n' "$STATUS" > "$OUT/AUDIT_EXIT_CODE.txt"
+          cp /tmp/r7-owner-targeted-server.log "$OUT/server.log"
+          exit "$STATUS"
+
+      - name: Upload targeted evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-owner-corrections-targeted-evidence
+          path: /tmp/r7-owner-targeted-evidence
+          if-no-files-found: warn
