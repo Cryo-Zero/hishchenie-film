@@ -152,3 +152,24 @@
   syncTime();
   syncVolume();
 })();
+
+/* Owner-correction follow-up: capture sequential viewport before legacy bubble handlers mutate geometry. */
+(() => {
+  'use strict';
+  const selector = '#cast .cast-list-item, #cast .r7-subject-back, #cast #dossierPrompt.r7-subject-return, #faq .faq-query-item, #faq .r7-query-back';
+  const scheduleRestore = (x, y) => {
+    const restore = () => {
+      if (Math.abs(scrollX - x) > .5 || Math.abs(scrollY - y) > .5) scrollTo({ left: x, top: y, behavior: 'auto' });
+    };
+    requestAnimationFrame(() => requestAnimationFrame(restore));
+    setTimeout(restore, 60);
+    setTimeout(restore, 180);
+  };
+  document.addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return;
+    if (!event.target.closest(selector)) return;
+    const x = scrollX;
+    const y = scrollY;
+    scheduleRestore(x, y);
+  }, true);
+})();

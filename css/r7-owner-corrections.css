@@ -272,3 +272,31 @@ body.r7-phone-landscape .r7-mobile-hero-actions { margin-top: 9px !important; ro
     clip-path: none !important;
   }
 }
+
+/* Owner-correction targeted QA follow-up: resolve legacy specificity and grid-gap interactions. */
+@media (min-width: 821px) {
+  #lightbox.open #lightboxPrev,
+  #lightbox.open #lightboxNext {
+    width: clamp(104px, 14vw, 220px) !important;
+    height: min(68vh, 560px) !important;
+    min-width: 104px !important;
+    min-height: 180px !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+@media (max-width: 820px) {
+  .hero-inner > .r7-mobile-hero-copy { margin-top: -19px !important; }
+  .hero-inner > .r7-mobile-hero-actions { margin-top: -24px !important; }
+}
+body.r7-phone-landscape .hero-inner > .r7-mobile-hero-copy { margin-top: -9px !important; }
+body.r7-phone-landscape .hero-inner > .r7-mobile-hero-actions { margin-top: -14px !important; }
+body.r7-phone-landscape.r7-sequential-ui #cast.r7-dossier-open .r7-subject-back,
+body.r7-phone-landscape.r7-sequential-ui #faq.r7-response-open .r7-query-back {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: flex-start;
+}
+body.r7-sequential-ui #cast .cast-console,
+body.r7-sequential-ui #faq .faq-console { overflow-anchor: none !important; }
