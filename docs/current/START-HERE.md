@@ -15,6 +15,19 @@ Before changing runtime, visual behavior, backend, release state or project docu
 
 For R7 work also read the relevant `docs/releases/revival/R7/OWNER-FEEDBACK-ROUND*.md` files as historical/evidence context. Release-round files do **not** override the current canonical state merely because they contain older owner instructions.
 
+### Mandatory fresh-read rule — durable project rule
+
+This is a standing governance rule, not optional prompt wording.
+
+- Every **new bridge, curator, planning/development session** must determine the actual current branch/commit first and then read `START-HERE.md` plus all five canonical files above from that current HEAD before planning or changing anything.
+- A bridge that has worked on the project before must **not** rely on a previous reading, remembered rules, an old prompt, chat context, release notes or a pasted summary as a substitute for the current canonical files.
+- A resumed bridge must perform the same fresh read when canonical documentation may have changed since its previous read.
+- If canonical documentation changes while a task is in progress, the bridge/curator must re-check `START-HERE.md` and the affected canonical files before finalizing implementation or making a new design/architecture decision.
+- The implementation report must state which HEAD/ref was used for the fresh canonical read. If the bridge cannot verify/read the current canonical files, it must stop and report that limitation instead of guessing.
+- Future task prompts may remind the bridge of this rule, but the rule applies even when a prompt does not repeat it.
+
+The purpose is to prevent a new or returning bridge from implementing an older interpretation after project memory has moved forward.
+
 ## 2. Status vocabulary — do not mix these states
 
 - **PRODUCTION** — merged/deployed public release on `main`.
