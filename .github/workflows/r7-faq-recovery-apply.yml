@@ -1,0 +1,36 @@
+name: R7 FAQ recovery apply
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+    paths:
+      - .github/workflows/r7-faq-recovery-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: revival-r7-responsive-mobile
+      - name: Apply bounded CSS correction
+        shell: bash
+        run: |
+          set -euo pipefail
+          PRODUCT_BASE=66c31fa36896b3b968799ec154fd3bbdb6f4a2e5
+          git merge-base --is-ancestor "$PRODUCT_BASE" HEAD
+          test -z "$(git diff --name-only "$PRODUCT_BASE"..HEAD -- index.html reviews.html admin assets css js supabase migrations | sed -n '1p')"
+          ! grep -q 'FAQ recovery: structural reveal stays un-translated' css/r7-owner-corrections.css
+          printf '%s' 'Ci8qIEZBUSByZWNvdmVyeTogc3RydWN0dXJhbCByZXZlYWwgc3RheXMgdW4tdHJhbnNsYXRlZC4KICAgTGVnYWN5IFI3IGxheWVycyBzdGlsbCB0cmFuc2l0aW9uIHRoZSBtb2JpbGUgcmVzcG9uc2Ugc2hlbGwgZnJvbSAtNHB4IGFuZAogICBzeXN0ZW0vY29udGVudCB3cmFwcGVycyBmcm9tICsyLys0cHguIE93bmVyLWFwcHJvdmVkIFI3IG1vdGlvbiBrZWVwcyB0aGVzZQogICBzdHJ1Y3R1cmFsIGNvb3JkaW5hdGVzIGZpeGVkIGFuZCByZXZlYWxzIGluZm9ybWF0aW9uIHZpYSBvcGFjaXR5L2NsaXAgb25seS4gKi8KYm9keS5yNy1zZXF1ZW50aWFsLXVpICNmYXE6bm90KC5yNy1yZXNwb25zZS1vcGVuKSAuZmFxLXJlc3BvbnNlLXBhbmVsLApib2R5LnI3LXNlcXVlbnRpYWwtdWkgI2ZhcS5yNy1yZXNwb25zZS1vcGVuIC5mYXEtcmVzcG9uc2UtcGFuZWwgewogIHRyYW5zZm9ybTogbm9uZSAhaW1wb3J0YW50Owp9Ci5mYXEtcmVzcG9uc2UtcGFuZWwuaXMtcjctY3Jvc3NmYWRlLW91dCAuZmFxLXJlc3BvbnNlLWNvbnRlbnQgPiAqLAouZmFxLXJlc3BvbnNlLXBhbmVsLmlzLXI3LWNyb3NzZmFkZS1vdXQgLmZhcS1zeXN0ZW0tYm94ID4gZGl2LAouZmFxLXJlc3BvbnNlLXBhbmVsLmlzLXI3LWNyb3NzZmFkZS1vdXQgLmZhcS1yZXNwb25zZS1sb2csCi5mYXEtcmVzcG9uc2UtcGFuZWwuaXMtcjctY3Jvc3NmYWRlLWluIC5mYXEtcmVzcG9uc2UtY29udGVudCA+ICosCi5mYXEtcmVzcG9uc2UtcGFuZWwuaXMtcjctY3Jvc3NmYWRlLWluIC5mYXEtc3lzdGVtLWJveCA+IGRpdiwKLmZhcS1yZXNwb25zZS1wYW5lbC5pcy1yNy1jcm9zc2ZhZGUtaW4gLmZhcS1yZXNwb25zZS1sb2csCi5mYXEtcmVzcG9uc2UtcGFuZWwuaXMtcmV2ZWFsZWQgLmZhcS1yZXNwb25zZS1jb250ZW50ID4gKiwKLmZhcS1yZXNwb25zZS1wYW5lbC5pcy1yZXZlYWxlZCAuZmFxLXN5c3RlbS1ib3ggPiBkaXYsCi5mYXEtcmVzcG9uc2UtcGFuZWwuaXMtcmV2ZWFsZWQgLmZhcS1yZXNwb25zZS1sb2cgewogIHRyYW5zZm9ybTogbm9uZSAhaW1wb3J0YW50OwogIHRyYW5zaXRpb24tcHJvcGVydHk6IG9wYWNpdHksIGNsaXAtcGF0aCAhaW1wb3J0YW50Owp9Cg==' | base64 -d >> css/r7-owner-corrections.css
+          git diff --check
+          test "$(git diff --name-only | tr '\n' ' ')" = "css/r7-owner-corrections.css "
+          git config user.name 'Cryo-Zero'
+          git config user.email 'Bogdan.Vedrentsov@gmail.com'
+          git add css/r7-owner-corrections.css
+          git commit -m 'fix: keep mobile FAQ structure stationary'
+          git push origin HEAD:revival-r7-responsive-mobile
