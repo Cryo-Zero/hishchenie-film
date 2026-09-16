@@ -155,3 +155,9 @@ Round4 remains **OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**. Do not merge or
 Round5 is implemented on the R7 feature branch and remains **NOT PRODUCTION / OWNER VISUAL REVIEW PENDING**. It hides (without deleting from source) the compact Hero synopsis, removes the Materials explanatory note and mobile Materials arrows, softens Actors/FAQ transitions, replaces CONTACT travel with a fixed endpoint/local impulse, adds tap-vs-scroll-aware burger dismissal/fullscreen safeguards, cleans the burger REPORT contour and profile-help geometry/state, removes the public BUILD label, and adds `THEFT // PUBLIC FILE // 2045` to Reviews.
 
 Round5 preserves Supabase/reviews/profile/auth business logic and desktop-only Materials pagination. Browser QA pre-commit result: **192/192 PASS**; final acceptance still depends on exact-final-SHA browser evidence and owner visual review.
+
+## Owner feedback Round 6 — 2026-09-16
+
+Post-Round5 visual review keeps the same draft R7 branch and supersedes only the specifically changed preview behavior: desktop CONTACT again uses deliberate line travel with a restrained diamond receive reaction; trailer initial audio is explicit/no-autoplay/unmuted at 30%; desktop Materials enlarged mode uses more viewport space with clean controls; profile help is a compact anchored popover; sequential mobile Actors/FAQ shell transitions are softer; an open burger no longer locks page scrolling while deliberate outside taps still close it; and phone smart-header hide/reveal is visually smoother.
+
+Round6 remains **OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**. No Supabase/backend/deploy/main work is part of this round.

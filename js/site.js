@@ -384,14 +384,21 @@
   addEventListener('resize', scheduleDesktopAudit);
   if (document.fonts?.ready) document.fonts.ready.then(scheduleDesktopAudit).catch(() => {});
 
-  // Trailer starts gently. Once a visitor changes the level, remember their choice.
+  // Trailer audio is deterministic and user-safe: no autoplay, explicit unmuted
+  // application state, and a restrained 30% starting level on each page entry.
+  // Native controls may change volume/mute for the current page session; we do not
+  // fight those user changes while playback is active.
   const trailerVideo = $('#trailerVideo');
   if (trailerVideo) {
-    const storedVolume = Number(localStorage.getItem('theft_trailer_volume'));
-    trailerVideo.volume = Number.isFinite(storedVolume) && storedVolume >= 0 && storedVolume <= 1 ? storedVolume : .35;
-    trailerVideo.addEventListener('volumechange', () => {
-      try { localStorage.setItem('theft_trailer_volume', String(trailerVideo.volume)); } catch {}
-    });
+    const resetTrailerAudio = () => {
+      trailerVideo.removeAttribute('autoplay');
+      trailerVideo.autoplay = false;
+      trailerVideo.defaultMuted = false;
+      trailerVideo.muted = false;
+      trailerVideo.volume = .30;
+    };
+    resetTrailerAudio();
+    addEventListener('pageshow', event => { if (event.persisted) resetTrailerAudio(); });
   }
 
   // SUBJECT DOSSIER ------------------------------------------------------------

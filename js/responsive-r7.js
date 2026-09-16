@@ -259,7 +259,7 @@ function installMobileNavDismissal() {
       if (panel.hidden) return;
       const parentRect = composer.getBoundingClientRect();
       const buttonRect = toggle.getBoundingClientRect();
-      const width = Math.min(380, Math.max(260, parentRect.width - 28));
+      const width = Math.min(360, Math.max(260, parentRect.width - 28));
       const preferredLeft = buttonRect.right - parentRect.left - width;
       const left = Math.max(10, Math.min(parentRect.width - width - 10, preferredLeft));
       const arrowRight = Math.max(16, Math.min(width - 20, parentRect.right - buttonRect.right + 13));

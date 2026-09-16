@@ -303,3 +303,14 @@ These rules supersede only conflicting R7 preview behavior and remain feature-br
 - Mobile burger dismissal distinguishes deliberate outside tap/click from scroll/swipe movement; fullscreen content must not retain the open burger above it.
 - Profile help `?` is quiet at rest and clearly active only while its anchored panel is open; the panel contour is complete/clean and approximately follows the profile block width.
 - Public build/debug labels are not visitor-facing UI. `THEFT // PUBLIC FILE // 2045` remains the public footer signature and is shared by main and Reviews.
+
+## R7 Round 6 preview refinements — owner-directed, not production
+
+These rules supersede only conflicting R7 preview behavior and do not alter the approved R6 production foundation.
+
+- Desktop CONTACT may again use a point travelling along the existing line, but arrival must read as an intentional signal handoff: the endpoint diamond briefly fills/glows and resets before the next calm cycle. Reduced-motion has no travelling animation.
+- Materials enlarged/lightbox mode must provide a visibly meaningful scale advantage over the normal stage while preserving contained image proportions and the existing sci-fi presentation. Enlarged-view close/pagination controls use balanced near-square geometry.
+- Profile help remains attached to the `?` control and reads as a compact system popover rather than a heavy form-wide/fullscreen overlay; help text is not changed by this visual rule.
+- Sequential mobile Actors/FAQ transitions should overlap/crossfade the list and detail shell softly; no long empty phase, layout jump or automatic page scroll is introduced.
+- An open mobile burger must not lock document scrolling. Scroll/touch movement alone does not dismiss it; deliberate outside tap and explicit navigation/close/fullscreen actions do.
+- Phone smart-header direction logic/hysteresis stays intact while the visual translate/opacity hide/reveal should interpolate smoothly rather than snap.
