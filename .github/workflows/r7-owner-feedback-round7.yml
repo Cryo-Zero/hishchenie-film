@@ -25,10 +25,6 @@ jobs:
           ROUND5=4197adc13cc91cbad395e6d2819e0fbb23278449
           DOCBASE=9d9b7ab613bb48a7273fc68bdf5756baaa156d3a
 
-          # DOCBASE contains the curator's complete post-Round6 canonical-memory
-          # checkpoint (including the later START-HERE entrypoint clarification
-          # in DECISIONS) plus temporary Round7 staging infrastructure, but no
-          # product-runtime modifications.
           git merge-base --is-ancestor "$ROUND6" "$DOCBASE"
           git merge-base --is-ancestor "$DOCBASE" HEAD
           git diff --name-only "$ROUND6".."$DOCBASE" | sort >/tmp/docbase-actual
@@ -46,11 +42,14 @@ jobs:
             'scripts/r7_round7_qa.cjs' | sort >/tmp/docbase-expected
           diff -u /tmp/docbase-expected /tmp/docbase-actual
 
-          # After the complete doc checkpoint only this workflow QA harness may
-          # have been repaired. No product/runtime drift is allowed here.
+          # Staging repairs after DOCBASE are restricted to the workflow and the
+          # temporary QA source itself. Product/runtime files must still match Round6.
           git diff --name-only "$DOCBASE"..HEAD | sort >/tmp/staging-actual
-          printf '%s\n' '.github/workflows/r7-owner-feedback-round7.yml' | sort >/tmp/staging-expected
+          printf '%s\n' \
+            '.github/workflows/r7-owner-feedback-round7.yml' \
+            'scripts/r7_round7_qa.cjs' | sort >/tmp/staging-expected
           diff -u /tmp/staging-expected /tmp/staging-actual
+          git diff --quiet "$ROUND6"..HEAD -- js/site.js js/responsive-r7.js css/site.css css/responsive-r7-polish.css css/responsive-r7-owner-round2.css
 
           git worktree add /tmp/r7-round7-round5 "$ROUND5"
           git worktree add /tmp/r7-round7-round6 "$ROUND6"
@@ -83,18 +82,11 @@ jobs:
           from pathlib import Path
           src = Path('/tmp/r7_round7_qa.cjs').read_text(encoding='utf-8')
 
-          # Run 35090298453 proved two QA-timing false negatives: 45ms was too
-          # early to observe the authored opacity interpolation reliably. Keep
-          # the same <.95 acceptance, sample later inside the 140ms outgoing phase.
           old = 'await p.waitForTimeout(45);'
           if src.count(old) != 2:
               raise SystemExit(f'Round7 reveal timing marker mismatch: {src.count(old)}')
           src = src.replace(old, 'await p.waitForTimeout(100);')
 
-          # The help control starts below the fold. Playwright correctly scrolls
-          # a clicked off-screen button into view; that is not product reflow.
-          # Put the control in view before the baseline snapshot so the assertion
-          # measures layout/scroll caused by OPENING help, not test-runner focus scroll.
           old = "  const tag = `[${v.name}][reviews]`;\n  const before = await p.evaluate(() => {"
           new = "  const tag = `[${v.name}][reviews]`;\n  await p.locator('#profileHelpToggle').scrollIntoViewIfNeeded();\n  await p.waitForTimeout(80);\n  const before = await p.evaluate(() => {"
           if src.count(old) != 1:
