@@ -1,4 +1,4 @@
-name: R7 owner corrections final targeted audit
+name: R7 owner corrections recovery targeted audit
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  targeted-final:
+  targeted-recovery:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
@@ -23,14 +23,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          PRODUCT=b8f9ce4b4fae79aa68baf1fee731f8f4fa730803
+          PRODUCT=66c31fa36896b3b968799ec154fd3bbdb6f4a2e5
           git merge-base --is-ancestor "$PRODUCT" HEAD
           test -z "$(git diff --name-only "$PRODUCT"..HEAD -- index.html reviews.html admin assets css js supabase migrations | sed -n '1p')"
           git worktree add /tmp/r7-owner-product "$PRODUCT"
           printf '%s\n' "$PRODUCT" >/tmp/R7_OWNER_PRODUCT_SHA.txt
           printf '%s\n' "$(git rev-parse HEAD)" >/tmp/AUDIT_TRIGGER_HEAD.txt
+          node --check /tmp/r7-owner-product/js/r7-owner-corrections.js
+          ! grep -q 'scheduleRestore' /tmp/r7-owner-product/js/r7-owner-corrections.js
 
-      - name: Install browsers and prepare harness
+      - name: Install browsers and prepare harnesses
         shell: bash
         run: |
           set -euo pipefail
@@ -61,13 +63,15 @@ jobs:
             s=s.replace(old,new,1)
           Path('/tmp/r7-owner-targeted-final.cjs').write_text(s,encoding='utf-8')
           PY
+          echo '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' | base64 -d | gzip -d >/tmp/r7-recovery-cycles.cjs
           NODE_PATH=/tmp/r7qa/node_modules node --check /tmp/r7-owner-targeted-final.cjs
+          NODE_PATH=/tmp/r7qa/node_modules node --check /tmp/r7-recovery-cycles.cjs
 
       - name: Run immutable targeted audit
         shell: bash
         env:
           NODE_PATH: /tmp/r7qa/node_modules
-          PRODUCT_SHA: b8f9ce4b4fae79aa68baf1fee731f8f4fa730803
+          PRODUCT_SHA: 66c31fa36896b3b968799ec154fd3bbdb6f4a2e5
         run: |
           set -euo pipefail
           OUT=/tmp/r7-owner-targeted-final
@@ -75,21 +79,25 @@ jobs:
           cp /tmp/R7_OWNER_PRODUCT_SHA.txt "$OUT/PRODUCT_SHA.txt"
           cp /tmp/AUDIT_TRIGGER_HEAD.txt "$OUT/AUDIT_TRIGGER_HEAD.txt"
           cp /tmp/r7-owner-targeted-final.cjs "$OUT/HARNESS-SOURCE.cjs"
+          cp /tmp/r7-recovery-cycles.cjs "$OUT/RECOVERY-CYCLES-SOURCE.cjs"
           python3 -m http.server 4175 --bind 127.0.0.1 --directory /tmp/r7-owner-product >/tmp/r7-owner-targeted-final-server.log 2>&1 & SERVER=$!
           trap 'kill $SERVER 2>/dev/null || true' EXIT
           sleep 1
           set +e
           timeout 1200s env BASE_URL=http://127.0.0.1:4175 PRODUCT_SHA="$PRODUCT_SHA" EVIDENCE_DIR="$OUT" node /tmp/r7-owner-targeted-final.cjs
-          STATUS=$?
+          MAIN_STATUS=$?
+          timeout 900s env BASE_URL=http://127.0.0.1:4175 PRODUCT_SHA="$PRODUCT_SHA" EVIDENCE_DIR="$OUT" node /tmp/r7-recovery-cycles.cjs
+          CYCLE_STATUS=$?
           set -e
-          printf '%s\n' "$STATUS" > "$OUT/AUDIT_EXIT_CODE.txt"
+          printf 'main=%s\ncycles=%s\n' "$MAIN_STATUS" "$CYCLE_STATUS" > "$OUT/AUDIT_EXIT_CODE.txt"
           cp /tmp/r7-owner-targeted-final-server.log "$OUT/server.log"
-          exit "$STATUS"
+          test "$MAIN_STATUS" -eq 0
+          test "$CYCLE_STATUS" -eq 0
 
-      - name: Upload final targeted evidence
+      - name: Upload recovery targeted evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: r7-owner-corrections-targeted-final-evidence
+          name: r7-owner-corrections-recovery-targeted-evidence
           path: /tmp/r7-owner-targeted-final
           if-no-files-found: warn
