@@ -2,15 +2,19 @@
 
 This document is the canonical multi-workstream plan for the project: what we want to improve, what is already accepted, what was rejected/superseded, what remains only an idea, what is complete, and what should happen next.
 
-It complements the other canonical files:
+Read `START-HERE.md` first. It defines status vocabulary and conflict resolution.
 
-- `PROJECT-STATE.md` — what is true now;
+This file complements the other canonical files:
+
+- `PROJECT-STATE.md` — what is factually true now;
 - `DECISIONS.md` — durable accepted rules/reasons;
 - `VISUAL-SYSTEM.md` — active visual/composition laws;
 - `BACKLOG.md` — ideas that may be revisited;
 - `ROADMAP.md` — how the known workstreams relate, their status/history and the intended sequence.
 
 **Presence in ROADMAP is not blanket authorization to implement every item.** Current explicit owner instruction and per-task approval still govern implementation. A workstream may contain approved principles while later stages/ideas remain unapproved.
+
+Historical sections are preserved for traceability. If a historical round conflicts with the current status/active direction recorded at the top of its workstream or in `PROJECT-STATE.md` / `VISUAL-SYSTEM.md`, the current canonical state wins.
 
 ## How to maintain this roadmap
 
@@ -32,7 +36,7 @@ Canonical documentation-preservation rules in `DECISIONS.md` apply to this file.
 
 ## Workstream A — Responsive / device adaptation
 
-**Status:** ACTIVE NEXT WORKSTREAM / design direction requires owner approval before substantial implementation.
+**Status:** ACTIVE R7 PREVIEW STABILIZATION / ROUND 6 IMPLEMENTED AND QA-VERIFIED / OWNER VISUAL ACCEPTANCE PENDING / POST-ROUND6 CORRECTIONS APPROVED AND PENDING IMPLEMENTATION.
 
 ### Goal
 
@@ -54,9 +58,30 @@ The site must account for real combinations of:
 
 ### Current state
 
-- REVIVAL R6 desktop runtime is the approved visual reference.
-- Partial adaptive safeguards already exist: burger navigation, short-desktop fallback, several mobile stacks, coarse-pointer handling and Archive touch/swipe support.
-- A full device-responsive reinterpretation has not yet been implemented as the next dedicated release.
+Production remains **REVIVAL R6** on `main`.
+
+Responsive implementation is already substantially present on feature branch:
+
+- branch: `revival-r7-responsive-mobile`;
+- draft PR: `#18`;
+- Round 6 verified feature SHA: `f5e154912986c95e7f48a15bce34c707db39667c`;
+- Round 6 automated browser gate passed;
+- production `main` was not changed by Round 6;
+- owner visual acceptance remains pending.
+
+Owner visual review after Round 6 found real presentation regressions/incorrect interpretations despite green automated QA. The owner has approved a bounded correction set that is **pending implementation**. Therefore the current runtime checkpoint and the current desired visual contract intentionally differ in those specific areas.
+
+### Current owner-approved correction set — pending implementation
+
+Authoritative details live in `VISUAL-SYSTEM.md` and `START-HERE.md`. Summary:
+
+- desktop Archive wall control remains the only currently approved outside-grid element and must preserve its physical-wall behavior;
+- mobile visible `ARCHIVE // 11` trigger is superseded and approved for removal while stage/swipe/lightbox remain;
+- Actors/FAQ keep staged text reveal but internal structural lines/dividers must remain stationary;
+- CONTACT keeps travelling-point semantics on desktop and mobile, with no extra receive/card/diamond glow/fill reaction;
+- profile help remains anchored/no-reflow but returns to approximately profile-console-aligned width rather than an arbitrary compact card;
+- mobile Hero restores the existing synopsis in order `POSTER → SYNOPSIS → ACTIONS`;
+- Round 6 burger scrolling and smart-header improvements remain unless a later owner review says otherwise.
 
 ### Accepted direction / decisions
 
@@ -68,7 +93,9 @@ The site must account for real combinations of:
 - Tablet landscape should remain close to desktop when space allows.
 - Phone may use sequential/fullscreen/sub-scene interpretations when literal compression would damage the design.
 - Actors, FAQ and Archive require scene-specific responsive treatment rather than generic card/accordion/gallery replacement.
-- Final acceptance must use actual browser/device rendering; mockups prove direction, not implementation.
+- Final acceptance must use actual browser/device rendering; mockups/source inspection/automated QA do not equal owner visual acceptance.
+- Mobile Actors/FAQ state changes do not auto-scroll the page.
+- Archive is Materials-local and does not follow the visitor through unrelated scenes.
 
 ### Rejected / superseded directions
 
@@ -77,31 +104,38 @@ The site must account for real combinations of:
 - Treating every portrait viewport as a phone.
 - Reviving P20/P21/P22 rejected redesigns as the responsive baseline.
 - Redesigning the approved desktop scene geometry merely to make mobile implementation easier.
+- Treating green browser automation as final owner visual approval.
+- Round4 mobile `ARCHIVE // 11` trigger as the active desired mobile control: superseded after Round6 owner review.
+- Round5 hidden mobile Hero synopsis as the active desired composition: superseded after Round6 owner review.
+- Round6 extra CONTACT receive glow/fill and arbitrary compact help-panel interpretation: rejected by owner visual review.
 
 ### Candidate ideas / open questions
 
-- Exact breakpoint strategy should be derived from content/scene constraints rather than arbitrary device names.
-- Some phone scenes may benefit from sub-scene navigation or controlled vertical sequencing.
-- Optional pixel-perfect mobile polish should follow functional completeness rather than block the first usable pass.
+- Exact breakpoint strategy should continue to be derived from content/scene constraints rather than arbitrary device names.
+- Optional pixel-perfect mobile polish may continue after functional/visual stabilization if the owner sees value.
+- Any new outside-world-grid visual exception beyond the desktop Archive control requires separate explicit owner approval.
 
 ### Next actions
 
-Planned sequence, each substantial visual reinterpretation still subject to owner review/approval:
+Current authorized sequence:
 
-1. Capture/confirm current desktop and existing adaptive baseline plus a rollback point.
-2. Review scene-by-scene responsive composition with the owner before implementation.
-3. Create a separate responsive feature branch after implementation is authorized.
-4. Establish shared viewport primitives: header/nav behavior, safe-area handling, viewport-height rules, touch targets and orientation handling.
-5. Adapt main public scenes incrementally: Hero → About → Materials/Archive → Trailer → Watch → Actors → FAQ → Contacts/navigation transitions.
-6. Adapt Reviews as its own dense workstream: RESPONSE summary → profile/composer → rating controls → feed → replies/inline edit → sorting/settings.
-7. Validate representative contexts including `390×844`, `844×390`, `430×932`, `932×430`, `768×1024`, `1024×768`, `1366×768`, `1080×1920`, plus real/problematic sizes discovered during QA.
-8. Test rotation/orientation changes, short-height windows, scaling/zoom, touch/pointer/hover and safe-area/browser-UI behavior.
-9. Perform actual browser/device render QA; do not substitute source inspection for visual proof.
-10. Only after functional completion, run a separate polish pass if useful.
+1. Read `START-HERE.md`, `PROJECT-STATE.md`, `DECISIONS.md`, `VISUAL-SYSTEM.md`, this ROADMAP and relevant R7 round history.
+2. Continue from the actual current R7 branch head; do not restart responsive work from R6 or an older round.
+3. Implement only the owner-approved post-Round6 correction set.
+4. Preserve production `main`, Supabase/backend/review/profile business logic and unrelated scenes.
+5. Add browser assertions and screenshot evidence specifically capable of catching the visual regressions missed by Round6 automation.
+6. Verify representative phone/tablet/desktop contexts, orientation, scrolling, overflow and JS errors.
+7. Produce an exact tested/pushed/remote feature SHA.
+8. Return to owner visual review.
+9. Repeat bounded corrections if needed.
+10. Only after explicit owner visual acceptance may merge/deploy be considered.
 
 ### History / evidence
 
-- `docs/current/VISUAL-SYSTEM.md`
+- `docs/current/START-HERE.md` — current gate/conflict rules.
+- `docs/current/VISUAL-SYSTEM.md` — active visual contract.
+- `docs/releases/revival/R7/PREVIEW-HANDOFF.md` — R7 implementation history.
+- `docs/releases/revival/R7/OWNER-FEEDBACK-ROUND2.md` through `OWNER-FEEDBACK-ROUND6.md` — chronological owner-feedback evidence; older conflicting choices may be superseded.
 - `docs/releases/revival/R2/` — stable section geometry/hash landing.
 - `docs/releases/revival/R3/` — desktop feed/inline edit and support-guide alignment.
 - `docs/releases/revival/R4/` — adaptive desktop behavior for short/narrow windows.
@@ -158,7 +192,7 @@ Accepted principles:
 
 ### Next actions
 
-- No admin redesign is required before responsive public-site work.
+- No admin redesign is required during the active R7 visual-stabilization phase.
 - Revisit admin only when: a functional/accessibility issue appears, multiple moderators are needed, Bug Reports v2 is approved, audit history becomes useful, or owner explicitly prioritizes visual polish.
 - Before expanding admin permissions, define the intended role/permission matrix and verify it server-side.
 
@@ -174,7 +208,7 @@ Accepted principles:
 
 ## Workstream C — Reviews / community
 
-**Status:** CORE SYSTEM STABLE / responsive adaptation is next; scale features remain future ideas.
+**Status:** CORE SYSTEM STABLE / R7 responsive preview exists / preserve business logic during current visual stabilization; scale features remain future ideas.
 
 ### Goal
 
@@ -202,6 +236,8 @@ Implemented current contract includes:
 - R6 profile-help/privacy explanation;
 - curated numbered aliases with database-enforced canonical uniqueness for covered identities.
 
+R7 includes responsive presentation work for Reviews/profile, but the current post-Round6 correction phase must not change review/profile business logic.
+
 ### Accepted direction / decisions
 
 - Public feeds/stats may be readable without exposing technical Auth IDs.
@@ -228,9 +264,8 @@ Implemented current contract includes:
 
 ### Next actions
 
-- Preserve current desktop review behavior during responsive work.
-- Design/approve the phone/tablet review workspace separately because composer + feed density cannot be solved by simple scaling.
-- After responsive QA, reassess feed size/performance and moderation needs using real usage rather than implementing scale features pre-emptively.
+- Preserve existing review/profile business logic during R7 visual correction work.
+- Reassess feed size/performance and moderation needs later using real usage rather than implementing scale features pre-emptively.
 
 ### History / evidence
 
@@ -240,6 +275,7 @@ Implemented current contract includes:
 - `docs/releases/revival/R3/` — inline edit and desktop review workspace.
 - `docs/releases/revival/R5/` — refresh/state stability.
 - `docs/releases/revival/R6/` + `docs/database/supabase/REVIVAL-R6-APPLIED.md` — profile safety and unique alias identity.
+- `docs/releases/revival/R7/` — responsive presentation history; not production until accepted/merged.
 
 ---
 
@@ -295,7 +331,7 @@ A failure of a chat, deployment, repository operation or database change should 
 - Git history preserves the primary runtime evolution.
 - Known R5 rollback point exists: branch `backup/revival-r5-before-r6`, commit `61bab24b3e0a925e1e2a1591add0e4e13875ac7c`.
 - Reserve repo: `Cryo-Zero/hishchenie-film-v2`.
-- Reserve contains `snapshots/project-memory/current/` as a verified safety copy of canonical project memory.
+- Reserve contains `snapshots/project-memory/current/` as a safety copy of canonical project memory.
 - Exact current production runtime mirror in reserve is **NOT VERIFIED / not created** because the connector cannot transfer the missing ~22 MB trailer blob into the reserve object database.
 - Production database documentation exists, but a formal private data-backup/recovery plan is not yet implemented.
 
@@ -318,7 +354,7 @@ A failure of a chat, deployment, repository operation or database change should 
 ### Next actions
 
 1. Continue verified project-memory safety-copy synchronization after meaningful canonical changes.
-2. Before the next substantial responsive release, create/verify an appropriate current rollback point rather than relying only on the older R5 baseline.
+2. Keep an appropriate current feature/recovery point before substantial risky operations.
 3. Separately design and approve a formal Database Recovery Plan.
 4. Revisit exact reserve runtime mirroring when the binary-transfer limitation can be solved and the complete tree can be independently verified.
 
@@ -371,15 +407,18 @@ None automatically. Each item begins only when the owner/film author provides or
 
 ## Workstream G — Documentation / handoff discipline
 
-**Status:** ONGOING.
+**Status:** ONGOING / CURRENT QUALITY PASS ACTIVE.
 
 ### Goal
 
-Make project recovery after chat/context loss fast enough that a new ChatGPT/developer can understand not only the current code but also why important choices were made and what remains planned.
+Make project recovery after chat/context loss fast enough that a new ChatGPT/developer can understand not only the current code but also why important choices were made, which historical rules are superseded, what is already implemented and what is merely approved/pending.
 
 ### Accepted direction / decisions
 
+- `START-HERE.md` is the mandatory entry/index for new bridge/curator sessions.
 - Maintain canonical project memory continuously when meaningful information appears.
+- Explicitly separate factual runtime state from owner-approved pending implementation direction.
+- Historical round records remain preserved but must be labelled/treated as history where newer canonical state supersedes them.
 - Preserve useful small details when they affect future recovery, design consistency, verification or reasoning.
 - Do not store routine chatter, temporary guesses, repetition or disproven assumptions.
 - Completed plans are not erased: summarize completion/current truth and preserve detailed history/release evidence.
@@ -394,7 +433,7 @@ After each significant task/release:
 2. record durable accepted/rejected decisions in DECISIONS when needed;
 3. update VISUAL-SYSTEM if the approved visual contract changed;
 4. update ROADMAP workstream status/history/next step;
-5. add/remove nothing from BACKLOG except by the documentation-preservation rules and owner-approved semantic changes;
+5. ensure BACKLOG contains only future/candidate material, not stale descriptions of already-active work;
 6. write release `UPDATE` + `QA` for a release-sized change;
 7. for database changes, keep source migration plus verified `*-APPLIED.md` only after production verification;
 8. synchronize and verify canonical project-memory safety copy in reserve.
@@ -405,86 +444,23 @@ After each significant task/release:
 
 The current project-level priority is:
 
-**protect current R6 state/documentation → approve responsive direction → implement responsive/device adaptation incrementally → real browser/device QA → optional polish → then reassess admin/review/report/content expansions based on actual need and owner priority**.
+**preserve production R6 → finish the owner-approved post-Round6 R7 corrections on the existing draft feature branch → browser + screenshot QA → owner visual review → repeat bounded corrections if necessary → only after explicit owner acceptance consider merge/deploy → verify real production behavior after deployment → then reassess later admin/review/report/content workstreams by actual need and owner priority**.
 
 This ordering may be changed by a newer explicit owner instruction, but it must not be silently rewritten by the assistant/operator.
 
-### Owner feedback round 3 — implemented on draft R7 branch
+## R7 responsive history capsules
 
-Round3 owner corrections implemented and browser-QA'd on `revival-r7-responsive-mobile`:
+### Owner feedback Round 3 — historical preview checkpoint
 
-- Reviews compact public-feed controls return to normal flow; the previous fixed/sticky preview choice remains only as history;
-- profanity explanatory hint removed from visible UI while preserving the toggle;
-- compact Archive drawer reduced and internally scrollable; all-asset stage geometry stabilized without image distortion;
-- CONTACT horizontal dot travel replaced by a fixed endpoint pulse;
-- targeted information-bearing microcopy readability pass completed;
-- Round2 Show More regression preserved;
-- required phone/landscape/desktop Chromium matrix passed.
+Round3 owner corrections implemented and browser-QA'd on `revival-r7-responsive-mobile` included normal-flow Reviews controls, reduced Archive footprint/stable stage, fixed-endpoint CONTACT pulse, targeted microcopy readability and preserved Show More behavior. Later rounds superseded several of these preview choices.
 
-Next gate: **owner visual review of Round3 preview**. Do not merge R7, publish mobile, begin Bug Reports v2/admin notifications, or treat browser QA as owner visual acceptance without a separate explicit decision.
+### Round 4 — historical preview checkpoint + accepted future architecture
 
-## Round 4 planning capture — responsive preview + accepted future architecture
+Round4 introduced local reversible CONTACT motion, mobile `ARCHIVE // 11`, centred Freshness, active/lighter profile help, a following Reviews control dock and phone smart-header behavior. It also captured future moderation/Bug Reports/CAPTCHA/backend/legal planning without implementing those backend workstreams.
 
-### R7 responsive preview — Round4
+Later owner feedback superseded several Round4 preview details. Do not use this history capsule as current implementation permission.
 
-**Status:** IMPLEMENTED ON DRAFT FEATURE BRANCH / OWNER VISUAL REVIEW REQUIRED / NOT PRODUCTION.
-
-Round4 active changes:
-- local reversible CONTACT signal motion;
-- interactive Actors “select another subject” alternate return route;
-- semantic Current Signal row identifiers/states;
-- compact horizontal mobile Archive trigger while preserving Round3 stable stage/drawer;
-- centred Freshness content;
-- active/lighter anchored profile help;
-- compact following Reviews control dock;
-- phone smart-hide/reveal global header.
-
-Superseded active preview rules:
-- Round3 fixed CONTACT dot presentation;
-- Round3 normal-flow-only Reviews control behavior;
-- Round3 compact/mobile vertical Archive trigger.
-
-Still preserved:
-- no auto-scroll for mobile Actors/FAQ state changes;
-- Show More batching;
-- profanity explanatory paragraph stays removed;
-- stable Materials stage with undistorted contained assets;
-- approved desktop/R6 foundation.
-
-**Open visual question:** mobile Hero synopsis placement. Keep the approved synopsis text/content and current placement until owner/planning-chat approves a new placement.
-
-### Admin / moderation — accepted future direction
-
-Future admin work may add editable official-reply templates and `ОТКРЫТЬ САЙТ ↗` in a new tab, without exposing admin controls on public pages. Moderation/audit semantics follow `DECISIONS.md`: criticism/low rating is not a violation; severe prohibited text can be system-hidden while genuine rating may remain; obvious fake/spam/manipulation may be removed including score; retain action reason/time/authorized operator/internal history.
-
-### Bug Reports v2 / Telegram — accepted future workstream
-
-Future flow:
-`visitor → Bug Report → server-verified anti-bot when required → safe backend storage → ADMIN / BUG REPORTS → minimum Telegram notification`.
-
-Visitor fields: simple single-choice category, optional details (`Что случилось?`), optional diagnostics checkbox off by default. Planned diagnostics are minimized as defined in `DECISIONS.md`. Admin statuses are exactly `NEW / IN PROGRESS / FIXED / CLOSED`; opening does not mutate status. Telegram is only an alert path and does not carry full report text/diagnostics by default.
-
-No Round4 backend/schema/notification implementation occurred.
-
-### CAPTCHA / anti-bot research
-
-Research Russian-hosted verification, with Yandex SmartCaptcha a preferred candidate to evaluate. Submission-time server verification is the direction for first review on a new anonymous identity and future Bug Reports. No CAPTCHA deployment/migration is authorized by this planning record.
-
-### Russian-hosted backend research
-
-Create a future research phase for a self-hosted Supabase-compatible stack physically hosted in Russia, prioritizing preservation of PostgreSQL/RLS/RPC/application architecture. Compare with a full Russian managed-stack alternative only after compatibility/operations/legal requirements are understood. No provider, migration, production copy, credential or endpoint change is approved yet.
-
-### Legal/privacy prerequisites
-
-Future legal/privacy publication is separate from the artistic FAQ and should cover the personal-data/privacy policy, community rules and any required consent/notice controls.
-
-**Unresolved prerequisite:** likely personal-data operator is the film author, but legal identity/contact are not confirmed. Owner will clarify later. Do not publish guessed operator details; the owner states it is not himself and not an ordinary site-team member, and a lawyer is not automatically the operator.
-
-### Next gate
-
-Owner/planning-chat visual review of Round4 browser evidence. Do not merge R7 or start the future Bug Reports/CAPTCHA/backend/legal implementation work merely because the architecture is documented.
-
-## Privacy-by-design backend/legal follow-up — added 2026-09-12
+### Privacy-by-design backend/legal follow-up — 2026-09-12
 
 Future backend migration and privacy-policy work must preserve the active privacy direction in `DECISIONS.md`: Russian-hosted backend direction; no required real names/email/phone for ordinary visitors; no application identity/features built around raw IP; minimum technical review identity; informed consent where legally required; deletion path for user-associated data; data minimization by default.
 
@@ -492,12 +468,34 @@ Before final Privacy Policy publication, confirm the legal identity/contact deta
 
 Infrastructure providers may technically observe network IP addresses even though the application itself must not use/store raw IP as ordinary product data. The artistic FAQ wording `На сайте есть безопасность?` remains separate from legal privacy documentation.
 
-This addendum does **not** authorize or perform a backend migration, CAPTCHA deployment, Telegram integration, Bug Reports v2 implementation, or Supabase production change in Round 4.
+This addendum does **not** authorize or perform a backend migration, CAPTCHA deployment, Telegram integration, Bug Reports v2 implementation, or Supabase production change.
 
-## R7 Round 5 feature-branch history — 2026-09-12
+### R7 Round 5 — historical preview checkpoint
 
-**Status:** IMPLEMENTED ON RESPONSIVE FEATURE BRANCH / OWNER VISUAL ACCEPTANCE PENDING / NOT PRODUCTION.
+Round5 focused on public responsive interaction/polish: mobile Hero synopsis hidden at that time, Materials copy/arrows changes, softer Actors/FAQ transitions, local CONTACT signal, robust burger dismissal/fullscreen behavior, burger REPORT contour cleanup, profile-help state/geometry, public BUILD removal and PUBLIC FILE footer consistency.
 
-Owner Round5 focuses on final public responsive interaction/polish rather than new product/backend scope: mobile Hero synopsis presentation, Materials copy/arrows, softer Actors/FAQ transitions, local CONTACT signal, robust burger dismissal/fullscreen behavior, burger REPORT contour cleanup, profile-help state/geometry, removal of public BUILD text and consistent PUBLIC FILE footer signature.
+The post-Round6 owner review now supersedes the hidden mobile Hero synopsis and retains only the non-conflicting historical choices.
 
-No Supabase/auth/review business-logic expansion is part of this round. Continue to require real browser evidence and explicit owner visual acceptance before R7 production/merge.
+### R7 Round 6 — verified implementation checkpoint, not owner-accepted final
+
+Round6 final SHA:
+
+`f5e154912986c95e7f48a15bce34c707db39667c`
+
+Round6 passed its automated browser gate and improved trailer audio determinism, enlarged Materials lightbox geometry, burger scrolling, mobile Actors/FAQ shell transitions and smart-header interpolation. It also restored a travelling desktop CONTACT point and changed profile-help geometry.
+
+Owner visual review then rejected/corrected specific results:
+
+- extra CONTACT receive glow/fill;
+- desktop Archive presentation regression;
+- arbitrary compact profile-help geometry;
+- moving/jittering structural lines in Actors/FAQ reveals;
+- old mobile CONTACT semantics;
+- visible mobile `ARCHIVE // 11` trigger;
+- hidden mobile Hero synopsis.
+
+### Active next gate after Round 6 owner review
+
+Implement only the current correction set documented in `START-HERE.md`, `PROJECT-STATE.md` and `VISUAL-SYSTEM.md`, then return an exact verified feature SHA plus screenshot evidence to owner visual review.
+
+Do not merge R7, deploy, touch Supabase/backend, start Bug Reports v2, Custom Cursor, SECURITY PROTOCOL // 2045 or unrelated redesign work merely because those topics exist elsewhere in project history/planning.
