@@ -2,13 +2,28 @@
 
 This document defines the active visual/composition laws of the project. It is **not** a list of arbitrary CSS values and it is **not** a backlog.
 
-Use it together with:
+Read `START-HERE.md` first. Use this file together with:
 
-- `PROJECT-STATE.md` — what is true now;
+- `PROJECT-STATE.md` — what is factually true now;
 - `DECISIONS.md` — accepted long-term rules/reasons;
+- `ROADMAP.md` — workstream status/history/next sequence;
 - `BACKLOG.md` — ideas that may be revisited, not implementation approval.
 
-Before visual/responsive work, read this file first.
+Before visual/responsive work, read this file in full enough to understand the relevant scene contract.
+
+## Active-contract reading rule
+
+This file intentionally preserves historical R7 preview rounds. Older round sections are evidence/history and may contain rules later superseded by the owner.
+
+For any topic that appears more than once:
+
+1. current explicit owner instruction wins;
+2. the newest explicitly marked **active/pending implementation** rule in this file wins over conflicting older R7 round history;
+3. older round text remains preserved to explain how the design evolved.
+
+Do not combine conflicting old/new rules into a compromise. Do not assume the currently implemented runtime is the desired final behavior merely because it exists.
+
+The current owner-approved visual target after Round 6 is recorded at the end under **R7 post-Round6 owner visual review corrections — active / pending implementation**. Until a later bridge implements it, Round 6 runtime and the active desired contract intentionally differ in those specific areas.
 
 ## 1. World field / world grid / сетка мира
 
@@ -32,7 +47,13 @@ A deliberate local exception is not automatically a layout bug. It must remain l
 
 Historically important example: **Materials / Archive**. The desired Archive composition previously suffered when it was forced too strictly inside the common grid. Do not repeat that mistake. If explicit creative direction says to leave the grid, leaving the grid is allowed.
 
-Current runtime reinforces this: the Archive control is intentionally tied to the physical viewport wall while the Materials scene is active.
+### Current explicit outside-grid state
+
+For the **current approved design**, the desktop Archive control/handle is the **only presently approved element that may and should sit outside the world grid**.
+
+This is a current-state clarification, not a permanent ban on future exceptions. Another element may leave the grid only after a new explicit owner approval.
+
+The Archive exception remains local to Materials: the desktop control is tied to the physical left viewport wall while Materials is active and must not redefine the global grid for other scenes.
 
 ## 3. Navigation = scenes / tabs
 
@@ -192,7 +213,9 @@ Archive / Materials is a deliberate exception to the default world grid when nee
 
 Preserve bespoke archive layout, drawer/viewer character, bespoke transition/animation behavior and the ability for explicit creative direction to take the composition outside the normal world field.
 
-Do not classify intentional overflow/alignment exceptions as bugs merely because they differ from the default grid.
+Current desktop contract is stronger and specific: the Archive control/handle is the presently approved outside-grid element, lives on the physical left viewport wall only while Materials is active, and retracts/hides when leaving Materials. Opening the drawer must not transform the wall handle into an ordinary inner-grid Materials control.
+
+Do not classify intentional Archive overflow/alignment as a bug merely because it differs from the default grid. Do not use Archive as precedent to move unrelated controls outside the grid without new owner approval.
 
 ## 13. Reviews / profile contract
 
@@ -243,7 +266,7 @@ Keep two evidence classes separate:
 - **Concept / mockup / prototype** — communicates the intended design direction.
 - **Actual browser render** — confirms how the real implementation behaves at a real viewport/device context.
 
-A proposed concept is **not approved design** until the owner explicitly approves it. Concept approval is permission to implement that direction, not proof that implementation is correct.
+A proposed concept is **not approved design** until the owner explicitly approves the direction. Concept approval is permission to implement that direction, not proof that implementation is correct.
 
 Final responsive acceptance must be based on actual browser rendering. Do not treat a mockup, source inspection or verbal plan as equivalent to a verified browser result.
 
@@ -257,19 +280,23 @@ Visual work follows this priority:
 
 `current explicit owner instruction`
 
+→ `owner-approved pending implementation direction recorded in the active contract`
+
 → `approved scene/task-specific decision`
 
 → `current VISUAL-SYSTEM contract`
+
+→ `factual runtime state in PROJECT-STATE`
 
 → `historical decision/context`
 
 → `BACKLOG idea`
 
-A newer explicit owner direction may intentionally override a more general older rule. BACKLOG never authorizes implementation.
+A newer explicit owner direction may intentionally override a more general older rule. BACKLOG never authorizes implementation. Runtime does not automatically override desired design merely because it is newer code; owner review may reject a newer implementation.
 
-## R7 Round 3 preview refinements — owner-directed, not production
+## R7 Round 3 preview refinements — historical owner-directed preview state
 
-These are owner-directed durable visual rules for the R7 preview; R7 is not production until separately accepted and merged.
+These rules are preserved as R7 history. Later R7 sections supersede only the conflicting parts.
 
 - On compact/mobile Reviews, public-feed heading/status/records, New/Old/Popular and profanity toggle belong to normal document flow and must not occupy permanent sticky/fixed space while the user reads the feed.
 - For compact Materials, mixed image aspect ratios must not move the page: the main stage uses stable geometry while assets preserve their own proportions through centered `object-fit: contain`. Free space inside the stage is preferable to stretching/cropping.
@@ -278,9 +305,9 @@ These are owner-directed durable visual rules for the R7 preview; R7 is not prod
 - Information-bearing microcopy must stay subordinate **and readable**. Do not solve this with a global font-size increase: target the tiny functional/status/meta class, preserve hierarchy, and verify geometry in browser. Decorative watermarks are not part of this rule.
 - Substantial responsive changes remain subject to direction/concept approval where practical, and final acceptance must use actual browser rendering rather than mockup-only evidence.
 
-## R7 Round 4 preview refinements — owner-directed, not production
+## R7 Round 4 preview refinements — historical owner-directed preview state
 
-These rules supersede only the conflicting Round3 preview rules; the earlier section remains historical traceability until R7 acceptance/release cleanup.
+These rules superseded conflicting Round3 preview rules at the time; newer sections may supersede them again.
 
 - CONTACT endpoint diamond is fixed. The nearby dot may move only a **short local horizontal distance** with continuous eased reversible motion; no full-line travel, abrupt reset or layout-coordinate animation. Reduced motion has no horizontal travel.
 - Compact Materials keeps Round3 stable stage geometry and centered `object-fit: contain`, but its phone/compact trigger is a horizontal technical `ARCHIVE // 11` control near the stage rather than the vertical wall handle. Desktop wall treatment remains the reference.
@@ -290,11 +317,11 @@ These rules supersede only the conflicting Round3 preview rules; the earlier sec
 - Anchored profile-help remains a popover, not fullscreen. Open `?` visibly communicates active state; popover may be slightly translucent/blurred while keeping readable contrast and zero page reflow/scroll lock.
 - Compact Reviews feed controls follow the reading context through a **small feed-local sticky/following surface**. Do not return to the early oversized sticky block, and do not reduce Round4 to Round3 normal-flow-only behavior.
 - Phone global site header may smart-hide on meaningful downward scroll and reveal on upward scroll, with hysteresis, top visibility, burger/header-interaction safety and rotation recovery. Desktop header behavior is unchanged.
-- Mobile Hero synopsis remains present and unchanged. Its final mobile placement is an **open visual question** requiring owner/planning-chat approval; no bridge implementation may invent a new final placement.
+- Mobile Hero synopsis remains present and unchanged. Its final mobile placement was an open visual question at this stage; a later owner decision now resolves it.
 
-## R7 Round 5 preview refinements — owner-directed, not production
+## R7 Round 5 preview refinements — historical owner-directed preview state
 
-These rules supersede only conflicting R7 preview behavior and remain feature-branch preview rules until owner acceptance/release.
+These rules superseded conflicting earlier R7 preview behavior at the time; newer sections may supersede them again.
 
 - Compact/mobile Hero keeps the synopsis text in project source/i18n but does not present it in the current mobile Hero composition; desktop Hero copy remains part of the approved reference.
 - Materials no longer presents the authorial-format explanatory note. On compact/mobile, previous/next arrow buttons are not shown in stage or fullscreen; touch/swipe is the primary navigation, while desktop arrows remain.
@@ -304,13 +331,60 @@ These rules supersede only conflicting R7 preview behavior and remain feature-br
 - Profile help `?` is quiet at rest and clearly active only while its anchored panel is open; the panel contour is complete/clean and approximately follows the profile block width.
 - Public build/debug labels are not visitor-facing UI. `THEFT // PUBLIC FILE // 2045` remains the public footer signature and is shared by main and Reviews.
 
-## R7 Round 6 preview refinements — owner-directed, not production
+## R7 Round 6 preview refinements — implemented checkpoint, owner visual acceptance rejected for specific details
 
-These rules supersede only conflicting R7 preview behavior and do not alter the approved R6 production foundation.
+These rules describe the Round 6 implementation checkpoint. They are not automatically the active desired contract where the owner later rejected the visual result.
 
-- Desktop CONTACT may again use a point travelling along the existing line, but arrival must read as an intentional signal handoff: the endpoint diamond briefly fills/glows and resets before the next calm cycle. Reduced-motion has no travelling animation.
+- Desktop CONTACT may again use a point travelling along the existing line, but Round6 also added an endpoint diamond receive fill/glow. The later owner review keeps the travelling point but rejects the extra receive glow/fill.
 - Materials enlarged/lightbox mode must provide a visibly meaningful scale advantage over the normal stage while preserving contained image proportions and the existing sci-fi presentation. Enlarged-view close/pagination controls use balanced near-square geometry.
-- Profile help remains attached to the `?` control and reads as a compact system popover rather than a heavy form-wide/fullscreen overlay; help text is not changed by this visual rule.
-- Sequential mobile Actors/FAQ transitions should overlap/crossfade the list and detail shell softly; no long empty phase, layout jump or automatic page scroll is introduced.
+- Round6 changed profile help toward a compact system popover. The later owner review rejects the arbitrary compact reinterpretation and restores profile-console-aligned geometry while keeping anchored/no-reflow semantics.
+- Sequential mobile Actors/FAQ transitions overlap/crossfade list/detail shells softly; no long empty phase, layout jump or automatic page scroll is intended. Later owner review additionally requires internal structural lines/dividers to remain stationary while text/data reveals.
 - An open mobile burger must not lock document scrolling. Scroll/touch movement alone does not dismiss it; deliberate outside tap and explicit navigation/close/fullscreen actions do.
 - Phone smart-header direction logic/hysteresis stays intact while the visual translate/opacity hide/reveal should interpolate smoothly rather than snap.
+
+## R7 post-Round6 owner visual review corrections — ACTIVE / APPROVED / PENDING IMPLEMENTATION
+
+This is the current visual target. It supersedes conflicting R7 preview choices above but does not claim that runtime already matches it.
+
+### Actors / FAQ reveal geometry
+
+- Keep staged text/data reveal.
+- The card/panel shell may transition as already approved where appropriate.
+- Structural lines, dividers and row geometry inside the selected Actors/FAQ data panel must already sit at final coordinates and remain stationary while values/text appear.
+- Do not animate those structural lines with translate/height/position changes.
+- Mobile sequential Actors/FAQ retains no-auto-scroll behavior.
+
+### CONTACT — desktop and mobile
+
+- Keep the travelling point along the existing line.
+- Desktop and mobile use the same signal idea; only geometry/scale adapts.
+- Remove the separate endpoint/card/diamond glow/fill receive reaction that reads as an extra flash. The travelling point itself is the signal event.
+- Reduced-motion keeps a static/non-travelling representation.
+
+### Archive / Materials
+
+- Desktop Archive wall behavior is restored/preserved: the handle lives on the physical left viewport wall while Materials is active, outside the world grid, and retracts/hides outside Materials.
+- The desktop wall handle is the only currently approved outside-grid element. Other elements require new explicit owner approval before leaving the grid.
+- Opening the drawer must not convert the wall handle into an ordinary in-grid Materials button/block.
+- The mobile visible `ARCHIVE // 11` trigger is no longer part of the approved mobile composition and is approved for removal.
+- Mobile Materials remains navigable through the existing stage/swipe/lightbox behavior; removing the trigger does not authorize removal of Materials, assets, swipe or lightbox.
+
+### Profile help `?`
+
+- Preserve existing help content.
+- Preserve anchored overlay/popover semantics and visible active `?` state.
+- Zero page reflow; zero scroll lock; not fullscreen/site-covering.
+- Geometry should approximately follow the profile-console/block width as in the previously accepted direction.
+- Do not reduce it to an arbitrary small ~360 px card merely because compactness seems cleaner.
+
+### Mobile Hero
+
+Use the existing synopsis from source/i18n. Current approved mobile order is:
+
+`POSTER → SHORT SYNOPSIS → ACTIONS`
+
+The actions remain the existing Trailer/About buttons. Desktop Hero is unchanged.
+
+### Owner acceptance gate
+
+These corrections require implementation + real browser/screenshot QA + another owner visual review. Automated QA may prove structure/behavior, but it does not close the visual-acceptance gate.
