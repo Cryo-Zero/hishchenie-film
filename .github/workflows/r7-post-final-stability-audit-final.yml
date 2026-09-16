@@ -1,0 +1,126 @@
+name: R7 post-final stability audit final cross-engine
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+
+permissions:
+  contents: read
+
+jobs:
+  stability-audit-final:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard immutable Round7 runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          PRODUCT=17fbee1cd912b64827ae6e81d8520882e3285831
+          FRESH=35fc2024c2f3eb09675c9cded316dfd50a561948
+          git merge-base --is-ancestor "$PRODUCT" HEAD
+          git merge-base --is-ancestor "$FRESH" HEAD
+          test -z "$(git diff --name-only "$PRODUCT"..HEAD -- index.html reviews.html admin assets css js supabase migrations | sed -n '1p')"
+          git worktree add /tmp/r7-product "$PRODUCT"
+          printf '%s\n' "$PRODUCT" >/tmp/R7_PRODUCT_SHA.txt
+          printf '%s\n' "$FRESH" >/tmp/FRESH_CANONICAL_READ_HEAD.txt
+          printf '%s\n' "$(git rev-parse HEAD)" >/tmp/AUDIT_TRIGGER_HEAD.txt
+
+      - name: Install browser audit runtime and prepare compatible harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7qa
+          cd /tmp/r7qa
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          npx playwright install --with-deps chromium >/dev/null
+          npx playwright install --with-deps firefox >/dev/null 2>&1
+          npx playwright install --with-deps webkit >/dev/null 2>&1
+          cd "$GITHUB_WORKSPACE"
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, base64, gzip
+
+          wf = Path('.github/workflows/r7-post-final-stability-audit.yml').read_text(encoding='utf-8')
+          m = re.search(r"echo '([^']+)' \| base64 -d \| gzip -d >/tmp/r7_post_final_audit\.cjs", wf)
+          if not m:
+              raise SystemExit('embedded audit harness not found')
+          src = gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
+
+          if "let activeEngineName = ''" not in src:
+              src = src.replace("const browserStatus = {};", "const browserStatus = {};\nlet activeEngineName = '';", 1)
+
+          old = """  const ctx = await browser.newContext({
+            viewport:{width:v.w,height:v.h},
+            hasTouch:v.touch,
+            isMobile:v.phone,
+            reducedMotion,
+            locale:'ru-RU'
+          });
+          """
+          new = """  const options = {
+            viewport:{width:v.w,height:v.h},
+            hasTouch:v.touch,
+            reducedMotion,
+            locale:'ru-RU'
+          };
+          // Firefox does not implement Playwright's isMobile flag. The real
+          // Firefox engine is still tested at the requested viewport/touch sizes.
+          if (activeEngineName !== 'firefox') options.isMobile = v.phone;
+          const ctx = await browser.newContext(options);
+          """
+          if old not in src:
+              raise SystemExit('Firefox context compatibility marker missing')
+          src = src.replace(old, new, 1)
+
+          old = """  for(const [browserName,type] of Object.entries(engines)){
+            let browser;
+          """
+          new = """  for(const [browserName,type] of Object.entries(engines)){
+            activeEngineName = browserName;
+            let browser;
+          """
+          if old not in src:
+              raise SystemExit('engine-loop marker missing')
+          src = src.replace(old, new, 1)
+
+          Path('/tmp/r7_post_final_audit.cjs').write_text(src, encoding='utf-8')
+          PY
+          NODE_PATH=/tmp/r7qa/node_modules node --check /tmp/r7_post_final_audit.cjs
+
+      - name: Run immutable product stability audit
+        id: audit
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+        run: |
+          set -euo pipefail
+          OUT=/tmp/r7-post-final-audit-final
+          rm -rf "$OUT" && mkdir -p "$OUT"
+          cp /tmp/R7_PRODUCT_SHA.txt "$OUT/"
+          cp /tmp/FRESH_CANONICAL_READ_HEAD.txt "$OUT/"
+          cp /tmp/AUDIT_TRIGGER_HEAD.txt "$OUT/"
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/r7-product >/tmp/r7-post-final-server.log 2>&1 & SERVER=$!
+          trap 'kill $SERVER 2>/dev/null || true' EXIT
+          sleep 1
+          set +e
+          timeout 1500s env BASE_URL=http://127.0.0.1:4173 PRODUCT_SHA=17fbee1cd912b64827ae6e81d8520882e3285831 EVIDENCE_DIR="$OUT" node /tmp/r7_post_final_audit.cjs
+          STATUS=$?
+          set -e
+          printf '%s\n' "$STATUS" >"$OUT/AUDIT_EXIT_CODE.txt"
+          cp /tmp/r7-post-final-server.log "$OUT/server.log"
+          exit "$STATUS"
+
+      - name: Upload final post-Round7 audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-post-final-stability-audit-final-evidence
+          path: /tmp/r7-post-final-audit-final
+          if-no-files-found: warn
