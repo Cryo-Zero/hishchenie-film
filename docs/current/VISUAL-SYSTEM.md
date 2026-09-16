@@ -23,7 +23,7 @@ For any topic that appears more than once:
 
 Do not combine conflicting old/new rules into a compromise. Do not assume the currently implemented runtime is the desired final behavior merely because it exists.
 
-The current owner-approved visual target after Round 6 is recorded at the end under **R7 post-Round6 owner visual review corrections — active / pending implementation**. Until a later bridge implements it, Round 6 runtime and the active desired contract intentionally differ in those specific areas.
+The current owner-approved visual target after Round 6 is recorded at the end under **R7 post-Round6 owner visual review corrections**. Round7 now implements that target on the feature preview; owner visual acceptance is still pending and production remains R6.
 
 ## 1. World field / world grid / сетка мира
 
@@ -342,9 +342,9 @@ These rules describe the Round 6 implementation checkpoint. They are not automat
 - An open mobile burger must not lock document scrolling. Scroll/touch movement alone does not dismiss it; deliberate outside tap and explicit navigation/close/fullscreen actions do.
 - Phone smart-header direction logic/hysteresis stays intact while the visual translate/opacity hide/reveal should interpolate smoothly rather than snap.
 
-## R7 post-Round6 owner visual review corrections — ACTIVE / APPROVED / PENDING IMPLEMENTATION
+## R7 post-Round6 owner visual review corrections — ACTIVE / IMPLEMENTED PREVIEW / OWNER VISUAL ACCEPTANCE PENDING
 
-This is the current visual target. It supersedes conflicting R7 preview choices above but does not claim that runtime already matches it.
+This is the current visual target and is implemented by the Round7 feature-branch correction pass. It supersedes conflicting R7 preview choices above. Automated/browser evidence does not constitute owner visual acceptance.
 
 ### Actors / FAQ reveal geometry
 
@@ -388,3 +388,7 @@ The actions remain the existing Trailer/About buttons. Desktop Hero is unchanged
 ### Owner acceptance gate
 
 These corrections require implementation + real browser/screenshot QA + another owner visual review. Automated QA may prove structure/behavior, but it does not close the visual-acceptance gate.
+
+### Round 7 implementation evidence contract
+
+Round7 browser verification specifically measures the regressions that escaped Round6 automation: stationary Actors/FAQ structural geometry during text reveal, physical Archive wall placement/opening without Materials reflow, profile-console-aligned help with zero reflow/scroll-lock, desktop/mobile CONTACT travel without a second receive glow, absence of the visible mobile `ARCHIVE // 11` trigger with stage/lightbox swipe preserved, and mobile Hero `POSTER → SYNOPSIS → ACTIONS` with RU/EN source continuity. Screenshot evidence compares Round5, Round6 and the Round7 candidate for the owner-found desktop states.

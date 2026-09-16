@@ -111,7 +111,13 @@ function installMobileNavDismissal() {
     const originalActions = $('.hero-actions', copy || document);
     const originalTitle = $('h1', copy || document);
     const poster = $('.hero-poster-frame', hero || document);
+    const synopsis = $('.hero-copy', copy || document);
     if (!hero || !copy || !originalActions || !poster) return;
+
+    // Keep one synopsis/i18n node. Compact/mobile repositions the real node
+    // between poster and actions; desktop restores it to its original slot.
+    const synopsisAnchor = synopsis ? document.createComment('r7-hero-copy-anchor') : null;
+    if (synopsis && synopsisAnchor) synopsis.parentNode.insertBefore(synopsisAnchor, synopsis);
 
     if (!$('.r7-mobile-hero-title', hero) && originalTitle) {
       const title = originalTitle.cloneNode(true);
@@ -125,6 +131,20 @@ function installMobileNavDismissal() {
       actions.setAttribute('aria-label', 'Быстрые действия');
       poster.insertAdjacentElement('afterend', actions);
     }
+
+    const syncSynopsisPlacement = () => {
+      if (!synopsis || !synopsisAnchor) return;
+      const compact = isCompactMediaContext();
+      synopsis.classList.toggle('r7-mobile-hero-copy', compact);
+      if (compact) {
+        poster.insertAdjacentElement('afterend', synopsis);
+      } else if (synopsisAnchor.parentNode) {
+        synopsisAnchor.parentNode.insertBefore(synopsis, synopsisAnchor.nextSibling);
+      }
+    };
+
+    syncSynopsisPlacement();
+    addEventListener('resize', syncSynopsisPlacement, { passive: true });
   }
 
   // Sequential FAQ / Actors --------------------------------------------------
@@ -259,7 +279,7 @@ function installMobileNavDismissal() {
       if (panel.hidden) return;
       const parentRect = composer.getBoundingClientRect();
       const buttonRect = toggle.getBoundingClientRect();
-      const width = Math.min(360, Math.max(260, parentRect.width - 28));
+      const width = Math.min(380, Math.max(260, parentRect.width - 28));
       const preferredLeft = buttonRect.right - parentRect.left - width;
       const left = Math.max(10, Math.min(parentRect.width - width - 10, preferredLeft));
       const arrowRight = Math.max(16, Math.min(width - 20, parentRect.right - buttonRect.right + 13));

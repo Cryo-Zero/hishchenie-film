@@ -56,9 +56,9 @@ Active responsive preview work is on:
 
 Round 6 passed automated QA, but owner visual review found several visual/behavior regressions. Therefore Round 6 is a verified implementation checkpoint, **not** the final accepted R7 design.
 
-## 5. Current owner-approved corrections after Round 6 — pending implementation
+## 5. Round 7 corrections after Round 6 — implemented preview / owner visual acceptance pending
 
-These directions are the current visual target and supersede conflicting R7 preview choices. Until the next bridge implements them, runtime and desired state intentionally differ.
+These directions are the current visual target and are now implemented on the Round7 feature-branch preview. They supersede conflicting R7 preview choices. Automated verification is required for the exact final SHA before push, and owner visual acceptance remains pending.
 
 ### World grid / Archive
 
@@ -116,3 +116,9 @@ A bridge/curator must distinguish:
 - what still requires owner visual acceptance.
 
 For implementation rounds, report exact initial/final/tested/pushed/remote SHAs and never call a preview accepted until the owner says so.
+
+## 8. Round 7 implementation gate
+
+The post-Round6 owner correction set has now been implemented as a bounded Round7 preview change. `OWNER-FEEDBACK-ROUND7-PENDING.md` remains the historical pre-implementation specification; `OWNER-FEEDBACK-ROUND7.md` is the implementation record.
+
+Round7 is still **not production and not owner-accepted**. The bridge may report it only after the exact-final browser/screenshot suite passes and the tested SHA is pushed with remote equality. PR #18 remains draft/unmerged; `main` and Supabase remain untouched. The next product gate after a verified Round7 SHA is owner visual review.

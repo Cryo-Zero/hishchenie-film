@@ -36,7 +36,7 @@ Canonical documentation-preservation rules in `DECISIONS.md` apply to this file.
 
 ## Workstream A — Responsive / device adaptation
 
-**Status:** ACTIVE R7 PREVIEW STABILIZATION / ROUND 6 IMPLEMENTED AND QA-VERIFIED / OWNER VISUAL ACCEPTANCE PENDING / POST-ROUND6 CORRECTIONS APPROVED AND PENDING IMPLEMENTATION.
+**Status:** ACTIVE R7 PREVIEW STABILIZATION / ROUND 7 CORRECTIONS IMPLEMENTED / EXACT-FINAL QA REQUIRED BEFORE PUSH / OWNER VISUAL ACCEPTANCE PENDING.
 
 ### Goal
 
@@ -69,9 +69,9 @@ Responsive implementation is already substantially present on feature branch:
 - production `main` was not changed by Round 6;
 - owner visual acceptance remains pending.
 
-Owner visual review after Round 6 found real presentation regressions/incorrect interpretations despite green automated QA. The owner has approved a bounded correction set that is **pending implementation**. Therefore the current runtime checkpoint and the current desired visual contract intentionally differ in those specific areas.
+Owner visual review after Round 6 found real presentation regressions/incorrect interpretations despite green automated QA. The owner approved a bounded correction set, and the Round7 bridge has now implemented that set on the feature preview. Exact-final browser/screenshot verification and owner visual acceptance remain separate gates.
 
-### Current owner-approved correction set — pending implementation
+### Round 7 correction set — implemented preview / owner visual acceptance pending
 
 Authoritative details live in `VISUAL-SYSTEM.md` and `START-HERE.md`. Summary:
 
@@ -119,16 +119,12 @@ Authoritative details live in `VISUAL-SYSTEM.md` and `START-HERE.md`. Summary:
 
 Current authorized sequence:
 
-1. Read `START-HERE.md`, `PROJECT-STATE.md`, `DECISIONS.md`, `VISUAL-SYSTEM.md`, this ROADMAP and relevant R7 round history.
-2. Continue from the actual current R7 branch head; do not restart responsive work from R6 or an older round.
-3. Implement only the owner-approved post-Round6 correction set.
-4. Preserve production `main`, Supabase/backend/review/profile business logic and unrelated scenes.
-5. Add browser assertions and screenshot evidence specifically capable of catching the visual regressions missed by Round6 automation.
-6. Verify representative phone/tablet/desktop contexts, orientation, scrolling, overflow and JS errors.
-7. Produce an exact tested/pushed/remote feature SHA.
-8. Return to owner visual review.
-9. Repeat bounded corrections if needed.
-10. Only after explicit owner visual acceptance may merge/deploy be considered.
+1. Complete the Round7 exact-final browser + screenshot gate against the clean final commit.
+2. Push only the exact tested SHA and verify remote equality.
+3. Re-check PR #18 remains draft/open/unmerged and production `main` remains unchanged.
+4. Return the verified Round7 preview to owner visual review.
+5. Repeat only bounded owner-requested corrections if needed.
+6. Only after explicit owner visual acceptance may merge/deploy be considered.
 
 ### History / evidence
 
@@ -499,3 +495,5 @@ Owner visual review then rejected/corrected specific results:
 Implement only the current correction set documented in `START-HERE.md`, `PROJECT-STATE.md` and `VISUAL-SYSTEM.md`, then return an exact verified feature SHA plus screenshot evidence to owner visual review.
 
 Do not merge R7, deploy, touch Supabase/backend, start Bug Reports v2, Custom Cursor, SECURITY PROTOCOL // 2045 or unrelated redesign work merely because those topics exist elsewhere in project history/planning.
+
+- `docs/releases/revival/R7/OWNER-FEEDBACK-ROUND7.md` — bounded implementation/evidence record.

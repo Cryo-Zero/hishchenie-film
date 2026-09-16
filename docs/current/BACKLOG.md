@@ -33,7 +33,7 @@ Possible future polish may include layout/legibility/accessibility improvements 
 
 Responsive/mobile is no longer a future backlog workstream. REVIVAL R7 exists on `revival-r7-responsive-mobile` under draft PR #18 and has gone through multiple owner-feedback rounds.
 
-Round 6 reached verified SHA `f5e154912986c95e7f48a15bce34c707db39667c` and passed its defined automated browser gate, but owner visual acceptance remains pending and a newer bounded correction set is approved for implementation.
+Round 6 reached verified SHA `f5e154912986c95e7f48a15bce34c707db39667c` and passed its defined automated browser gate. The newer bounded owner correction set has now been implemented as Round7 preview work, but owner visual acceptance remains pending. This remains current responsive stabilization, not a backlog authorization for additional redesign.
 
 This factual context is included only to prevent stale backlog interpretation. The actual active visual rules live in `VISUAL-SYSTEM.md`.
 

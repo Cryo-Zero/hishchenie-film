@@ -354,3 +354,11 @@ This is an active project direction and a documentation decision, not a claim th
 **Personal-data operator — provisional assumption only:** the film author is the current working assumption. This is not yet a final legal publication. The author's legal identity/details/contact have not been confirmed for publication, and the actual operator/processor allocation must be confirmed before a final Privacy Policy is published. Do not publish guessed legal details. Ordinary team members or the technical developer are not automatically designated the operator merely because they implement or maintain the system.
 
 The FAQ item `На сайте есть безопасность?` remains untouched as intentional artistic wordplay. It is not the legal Privacy Policy and must not be treated as one.
+
+## R7 owner clarification — current world-grid exception (2026-09-16)
+
+The durable rule remains that the world grid is a default contract and a scene may receive a deliberate local exception only through explicit owner approval. The owner now clarifies the **current factual exception set** for the active design: **CURRENTLY APPROVED OUTSIDE-GRID EXCEPTION = MATERIALS ARCHIVE CONTROL / HANDLE ONLY**.
+
+This is not a permanent ban on all future exceptions. It means no other element may inherit Archive's privilege by analogy; any additional element crossing the world grid requires its own explicit owner approval. Archive remains Materials-local, retracts when leaving the scene, and its drawer interaction must not redefine the global grid.
+
+Round7 also reconfirms documentation traceability: Round4 mobile `ARCHIVE // 11`, Round5 hidden mobile Hero synopsis, and Round6 diamond receive glow / compact profile-help geometry remain historical preview decisions even where the current owner direction supersedes them.

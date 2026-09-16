@@ -161,3 +161,13 @@ Round5 preserves Supabase/reviews/profile/auth business logic and desktop-only M
 Post-Round5 visual review keeps the same draft R7 branch and supersedes only the specifically changed preview behavior: desktop CONTACT again uses deliberate line travel with a restrained diamond receive reaction; trailer initial audio is explicit/no-autoplay/unmuted at 30%; desktop Materials enlarged mode uses more viewport space with clean controls; profile help is a compact anchored popover; sequential mobile Actors/FAQ shell transitions are softer; an open burger no longer locks page scrolling while deliberate outside taps still close it; and phone smart-header hide/reveal is visually smoother.
 
 Round6 remains **OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**. No Supabase/backend/deploy/main work is part of this round.
+
+## Owner feedback Round 7 — 2026-09-16
+
+Owner visual review of the green Round6 automation found visual regressions that structural assertions had missed. Round7 therefore adds screenshot-backed visual-regression checks and corrects only the owner-listed areas.
+
+Current Round7 preview: desktop Actors/FAQ keep staged text reveal while structural lines stay stationary; desktop CONTACT keeps point travel but removes the separate diamond receive glow; mobile CONTACT adopts the same travelling-point semantics; desktop Archive is restored to a true Materials-local physical-wall handle/drawer; Round5 profile-console-aligned help geometry is restored; the visible compact/mobile `ARCHIVE // 11` control is superseded/hidden while stage+swipe+lightbox remain; mobile Hero restores the existing translated synopsis between poster and actions in portrait and landscape. Desktop Hero remains unchanged.
+
+Canonical clarification: **the Archive control/handle is the only currently approved outside-world-grid element**. Other future local exceptions remain possible only through new explicit owner approval. Historical Round4/5/6 choices and the pre-implementation `OWNER-FEEDBACK-ROUND7-PENDING.md` record remain preserved rather than deleted.
+
+Round7 remains **OWNER VISUAL REVIEW PENDING / NOT PRODUCTION**. No merge, deploy, Supabase/backend or production-main operation is part of this correction pass.

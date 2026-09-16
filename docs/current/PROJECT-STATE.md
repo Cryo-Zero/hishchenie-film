@@ -17,7 +17,7 @@ Round 6 of the R7 preview reached verified feature SHA:
 
 It passed its automated browser gate, but the owner then found visual/behavior regressions in real review. Therefore Round 6 is a verified implementation checkpoint, **not owner-accepted final R7**.
 
-The owner has already approved a next correction set after Round 6. Those corrections are **PENDING IMPLEMENTATION** until a bridge produces and verifies a later feature SHA. Do not describe the pending directions as already present in runtime.
+The owner-approved post-Round6 correction set has now been implemented by the bounded Round7 bridge pass. It remains **OWNER VISUAL ACCEPTANCE PENDING** and is not production. The exact final Round7 SHA is established by the exact-final browser/screenshot gate before push; do not confuse automated verification with owner acceptance.
 
 ## Production
 
@@ -40,9 +40,9 @@ The owner has already approved a next correction set after Round 6. Those correc
 - Deploy: **NO**.
 - Supabase/backend changes in Round 6: **NO**.
 
-### Owner-approved corrections after Round 6 — pending implementation
+### Round 7 corrections after Round 6 — implemented preview / owner visual acceptance pending
 
-The following is the active target for the next bounded R7 bridge task. Current Round 6 runtime may still show the older behavior until that task is completed.
+The following active target is now implemented on the Round7 feature preview. It remains subject to exact-final verification before push and then owner visual review; production R6 is unchanged.
 
 - **World grid / Archive:** on the current design, the desktop Archive wall control is the only explicitly approved outside-grid element. It belongs only to Materials and should remain on the physical left viewport wall while Materials is active. Other outside-grid exceptions require new explicit owner approval.
 - **Desktop Archive regression:** restore the approved wall-handle/drawer behavior; it must not read as an ordinary button/block inside the Materials grid.
@@ -191,7 +191,7 @@ Detailed R6 release documentation: `docs/releases/revival/R6/`.
 
 R7 is an additive responsive interpretation, not a replacement of the approved desktop identity. It has already gone through multiple owner-feedback rounds and real Chromium matrices. Historical Round1–Round6 choices are preserved under `docs/releases/revival/R7/`.
 
-Do not use an earlier round description as current truth without checking `START-HERE.md`, this file and `VISUAL-SYSTEM.md`. Several preview choices were intentionally superseded in later rounds, and the owner has now supplied a post-Round6 correction set that is approved but not yet implemented.
+Do not use an earlier round description as current truth without checking `START-HERE.md`, this file and `VISUAL-SYSTEM.md`. Several preview choices were intentionally superseded in later rounds. The post-Round6 owner correction set is now implemented in the Round7 preview but remains pending owner visual acceptance.
 
 ## Responsive design workflow state
 
@@ -203,9 +203,9 @@ Current workflow state:
 2. Multiple owner-feedback rounds (including Round 6) were implemented and browser-QA'd.
 3. Round 6 final SHA `f5e154912986c95e7f48a15bce34c707db39667c` passed its automated gate.
 4. Owner visual review then found several regressions/incorrect interpretations.
-5. The owner has approved the next correction direction listed above and in `VISUAL-SYSTEM.md`.
-6. Next bridge task must implement only that bounded correction set, re-run browser/screenshot QA, push an exact verified feature SHA and return to owner visual review.
-7. R7 must remain draft/unmerged/not production until explicit owner acceptance.
+5. The owner-approved correction direction listed above and in `VISUAL-SYSTEM.md` has been implemented by the bounded Round7 bridge pass.
+6. The Round7 implementation must pass the full browser/screenshot suite against the exact final commit, then push that exact SHA and verify remote equality.
+7. After that verification, the next gate is owner visual review; R7 remains draft/unmerged/not production until explicit owner acceptance.
 
 Concept/mockup, source inspection, automated assertions and browser QA are distinct evidence classes. Final visual acceptance belongs to the owner.
 
