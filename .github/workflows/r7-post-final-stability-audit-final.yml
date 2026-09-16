@@ -53,42 +53,20 @@ jobs:
               raise SystemExit('embedded audit harness not found')
           src = gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
 
-          if "let activeEngineName = ''" not in src:
-              src = src.replace("const browserStatus = {};", "const browserStatus = {};\nlet activeEngineName = '';", 1)
+          marker = "const browserStatus = {};"
+          if marker not in src:
+              raise SystemExit('browserStatus marker missing')
+          src = src.replace(marker, marker + "\nlet activeEngineName = '';", 1)
 
-          old = """  const ctx = await browser.newContext({
-            viewport:{width:v.w,height:v.h},
-            hasTouch:v.touch,
-            isMobile:v.phone,
-            reducedMotion,
-            locale:'ru-RU'
-          });
-          """
-          new = """  const options = {
-            viewport:{width:v.w,height:v.h},
-            hasTouch:v.touch,
-            reducedMotion,
-            locale:'ru-RU'
-          };
-          // Firefox does not implement Playwright's isMobile flag. The real
-          // Firefox engine is still tested at the requested viewport/touch sizes.
-          if (activeEngineName !== 'firefox') options.isMobile = v.phone;
-          const ctx = await browser.newContext(options);
-          """
-          if old not in src:
-              raise SystemExit('Firefox context compatibility marker missing')
-          src = src.replace(old, new, 1)
+          marker = 'isMobile:v.phone,'
+          if src.count(marker) != 1:
+              raise SystemExit(f'Firefox isMobile marker count: {src.count(marker)}')
+          src = src.replace(marker, "...(activeEngineName !== 'firefox' ? {isMobile:v.phone} : {}),", 1)
 
-          old = """  for(const [browserName,type] of Object.entries(engines)){
-            let browser;
-          """
-          new = """  for(const [browserName,type] of Object.entries(engines)){
-            activeEngineName = browserName;
-            let browser;
-          """
-          if old not in src:
-              raise SystemExit('engine-loop marker missing')
-          src = src.replace(old, new, 1)
+          marker = 'for(const [browserName,type] of Object.entries(engines)){' 
+          if src.count(marker) != 1:
+              raise SystemExit(f'engine loop marker count: {src.count(marker)}')
+          src = src.replace(marker, marker + "\n    activeEngineName = browserName;", 1)
 
           Path('/tmp/r7_post_final_audit.cjs').write_text(src, encoding='utf-8')
           PY
