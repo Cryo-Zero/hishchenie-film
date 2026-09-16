@@ -215,7 +215,8 @@
     mainImage.src = item.src;
     mainImage.alt = item.alt;
     if (item.i18n) mainImage.dataset.i18nAlt = item.i18n;
-    stage.style.setProperty('--archive-bg', `url("${item.src.replace(/"/g,'%22')}")`);
+    const archiveBackdropSrc = new URL(item.src, document.baseURI).href;
+    stage.style.setProperty('--archive-bg', `url("${archiveBackdropSrc.replace(/"/g,'%22')}")`);
     if (code) code.textContent = `${item.file} // ${item.type}`;
     if (counter) counter.textContent = `${String(archiveIndex+1).padStart(2,'0')} / ${String(archiveItems.length).padStart(2,'0')}`;
     cards.forEach((card, i) => {
