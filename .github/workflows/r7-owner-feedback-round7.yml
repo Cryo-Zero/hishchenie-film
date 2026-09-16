@@ -42,12 +42,10 @@ jobs:
             'scripts/r7_round7_qa.cjs' | sort >/tmp/docbase-expected
           diff -u /tmp/docbase-expected /tmp/docbase-actual
 
-          # Staging repairs after DOCBASE are restricted to the workflow and the
-          # temporary QA source itself. Product/runtime files must still match Round6.
           git diff --name-only "$DOCBASE"..HEAD | sort >/tmp/staging-actual
           printf '%s\n' \
             '.github/workflows/r7-owner-feedback-round7.yml' \
-            'scripts/r7_round7_qa.cjs' | sort >/tmp/staging-expected
+            'scripts/r7_round7_trigger.txt' | sort >/tmp/staging-expected
           diff -u /tmp/staging-expected /tmp/staging-actual
           git diff --quiet "$ROUND6"..HEAD -- js/site.js js/responsive-r7.js css/site.css css/responsive-r7-polish.css css/responsive-r7-owner-round2.css
 
@@ -121,6 +119,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('/tmp/r7_round7_finalize.py')
+          s = p.read_text(encoding='utf-8')
+          old = "    'scripts/r7_round7_finalize.py',\n]"
+          new = "    'scripts/r7_round7_finalize.py',\n    'scripts/r7_round7_trigger.txt',\n]"
+          if s.count(old) != 1:
+              raise SystemExit(f'Round7 finalizer trigger marker mismatch: {s.count(old)}')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
           python3 /tmp/r7_round7_finalize.py
 
       - name: Exact-final-SHA full browser and screenshot verification
@@ -137,7 +145,8 @@ jobs:
             .github/workflows/r7-owner-feedback-round7.yml \
             scripts/r7_round7_apply.py \
             scripts/r7_round7_finalize.py \
-            scripts/r7_round7_qa.cjs; do
+            scripts/r7_round7_qa.cjs \
+            scripts/r7_round7_trigger.txt; do
             test ! -e "$f"
           done
 
