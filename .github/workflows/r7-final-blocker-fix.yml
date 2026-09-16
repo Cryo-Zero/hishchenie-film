@@ -1,4 +1,4 @@
-name: R7 final blocker fix and targeted audit
+name: R7 final blocker targeted audit
 
 on:
   push:
@@ -8,52 +8,26 @@ on:
       - .github/workflows/r7-final-blocker-fix.yml
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  fix-and-targeted-audit:
+  targeted-audit:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: revival-r7-responsive-mobile
 
-      - name: Apply the single allowed runtime fix
-        id: fix
+      - name: Guard and mount exact product checkpoint
         shell: bash
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path('js/public-response.js')
-          s = p.read_text(encoding='utf-8')
-          old = "if(open)setTimeout(()=>$('.info-overlay-close',panel)?.focus(),0);"
-          new = "if(open)setTimeout(()=>$('.info-overlay-close',panel)?.focus({preventScroll:true}),0);"
-          if s.count(old) != 1:
-              raise SystemExit(f'expected exactly one old overlay focus call, found {s.count(old)}')
-          if new in s:
-              raise SystemExit('new overlay focus call unexpectedly already present')
-          p.write_text(s.replace(old, new, 1), encoding='utf-8')
-          PY
-          node --check js/public-response.js
-          test "$(git diff --name-only | tr -d '\r')" = "js/public-response.js"
-          git diff --check
-          git diff -- js/public-response.js
-          if [ "$(git diff --numstat -- js/public-response.js)" != $'1\t1\tjs/public-response.js' ]; then
-            echo 'Unexpected runtime diff scope:'
-            git diff --numstat -- js/public-response.js
-            exit 1
-          fi
-          git config user.name 'Cryo-Zero'
-          git config user.email 'Bogdan.Vedrentsov@gmail.com'
-          git add js/public-response.js
-          git commit -m 'fix: preserve viewport when focusing overlays'
-          PRODUCT_SHA="$(git rev-parse HEAD)"
-          echo "product_sha=$PRODUCT_SHA" >> "$GITHUB_OUTPUT"
-          printf '%s\n' "$PRODUCT_SHA" > /tmp/R7_FINAL_PRODUCT_SHA.txt
-          git push origin HEAD:revival-r7-responsive-mobile
+          PRODUCT=3fe6265505e6c287061aeae2c6f45c1e66af6bdb
+          git merge-base --is-ancestor "$PRODUCT" HEAD
+          test -z "$(git diff --name-only "$PRODUCT"..HEAD -- index.html reviews.html admin assets css js supabase migrations | sed -n '1p')"
+          git worktree add /tmp/r7-product "$PRODUCT"
+          printf '%s\n' "$PRODUCT" >/tmp/R7_FINAL_PRODUCT_SHA.txt
 
       - name: Install targeted browser runtime
         shell: bash
@@ -69,13 +43,13 @@ jobs:
         shell: bash
         env:
           NODE_PATH: /tmp/r7-targeted/node_modules
-          PRODUCT_SHA: ${{ steps.fix.outputs.product_sha }}
+          PRODUCT_SHA: 3fe6265505e6c287061aeae2c6f45c1e66af6bdb
         run: |
           set -euo pipefail
           OUT=/tmp/r7-final-blocker-targeted
           rm -rf "$OUT" && mkdir -p "$OUT"
           cp /tmp/R7_FINAL_PRODUCT_SHA.txt "$OUT/"
-          python3 -m http.server 4174 --bind 127.0.0.1 --directory "$GITHUB_WORKSPACE" >/tmp/r7-targeted-server.log 2>&1 & SERVER=$!
+          python3 -m http.server 4174 --bind 127.0.0.1 --directory /tmp/r7-product >/tmp/r7-targeted-server.log 2>&1 & SERVER=$!
           trap 'kill $SERVER 2>/dev/null || true' EXIT
           sleep 1
           cat > /tmp/r7-targeted/targeted.cjs <<'JS'
@@ -87,7 +61,6 @@ jobs:
           const results=[];
           function record(ok,browser,name,detail=''){results.push({ok,browser,name,detail});if(!ok)console.error('FAIL',browser,name,detail);}
           function near(a,b,t=1){return Math.abs(a-b)<=t;}
-          function docRect(r,y){return {x:r.x,y:r.y+y,width:r.width,height:r.height};}
           (async()=>{
             for(const [browserName,type] of Object.entries(engines)){
               const browser=await type.launch({headless:true});
@@ -129,7 +102,8 @@ jobs:
               record(focusOk,browserName,'Profile Help moves keyboard focus to close control without scroll');
               record(escapeOk,browserName,'Profile Help Escape closes');
 
-              await page.locator('#bugReportToggle').scrollIntoViewIfNeeded();await page.waitForTimeout(50);
+              const bugExists=await page.evaluate(()=>!!document.querySelector('#bugReportToggle')&&!!document.querySelector('#bugReportPanel')&&!!document.querySelector('#bugReportClose'));
+              record(bugExists,browserName,'Bug Report shared overlay DOM exists');
               const bugY=await page.evaluate(()=>scrollY);
               await page.evaluate(()=>document.querySelector('#bugReportToggle').click());
               await page.waitForFunction(()=>!document.querySelector('#bugReportPanel').hidden && document.activeElement?.id==='bugReportClose');
@@ -144,12 +118,12 @@ jobs:
             const failed=results.filter(x=>!x.ok).length;
             const summary={product_sha:process.env.PRODUCT_SHA,browsers:Object.keys(engines),viewport:'1366x768',total:results.length,passed:results.length-failed,failed,results};
             fs.writeFileSync(out+'/TARGETED-RESULTS.json',JSON.stringify(summary,null,2));
+            fs.copyFileSync('/tmp/r7-targeted-server.log',out+'/server.log');
             console.log(JSON.stringify(summary,null,2));
             process.exit(failed?1:0);
           })().catch(e=>{console.error(e);process.exit(2)});
           JS
           NODE_PATH=/tmp/r7-targeted/node_modules node /tmp/r7-targeted/targeted.cjs
-          cp /tmp/r7-targeted-server.log "$OUT/server.log"
 
       - name: Upload targeted evidence
         if: always()
