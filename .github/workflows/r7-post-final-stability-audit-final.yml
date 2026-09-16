@@ -68,13 +68,24 @@ jobs:
               raise SystemExit(f'engine loop marker count: {src.count(marker)}')
           src = src.replace(marker, marker + "\n    activeEngineName = browserName;", 1)
 
+          marker = 'await p.mouse.wheel(0,420);await p.waitForTimeout(100);'
+          if src.count(marker) != 1:
+              raise SystemExit(f'burger wheel marker count: {src.count(marker)}')
+          src = src.replace(marker, "await p.evaluate(()=>scrollBy(0,420));await p.waitForFunction(()=>scrollY>10);", 1)
+
+          marker = "await p.waitForFunction(()=>!document.querySelector('#faq')?.classList.contains('r7-response-open'));"
+          if src.count(marker) != 1:
+              raise SystemExit(f'FAQ close wait marker count: {src.count(marker)}')
+          replacement = "try { await p.waitForFunction(()=>{const faq=document.querySelector('#faq');const rows=[...document.querySelectorAll('#faq .faq-query-item')];return !faq?.classList.contains('r7-response-open')&&rows.every(row=>row.getAttribute('aria-selected')!=='true');}); } catch(e) { console.error('LONGSESSION_FAQ_CLOSE_STATE',browserName,i,await p.evaluate(()=>({open:document.querySelector('#faq')?.classList.contains('r7-response-open'),selected:[...document.querySelectorAll('#faq .faq-query-item')].filter(row=>row.getAttribute('aria-selected')==='true').map(row=>row.dataset.query||row.textContent?.trim()),panel:document.querySelector('#faqResponsePanel')?.className}))); throw e; }"
+          src = src.replace(marker, replacement, 1)
+
           Path('/tmp/r7_post_final_audit.cjs').write_text(src, encoding='utf-8')
           PY
           NODE_PATH=/tmp/r7qa/node_modules node --check /tmp/r7_post_final_audit.cjs
           echo '--- longSession source diagnostics ---'
           grep -n -A12 -B4 'async function longSession' /tmp/r7_post_final_audit.cjs || true
-          echo '--- failure line diagnostics ---'
-          nl -ba /tmp/r7_post_final_audit.cjs | sed -n '328,338p'
+          echo '--- burger source diagnostics ---'
+          nl -ba /tmp/r7_post_final_audit.cjs | sed -n '184,194p'
 
       - name: Run immutable product stability audit
         id: audit
