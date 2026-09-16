@@ -62,7 +62,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cp scripts/r7_round6_qa.cjs /tmp/r7_round6_qa.cjs
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('scripts/r7_round6_qa.cjs').read_text(encoding='utf-8')
+          wrapped="(async () => {\n"+src+"\n})().catch(err => { console.error(err); process.exit(1); });\n"
+          Path('/tmp/r7_round6_qa.cjs').write_text(wrapped,encoding='utf-8')
+          PY
           node --check /tmp/r7_round6_qa.cjs
 
       - name: Pre-commit full browser matrix
