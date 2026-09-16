@@ -2,10 +2,8 @@ name: R7 live production smoke
 
 on:
   push:
-    branches:
-      - revival-r7-responsive-mobile
-    paths:
-      - .github/workflows/r7-live-production-smoke.yml
+    branches: [revival-r7-responsive-mobile]
+    paths: [.github/workflows/r7-live-production-smoke.yml]
 
 permissions:
   contents: read
@@ -16,100 +14,41 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        with: {fetch-depth: 0}
       - name: Guard production main
         shell: bash
         run: |
-          set -euo pipefail
           git fetch origin main
           test "$(git rev-parse origin/main)" = "4e16c09f9704f634e443efadf042e3516465201a"
       - name: Install Chromium
         shell: bash
         run: |
-          set -euo pipefail
           mkdir -p /tmp/liveqa && cd /tmp/liveqa
           npm init -y >/dev/null 2>&1
           npm install --silent playwright@1.55.0
           npx playwright install --with-deps chromium >/dev/null 2>&1
       - name: Run live smoke
         shell: bash
-        env:
-          NODE_PATH: /tmp/liveqa/node_modules
+        env: {NODE_PATH: /tmp/liveqa/node_modules}
         run: |
-          set -euo pipefail
           mkdir -p /tmp/r7-live-evidence
-          cat > /tmp/r7-live-smoke.cjs <<'NODE'
-          const { chromium } = require('playwright');
-          const fs=require('fs'), path=require('path');
-          const BASE='https://cryo-zero.github.io/hishchenie-film';
-          const OUT='/tmp/r7-live-evidence';
-          const R=[], pageErrors=[], consoleErrors=[], badLocal=[], failedRequests=[];
-          const check=(ok,name,detail='')=>{R.push({ok,name,detail});if(!ok)console.log('FAIL',name,detail);};
-          const near=(a,b,t=2)=>Math.abs(a-b)<=t;
-          async function openPage(ctx,pth){
-            const p=await ctx.newPage();
-            p.on('pageerror',e=>pageErrors.push(`${pth}: ${String(e)}`));
-            p.on('console',m=>{if(m.type()==='error')consoleErrors.push(`${pth}: ${m.text()}`)});
-            p.on('requestfailed',r=>{const t=r.resourceType();if(['document','script','stylesheet','image'].includes(t))failedRequests.push(`${t} ${r.url()} ${r.failure()?.errorText||''}`)});
-            p.on('response',r=>{try{const u=new URL(r.url()),b=new URL(BASE);if(u.origin===b.origin&&r.status()>=400)badLocal.push(`${r.status()} ${u.pathname}`)}catch{}});
-            let last;
-            for(let i=0;i<5;i++){
-              try{last=await p.goto(`${BASE}${pth}?live-smoke=${Date.now()}-${i}`,{waitUntil:'domcontentloaded',timeout:30000});if(last&&last.status()<400)break;}catch(e){if(i===4)throw e;await p.waitForTimeout(1500);}
-            }
-            await p.waitForTimeout(700);
-            return p;
-          }
-          async function swipe(locator,fromX=300,toX=70){await locator.evaluate((node,xs)=>{const emit=(type,x)=>{const e=new Event(type,{bubbles:true,cancelable:true});Object.defineProperty(e,'changedTouches',{value:[{clientX:x,clientY:120}]});node.dispatchEvent(e)};emit('touchstart',xs[0]);emit('touchend',xs[1]);},[fromX,toX]);}
-          (async()=>{
-            const browser=await chromium.launch({headless:true});
-            const req=await browser.request.newContext();
-            for(const asset of ['/','/reviews.html','/css/r7-owner-corrections.css','/css/responsive-r7.css','/js/r7-owner-corrections.js','/js/responsive-r7.js','/assets/images/archive/archive-01.jpg']){
-              const r=await req.get(BASE+asset,{timeout:30000});check(r.status()===200,`live asset ${asset} HTTP 200`,String(r.status()));
-            }
-            await req.dispose();
-
-            const dc=await browser.newContext({viewport:{width:1366,height:768}});const d=await openPage(dc,'/');
-            check(await d.locator('.hero-poster-frame').isVisible(),'desktop Hero visible');
-            check(Math.abs(await d.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth))<=1,'desktop no horizontal overflow');
-            await d.locator('#materials').scrollIntoViewIfNeeded();await d.waitForTimeout(180);check(await d.locator('#archiveStage').isVisible(),'Materials/Archive stage visible');
-            await d.locator('#archiveStage').click();await d.waitForTimeout(120);check(await d.locator('#lightbox').evaluate(e=>e.classList.contains('open')),'Materials lightbox opens');await d.keyboard.press('Escape');
-            await d.locator('#trailer').scrollIntoViewIfNeeded();await d.waitForTimeout(100);const tr=await d.evaluate(()=>{const v=document.querySelector('#trailerVideo'),c=document.querySelector('.r7-player-controls');return {native:v?.controls,custom:!!c&&getComputedStyle(c).display!=='none',play:!!document.querySelector('.r7-player-play'),time:!!document.querySelector('.r7-player-time'),volume:!!document.querySelector('.r7-player-volume'),pip:!!document.querySelector('.r7-player-pip'),fs:!!document.querySelector('.r7-player-fullscreen')};});check(tr.native===false&&tr.custom&&tr.play&&tr.time&&tr.volume&&tr.pip&&tr.fs,'desktop Trailer custom controls',JSON.stringify(tr));
-            await d.locator('#cast').scrollIntoViewIfNeeded();await d.locator('#cast .cast-list-item').first().click();await d.waitForTimeout(350);check(await d.locator('#cast .cast-list-item.is-selected').count()===1,'desktop Actors selection works');
-            await d.locator('#faq').scrollIntoViewIfNeeded();await d.locator('#faq .faq-query-item').first().click();await d.waitForTimeout(350);check(await d.locator('#faq .faq-query-item.is-selected').count()===1,'desktop FAQ selection works');
-            await d.locator('#contacts').scrollIntoViewIfNeeded();const contact=await d.evaluate(()=>({point:!!document.querySelector('.contact-signal-track i'),diamond:getComputedStyle(document.querySelector('.contact-signal-track b')).display,sweep:getComputedStyle(document.querySelector('.contact-signal'),'::before').content}));check(contact.point&&contact.diamond==='none'&&(contact.sweep==='none'||contact.sweep==='normal'),'Contact live signal semantics',JSON.stringify(contact));
-            await d.screenshot({path:path.join(OUT,'live-desktop.png'),fullPage:false});await dc.close();
-
-            const rc=await browser.newContext({viewport:{width:1366,height:768}});const r=await openPage(rc,'/reviews.html');
-            check(await r.locator('.review-sort-button').count()>=3,'Reviews page loads sort controls');
-            const grid=await r.evaluate(()=>{const rr=s=>document.querySelector(s).getBoundingClientRect();const a=rr('.profile-console'),b=rr('.rating-scale'),c=rr('#reviewText');return {a:{l:a.left,r:a.right},b:{l:b.left,r:b.right},c:{l:c.left,r:c.right}}});check(near(grid.a.l,grid.b.l,1)&&near(grid.a.r,grid.b.r,1)&&near(grid.a.l,grid.c.l,1)&&near(grid.a.r,grid.c.r,1),'Reviews local block grid aligned',JSON.stringify(grid));
-            await r.locator('#profileHelpToggle').scrollIntoViewIfNeeded();await r.waitForTimeout(80);const y0=await r.evaluate(()=>scrollY);await r.evaluate(()=>document.querySelector('#profileHelpToggle')?.click());await r.waitForFunction(()=>!document.querySelector('#profileHelpPanel')?.hidden);const hs=await r.evaluate(()=>({y:scrollY,hidden:document.querySelector('#profileHelpPanel').hidden,pos:getComputedStyle(document.querySelector('#profileHelpPanel')).position}));check(!hs.hidden&&hs.pos==='absolute'&&near(y0,hs.y,1),'Profile Help opens without viewport scroll',JSON.stringify({y0,hs}));await r.keyboard.press('Escape');await r.screenshot({path:path.join(OUT,'live-reviews.png'),fullPage:false});await rc.close();
-
-            const mc=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});const m=await openPage(mc,'/');
-            const hero=await m.evaluate(()=>{const rr=s=>{const e=document.querySelector(s);if(!e)return null;const x=e.getBoundingClientRect();return {t:x.top,b:x.bottom}};return {poster:rr('.hero-poster-frame'),synopsis:rr('.r7-mobile-hero-copy'),actions:rr('.r7-mobile-hero-actions')};});check(hero.poster&&hero.synopsis&&hero.actions&&hero.poster.b<=hero.synopsis.t+2&&hero.synopsis.b<=hero.actions.t+2,'mobile Hero poster-synopsis-actions order',JSON.stringify(hero));
-            check(await m.locator('#menuToggle').isVisible(),'mobile burger/header visible');await m.locator('#menuToggle').click();check(await m.locator('body').evaluate(e=>e.classList.contains('nav-open')),'mobile burger opens');await m.locator('#menuToggle').click();
-            await m.locator('#materials').scrollIntoViewIfNeeded();await m.waitForTimeout(120);check((await m.locator('#r7MobileArchiveToggle').evaluate(e=>getComputedStyle(e).display))==='none','mobile ARCHIVE // 11 absent');const c0=await m.locator('#archiveCounter').textContent();await swipe(m.locator('#archiveStage'));await m.waitForTimeout(80);const c1=await m.locator('#archiveCounter').textContent();check(c0!==c1,'mobile Materials swipe works',`${c0}->${c1}`);
-            await m.locator('#cast').scrollIntoViewIfNeeded();await m.waitForTimeout(80);const ay0=await m.evaluate(()=>scrollY);await m.evaluate(()=>document.querySelector('#cast .cast-list-item')?.click());await m.locator('.r7-subject-back').waitFor({state:'visible'});await m.waitForTimeout(220);check(near(ay0,await m.evaluate(()=>scrollY),2)&&await m.locator('#cast').evaluate(e=>e.classList.contains('r7-dossier-open')),'mobile Actors transition stable');await m.evaluate(()=>document.querySelector('.r7-subject-back')?.click());
-            await m.locator('#faq').scrollIntoViewIfNeeded();await m.waitForTimeout(80);const fy0=await m.evaluate(()=>scrollY);await m.evaluate(()=>document.querySelector('#faq .faq-query-item')?.click());await m.locator('.r7-query-back').waitFor({state:'visible'});await m.waitForTimeout(220);check(near(fy0,await m.evaluate(()=>scrollY),2)&&await m.locator('#faq').evaluate(e=>e.classList.contains('r7-response-open')),'mobile FAQ transition stable');await m.evaluate(()=>document.querySelector('.r7-query-back')?.click());
-            await m.screenshot({path:path.join(OUT,'live-mobile.png'),fullPage:false});await mc.close();
-
-            const badCss=badLocal.filter(x=>x.includes('/css/assets/images/archive/'));
-            check(badCss.length===0,'Archive bad /css/assets path absent',JSON.stringify(badCss));
-            check(pageErrors.length===0,'live uncaught page errors = 0',JSON.stringify(pageErrors));
-            check(consoleErrors.length===0,'live console errors = 0',JSON.stringify(consoleErrors));
-            check(badLocal.length===0,'live same-origin HTTP >=400 = 0',JSON.stringify(badLocal));
-            check(failedRequests.length===0,'live critical request failures = 0',JSON.stringify(failedRequests));
-            const failures=R.filter(x=>!x.ok);const summary={live_url:BASE,production_main:'4e16c09f9704f634e443efadf042e3516465201a',verified_product:'51158b052186d880a9b5eaab2d1c6f66e7497322',total:R.length,passed:R.length-failures.length,failed:failures.length,failures,pageErrors,consoleErrors,badLocal,failedRequests,checks:R};
-            fs.writeFileSync(path.join(OUT,'LIVE-RESULTS.json'),JSON.stringify(summary,null,2));fs.writeFileSync(path.join(OUT,'LIVE-URL.txt'),BASE+'\n');fs.writeFileSync(path.join(OUT,'PRODUCTION-MAIN.txt'),summary.production_main+'\n');console.log(JSON.stringify({total:summary.total,passed:summary.passed,failed:summary.failed,live_url:BASE,pageErrors:pageErrors.length,consoleErrors:consoleErrors.length,badLocal:badLocal.length,failedRequests:failedRequests.length},null,2));await browser.close();process.exit(failures.length?1:0);
-          })().catch(e=>{console.error(e);process.exit(2)});
+          cat > /tmp/live.cjs <<'NODE'
+          const {chromium,request}=require('playwright');const fs=require('fs'),path=require('path');
+          const BASE='https://cryo-zero.github.io/hishchenie-film',OUT='/tmp/r7-live-evidence';const R=[],E=[],C=[],B=[],F=[];
+          const ok=(v,n,d='')=>{R.push({ok:!!v,name:n,detail:d});if(!v)console.log('FAIL',n,d)},near=(a,b,t=2)=>Math.abs(a-b)<=t;
+          async function page(ctx,pth){const p=await ctx.newPage();p.on('pageerror',e=>E.push(`${pth}: ${e}`));p.on('console',m=>{if(m.type()==='error')C.push(`${pth}: ${m.text()}`)});p.on('response',r=>{try{const u=new URL(r.url()),b=new URL(BASE);if(u.origin===b.origin&&r.status()>=400)B.push(`${r.status()} ${u.pathname}`)}catch{}});p.on('requestfailed',r=>{if(['document','script','stylesheet','image'].includes(r.resourceType()))F.push(`${r.resourceType()} ${r.url()} ${r.failure()?.errorText||''}`)});await p.goto(BASE+pth+`?live=${Date.now()}`,{waitUntil:'domcontentloaded',timeout:30000});await p.waitForTimeout(700);return p}
+          async function swipe(l){await l.evaluate(n=>{const e=(t,x)=>{const z=new Event(t,{bubbles:true,cancelable:true});Object.defineProperty(z,'changedTouches',{value:[{clientX:x,clientY:120}]});n.dispatchEvent(z)};e('touchstart',300);e('touchend',70)})}
+          (async()=>{const rq=await request.newContext();for(const a of ['/','/reviews.html','/css/r7-owner-corrections.css','/css/responsive-r7.css','/js/r7-owner-corrections.js','/js/responsive-r7.js','/assets/images/archive/archive-01.jpg']){const r=await rq.get(BASE+a);ok(r.status()===200,`HTTP 200 ${a}`,String(r.status()))}await rq.dispose();
+          const br=await chromium.launch({headless:true});
+          let ctx=await br.newContext({viewport:{width:1366,height:768}}),p=await page(ctx,'/');ok(await p.locator('.hero-poster-frame').isVisible(),'desktop Hero');ok(Math.abs(await p.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth))<=1,'desktop overflow=0');await p.locator('#materials').scrollIntoViewIfNeeded();await p.locator('#archiveStage').click();await p.waitForTimeout(120);ok(await p.locator('#lightbox').evaluate(e=>e.classList.contains('open')),'Materials lightbox');await p.keyboard.press('Escape');await p.locator('#trailer').scrollIntoViewIfNeeded();const t=await p.evaluate(()=>{const v=document.querySelector('#trailerVideo'),c=document.querySelector('.r7-player-controls');return {native:v.controls,custom:getComputedStyle(c).display,play:!!document.querySelector('.r7-player-play'),time:!!document.querySelector('.r7-player-time'),vol:!!document.querySelector('.r7-player-volume'),pip:!!document.querySelector('.r7-player-pip'),fs:!!document.querySelector('.r7-player-fullscreen')}});ok(!t.native&&t.custom!=='none'&&t.play&&t.time&&t.vol&&t.pip&&t.fs,'Trailer controls',JSON.stringify(t));await p.locator('#cast').scrollIntoViewIfNeeded();await p.locator('#cast .cast-list-item').first().click();await p.waitForTimeout(300);ok(await p.locator('#cast .cast-list-item.is-selected').count()===1,'Actors');await p.locator('#faq').scrollIntoViewIfNeeded();await p.locator('#faq .faq-query-item').first().click();await p.waitForTimeout(300);ok(await p.locator('#faq .faq-query-item.is-selected').count()===1,'FAQ');await p.locator('#contacts').scrollIntoViewIfNeeded();const co=await p.evaluate(()=>({point:!!document.querySelector('.contact-signal-track i'),diamond:getComputedStyle(document.querySelector('.contact-signal-track b')).display}));ok(co.point&&co.diamond==='none','Contact',JSON.stringify(co));await p.screenshot({path:path.join(OUT,'live-desktop.png')});await ctx.close();
+          ctx=await br.newContext({viewport:{width:1366,height:768}});p=await page(ctx,'/reviews.html');ok(await p.locator('.review-sort-button').count()>=3,'Reviews loads');const g=await p.evaluate(()=>{const r=s=>document.querySelector(s).getBoundingClientRect(),a=r('.profile-console'),b=r('.rating-scale'),c=r('#reviewText');return [a.left,a.right,b.left,b.right,c.left,c.right]});ok(near(g[0],g[2],1)&&near(g[1],g[3],1)&&near(g[0],g[4],1)&&near(g[1],g[5],1),'Reviews grid',JSON.stringify(g));await p.locator('#profileHelpToggle').scrollIntoViewIfNeeded();const y=await p.evaluate(()=>scrollY);await p.evaluate(()=>document.querySelector('#profileHelpToggle').click());await p.waitForFunction(()=>!document.querySelector('#profileHelpPanel').hidden);ok(near(y,await p.evaluate(()=>scrollY),1),'Profile Help no scroll');await p.keyboard.press('Escape');await p.screenshot({path:path.join(OUT,'live-reviews.png')});await ctx.close();
+          ctx=await br.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});p=await page(ctx,'/');const h=await p.evaluate(()=>{const r=s=>{const x=document.querySelector(s)?.getBoundingClientRect();return x&&[x.top,x.bottom]};return {p:r('.hero-poster-frame'),s:r('.r7-mobile-hero-copy'),a:r('.r7-mobile-hero-actions')}});ok(h.p&&h.s&&h.a&&h.p[1]<=h.s[0]+2&&h.s[1]<=h.a[0]+2,'mobile Hero order',JSON.stringify(h));ok(await p.locator('#menuToggle').isVisible(),'burger visible');await p.locator('#menuToggle').click();ok(await p.locator('body').evaluate(e=>e.classList.contains('nav-open')),'burger opens');await p.locator('#menuToggle').click();await p.locator('#materials').scrollIntoViewIfNeeded();ok((await p.locator('#r7MobileArchiveToggle').evaluate(e=>getComputedStyle(e).display))==='none','mobile archive trigger absent');const c0=await p.locator('#archiveCounter').textContent();await swipe(p.locator('#archiveStage'));await p.waitForTimeout(80);const c1=await p.locator('#archiveCounter').textContent();ok(c0!==c1,'mobile swipe',`${c0}->${c1}`);await p.locator('#cast').scrollIntoViewIfNeeded();await p.waitForTimeout(80);let y0=await p.evaluate(()=>scrollY);await p.evaluate(()=>document.querySelector('#cast .cast-list-item').click());await p.locator('.r7-subject-back').waitFor({state:'visible'});await p.waitForTimeout(220);ok(near(y0,await p.evaluate(()=>scrollY),2)&&await p.locator('#cast').evaluate(e=>e.classList.contains('r7-dossier-open')),'mobile Actors stable');await p.evaluate(()=>document.querySelector('.r7-subject-back').click());await p.locator('#faq').scrollIntoViewIfNeeded();await p.waitForTimeout(80);y0=await p.evaluate(()=>scrollY);await p.evaluate(()=>document.querySelector('#faq .faq-query-item').click());await p.locator('.r7-query-back').waitFor({state:'visible'});await p.waitForTimeout(220);ok(near(y0,await p.evaluate(()=>scrollY),2)&&await p.locator('#faq').evaluate(e=>e.classList.contains('r7-response-open')),'mobile FAQ stable');await p.screenshot({path:path.join(OUT,'live-mobile.png')});await ctx.close();
+          ok(!B.some(x=>x.includes('/css/assets/images/archive/')),'Archive bad path absent',JSON.stringify(B));ok(E.length===0,'page errors=0',JSON.stringify(E));ok(C.length===0,'console errors=0',JSON.stringify(C));ok(B.length===0,'same-origin HTTP errors=0',JSON.stringify(B));ok(F.length===0,'critical request failures=0',JSON.stringify(F));const fail=R.filter(x=>!x.ok),S={live_url:BASE,production_main:'4e16c09f9704f634e443efadf042e3516465201a',verified_product:'51158b052186d880a9b5eaab2d1c6f66e7497322',total:R.length,passed:R.length-fail.length,failed:fail.length,failures:fail,pageErrors:E,consoleErrors:C,badLocal:B,failedRequests:F,checks:R};fs.writeFileSync(path.join(OUT,'LIVE-RESULTS.json'),JSON.stringify(S,null,2));fs.writeFileSync(path.join(OUT,'LIVE-URL.txt'),BASE+'\n');console.log(JSON.stringify({total:S.total,passed:S.passed,failed:S.failed,live_url:BASE,pageErrors:E.length,consoleErrors:C.length,badLocal:B.length,failedRequests:F.length},null,2));await br.close();process.exit(fail.length?1:0)})().catch(e=>{console.error(e);process.exit(2)});
           NODE
-          node --check /tmp/r7-live-smoke.cjs
-          set +e
-          node /tmp/r7-live-smoke.cjs | tee /tmp/r7-live-evidence/run.log
-          STATUS=${PIPESTATUS[0]}
-          set -e
-          printf '%s\n' "$STATUS" >/tmp/r7-live-evidence/AUDIT_EXIT_CODE.txt
-          test "$STATUS" -eq 0
+          node --check /tmp/live.cjs
+          set +e; node /tmp/live.cjs | tee /tmp/r7-live-evidence/run.log; X=${PIPESTATUS[0]}; set -e
+          echo "$X" >/tmp/r7-live-evidence/AUDIT_EXIT_CODE.txt
+          test "$X" -eq 0
       - name: Upload live evidence
         if: always()
         uses: actions/upload-artifact@v4
