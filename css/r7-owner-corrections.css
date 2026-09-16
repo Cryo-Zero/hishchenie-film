@@ -300,3 +300,24 @@ body.r7-phone-landscape.r7-sequential-ui #faq.r7-response-open .r7-query-back {
 }
 body.r7-sequential-ui #cast .cast-console,
 body.r7-sequential-ui #faq .faq-console { overflow-anchor: none !important; }
+
+/* FAQ recovery: structural reveal stays un-translated.
+   Legacy R7 layers still transition the mobile response shell from -4px and
+   system/content wrappers from +2/+4px. Owner-approved R7 motion keeps these
+   structural coordinates fixed and reveals information via opacity/clip only. */
+body.r7-sequential-ui #faq:not(.r7-response-open) .faq-response-panel,
+body.r7-sequential-ui #faq.r7-response-open .faq-response-panel {
+  transform: none !important;
+}
+.faq-response-panel.is-r7-crossfade-out .faq-response-content > *,
+.faq-response-panel.is-r7-crossfade-out .faq-system-box > div,
+.faq-response-panel.is-r7-crossfade-out .faq-response-log,
+.faq-response-panel.is-r7-crossfade-in .faq-response-content > *,
+.faq-response-panel.is-r7-crossfade-in .faq-system-box > div,
+.faq-response-panel.is-r7-crossfade-in .faq-response-log,
+.faq-response-panel.is-revealed .faq-response-content > *,
+.faq-response-panel.is-revealed .faq-system-box > div,
+.faq-response-panel.is-revealed .faq-response-log {
+  transform: none !important;
+  transition-property: opacity, clip-path !important;
+}
