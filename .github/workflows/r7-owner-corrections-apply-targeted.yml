@@ -1,0 +1,111 @@
+name: R7 owner corrections apply and targeted audit
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+    paths:
+      - .github/workflows/r7-owner-corrections-apply-targeted.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-targeted:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: revival-r7-responsive-mobile
+
+      - name: Guard baseline and apply bounded owner corrections
+        id: product
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=56c8e1f18f79749687b32d57ea34775880f825c9
+          git merge-base --is-ancestor "$BASE" HEAD
+          test -z "$(git diff --name-only "$BASE"..HEAD -- index.html reviews.html admin assets css js supabase migrations | sed -n '1p')"
+          echo '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' | base64 -d | gzip -d > css/r7-owner-corrections.css
+          echo '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' | base64 -d | gzip -d > js/r7-owner-corrections.js
+          python3 - <<'PY2'
+          from pathlib import Path
+          idx=Path('index.html')
+          s=idx.read_text(encoding='utf-8')
+          css_marker='<link rel="stylesheet" href="css/responsive-r7-owner-round2.css?v=r7-owner-20260911a">'
+          css_new=css_marker+'\n<link rel="stylesheet" href="css/r7-owner-corrections.css?v=r7-owner-20260916b">'
+          if s.count(css_marker)!=1 or 'r7-owner-corrections.css' in s: raise SystemExit('index CSS marker mismatch')
+          s=s.replace(css_marker,css_new,1)
+          js_marker='<script src="js/responsive-r7.js?v=r7-owner-20260911a"></script>'
+          js_new=js_marker+'\n<script src="js/r7-owner-corrections.js?v=r7-owner-20260916b"></script>'
+          if s.count(js_marker)!=1 or 'r7-owner-corrections.js' in s: raise SystemExit('index JS marker mismatch')
+          s=s.replace(js_marker,js_new,1)
+          idx.write_text(s,encoding='utf-8')
+
+          rev=Path('reviews.html')
+          s=rev.read_text(encoding='utf-8')
+          if s.count(css_marker)!=1 or 'r7-owner-corrections.css' in s: raise SystemExit('reviews CSS marker mismatch')
+          rev.write_text(s.replace(css_marker,css_new,1),encoding='utf-8')
+          PY2
+          node --check js/r7-owner-corrections.js
+          git diff --check
+          echo '--- bounded runtime diff ---'
+          git diff --stat
+          git diff --name-only
+          bad=$(git diff --name-only | grep -E '^(supabase/|migrations/|admin/)' || true)
+          test -z "$bad"
+          expected=$(git diff --name-only | sort | tr '\n' ' ')
+          test "$expected" = "css/r7-owner-corrections.css index.html js/r7-owner-corrections.js reviews.html "
+          git config user.name 'Cryo-Zero'
+          git config user.email 'Bogdan.Vedrentsov@gmail.com'
+          git add css/r7-owner-corrections.css js/r7-owner-corrections.js index.html reviews.html
+          git commit -m 'feat: apply final R7 owner visual corrections'
+          PRODUCT_SHA=$(git rev-parse HEAD)
+          echo "product_sha=$PRODUCT_SHA" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$PRODUCT_SHA" >/tmp/R7_OWNER_PRODUCT_SHA.txt
+          git push origin HEAD:revival-r7-responsive-mobile
+          git worktree add /tmp/r7-owner-product "$PRODUCT_SHA"
+
+      - name: Install targeted browser runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7qa
+          cd /tmp/r7qa
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          npx playwright install --with-deps chromium firefox webkit >/dev/null 2>&1
+
+      - name: Run targeted owner-correction regression
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+          PRODUCT_SHA: ${{ steps.product.outputs.product_sha }}
+        run: |
+          set -euo pipefail
+          OUT=/tmp/r7-owner-targeted-evidence
+          rm -rf "$OUT" && mkdir -p "$OUT"
+          cp /tmp/R7_OWNER_PRODUCT_SHA.txt "$OUT/PRODUCT_SHA.txt"
+          echo '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' | base64 -d | gzip -d >/tmp/r7-owner-targeted.cjs
+          cp /tmp/r7-owner-targeted.cjs "$OUT/HARNESS-SOURCE.cjs"
+          node --check /tmp/r7-owner-targeted.cjs
+          python3 -m http.server 4175 --bind 127.0.0.1 --directory /tmp/r7-owner-product >/tmp/r7-owner-targeted-server.log 2>&1 & SERVER=$!
+          trap 'kill $SERVER 2>/dev/null || true' EXIT
+          sleep 1
+          set +e
+          timeout 1200s env BASE_URL=http://127.0.0.1:4175 PRODUCT_SHA="$PRODUCT_SHA" EVIDENCE_DIR="$OUT" node /tmp/r7-owner-targeted.cjs
+          STATUS=$?
+          set -e
+          printf '%s\n' "$STATUS" > "$OUT/AUDIT_EXIT_CODE.txt"
+          cp /tmp/r7-owner-targeted-server.log "$OUT/server.log"
+          exit "$STATUS"
+
+      - name: Upload targeted evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-owner-corrections-targeted-evidence
+          path: /tmp/r7-owner-targeted-evidence
+          if-no-files-found: warn
