@@ -17,22 +17,42 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Guard exact Round6 baseline and staging-only diff
+      - name: Guard Round6 runtime and curator documentation checkpoint
         shell: bash
         run: |
           set -euo pipefail
-          BASE=f5e154912986c95e7f48a15bce34c707db39667c
+          ROUND6=f5e154912986c95e7f48a15bce34c707db39667c
           ROUND5=4197adc13cc91cbad395e6d2819e0fbb23278449
-          git merge-base --is-ancestor "$BASE" HEAD
-          git diff --name-only "$BASE"..HEAD | sort >/tmp/actual
+          DOCBASE=1b83cd39e13f439ac1a6da084a8f9a6544f810f3
+
+          # DOCBASE is the curator's post-Round6 canonical-memory checkpoint.
+          # It intentionally contains documentation + the four temporary Round7
+          # staging files, but no runtime product changes.
+          git merge-base --is-ancestor "$ROUND6" "$DOCBASE"
+          git merge-base --is-ancestor "$DOCBASE" HEAD
+          git diff --name-only "$ROUND6".."$DOCBASE" | sort >/tmp/docbase-actual
           printf '%s\n' \
             '.github/workflows/r7-owner-feedback-round7.yml' \
+            'docs/current/BACKLOG.md' \
+            'docs/current/PROJECT-STATE.md' \
+            'docs/current/ROADMAP.md' \
+            'docs/current/START-HERE.md' \
+            'docs/current/VISUAL-SYSTEM.md' \
+            'docs/releases/revival/R7/OWNER-FEEDBACK-ROUND7-PENDING.md' \
             'scripts/r7_round7_apply.py' \
             'scripts/r7_round7_finalize.py' \
-            'scripts/r7_round7_qa.cjs' | sort >/tmp/expected
-          diff -u /tmp/expected /tmp/actual
+            'scripts/r7_round7_qa.cjs' | sort >/tmp/docbase-expected
+          diff -u /tmp/docbase-expected /tmp/docbase-actual
+
+          # After DOCBASE only the finalizer/gate itself may have been repaired.
+          git diff --name-only "$DOCBASE"..HEAD | sort >/tmp/staging-actual
+          printf '%s\n' \
+            '.github/workflows/r7-owner-feedback-round7.yml' \
+            'scripts/r7_round7_finalize.py' | sort >/tmp/staging-expected
+          diff -u /tmp/staging-expected /tmp/staging-actual
+
           git worktree add /tmp/r7-round7-round5 "$ROUND5"
-          git worktree add /tmp/r7-round7-round6 "$BASE"
+          git worktree add /tmp/r7-round7-round6 "$ROUND6"
           cp scripts/r7_round7_apply.py /tmp/r7_round7_apply.py
           cp scripts/r7_round7_finalize.py /tmp/r7_round7_finalize.py
           cp scripts/r7_round7_qa.cjs /tmp/r7_round7_qa.cjs
@@ -43,7 +63,11 @@ jobs:
           set -euo pipefail
           python3 /tmp/r7_round7_apply.py
           git diff --check
-          git diff --name-only | sort
+          git diff --name-only | sort >/tmp/runtime-actual
+          printf '%s\n' \
+            'css/responsive-r7-owner-round2.css' \
+            'js/responsive-r7.js' | sort >/tmp/runtime-expected
+          diff -u /tmp/runtime-expected /tmp/runtime-actual
 
       - name: Install Chromium QA runtime
         shell: bash
@@ -87,7 +111,7 @@ jobs:
           NODE_PATH: /tmp/r7qa/node_modules
         run: |
           set -euo pipefail
-          BASE=f5e154912986c95e7f48a15bce34c707db39667c
+          ROUND6=f5e154912986c95e7f48a15bce34c707db39667c
           FINAL=$(cat /tmp/r7-round7-final-sha.txt)
           test "$(git rev-parse HEAD)" = "$FINAL"
           test -z "$(git status --porcelain)"
@@ -98,16 +122,22 @@ jobs:
             scripts/r7_round7_qa.cjs; do
             test ! -e "$f"
           done
-          git diff --name-only "$BASE"..HEAD | sort >/tmp/final-actual
+
+          git diff --name-only "$ROUND6"..HEAD | sort >/tmp/final-actual
           printf '%s\n' \
             'css/responsive-r7-owner-round2.css' \
+            'docs/current/BACKLOG.md' \
             'docs/current/DECISIONS.md' \
+            'docs/current/PROJECT-STATE.md' \
+            'docs/current/ROADMAP.md' \
+            'docs/current/START-HERE.md' \
             'docs/current/VISUAL-SYSTEM.md' \
+            'docs/releases/revival/R7/OWNER-FEEDBACK-ROUND7-PENDING.md' \
             'docs/releases/revival/R7/OWNER-FEEDBACK-ROUND7.md' \
             'docs/releases/revival/R7/PREVIEW-HANDOFF.md' \
             'js/responsive-r7.js' | sort >/tmp/final-expected
           diff -u /tmp/final-expected /tmp/final-actual
-          ! git diff --name-only "$BASE"..HEAD | grep -Eq '(^|/)js/public-response\.js$|(^|/)admin/|supabase|migrations'
+          ! git diff --name-only "$ROUND6"..HEAD | grep -Eq '(^|/)js/public-response\.js$|(^|/)admin/|supabase|migrations'
 
           rm -rf /tmp/r7-round7-final && mkdir -p /tmp/r7-round7-final
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/r7-target-final.log 2>&1 & P1=$!
@@ -122,7 +152,11 @@ jobs:
             EVIDENCE_DIR=/tmp/r7-round7-final \
             node /tmp/r7_round7_qa.cjs
           printf '%s\n' "$FINAL" >/tmp/r7-round7-final/FINAL_SHA.txt
-          printf '%s\n' 'ROUND5=4197adc13cc91cbad395e6d2819e0fbb23278449' 'ROUND6=f5e154912986c95e7f48a15bce34c707db39667c' "ROUND7=$FINAL" >/tmp/r7-round7-final/BASELINES.txt
+          printf '%s\n' \
+            'ROUND5=4197adc13cc91cbad395e6d2819e0fbb23278449' \
+            'ROUND6=f5e154912986c95e7f48a15bce34c707db39667c' \
+            'CURATOR_DOCBASE=1b83cd39e13f439ac1a6da084a8f9a6544f810f3' \
+            "ROUND7=$FINAL" >/tmp/r7-round7-final/BASELINES.txt
           test -z "$(git status --porcelain)"
 
       - name: Push exact verified final SHA
