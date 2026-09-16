@@ -1,0 +1,72 @@
+name: R7 owner corrections semantic cycles v2
+on:
+  push:
+    branches: [revival-r7-responsive-mobile]
+    paths: [.github/workflows/r7-owner-corrections-recovery-cycles-v2.yml]
+permissions:
+  contents: read
+jobs:
+  cycles:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Guard exact product
+        shell: bash
+        run: |
+          set -euo pipefail
+          PRODUCT=66c31fa36896b3b968799ec154fd3bbdb6f4a2e5
+          git merge-base --is-ancestor "$PRODUCT" HEAD
+          test -z "$(git diff --name-only "$PRODUCT"..HEAD -- index.html reviews.html admin assets css js supabase migrations | sed -n '1p')"
+          git worktree add /tmp/product "$PRODUCT"
+          printf '%s\n' "$PRODUCT" >/tmp/product.txt
+          printf '%s\n' "$(git rev-parse HEAD)" >/tmp/trigger.txt
+      - name: Install browsers
+        shell: bash
+        run: |
+          mkdir -p /tmp/qa && cd /tmp/qa
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          npx playwright install --with-deps chromium firefox webkit >/dev/null 2>&1
+      - name: Write harness
+        shell: bash
+        run: |
+          cat > /tmp/cycles.cjs <<'NODE'
+          const {chromium,firefox,webkit}=require('playwright');const fs=require('fs'),path=require('path');
+          const BASE=process.env.BASE_URL,OUT=process.env.EVIDENCE_DIR,SHA=process.env.PRODUCT_SHA;
+          const engines={chromium,firefox,webkit},vps=[['390x844',390,844],['430x932',430,932],['844x390',844,390]],R=[],E=[];
+          const add=(ok,b,v,n,d={})=>{R.push({ok,browser:b,viewport:v,name:n,detail:d});if(!ok)console.log('FAIL',b,v,n,JSON.stringify(d));};
+          const near=(a,b,t=1)=>Math.abs(a-b)<=t,same=(a,b,t=.5)=>a.length===b.length&&a.every((x,i)=>['top','left','width','height'].every(k=>Math.abs(x[k]-b[i][k])<=t));
+          (async()=>{for(const [bn,bt] of Object.entries(engines)){const br=await bt.launch({headless:true});try{for(const [vn,w,h] of vps){const c=await br.newContext({viewport:{width:w,height:h},hasTouch:true,...(bn!=='firefox'?{isMobile:true}:{})}),p=await c.newPage();p.on('pageerror',e=>E.push({browser:bn,viewport:vn,error:String(e)}));await p.goto(`${BASE}/index.html?cycles=2`,{waitUntil:'domcontentloaded',timeout:30000});await p.waitForTimeout(500);await p.evaluate(()=>document.documentElement.style.scrollBehavior='auto');
+          await p.locator('#cast').evaluate(e=>e.scrollIntoView({block:'start'}));await p.waitForTimeout(120);for(let i=1;i<=4;i++){let y=await p.evaluate(()=>scrollY);await p.evaluate(()=>document.querySelector('#cast .cast-list-item')?.click());await p.waitForFunction(()=>document.querySelector('#cast')?.classList.contains('r7-dossier-open'));await p.waitForTimeout(260);let s=await p.evaluate(()=>({y:scrollY,min:getComputedStyle(document.querySelector('#cast .cast-console')).minHeight,vis:getComputedStyle(document.querySelector('#cast .subject-dossier')).display!=='none'}));add(near(y,s.y)&&s.min==='0px'&&s.vis,bn,vn,`Actors cycle ${i} open stable`,{before:y,...s});await p.evaluate(()=>document.querySelector('.r7-subject-back')?.click());await p.waitForFunction(()=>!document.querySelector('#cast')?.classList.contains('r7-dossier-open'));await p.waitForTimeout(260);s=await p.evaluate(()=>({y:scrollY,min:getComputedStyle(document.querySelector('#cast .cast-console')).minHeight,rows:[...document.querySelectorAll('#cast .cast-list-item')].map(n=>n.getBoundingClientRect().height),vis:getComputedStyle(document.querySelector('#cast .cast-list')).display!=='none'}));add(near(y,s.y)&&s.min==='0px'&&s.vis&&s.rows.every(x=>x>0),bn,vn,`Actors cycle ${i} back real geometry`,{before:y,...s});}
+          await p.locator('#faq').evaluate(e=>e.scrollIntoView({block:'start'}));await p.waitForTimeout(120);const base=await p.evaluate(()=>[...document.querySelectorAll('#faq .faq-query-item')].map(n=>n.getBoundingClientRect().height));for(let i=1;i<=4;i++){let y=await p.evaluate(()=>scrollY);await p.evaluate(()=>document.querySelector('#faq .faq-query-item')?.click());await p.waitForFunction(()=>document.querySelector('#faq')?.classList.contains('r7-response-open'));await p.waitForTimeout(185);let a=await p.evaluate(()=>({y:scrollY,min:getComputedStyle(document.querySelector('#faq .faq-console')).minHeight,vis:getComputedStyle(document.querySelector('#faq .faq-response-panel')).display!=='none',layout:[...document.querySelectorAll('#faq .faq-system-box > div,#faq .faq-response-log')].map(n=>({top:n.offsetTop,left:n.offsetLeft,width:n.offsetWidth,height:n.offsetHeight}))}));await p.waitForTimeout(180);let b=await p.evaluate(()=>({y:scrollY,layout:[...document.querySelectorAll('#faq .faq-system-box > div,#faq .faq-response-log')].map(n=>({top:n.offsetTop,left:n.offsetLeft,width:n.offsetWidth,height:n.offsetHeight}))}));add(near(y,a.y)&&near(y,b.y)&&a.min==='0px'&&a.vis&&same(a.layout,b.layout),bn,vn,`FAQ cycle ${i} open scroll/layout stable`,{before:y,mid:a,after:b});await p.evaluate(()=>document.querySelector('.r7-query-back')?.click());await p.waitForFunction(()=>!document.querySelector('#faq')?.classList.contains('r7-response-open'));await p.waitForTimeout(260);let s=await p.evaluate(()=>({y:scrollY,min:getComputedStyle(document.querySelector('#faq .faq-console')).minHeight,rows:[...document.querySelectorAll('#faq .faq-query-item')].map(n=>n.getBoundingClientRect().height),vis:getComputedStyle(document.querySelector('#faq .faq-query-list')).display!=='none'}));add(near(y,s.y)&&s.min==='0px'&&s.vis&&s.rows.length===base.length&&s.rows.every((x,j)=>near(x,base[j],.75)),bn,vn,`FAQ cycle ${i} back real geometry`,{before:y,base,...s});}await c.close();}}finally{await br.close();}}
+          const F=R.filter(x=>!x.ok),S={product_sha:SHA,total:R.length,passed:R.length-F.length,failed:F.length,page_errors:E.length,failures:F,errors:E,browsers:Object.keys(engines),viewports:vps.map(x=>x[0]),cycles:4};fs.mkdirSync(OUT,{recursive:true});fs.writeFileSync(path.join(OUT,'RESULTS.json'),JSON.stringify(S,null,2));fs.writeFileSync(path.join(OUT,'REPORT.md'),`# Semantic recovery cycles\n\n${S.total} total / ${S.passed} PASS / ${S.failed} FAIL / ${S.page_errors} page errors\n`);console.log(JSON.stringify(S,null,2));process.exit(F.length||E.length?1:0);})().catch(e=>{console.error(e);process.exit(2)});
+          NODE
+          NODE_PATH=/tmp/qa/node_modules node --check /tmp/cycles.cjs
+      - name: Run cycles
+        shell: bash
+        env:
+          NODE_PATH: /tmp/qa/node_modules
+          BASE_URL: http://127.0.0.1:4175
+          PRODUCT_SHA: 66c31fa36896b3b968799ec154fd3bbdb6f4a2e5
+          EVIDENCE_DIR: /tmp/evidence
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/evidence
+          cp /tmp/product.txt /tmp/evidence/PRODUCT_SHA.txt
+          cp /tmp/trigger.txt /tmp/evidence/AUDIT_TRIGGER_HEAD.txt
+          cp /tmp/cycles.cjs /tmp/evidence/HARNESS-SOURCE.cjs
+          python3 -m http.server 4175 --bind 127.0.0.1 --directory /tmp/product >/tmp/evidence/server.log 2>&1 & S=$!
+          trap 'kill $S 2>/dev/null || true' EXIT
+          sleep 1
+          set +e; timeout 900s node /tmp/cycles.cjs; X=$?; set -e
+          echo "$X" >/tmp/evidence/AUDIT_EXIT_CODE.txt
+          test "$X" -eq 0
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-owner-corrections-semantic-cycles-v2
+          path: /tmp/evidence
+          if-no-files-found: warn
