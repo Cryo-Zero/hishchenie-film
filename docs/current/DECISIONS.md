@@ -2,7 +2,7 @@
 
 This document stores long-lived decisions and the reasoning/constraints behind them. It is not a release log and not a task list.
 
-For active visual/composition laws, see `VISUAL-SYSTEM.md`. For current factual state, see `PROJECT-STATE.md`. For the multi-workstream plan/status/history, see `ROADMAP.md`. For unapproved future ideas, see `BACKLOG.md`.
+Read `START-HERE.md` first. For active visual/composition laws, see `VISUAL-SYSTEM.md`. For current factual state, see `PROJECT-STATE.md`. For the multi-workstream plan/status/history, see `ROADMAP.md`. For unapproved future ideas, see `BACKLOG.md`.
 
 ## Workflow / governance
 
