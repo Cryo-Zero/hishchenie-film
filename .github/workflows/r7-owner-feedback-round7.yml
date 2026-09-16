@@ -23,14 +23,19 @@ jobs:
           set -euo pipefail
           ROUND6=f5e154912986c95e7f48a15bce34c707db39667c
           ROUND5=4197adc13cc91cbad395e6d2819e0fbb23278449
-          DOCBASE=1b83cd39e13f439ac1a6da084a8f9a6544f810f3
+          DOCBASE=9d9b7ab613bb48a7273fc68bdf5756baaa156d3a
 
+          # DOCBASE contains the curator's complete post-Round6 canonical-memory
+          # checkpoint (including the later START-HERE entrypoint clarification
+          # in DECISIONS) plus temporary Round7 staging infrastructure, but no
+          # product-runtime modifications.
           git merge-base --is-ancestor "$ROUND6" "$DOCBASE"
           git merge-base --is-ancestor "$DOCBASE" HEAD
           git diff --name-only "$ROUND6".."$DOCBASE" | sort >/tmp/docbase-actual
           printf '%s\n' \
             '.github/workflows/r7-owner-feedback-round7.yml' \
             'docs/current/BACKLOG.md' \
+            'docs/current/DECISIONS.md' \
             'docs/current/PROJECT-STATE.md' \
             'docs/current/ROADMAP.md' \
             'docs/current/START-HERE.md' \
@@ -41,11 +46,10 @@ jobs:
             'scripts/r7_round7_qa.cjs' | sort >/tmp/docbase-expected
           diff -u /tmp/docbase-expected /tmp/docbase-actual
 
-          # Only the finalizer/gate itself changed after the curator checkpoint.
+          # After the complete doc checkpoint only this workflow QA harness may
+          # have been repaired. No product/runtime drift is allowed here.
           git diff --name-only "$DOCBASE"..HEAD | sort >/tmp/staging-actual
-          printf '%s\n' \
-            '.github/workflows/r7-owner-feedback-round7.yml' \
-            'scripts/r7_round7_finalize.py' | sort >/tmp/staging-expected
+          printf '%s\n' '.github/workflows/r7-owner-feedback-round7.yml' | sort >/tmp/staging-expected
           diff -u /tmp/staging-expected /tmp/staging-actual
 
           git worktree add /tmp/r7-round7-round5 "$ROUND5"
@@ -177,7 +181,7 @@ jobs:
           printf '%s\n' \
             'ROUND5=4197adc13cc91cbad395e6d2819e0fbb23278449' \
             'ROUND6=f5e154912986c95e7f48a15bce34c707db39667c' \
-            'CURATOR_DOCBASE=1b83cd39e13f439ac1a6da084a8f9a6544f810f3' \
+            'CURATOR_DOCBASE=9d9b7ab613bb48a7273fc68bdf5756baaa156d3a' \
             "ROUND7=$FINAL" >/tmp/r7-round7-final/BASELINES.txt
           test -z "$(git status --porcelain)"
 
