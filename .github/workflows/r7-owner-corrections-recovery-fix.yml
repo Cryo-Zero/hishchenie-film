@@ -1,0 +1,141 @@
+name: R7 owner corrections FAQ recovery fix
+
+on:
+  push:
+    branches:
+      - revival-r7-responsive-mobile
+    paths:
+      - .github/workflows/r7-owner-corrections-recovery-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-targeted:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: revival-r7-responsive-mobile
+
+      - name: Guard state and apply bounded FAQ fix
+        id: product
+        shell: bash
+        run: |
+          set -euo pipefail
+          RECOVERY_BASE=a8807319a340a6208d4820cf47ae7368efce95e7
+          PRE_FIX_PRODUCT=66c31fa36896b3b968799ec154fd3bbdb6f4a2e5
+          git merge-base --is-ancestor "$RECOVERY_BASE" HEAD
+          git merge-base --is-ancestor "$PRE_FIX_PRODUCT" HEAD
+          test -z "$(git diff --name-only "$PRE_FIX_PRODUCT"..HEAD -- index.html reviews.html admin assets css js supabase migrations | sed -n '1p')"
+          ! grep -q 'FAQ recovery: structural reveal stays un-translated' css/r7-owner-corrections.css
+          cat >> css/r7-owner-corrections.css <<'CSS'
+
+/* FAQ recovery: structural reveal stays un-translated.
+   Legacy R7 layers still transition the mobile response shell from -4px and
+   system/content wrappers from +2/+4px. Owner-approved R7 motion keeps these
+   structural coordinates fixed and reveals information via opacity/clip only. */
+body.r7-sequential-ui #faq:not(.r7-response-open) .faq-response-panel,
+body.r7-sequential-ui #faq.r7-response-open .faq-response-panel {
+  transform: none !important;
+}
+.faq-response-panel.is-r7-crossfade-out .faq-response-content > *,
+.faq-response-panel.is-r7-crossfade-out .faq-system-box > div,
+.faq-response-panel.is-r7-crossfade-out .faq-response-log,
+.faq-response-panel.is-r7-crossfade-in .faq-response-content > *,
+.faq-response-panel.is-r7-crossfade-in .faq-system-box > div,
+.faq-response-panel.is-r7-crossfade-in .faq-response-log,
+.faq-response-panel.is-revealed .faq-response-content > *,
+.faq-response-panel.is-revealed .faq-system-box > div,
+.faq-response-panel.is-revealed .faq-response-log {
+  transform: none !important;
+  transition-property: opacity, clip-path !important;
+}
+CSS
+          git diff --check
+          test "$(git diff --name-only | tr '\n' ' ')" = "css/r7-owner-corrections.css "
+          git config user.name 'Cryo-Zero'
+          git config user.email 'Bogdan.Vedrentsov@gmail.com'
+          git add css/r7-owner-corrections.css
+          git commit -m 'fix: keep mobile FAQ structure stationary'
+          PRODUCT_SHA=$(git rev-parse HEAD)
+          echo "product_sha=$PRODUCT_SHA" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$PRODUCT_SHA" >/tmp/R7_OWNER_PRODUCT_SHA.txt
+          git push origin HEAD:revival-r7-responsive-mobile
+          git worktree add /tmp/r7-owner-product "$PRODUCT_SHA"
+
+      - name: Install browsers and recover exact harnesses
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r7qa && cd /tmp/r7qa
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          npx playwright install --with-deps chromium firefox webkit >/dev/null 2>&1
+          cd "$GITHUB_WORKSPACE"
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,base64,gzip
+          apply=Path('.github/workflows/r7-owner-corrections-apply-targeted.yml').read_text(encoding='utf-8')
+          m=re.search(r"echo '([^']+)' \| base64 -d \| gzip -d >/tmp/r7-owner-targeted\.cjs",apply)
+          if not m: raise SystemExit('main targeted harness payload missing')
+          s=gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
+          replacements={
+            "await p.locator('#cast .cast-list-item').first().click();await p.locator('.r7-subject-back').waitFor({state:'visible'});const sy1=await p.evaluate(()=>scrollY);":
+            "await p.evaluate(()=>document.querySelector('#cast .cast-list-item')?.click());await p.locator('.r7-subject-back').waitFor({state:'visible'});await p.waitForTimeout(220);const sy1=await p.evaluate(()=>scrollY);",
+            "await p.locator('.r7-subject-back').click();await p.waitForFunction(()=>!document.querySelector('#cast').classList.contains('r7-dossier-open'));const sy2=await p.evaluate(()=>scrollY);":
+            "await p.evaluate(()=>document.querySelector('.r7-subject-back')?.click());await p.waitForFunction(()=>!document.querySelector('#cast').classList.contains('r7-dossier-open'));await p.waitForTimeout(220);const sy2=await p.evaluate(()=>scrollY);",
+            "await p.locator('#faq .faq-query-item').first().click();await p.locator('.r7-query-back').waitFor({state:'visible'});const fy1=await p.evaluate(()=>scrollY);":
+            "await p.evaluate(()=>document.querySelector('#faq .faq-query-item')?.click());await p.locator('.r7-query-back').waitFor({state:'visible'});await p.waitForTimeout(220);const fy1=await p.evaluate(()=>scrollY);",
+            "await p.locator('.r7-query-back').click();await p.waitForFunction(()=>!document.querySelector('#faq').classList.contains('r7-response-open'));const fy2=await p.evaluate(()=>scrollY);":
+            "await p.evaluate(()=>document.querySelector('.r7-query-back')?.click());await p.waitForFunction(()=>!document.querySelector('#faq').classList.contains('r7-response-open'));await p.waitForTimeout(220);const fy2=await p.evaluate(()=>scrollY);",
+          }
+          for old,new in replacements.items():
+            if s.count(old)!=1: raise SystemExit(f'main harness patch marker count {s.count(old)} for {old[:70]}')
+            s=s.replace(old,new,1)
+          Path('/tmp/r7-owner-targeted-final.cjs').write_text(s,encoding='utf-8')
+
+          recovery=Path('.github/workflows/r7-owner-corrections-targeted-final.yml').read_text(encoding='utf-8')
+          m2=re.search(r"echo '([^']+)' \| base64 -d \| gzip -d >/tmp/r7-recovery-cycles\.cjs",recovery)
+          if not m2: raise SystemExit('recovery cycle harness payload missing')
+          Path('/tmp/r7-recovery-cycles.cjs').write_bytes(gzip.decompress(base64.b64decode(m2.group(1))))
+          PY
+          NODE_PATH=/tmp/r7qa/node_modules node --check /tmp/r7-owner-targeted-final.cjs
+          NODE_PATH=/tmp/r7qa/node_modules node --check /tmp/r7-recovery-cycles.cjs
+
+      - name: Run exact targeted and repeated-cycle audit
+        shell: bash
+        env:
+          NODE_PATH: /tmp/r7qa/node_modules
+          PRODUCT_SHA: ${{ steps.product.outputs.product_sha }}
+        run: |
+          set -euo pipefail
+          OUT=/tmp/r7-owner-recovery-fix-evidence
+          rm -rf "$OUT" && mkdir -p "$OUT"
+          cp /tmp/R7_OWNER_PRODUCT_SHA.txt "$OUT/PRODUCT_SHA.txt"
+          printf '%s\n' "$(git rev-parse HEAD)" > "$OUT/AUDIT_TRIGGER_HEAD.txt"
+          cp /tmp/r7-owner-targeted-final.cjs "$OUT/HARNESS-SOURCE.cjs"
+          cp /tmp/r7-recovery-cycles.cjs "$OUT/RECOVERY-CYCLES-SOURCE.cjs"
+          python3 -m http.server 4175 --bind 127.0.0.1 --directory /tmp/r7-owner-product >/tmp/r7-owner-recovery-fix-server.log 2>&1 & SERVER=$!
+          trap 'kill $SERVER 2>/dev/null || true' EXIT
+          sleep 1
+          set +e
+          timeout 1200s env BASE_URL=http://127.0.0.1:4175 PRODUCT_SHA="$PRODUCT_SHA" EVIDENCE_DIR="$OUT" node /tmp/r7-owner-targeted-final.cjs
+          MAIN_STATUS=$?
+          timeout 900s env BASE_URL=http://127.0.0.1:4175 PRODUCT_SHA="$PRODUCT_SHA" EVIDENCE_DIR="$OUT" node /tmp/r7-recovery-cycles.cjs
+          CYCLE_STATUS=$?
+          set -e
+          printf 'main=%s\ncycles=%s\n' "$MAIN_STATUS" "$CYCLE_STATUS" > "$OUT/AUDIT_EXIT_CODE.txt"
+          cp /tmp/r7-owner-recovery-fix-server.log "$OUT/server.log"
+          test "$MAIN_STATUS" -eq 0
+          test "$CYCLE_STATUS" -eq 0
+
+      - name: Upload recovery fix evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-owner-corrections-recovery-fix-evidence
+          path: /tmp/r7-owner-recovery-fix-evidence
+          if-no-files-found: warn
