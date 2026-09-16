@@ -21,8 +21,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          PRODUCT=17fbee1cd912b64827ae6e81d8520882e3285831
-          FRESH=35fc2024c2f3eb09675c9cded316dfd50a561948
+          PRODUCT=fb2a7e5060f24b0f2c6f1bd4baf35288631816e7
+          FRESH=fb2a7e5060f24b0f2c6f1bd4baf35288631816e7
           git merge-base --is-ancestor "$PRODUCT" HEAD
           git merge-base --is-ancestor "$FRESH" HEAD
           test -z "$(git diff --name-only "$PRODUCT"..HEAD -- index.html reviews.html admin assets css js supabase migrations | sed -n '1p')"
@@ -79,13 +79,60 @@ jobs:
           replacement = "try { await p.waitForFunction(()=>{const faq=document.querySelector('#faq');const rows=[...document.querySelectorAll('#faq .faq-query-item')];return !faq?.classList.contains('r7-response-open')&&rows.every(row=>row.getAttribute('aria-selected')!=='true');}); } catch(e) { console.error('LONGSESSION_FAQ_CLOSE_STATE',browserName,i,await p.evaluate(()=>({open:document.querySelector('#faq')?.classList.contains('r7-response-open'),selected:[...document.querySelectorAll('#faq .faq-query-item')].filter(row=>row.getAttribute('aria-selected')==='true').map(row=>row.dataset.query||row.textContent?.trim()),panel:document.querySelector('#faqResponsePanel')?.className}))); throw e; }"
           src = src.replace(marker, replacement, 1)
 
+          marker = 'await p.locator(\'.brand[href="#top"]\').click();await p.waitForTimeout(260);'
+          if src.count(marker) != 1:
+              raise SystemExit(f'HOME wait marker count: {src.count(marker)}')
+          src = src.replace(marker, 'await p.locator(\'.brand[href="#top"]\').click();await p.waitForFunction(()=>location.hash===\'#top\'&&scrollY<=2,null,{timeout:10000});', 1)
+
+          marker = "await q.locator('#cast .cast-list-item').first().click();await q.waitForTimeout(220);const sy1="
+          if src.count(marker) != 1:
+              raise SystemExit(f'Actors back visibility marker count: {src.count(marker)}')
+          src = src.replace(marker, "await q.locator('#cast .cast-list-item').first().click();await q.locator('.r7-subject-back').waitFor({state:'visible',timeout:10000});const sy1=", 1)
+
+          marker = "await q.locator('#faq .faq-query-item').first().click();await q.waitForTimeout(220);const fy1="
+          if src.count(marker) != 1:
+              raise SystemExit(f'FAQ back visibility marker count: {src.count(marker)}')
+          src = src.replace(marker, "await q.locator('#faq .faq-query-item').first().click();await q.locator('.r7-query-back').waitFor({state:'visible',timeout:10000});const fy1=", 1)
+
+          pattern = r"async function profileHelpAudit\(browserName,browser\)\{.*?\n\}\n\nasync function trailerAudit"
+          pm = re.search(pattern, src, re.S)
+          if not pm:
+              raise SystemExit('Profile Help audit block missing')
+          profile = r"""async function profileHelpAudit(browserName,browser){
+  for(const v of [{name:'390x844',w:390,h:844,phone:true,touch:true},{name:'1366x768',w:1366,h:768,phone:false,touch:false}]){
+    const {ctx,mutationAttempts}=await makeContext(browser,v);const {p,pageErrors}=await openPage(ctx,'/reviews.html',`help=${v.name}`);await p.locator('#profileHelpToggle').scrollIntoViewIfNeeded();await p.waitForTimeout(60);
+    const before=await p.evaluate(()=>{const rr=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,docX:r.x+scrollX,docY:r.y+scrollY}};return {composer:rr(document.querySelector('.review-composer')),profile:rr(document.querySelector('.profile-console')),y:scrollY};});
+    for(let i=0;i<10;i++){
+      await p.evaluate(()=>document.querySelector('#profileHelpToggle')?.click());
+      await p.waitForFunction(()=>!document.querySelector('#profileHelpPanel')?.hidden);
+      check(!(await p.locator('#profileHelpPanel').evaluate(e=>e.hidden)),browserName,`[${browserName}][${v.name}] Profile Help cycle ${i+1} open`);
+      await p.evaluate(()=>document.querySelector('#profileHelpToggle')?.click());
+      await p.waitForFunction(()=>document.querySelector('#profileHelpPanel')?.hidden);
+    }
+    const openY=await p.evaluate(()=>scrollY);await p.evaluate(()=>document.querySelector('#profileHelpToggle')?.click());await p.waitForFunction(()=>!document.querySelector('#profileHelpPanel')?.hidden);
+    const state=await p.evaluate(()=>{const rr=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,top:r.top,bottom:r.bottom,left:r.left,right:r.right,docX:r.x+scrollX,docY:r.y+scrollY}};const h=document.querySelector('#profileHelpPanel'),pr=document.querySelector('.profile-console'),t=document.querySelector('#profileHelpToggle'),c=document.querySelector('.review-composer');return {help:rr(h),profile:rr(pr),toggle:rr(t),composer:rr(c),pos:getComputedStyle(h).position,overflow:getComputedStyle(document.body).overflowY,y:scrollY,count:document.querySelectorAll('#profileHelpPanel').length,text:String(h.innerText||'').replace(/\s+/g,' ').trim()};});
+    const docDelta=(a,b)=>Math.max(Math.abs(a.docX-b.docX),Math.abs(a.docY-b.docY),Math.abs(a.width-b.width),Math.abs(a.height-b.height));
+    check(state.pos==='absolute'&&state.help.width/state.profile.width>=.90&&state.help.width/state.profile.width<=1.12,browserName,`[${browserName}][${v.name}] Profile Help anchored/profile-width`,JSON.stringify(state));
+    check(docDelta(before.composer,state.composer)<=1&&docDelta(before.profile,state.profile)<=1&&Math.abs(before.y-state.y)<=1&&Math.abs(openY-state.y)<=1,browserName,`[${browserName}][${v.name}] Profile Help zero reflow/scroll`,JSON.stringify({before,state,openY}));
+    check(state.overflow!=='hidden'&&state.count===1,browserName,`[${browserName}][${v.name}] Profile Help no scroll lock/duplicate`,JSON.stringify(state));
+    await p.mouse.click(5,5);await p.waitForTimeout(20);check(!(await p.locator('#profileHelpPanel').evaluate(e=>e.hidden)),browserName,`[${browserName}][${v.name}] outside interaction follows contract (does not silently dismiss)`);await p.keyboard.press('Escape');await p.waitForTimeout(30);check(await p.locator('#profileHelpPanel').evaluate(e=>e.hidden),browserName,`[${browserName}][${v.name}] Profile Help ESC closes`);check((await p.evaluate(()=>document.activeElement?.id||''))!=='profileHelpPanel',browserName,`[${browserName}][${v.name}] no keyboard trap after Help close`);
+    check(mutationAttempts.length===0,browserName,`[${browserName}][${v.name}] Reviews Help audit caused no Supabase mutations`,mutationAttempts.join(' | '));check(pageErrors.length===0,browserName,`[${browserName}][${v.name}] Reviews Help uncaught errors = 0`,pageErrors.join(' | '));await ctx.close();
+  }
+}"""
+          src = src[:pm.start()] + profile + "\n\nasync function trailerAudit" + src[pm.end():]
+
           Path('/tmp/r7_post_final_audit.cjs').write_text(src, encoding='utf-8')
           PY
           NODE_PATH=/tmp/r7qa/node_modules node --check /tmp/r7_post_final_audit.cjs
-          echo '--- longSession source diagnostics ---'
-          grep -n -A12 -B4 'async function longSession' /tmp/r7_post_final_audit.cjs || true
-          echo '--- burger source diagnostics ---'
-          nl -ba /tmp/r7_post_final_audit.cjs | sed -n '184,194p'
+          echo '--- exact product target ---'
+          cat /tmp/R7_PRODUCT_SHA.txt
+          echo '--- HOME source diagnostics ---'
+          grep -n -A3 -B2 'brand/home returns exact top' /tmp/r7_post_final_audit.cjs || true
+          echo '--- Actors/FAQ source diagnostics ---'
+          grep -n -A4 -B2 'mobile Actors return-to-index visible' /tmp/r7_post_final_audit.cjs || true
+          grep -n -A4 -B2 'mobile FAQ return-to-index visible' /tmp/r7_post_final_audit.cjs || true
+          echo '--- Profile Help source diagnostics ---'
+          grep -n -A16 -B2 'async function profileHelpAudit' /tmp/r7_post_final_audit.cjs || true
 
       - name: Run immutable product stability audit
         id: audit
@@ -104,7 +151,7 @@ jobs:
           trap 'kill $SERVER 2>/dev/null || true' EXIT
           sleep 1
           set +e
-          timeout 1500s env BASE_URL=http://127.0.0.1:4173 PRODUCT_SHA=17fbee1cd912b64827ae6e81d8520882e3285831 EVIDENCE_DIR="$OUT" node /tmp/r7_post_final_audit.cjs
+          timeout 1500s env BASE_URL=http://127.0.0.1:4173 PRODUCT_SHA=fb2a7e5060f24b0f2c6f1bd4baf35288631816e7 EVIDENCE_DIR="$OUT" node /tmp/r7_post_final_audit.cjs
           STATUS=$?
           set -e
           printf '%s\n' "$STATUS" >"$OUT/AUDIT_EXIT_CODE.txt"
