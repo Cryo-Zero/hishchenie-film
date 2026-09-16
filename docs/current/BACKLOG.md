@@ -4,30 +4,22 @@
 
 > **Наличие идеи в этом файле не означает разрешение на реализацию. Любая функция или изменение требует отдельного явного согласования до начала разработки.**
 
-This file remembers future or historical ideas. Before implementing anything here, first verify the current production state and obtain explicit approval.
+Read `START-HERE.md` before using this file. This file remembers future or historical ideas only. It must not be used to infer the current active R7 correction scope.
+
+If an item here has already become an active owner-approved task, `PROJECT-STATE.md` / `VISUAL-SYSTEM.md` / `ROADMAP.md` are authoritative and this backlog must not be used to reclassify it as unapproved.
 
 ## NEXT / near-term
 
-### Responsive/mobile release
+There is currently **no blanket backlog item that authorizes the next implementation**.
 
-Admin activation and the first real owner browser smoke-test are completed sufficiently for the current release sequence.
+The active R7 post-Round6 owner correction set is already approved and is tracked in current canonical state, not as a backlog proposal. See:
 
-The next workstream is responsive/mobile, but **the proposed responsive layouts are not approved merely because they exist in a plan**.
+- `START-HERE.md`;
+- `PROJECT-STATE.md`;
+- `VISUAL-SYSTEM.md`;
+- `ROADMAP.md`.
 
-Required sequence:
-
-1. review the scene-by-scene responsive direction with the owner;
-2. explicitly approve substantial visual reinterpretations before final implementation whenever practical;
-3. create a separate responsive feature branch only after implementation is authorized;
-4. implement incrementally scene by scene while protecting approved desktop behavior;
-5. validate complex stages with actual browser rendering;
-6. finish with a functionally complete phone/tablet pass before optional pixel-perfect polish.
-
-First-pass goal: a functionally complete phone experience, not mandatory pixel-perfect polish.
-
-Follow `VISUAL-SYSTEM.md`: preserve visual identity/meaning while allowing device-specific composition instead of literally shrinking desktop.
-
-Reference viewports for design/testing may include `390×844`, `844×390`, `430×932`, `932×430`, `768×1024`, `1024×768`, `1366×768` and `1080×1920`. These are reference contexts, not fixed breakpoint requirements.
+Do not use older backlog language about “starting responsive/mobile” to restart or redesign R7 from scratch. Responsive/mobile implementation already exists on the draft feature branch and is in owner-review stabilization.
 
 ### Admin visual refinement — future polish
 
@@ -36,6 +28,14 @@ The real owner smoke-test confirmed functional admin readiness for the current s
 Possible future polish may include layout/legibility/accessibility improvements if they become useful, but **this backlog entry is not permission to redesign the admin panel now**.
 
 ## COMPLETED / CURRENT CONTEXT
+
+### Responsive/mobile implementation context
+
+Responsive/mobile is no longer a future backlog workstream. REVIVAL R7 exists on `revival-r7-responsive-mobile` under draft PR #18 and has gone through multiple owner-feedback rounds.
+
+Round 6 reached verified SHA `f5e154912986c95e7f48a15bce34c707db39667c` and passed its defined automated browser gate, but owner visual acceptance remains pending and a newer bounded correction set is approved for implementation.
+
+This factual context is included only to prevent stale backlog interpretation. The actual active visual rules live in `VISUAL-SYSTEM.md`.
 
 ### Admin activation + first real UI smoke-test
 
@@ -70,14 +70,7 @@ Possible visitor UI:
 - privacy-safe technical diagnostics;
 - send action.
 
-Possible categories:
-
-- ошибка;
-- визуальная проблема;
-- функция не работает;
-- другое.
-
-Possible admin workflow:
+The older candidate status sketch below is historical and is superseded by the more specific Round4 planning direction later in this file:
 
 - `NEW`;
 - `CHECKING`;
@@ -106,7 +99,7 @@ This is future work only; current repository documentation is not a production-d
 
 ## HISTORICAL IDEAS / revisit only if useful
 
-These are remembered because they may still contain useful UX directions. Some may already be partly implemented or obsolete; always verify current production before treating them as work.
+These are remembered because they may still contain useful UX directions. Some are already partly/fully implemented or superseded; always verify current state before treating them as work.
 
 - mobile burger/navigation refinements;
 - touch-friendly hit targets;
@@ -120,6 +113,8 @@ These are remembered because they may still contain useful UX directions. Some m
 - smooth but safe scene transitions;
 - optional future visual polish after functional responsive release;
 - possible visual pulse/intensity dependence on rating — historical idea only, not an approved feature.
+
+Several items above now have implemented R7 forms. Their continued presence here preserves history only; it does not authorize reverting the current design or reimplementing them differently.
 
 Do not list already fully implemented functionality as mandatory future work merely because it existed in an older backlog.
 
