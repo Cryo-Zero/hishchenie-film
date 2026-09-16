@@ -1,0 +1,323 @@
+/* ========================================================================== */
+/* R7 OWNER PC + MOBILE CORRECTIONS — 2026-09-16                            */
+/* Bounded visual-correction layer. Loaded after previous R7 layers.         */
+/* ========================================================================== */
+
+/* MATERIALS / LIGHTBOX — desktop: large forgiving hit areas, quiet arrows. */
+@media (min-width: 821px) {
+  .lightbox-prev,
+  .lightbox-next {
+    top: 50% !important;
+    bottom: auto !important;
+    width: clamp(104px, 14vw, 220px) !important;
+    height: min(68vh, 560px) !important;
+    min-width: 104px !important;
+    min-height: 180px !important;
+    padding: 0 !important;
+    transform: translateY(-50%) !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .lightbox-prev { left: 0 !important; justify-content: flex-start !important; padding-left: clamp(24px, 4vw, 64px) !important; }
+  .lightbox-next { right: 0 !important; justify-content: flex-end !important; padding-right: clamp(24px, 4vw, 64px) !important; }
+  .lightbox-prev:hover,
+  .lightbox-next:hover,
+  .lightbox-prev:focus-visible,
+  .lightbox-next:focus-visible {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .lightbox-prev:focus-visible,
+  .lightbox-next:focus-visible { outline: 0 !important; }
+  .lightbox-prev:focus-visible .lightbox-chevron,
+  .lightbox-next:focus-visible .lightbox-chevron {
+    box-shadow: 0 0 0 3px rgba(155,196,199,.16), 0 0 24px rgba(155,196,199,.2);
+  }
+  .lightbox-prev .lightbox-chevron,
+  .lightbox-next .lightbox-chevron {
+    width: 16px !important;
+    height: 16px !important;
+    border-width: 0 0 1.5px 1.5px !important;
+  }
+  .lightbox-close {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    padding: 0 0 2px !important;
+    display: grid !important;
+    place-items: center !important;
+    line-height: 1 !important;
+    font-size: 27px !important;
+  }
+}
+
+/* TRAILER — site-controlled desktop controls; native controls remain mobile. */
+.video-shell { position: relative; }
+.r7-player-controls {
+  position: absolute;
+  z-index: 6;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
+  padding: 34px 16px 13px;
+  background: linear-gradient(to top, rgba(2,5,6,.94), rgba(2,5,6,.62) 58%, transparent);
+  color: #dce6e6;
+  font: 700 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing: .08em;
+  pointer-events: none;
+}
+@media (min-width: 821px) {
+  .video-shell.r7-custom-player-ready .r7-player-controls { display: block; }
+}
+.r7-player-progress-row { width: 100%; margin-bottom: 10px; pointer-events: auto; }
+.r7-player-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.r7-player-left,
+.r7-player-right { display: flex; align-items: center; gap: 10px; min-width: 0; pointer-events: auto; }
+.r7-player-button {
+  width: 36px;
+  height: 34px;
+  min-width: 36px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(155,196,199,.18);
+  background: rgba(5,10,11,.58);
+  color: #dce6e6;
+  cursor: pointer;
+}
+.r7-player-button:hover,
+.r7-player-button:focus-visible { border-color: rgba(155,196,199,.55); background: rgba(12,20,21,.8); outline: none; }
+.r7-player-button[hidden] { display: none !important; }
+.r7-player-time { min-width: 92px; color: #aababb; letter-spacing: .04em; white-space: nowrap; }
+.r7-player-range {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 18px;
+  background: transparent;
+  cursor: pointer;
+}
+.r7-player-range::-webkit-slider-runnable-track { height: 2px; background: rgba(155,196,199,.34); }
+.r7-player-range::-moz-range-track { height: 2px; background: rgba(155,196,199,.34); }
+.r7-player-range::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; margin-top: -4px; border: 0; border-radius: 50%; background: #c9dcdd; }
+.r7-player-range::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 50%; background: #c9dcdd; }
+.r7-player-range:focus-visible { outline: 1px solid rgba(155,196,199,.55); outline-offset: 3px; }
+.r7-player-progress { width: 100%; }
+.r7-player-volume { width: 92px; }
+.r7-player-glyph { position: relative; display: block; width: 14px; height: 14px; }
+.r7-play-glyph::before { content:""; position:absolute; left:3px; top:2px; border-top:5px solid transparent; border-bottom:5px solid transparent; border-left:8px solid currentColor; }
+.r7-player-button.is-playing .r7-play-glyph::before { left:3px; top:2px; width:3px; height:10px; border:0; background:currentColor; box-shadow:6px 0 0 currentColor; }
+.r7-volume-glyph::before { content:""; position:absolute; left:1px; top:5px; width:4px; height:5px; background:currentColor; }
+.r7-volume-glyph::after { content:""; position:absolute; left:5px; top:3px; width:6px; height:9px; border-right:1.5px solid currentColor; border-radius:50%; }
+.r7-player-button.is-muted .r7-volume-glyph::after { left:8px; top:1px; width:1px; height:12px; border:0; border-left:1.5px solid currentColor; border-radius:0; transform:rotate(45deg); }
+.r7-pip-glyph { border:1.5px solid currentColor; }
+.r7-pip-glyph::after { content:""; position:absolute; right:1px; bottom:1px; width:6px; height:5px; border:1px solid currentColor; background:#071011; }
+.r7-fullscreen-glyph { background:linear-gradient(currentColor,currentColor) 0 0/5px 1px no-repeat,linear-gradient(currentColor,currentColor) 0 0/1px 5px no-repeat,linear-gradient(currentColor,currentColor) 100% 0/5px 1px no-repeat,linear-gradient(currentColor,currentColor) 100% 0/1px 5px no-repeat,linear-gradient(currentColor,currentColor) 0 100%/5px 1px no-repeat,linear-gradient(currentColor,currentColor) 0 100%/1px 5px no-repeat,linear-gradient(currentColor,currentColor) 100% 100%/5px 1px no-repeat,linear-gradient(currentColor,currentColor) 100% 100%/1px 5px no-repeat; }
+
+/* ACTORS / FAQ — system reveal/load, no jump/bounce/translate. */
+.subject-dossier .dossier-data > div,
+.faq-response-panel .faq-system-box > div,
+.faq-response-panel .faq-response-log,
+.subject-dossier .dossier-reveal > *,
+.faq-response-panel .faq-response-content > * {
+  transform: none !important;
+}
+.subject-dossier .dossier-data small,
+.subject-dossier .dossier-data strong,
+.subject-dossier .dossier-subject,
+.subject-dossier .dossier-prompt,
+.faq-response-panel .faq-system-box > div > span,
+.faq-response-panel .faq-system-box > div > strong,
+.faq-response-panel .faq-response-log > span,
+.faq-response-panel .faq-response-content > h3,
+.faq-response-panel .faq-response-content > p {
+  transform: none !important;
+  clip-path: inset(0 0 0 0);
+  transition: opacity .28s ease, clip-path .38s cubic-bezier(.2,.72,.2,1) !important;
+}
+.subject-dossier.is-r7-crossfade-out .dossier-data small,
+.subject-dossier.is-r7-crossfade-out .dossier-data strong,
+.subject-dossier.is-r7-crossfade-out .dossier-subject,
+.subject-dossier.is-r7-crossfade-out .dossier-prompt,
+.faq-response-panel.is-r7-crossfade-out .faq-system-box > div > span,
+.faq-response-panel.is-r7-crossfade-out .faq-system-box > div > strong,
+.faq-response-panel.is-r7-crossfade-out .faq-response-log > span,
+.faq-response-panel.is-r7-crossfade-out .faq-response-content > h3,
+.faq-response-panel.is-r7-crossfade-out .faq-response-content > p {
+  opacity: .34 !important;
+  transform: none !important;
+  clip-path: inset(0 0 0 0) !important;
+}
+.subject-dossier.is-r7-crossfade-in .dossier-data small,
+.subject-dossier.is-r7-crossfade-in .dossier-data strong,
+.subject-dossier.is-r7-crossfade-in .dossier-subject,
+.subject-dossier.is-r7-crossfade-in .dossier-prompt,
+.faq-response-panel.is-r7-crossfade-in .faq-system-box > div > span,
+.faq-response-panel.is-r7-crossfade-in .faq-system-box > div > strong,
+.faq-response-panel.is-r7-crossfade-in .faq-response-log > span,
+.faq-response-panel.is-r7-crossfade-in .faq-response-content > h3,
+.faq-response-panel.is-r7-crossfade-in .faq-response-content > p {
+  opacity: .08 !important;
+  transform: none !important;
+  clip-path: inset(0 0 100% 0) !important;
+  transition: none !important;
+}
+.subject-dossier.is-revealed .dossier-data small,
+.subject-dossier.is-revealed .dossier-data strong,
+.subject-dossier.is-revealed .dossier-subject,
+.subject-dossier.is-revealed .dossier-prompt,
+.faq-response-panel.is-revealed .faq-system-box > div > span,
+.faq-response-panel.is-revealed .faq-system-box > div > strong,
+.faq-response-panel.is-revealed .faq-response-log > span,
+.faq-response-panel.is-revealed .faq-response-content > h3,
+.faq-response-panel.is-revealed .faq-response-content > p {
+  opacity: 1 !important;
+  transform: none !important;
+  clip-path: inset(0 0 0 0) !important;
+}
+
+/* Mobile sequential close/back — actual semantic states only; neutralize the
+   old temporary min-height reservation that created phantom standard geometry. */
+body.r7-sequential-ui #cast .cast-console,
+body.r7-sequential-ui #faq .faq-console {
+  min-height: 0 !important;
+  height: auto !important;
+}
+@media (max-width: 820px) {
+  body.r7-sequential-ui #cast.r7-dossier-open .subject-dossier,
+  body.r7-sequential-ui #cast:not(.r7-dossier-open) .cast-list,
+  body.r7-sequential-ui #faq.r7-response-open .faq-response-panel,
+  body.r7-sequential-ui #faq:not(.r7-response-open) .faq-query-list {
+    animation: r7SemanticStateReveal .22s ease both;
+  }
+}
+body.r7-phone-landscape #cast.r7-dossier-open .subject-dossier,
+body.r7-phone-landscape #cast:not(.r7-dossier-open) .cast-list,
+body.r7-phone-landscape #faq.r7-response-open .faq-response-panel,
+body.r7-phone-landscape #faq:not(.r7-response-open) .faq-query-list {
+  animation: r7SemanticStateReveal .22s ease both;
+}
+@keyframes r7SemanticStateReveal { from { opacity:.34; clip-path:inset(0 0 4% 0); } to { opacity:1; clip-path:inset(0); } }
+
+/* CONTACT — line + exactly one travelling point; no endpoint diamond/sweep. */
+.contact-signal::before { content: none !important; display: none !important; animation: none !important; }
+.contact-signal-track b { display: none !important; animation: none !important; box-shadow: none !important; background: transparent !important; }
+.contact-signal-track i::after { content: none !important; display: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .contact-signal-track i { animation: none !important; left: 50% !important; opacity: .7 !important; box-shadow: none !important; }
+}
+
+/* REVIEWS — local block anchor grid. */
+.review-composer .profile-console,
+.review-composer .score-field,
+.review-composer .rating-scale,
+.review-composer .review-text-field,
+.review-composer #reviewText {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+.review-composer .score-field,
+.review-composer .rating-scale { padding-left: 0 !important; padding-right: 0 !important; }
+.review-composer .rating-scale { grid-auto-flow: row; }
+@media (min-width: 821px) {
+  .review-composer .rating-scale { grid-template-columns: repeat(11,minmax(0,1fr)) !important; }
+}
+@media (max-width: 820px) {
+  .review-composer .rating-scale { grid-template-columns: repeat(6,minmax(0,1fr)) !important; }
+  .review-composer .rating-button:last-child { grid-column: span 2 !important; }
+}
+
+/* MOBILE HERO — keep POSTER -> SYNOPSIS -> ACTIONS, remove decorative divider
+   and tighten only the two owner-approved gaps. */
+@media (max-width: 820px) {
+  .hero-inner > .r7-mobile-hero-copy {
+    margin-top: 15px !important;
+    padding-top: 0 !important;
+    border-top: 0 !important;
+  }
+  .r7-mobile-hero-actions {
+    margin-top: 13px !important;
+    row-gap: 6px !important;
+  }
+}
+body.r7-phone-landscape .r7-mobile-hero-copy {
+  margin-top: 10px !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+body.r7-phone-landscape .r7-mobile-hero-actions { margin-top: 9px !important; row-gap: 5px !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .subject-dossier .dossier-data small,
+  .subject-dossier .dossier-data strong,
+  .subject-dossier .dossier-subject,
+  .subject-dossier .dossier-prompt,
+  .faq-response-panel .faq-system-box > div > span,
+  .faq-response-panel .faq-system-box > div > strong,
+  .faq-response-panel .faq-response-log > span,
+  .faq-response-panel .faq-response-content > h3,
+  .faq-response-panel .faq-response-content > p,
+  body.r7-sequential-ui #cast .cast-list,
+  body.r7-sequential-ui #cast .subject-dossier,
+  body.r7-sequential-ui #faq .faq-query-list,
+  body.r7-sequential-ui #faq .faq-response-panel {
+    animation: none !important;
+    transition: none !important;
+    clip-path: none !important;
+  }
+}
+
+/* Owner-correction targeted QA follow-up: resolve legacy specificity and grid-gap interactions. */
+@media (min-width: 821px) {
+  #lightbox.open #lightboxPrev,
+  #lightbox.open #lightboxNext {
+    width: clamp(104px, 14vw, 220px) !important;
+    height: min(68vh, 560px) !important;
+    min-width: 104px !important;
+    min-height: 180px !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+@media (max-width: 820px) {
+  .hero-inner > .r7-mobile-hero-copy { margin-top: -19px !important; }
+  .hero-inner > .r7-mobile-hero-actions { margin-top: -24px !important; }
+}
+body.r7-phone-landscape .hero-inner > .r7-mobile-hero-copy { margin-top: -9px !important; }
+body.r7-phone-landscape .hero-inner > .r7-mobile-hero-actions { margin-top: -14px !important; }
+body.r7-phone-landscape.r7-sequential-ui #cast.r7-dossier-open .r7-subject-back,
+body.r7-phone-landscape.r7-sequential-ui #faq.r7-response-open .r7-query-back {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: flex-start;
+}
+body.r7-sequential-ui #cast .cast-console,
+body.r7-sequential-ui #faq .faq-console { overflow-anchor: none !important; }
+
+/* FAQ recovery: structural reveal stays un-translated.
+   Legacy R7 layers still transition the mobile response shell from -4px and
+   system/content wrappers from +2/+4px. Owner-approved R7 motion keeps these
+   structural coordinates fixed and reveals information via opacity/clip only. */
+body.r7-sequential-ui #faq:not(.r7-response-open) .faq-response-panel,
+body.r7-sequential-ui #faq.r7-response-open .faq-response-panel {
+  transform: none !important;
+}
+.faq-response-panel.is-r7-crossfade-out .faq-response-content > *,
+.faq-response-panel.is-r7-crossfade-out .faq-system-box > div,
+.faq-response-panel.is-r7-crossfade-out .faq-response-log,
+.faq-response-panel.is-r7-crossfade-in .faq-response-content > *,
+.faq-response-panel.is-r7-crossfade-in .faq-system-box > div,
+.faq-response-panel.is-r7-crossfade-in .faq-response-log,
+.faq-response-panel.is-revealed .faq-response-content > *,
+.faq-response-panel.is-revealed .faq-system-box > div,
+.faq-response-panel.is-revealed .faq-response-log {
+  transform: none !important;
+  transition-property: opacity, clip-path !important;
+}

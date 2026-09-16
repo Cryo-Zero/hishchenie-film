@@ -15,22 +15,30 @@
   // One staged-reveal engine is shared by SUBJECT DOSSIER and SYSTEM QUERY.
   // Keeping one implementation prevents the two interfaces from drifting apart.
   function stagedReveal(panel, writeValues) {
-    if (!panel) { if (typeof writeValues === 'function') writeValues(); return; }
-    panel.classList.remove('is-revealed');
-    panel.classList.add('is-revealing');
+  if (!panel) { if (typeof writeValues === 'function') writeValues(); return; }
+  clearTimeout(panel._theftRevealTimer);
+  panel.classList.remove('is-revealing', 'is-r7-crossfade-in', 'is-r7-crossfade-out');
+  panel.classList.add('is-revealed');
+  if (motionReduced()) {
     if (typeof writeValues === 'function') writeValues();
-    if (motionReduced()) {
-      panel.classList.remove('is-revealing');
-      panel.classList.add('is-revealed');
-      return;
-    }
-    // Force the hidden state to be painted before starting the reveal.
+    return;
+  }
+
+  // Keep the old state visible while it softens. The new state is written
+  // only after that short fade and starts partially visible, avoiding an
+  // empty-panel flash while still reading as one continuous transformation.
+  panel.classList.add('is-r7-crossfade-out');
+  panel._theftRevealTimer = setTimeout(() => {
+    if (typeof writeValues === 'function') writeValues();
+    panel.classList.remove('is-r7-crossfade-out');
+    panel.classList.add('is-r7-crossfade-in');
     void panel.offsetWidth;
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      panel.classList.remove('is-revealing');
+      panel.classList.remove('is-r7-crossfade-in');
       panel.classList.add('is-revealed');
     }));
-  }
+  }, 140);
+}
 
   function closeNav() {
     body.classList.remove('nav-open');
@@ -207,7 +215,8 @@
     mainImage.src = item.src;
     mainImage.alt = item.alt;
     if (item.i18n) mainImage.dataset.i18nAlt = item.i18n;
-    stage.style.setProperty('--archive-bg', `url("${item.src.replace(/"/g,'%22')}")`);
+    const archiveBackdropSrc = new URL(item.src, document.baseURI).href;
+    stage.style.setProperty('--archive-bg', `url("${archiveBackdropSrc.replace(/"/g,'%22')}")`);
     if (code) code.textContent = `${item.file} // ${item.type}`;
     if (counter) counter.textContent = `${String(archiveIndex+1).padStart(2,'0')} / ${String(archiveItems.length).padStart(2,'0')}`;
     cards.forEach((card, i) => {
@@ -376,14 +385,21 @@
   addEventListener('resize', scheduleDesktopAudit);
   if (document.fonts?.ready) document.fonts.ready.then(scheduleDesktopAudit).catch(() => {});
 
-  // Trailer starts gently. Once a visitor changes the level, remember their choice.
+  // Trailer audio is deterministic and user-safe: no autoplay, explicit unmuted
+  // application state, and a restrained 30% starting level on each page entry.
+  // Native controls may change volume/mute for the current page session; we do not
+  // fight those user changes while playback is active.
   const trailerVideo = $('#trailerVideo');
   if (trailerVideo) {
-    const storedVolume = Number(localStorage.getItem('theft_trailer_volume'));
-    trailerVideo.volume = Number.isFinite(storedVolume) && storedVolume >= 0 && storedVolume <= 1 ? storedVolume : .35;
-    trailerVideo.addEventListener('volumechange', () => {
-      try { localStorage.setItem('theft_trailer_volume', String(trailerVideo.volume)); } catch {}
-    });
+    const resetTrailerAudio = () => {
+      trailerVideo.removeAttribute('autoplay');
+      trailerVideo.autoplay = false;
+      trailerVideo.defaultMuted = false;
+      trailerVideo.muted = false;
+      trailerVideo.volume = .30;
+    };
+    resetTrailerAudio();
+    addEventListener('pageshow', event => { if (event.persisted) resetTrailerAudio(); });
   }
 
   // SUBJECT DOSSIER ------------------------------------------------------------

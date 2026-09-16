@@ -1039,7 +1039,7 @@
     panel.hidden=!open;panel.setAttribute('aria-hidden',String(!open));
     button?.setAttribute('aria-expanded',String(open));
     document.body.classList.toggle('info-overlay-open',open);
-    if(open)setTimeout(()=>$('.info-overlay-close',panel)?.focus(),0);
+    if(open)setTimeout(()=>$('.info-overlay-close',panel)?.focus({preventScroll:true}),0);
   }
   function diagnosticsText(){
     const vv=window.visualViewport;
