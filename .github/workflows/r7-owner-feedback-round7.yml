@@ -78,7 +78,13 @@ jobs:
           npm init -y >/dev/null 2>&1
           npm install --silent playwright@1.55.0
           npx playwright install --with-deps chromium >/dev/null
-          NODE_PATH=/tmp/r7qa/node_modules node --check /tmp/r7_round7_qa.cjs
+          python3 - <<'PY'
+          from pathlib import Path
+          src = Path('/tmp/r7_round7_qa.cjs').read_text(encoding='utf-8')
+          wrapped = "(async () => {\n" + src + "\n})().catch(err => { console.error(err); process.exit(1); });\n"
+          Path('/tmp/r7_round7_qa_run.cjs').write_text(wrapped, encoding='utf-8')
+          PY
+          NODE_PATH=/tmp/r7qa/node_modules node --check /tmp/r7_round7_qa_run.cjs
 
       - name: Pre-commit full browser and visual-regression matrix
         shell: bash
@@ -97,7 +103,7 @@ jobs:
             ROUND5_URL=http://127.0.0.1:4174 \
             ROUND6_URL=http://127.0.0.1:4175 \
             EVIDENCE_DIR=/tmp/r7-round7-pre \
-            node /tmp/r7_round7_qa.cjs
+            node /tmp/r7_round7_qa_run.cjs
 
       - name: Create clean Round7 final commit
         shell: bash
@@ -150,7 +156,7 @@ jobs:
             ROUND5_URL=http://127.0.0.1:4174 \
             ROUND6_URL=http://127.0.0.1:4175 \
             EVIDENCE_DIR=/tmp/r7-round7-final \
-            node /tmp/r7_round7_qa.cjs
+            node /tmp/r7_round7_qa_run.cjs
           printf '%s\n' "$FINAL" >/tmp/r7-round7-final/FINAL_SHA.txt
           printf '%s\n' \
             'ROUND5=4197adc13cc91cbad395e6d2819e0fbb23278449' \
