@@ -71,6 +71,10 @@ jobs:
           Path('/tmp/r7_post_final_audit.cjs').write_text(src, encoding='utf-8')
           PY
           NODE_PATH=/tmp/r7qa/node_modules node --check /tmp/r7_post_final_audit.cjs
+          echo '--- longSession source diagnostics ---'
+          grep -n -A12 -B4 'async function longSession' /tmp/r7_post_final_audit.cjs || true
+          echo '--- failure line diagnostics ---'
+          nl -ba /tmp/r7_post_final_audit.cjs | sed -n '328,338p'
 
       - name: Run immutable product stability audit
         id: audit
@@ -84,6 +88,7 @@ jobs:
           cp /tmp/R7_PRODUCT_SHA.txt "$OUT/"
           cp /tmp/FRESH_CANONICAL_READ_HEAD.txt "$OUT/"
           cp /tmp/AUDIT_TRIGGER_HEAD.txt "$OUT/"
+          cp /tmp/r7_post_final_audit.cjs "$OUT/HARNESS-SOURCE.cjs"
           python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/r7-product >/tmp/r7-post-final-server.log 2>&1 & SERVER=$!
           trap 'kill $SERVER 2>/dev/null || true' EXIT
           sleep 1
