@@ -1,0 +1,69 @@
+name: R7 live follow-up full audit
+
+on:
+  push:
+    branches:
+      - r7-live-followup-pc-mobile
+    paths:
+      - .github/workflows/r7-live-followup-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      PRODUCT_SHA: da2034f6917d732c1925ea73a45941b16f236659
+      EVIDENCE_DIR: /tmp/r7-evidence
+      BASE_URL: http://127.0.0.1:4173
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Preserve audit runner and freeze exact product
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .github/r7-live-followup-audit.mjs /tmp/r7-live-followup-audit.mjs
+          git checkout "$PRODUCT_SHA"
+          test "$(git rev-parse HEAD)" = "$PRODUCT_SHA"
+      - name: Install Playwright browsers
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium firefox webkit
+      - name: Start frozen product server
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/r7-http.log 2>&1 &
+          echo $! >/tmp/r7-http.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/r7-http.log
+          exit 1
+      - name: Run Chromium Firefox WebKit full matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp
+          node /tmp/r7-live-followup-audit.mjs
+      - name: Show report
+        if: always()
+        shell: bash
+        run: |
+          if [ -f /tmp/r7-evidence/REPORT.md ]; then cat /tmp/r7-evidence/REPORT.md; fi
+      - name: Upload audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-live-followup-audit-evidence
+          path: /tmp/r7-evidence
+          if-no-files-found: error
