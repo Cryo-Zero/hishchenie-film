@@ -148,27 +148,10 @@ function installMobileNavDismissal() {
   }
 
   // Sequential FAQ / Actors --------------------------------------------------
-  // Owner rule: changing index/detail state must never move the viewport.
-  // The clicked element changes the local scene only; the visitor controls all scrolling.
-  function holdSequentialHeight(section, selector) {
-    if (!section || !isSequentialContext()) return;
-    const consoleNode = $(selector, section);
-    if (!consoleNode) return;
-    const height = Math.ceil(consoleNode.getBoundingClientRect().height);
-    if (height > 0) consoleNode.style.minHeight = `${height}px`;
-    clearTimeout(consoleNode._r7HeightTimer);
-    consoleNode._r7HeightTimer = setTimeout(() => {
-      consoleNode.style.removeProperty('min-height');
-    }, 900);
-  }
-
-  function preserveViewportPosition() {
-    if (!isSequentialContext()) return;
-    const x = scrollX;
-    const y = scrollY;
-    requestAnimationFrame(() => scrollTo({ left: x, top: y, behavior: 'auto' }));
-    setTimeout(() => scrollTo({ left: x, top: y, behavior: 'auto' }), 80);
-  }
+  // Follow-up contract: never force viewport coordinates or fabricate a temporary
+  // height. Keep the real detail state alive for its reverse reveal, then switch to
+  // the real index geometry. Focus restoration uses preventScroll only.
+  const reverseRevealMs = 340;
 
   function makeBackButton(label, className) {
     const button = document.createElement('button');
@@ -185,38 +168,41 @@ function installMobileNavDismissal() {
     const close = $('#subjectDossierClose', cast);
     const topline = $('.dossier-topline', dossier || cast);
     let lastSelected = null;
+    let closeTimer = 0;
+
+    const finishClose = () => {
+      const selected = items.find(item => item.getAttribute('aria-selected') === 'true') || null;
+      if (selected) return;
+      cast.classList.remove('r7-dossier-open');
+      const target = cast._r7SequenceFocusTarget;
+      cast._r7SequenceFocusTarget = null;
+      requestAnimationFrame(() => target?.focus({ preventScroll: true }));
+    };
 
     const back = dossier ? makeBackButton('SUBJECT INDEX', 'r7-subject-back') : null;
     if (back && dossier && !$('.r7-subject-back', dossier)) {
       dossier.insertBefore(back, topline || dossier.firstChild);
       back.addEventListener('click', () => {
-        holdSequentialHeight(cast, '.cast-console');
-        const target = lastSelected || items[0];
+        cast._r7SequenceFocusTarget = lastSelected || items[0];
         close?.click();
-        preserveViewportPosition();
-        requestAnimationFrame(() => target?.focus({ preventScroll: true }));
       });
     }
 
     function syncCast() {
       const selected = items.find(item => item.getAttribute('aria-selected') === 'true') || null;
-      cast.classList.toggle('r7-dossier-open', Boolean(selected));
-      if (selected) lastSelected = selected;
+      clearTimeout(closeTimer);
+      if (selected) {
+        cast.classList.add('r7-dossier-open');
+        lastSelected = selected;
+        return;
+      }
+      if (!cast.classList.contains('r7-dossier-open')) return;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) finishClose();
+      else closeTimer = setTimeout(finishClose, reverseRevealMs);
     }
 
-    items.forEach(item => {
-      item.addEventListener('click', () => {
-        holdSequentialHeight(cast, '.cast-console');
-        queueMicrotask(syncCast);
-        preserveViewportPosition();
-      });
-    });
-
-    close?.addEventListener('click', () => {
-      queueMicrotask(syncCast);
-      preserveViewportPosition();
-    });
-
+    items.forEach(item => item.addEventListener('click', () => queueMicrotask(syncCast)));
+    close?.addEventListener('click', () => queueMicrotask(syncCast));
     const observer = new MutationObserver(syncCast);
     items.forEach(item => observer.observe(item, { attributes: true, attributeFilter: ['aria-selected', 'class'] }));
     syncCast();
@@ -229,38 +215,41 @@ function installMobileNavDismissal() {
     const close = $('#faqResponseClose', faq);
     const header = $('.faq-response-header', panel || faq);
     let lastSelected = null;
+    let closeTimer = 0;
+
+    const finishClose = () => {
+      const selected = items.find(item => item.getAttribute('aria-selected') === 'true') || null;
+      if (selected) return;
+      faq.classList.remove('r7-response-open');
+      const target = faq._r7SequenceFocusTarget;
+      faq._r7SequenceFocusTarget = null;
+      requestAnimationFrame(() => target?.focus({ preventScroll: true }));
+    };
 
     const back = panel ? makeBackButton('QUERY INDEX', 'r7-query-back') : null;
     if (back && panel && !$('.r7-query-back', panel)) {
       panel.insertBefore(back, header || panel.firstChild);
       back.addEventListener('click', () => {
-        holdSequentialHeight(faq, '.faq-console');
-        const target = lastSelected || items[0];
+        faq._r7SequenceFocusTarget = lastSelected || items[0];
         close?.click();
-        preserveViewportPosition();
-        requestAnimationFrame(() => target?.focus({ preventScroll: true }));
       });
     }
 
     function syncFaq() {
       const selected = items.find(item => item.getAttribute('aria-selected') === 'true') || null;
-      faq.classList.toggle('r7-response-open', Boolean(selected));
-      if (selected) lastSelected = selected;
+      clearTimeout(closeTimer);
+      if (selected) {
+        faq.classList.add('r7-response-open');
+        lastSelected = selected;
+        return;
+      }
+      if (!faq.classList.contains('r7-response-open')) return;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) finishClose();
+      else closeTimer = setTimeout(finishClose, reverseRevealMs);
     }
 
-    items.forEach(item => {
-      item.addEventListener('click', () => {
-        holdSequentialHeight(faq, '.faq-console');
-        queueMicrotask(syncFaq);
-        preserveViewportPosition();
-      });
-    });
-
-    close?.addEventListener('click', () => {
-      queueMicrotask(syncFaq);
-      preserveViewportPosition();
-    });
-
+    items.forEach(item => item.addEventListener('click', () => queueMicrotask(syncFaq)));
+    close?.addEventListener('click', () => queueMicrotask(syncFaq));
     const observer = new MutationObserver(syncFaq);
     items.forEach(item => observer.observe(item, { attributes: true, attributeFilter: ['aria-selected', 'class'] }));
     if (panel) observer.observe(panel, { attributes: true, attributeFilter: ['class'] });
@@ -300,23 +289,14 @@ function installMobileNavDismissal() {
     }, { passive: true });
   }
 
-  // OWNER FEEDBACK ROUND 4 ---------------------------------------------------
-  // The dossier footer is a second route to the existing SUBJECT INDEX action.
-  // It deliberately clicks the already-installed back control so state/focus/scroll
-  // semantics cannot drift into a parallel navigation model.
+  // OWNER FOLLOW-UP — dossier footer uses the same semantic back action.
   function installSubjectPromptAction() {
     const cast = $('#cast');
     const prompt = $('#dossierPrompt', cast || document);
     if (!cast || !prompt) return;
 
-    let wasActionable = false;
-    let openScroll = null;
-
     const sync = () => {
       const actionable = isSequentialContext() && cast.classList.contains('r7-dossier-open');
-      if (actionable && !wasActionable) openScroll = { x: scrollX, y: scrollY };
-      if (!actionable) openScroll = null;
-      wasActionable = actionable;
       prompt.classList.toggle('r7-subject-return', actionable);
       if (actionable) {
         prompt.setAttribute('role', 'button');
@@ -335,19 +315,7 @@ function installMobileNavDismissal() {
       if (!prompt.classList.contains('r7-subject-return')) return;
       if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
       if (event.type === 'keydown') event.preventDefault();
-
-      const current = { x: scrollX, y: scrollY };
-      const smallIncidentalDrift = openScroll && Math.abs(current.y - openScroll.y) <= 24;
-      const targetScroll = smallIncidentalDrift ? openScroll : current;
       $('.r7-subject-back', cast)?.click();
-
-      const restore = () => {
-        if (!isSequentialContext()) return;
-        if (Math.abs(scrollX - targetScroll.x) <= .5 && Math.abs(scrollY - targetScroll.y) <= .5) return;
-        scrollTo({ left: targetScroll.x, top: targetScroll.y, behavior: 'auto' });
-      };
-      requestAnimationFrame(() => requestAnimationFrame(restore));
-      setTimeout(restore, 90);
     };
 
     prompt.addEventListener('click', activate);

@@ -24,9 +24,8 @@
     return;
   }
 
-  // Keep the old state visible while it softens. The new state is written
-  // only after that short fade and starts partially visible, avoiding an
-  // empty-panel flash while still reading as one continuous transformation.
+  // Reverse-draw the current record first. Swap semantic values only after the
+  // old record has visually cleared, then draw the new record back in. Geometry stays fixed.
   panel.classList.add('is-r7-crossfade-out');
   panel._theftRevealTimer = setTimeout(() => {
     if (typeof writeValues === 'function') writeValues();
@@ -37,7 +36,7 @@
       panel.classList.remove('is-r7-crossfade-in');
       panel.classList.add('is-revealed');
     }));
-  }, 140);
+  }, 320);
 }
 
   function closeNav() {
