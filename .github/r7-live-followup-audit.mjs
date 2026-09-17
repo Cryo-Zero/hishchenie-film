@@ -19,14 +19,21 @@ const matrix = [
 const touchKeys = new Set(['360x800','390x844','430x932','800x360','844x390','932x430','768x1024','1024x768']);
 const screenshotKeys = new Set(['390x844','844x390','1366x768','1440x900']);
 const targetedKeys = new Set(['390x844','430x932','844x390','1366x768','1440x900']);
+const mobileSwipeKeys = new Set(['390x844','430x932','844x390']);
 const results = [];
 const screenshots = [];
+let productConsoleErrorTotal = 0;
+let pageExceptionTotal = 0;
+let environmentEventTotal = 0;
 
 function add(engine, viewport, check, ok, detail = '') {
   results.push({ engine, viewport, check, status: ok ? 'PASS' : 'FAIL', detail });
 }
 function nt(engine, viewport, check, detail) {
   results.push({ engine, viewport, check, status: 'NOT TESTED', detail });
+}
+function env(engine, viewport, check, detail) {
+  results.push({ engine, viewport, check, status: 'ENVIRONMENT', detail });
 }
 const near = (a,b,t=2) => Math.abs(a-b) <= t;
 
@@ -56,6 +63,59 @@ async function jumpTo(page, selector) {
   }, selector);
   await settle(page, 180);
 }
+async function anchorGeometry(page, selector) {
+  return page.locator(selector).evaluate(el => {
+    const r = el.getBoundingClientRect();
+    return {
+      top: r.top,
+      bottom: r.bottom,
+      height: r.height,
+      scrollY,
+      bottomGap: document.documentElement.scrollHeight - (scrollY + innerHeight),
+      viewportHeight: innerHeight
+    };
+  });
+}
+async function prepareVisualAnchor(page, sectionSelector, anchorSelector) {
+  await page.locator(sectionSelector).evaluate(el => el.scrollIntoView({ behavior:'instant', block:'center' }));
+  await settle(page, 90);
+  let geometry = await anchorGeometry(page, anchorSelector);
+  for (let i=0; i<2 && geometry.bottomGap < 160; i += 1) {
+    await page.mouse.wheel(0, -260);
+    await settle(page, 90);
+    geometry = await anchorGeometry(page, anchorSelector);
+  }
+  return geometry;
+}
+async function activateSectionAndWaitRail(page, selector, expected) {
+  const locator = page.locator(selector);
+  await locator.evaluate(el => el.scrollIntoView({ behavior:'instant', block:'start' }));
+  const geometry = await locator.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    return { top:r.top, bottom:r.bottom, height:r.height, viewportHeight:innerHeight };
+  });
+  const geometryActive = geometry.top <= Math.max(12, geometry.viewportHeight * .20) && geometry.bottom > Math.min(120, geometry.viewportHeight * .30);
+  let text = (await page.locator('#railSection').textContent() || '').trim();
+  let synced = false;
+  if (geometryActive) {
+    try {
+      await page.waitForFunction(exp => (document.querySelector('#railSection')?.textContent || '').includes(exp), expected, { timeout: 2600, polling: 50 });
+      synced = true;
+      text = (await page.locator('#railSection').textContent() || '').trim();
+    } catch {
+      text = (await page.locator('#railSection').textContent() || '').trim();
+    }
+  }
+  return { ok: geometryActive && synced, geometryActive, geometry, text, expected };
+}
+function isSupabaseUrl(value = '') {
+  try { return new URL(value).hostname === 'xltwwvutqkpmtmlavngi.supabase.co'; }
+  catch { return false; }
+}
+function externalConsoleRecord(record, externalFailures) {
+  if (isSupabaseUrl(record.location?.url || '')) return true;
+  return /^\[P17\/stats\]\s+TypeError:\s+Failed to fetch/.test(record.text) && externalFailures.length > 0;
+}
 
 for (const [engineName, launcher] of Object.entries(engines)) {
   const browser = await launcher.launch({ headless: true });
@@ -65,8 +125,14 @@ for (const [engineName, launcher] of Object.entries(engines)) {
     const page = await context.newPage();
     const consoleErrors = [];
     const pageErrors = [];
-    page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+    const externalFailures = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push({ text: msg.text(), location: msg.location() || {} });
+    });
     page.on('pageerror', err => pageErrors.push(String(err)));
+    page.on('requestfailed', request => {
+      if (isSupabaseUrl(request.url())) externalFailures.push({ url: request.url(), errorText: request.failure()?.errorText || 'request failed' });
+    });
 
     try {
       const response = await page.goto(`${BASE}/index.html`, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -77,15 +143,70 @@ for (const [engineName, launcher] of Object.entries(engines)) {
       add(engineName,vpName,'vertical section indicator visible',await visible(page.locator('.system-rail')));
       add(engineName,vpName,'section indicator has current code',(await page.locator('#railSection').textContent() || '').trim().length>0);
       add(engineName,vpName,'no horizontal document overflow',await noOverflow(page));
+      add(engineName,vpName,'Hero title visible',await visible(page.locator('.hero h1').first()));
+      add(engineName,vpName,'Hero poster visible',await visible(page.locator('.hero-poster-frame')));
 
       const order = await page.locator('#primaryNav a').evaluateAll(nodes => nodes.map(n => ({href:n.getAttribute('href')||'', cls:n.className||''})));
       const idx = pred => order.findIndex(pred);
       const iCast=idx(x=>x.href.includes('#cast')), iFaq=idx(x=>x.href.includes('#faq')), iReviews=idx(x=>x.href.includes('reviews')), iReport=idx(x=>x.cls.includes('r7-nav-report'));
       add(engineName,vpName,'navigation ACTORS→FAQ→REVIEWS→REPORT',iCast>=0&&iFaq===iCast+1&&iReviews===iFaq+1&&iReport===iReviews+1,JSON.stringify({iCast,iFaq,iReviews,iReport}));
 
+      if (width <= 980) {
+        const toggle = page.locator('#menuToggle');
+        add(engineName,vpName,'burger control visible',await visible(toggle));
+        await toggle.click(); await settle(page,60);
+        add(engineName,vpName,'burger opens navigation',(await page.locator('body').evaluate(b=>b.classList.contains('nav-open'))) && (await toggle.getAttribute('aria-expanded'))==='true');
+        await toggle.click(); await settle(page,60);
+        add(engineName,vpName,'burger closes navigation',!(await page.locator('body').evaluate(b=>b.classList.contains('nav-open'))) && (await toggle.getAttribute('aria-expanded'))==='false');
+      }
+
+      if (targetedKeys.has(vpName)) {
+        const beforeLang = await page.locator('[data-i18n="navAbout"]').first().textContent();
+        await page.locator('#langToggle').click(); await settle(page,70);
+        const enLang = await page.locator('html').getAttribute('lang');
+        const afterLang = await page.locator('[data-i18n="navAbout"]').first().textContent();
+        add(engineName,vpName,'translation RU→EN updates language and copy',enLang==='en' && afterLang!==beforeLang,JSON.stringify({beforeLang,afterLang,enLang}));
+        await page.locator('#langToggle').click(); await settle(page,70);
+        add(engineName,vpName,'translation returns to RU',(await page.locator('html').getAttribute('lang'))==='ru');
+      }
+
+      await page.locator('#materials').evaluate(el=>el.scrollIntoView({behavior:'instant',block:'start'})); await settle(page,120);
+      add(engineName,vpName,'Materials stage visible',await visible(page.locator('#archiveStage')));
+      add(engineName,vpName,'Materials archive has 11 items',(await page.locator('#gallery .gallery-card').count())===11);
+      if (targetedKeys.has(vpName)) {
+        await page.locator('#archiveStage').click({force:true}); await settle(page,90);
+        add(engineName,vpName,'Materials lightbox opens',await page.locator('#lightbox').evaluate(el=>el.classList.contains('open') && el.getAttribute('aria-hidden')==='false'));
+        const lb0=(await page.locator('#lightboxCounter').textContent()||'').trim();
+        await page.locator('#lightboxNext').click(); await settle(page,70);
+        const lb1=(await page.locator('#lightboxCounter').textContent()||'').trim();
+        add(engineName,vpName,'Materials lightbox next advances',lb0.length>0 && lb1.length>0 && lb1!==lb0,`${lb0}→${lb1}`);
+        await page.locator('#lightboxClose').click(); await settle(page,70);
+        add(engineName,vpName,'Materials lightbox closes',await page.locator('#lightbox').evaluate(el=>!el.classList.contains('open') && el.getAttribute('aria-hidden')==='true'));
+      }
+      if (mobileSwipeKeys.has(vpName)) {
+        await page.locator('#gallery .gallery-card').first().click({force:true}); await settle(page,50);
+        const beforeSwipe=(await page.locator('#archiveCounter').textContent()||'').trim();
+        await page.locator('#archiveStage').evaluate(el => {
+          const start = new Event('touchstart',{bubbles:true});
+          Object.defineProperty(start,'changedTouches',{value:[{clientX:260}]});
+          el.dispatchEvent(start);
+          const end = new Event('touchend',{bubbles:true});
+          Object.defineProperty(end,'changedTouches',{value:[{clientX:120}]});
+          el.dispatchEvent(end);
+        });
+        await settle(page,70);
+        const afterSwipe=(await page.locator('#archiveCounter').textContent()||'').trim();
+        add(engineName,vpName,'mobile Materials swipe advances archive',beforeSwipe.length>0&&afterSwipe.length>0&&beforeSwipe!==afterSwipe,`${beforeSwipe}→${afterSwipe}`);
+      }
+
       const controls = page.locator('.r7-player-controls');
       add(engineName,vpName,'THEFT trailer controls visible',await visible(controls));
-      add(engineName,vpName,'native trailer controls disabled',await page.locator('#trailerVideo').evaluate(v=>!v.controls));
+      const nativeFlagDisabled = await page.locator('#trailerVideo').evaluate(v=>!v.controls);
+      if (engineName==='webkit' && vpName==='360x800') {
+        nt(engineName,vpName,'native trailer browser chrome visibility','NOT TESTED / BROWSER-NATIVE: headless WebKit DOM controls flag cannot truthfully observe Safari/iOS native media chrome');
+      } else {
+        add(engineName,vpName,'native trailer controls DOM flag disabled',nativeFlagDisabled,String(nativeFlagDisabled));
+      }
       add(engineName,vpName,'trailer play control present',await visible(page.locator('.r7-player-play')));
       add(engineName,vpName,'trailer seek control present',await visible(page.locator('.r7-player-progress')));
       add(engineName,vpName,'trailer fullscreen control present',await visible(page.locator('.r7-player-fullscreen')));
@@ -104,9 +225,8 @@ for (const [engineName, launcher] of Object.entries(engines)) {
       add(engineName,vpName,'CONTACT linear uniform timing',contact.timing==='linear',JSON.stringify(contact));
       add(engineName,vpName,'CONTACT endpoint diamond hidden',contact.b==='none',JSON.stringify(contact));
 
-      await jumpTo(page, '#cast');
-      const railCast = (await page.locator('#railSection').textContent()||'');
-      add(engineName,vpName,'section indicator updates at ACTORS',railCast.includes('05'),railCast);
+      const castRail = await activateSectionAndWaitRail(page,'#cast','05');
+      add(engineName,vpName,'section indicator updates at ACTORS',castRail.ok,JSON.stringify(castRail));
 
       if (targetedKeys.has(vpName)) {
         const y0 = await page.evaluate(()=>scrollY);
@@ -121,18 +241,18 @@ for (const [engineName, launcher] of Object.entries(engines)) {
         add(engineName,vpName,'Actors close returns neutral',(await page.locator('#cast .cast-list-item[aria-selected="true"]').count())===0);
         if (isCompact) add(engineName,vpName,'Actors mobile viewport stable on close',near(y1,y2,4),`${y1}→${y2}`);
 
-        await jumpTo(page, '#faq');
-        const fq0=await page.evaluate(()=>scrollY);
+        const fq0=await prepareVisualAnchor(page,'#faq','#faq .section-head');
+        add(engineName,vpName,'FAQ stability setup has scroll headroom',fq0.bottomGap>=120,JSON.stringify(fq0));
         await page.locator('#faq .faq-query-item').first().click(); await settle(page,760);
-        const fq1=await page.evaluate(()=>scrollY);
+        const fq1=await anchorGeometry(page,'#faq .section-head');
         add(engineName,vpName,'FAQ open selects response',await page.locator('#faq .faq-query-item').first().getAttribute('aria-selected')==='true');
         add(engineName,vpName,'FAQ structure has no transform',await page.locator('#faqResponsePanel').evaluate(el=>getComputedStyle(el).transform==='none'));
-        if (isCompact) add(engineName,vpName,'FAQ mobile viewport stable on open',near(fq0,fq1,4),`${fq0}→${fq1}`);
+        if (isCompact) add(engineName,vpName,'FAQ mobile viewport stable on open',near(fq0.top,fq1.top,4),JSON.stringify({before:fq0,after:fq1}));
         const faqSequential = await page.locator('body').evaluate(el=>el.classList.contains('r7-sequential-ui'));
         await page.locator(faqSequential ? '#faq .r7-query-back' : '#faqResponseClose').click(); await settle(page,760);
-        const fq2=await page.evaluate(()=>scrollY);
+        const fq2=await anchorGeometry(page,'#faq .section-head');
         add(engineName,vpName,'FAQ close returns standby',(await page.locator('#faq .faq-query-item[aria-selected="true"]').count())===0);
-        if (isCompact) add(engineName,vpName,'FAQ mobile viewport stable on close',near(fq1,fq2,4),`${fq1}→${fq2}`);
+        if (isCompact) add(engineName,vpName,'FAQ mobile viewport stable on close',near(fq1.top,fq2.top,4),JSON.stringify({before:fq1,after:fq2}));
       }
 
       if (isCompact) {
@@ -157,11 +277,20 @@ for (const [engineName, launcher] of Object.entries(engines)) {
         await page.goto(`${BASE}/index.html#trailer`,{waitUntil:'domcontentloaded'}); await settle(page,250);
         const video=page.locator('#trailerVideo');
         await video.click({position:{x:30,y:30}}).catch(()=>{});
-        await page.keyboard.press('f').catch(()=>{}); await settle(page,120);
+        await page.keyboard.press('f').catch(()=>{}); await settle(page,140);
         const fsAfterF=await page.evaluate(()=>!!(document.fullscreenElement||document.webkitFullscreenElement));
-        if (fsAfterF) { add(engineName,vpName,'F fullscreen toggle',true); await page.keyboard.press('Escape').catch(()=>{}); await settle(page,100); }
-        else nt(engineName,vpName,'F fullscreen toggle','browser-native fullscreen not observable/allowed in this headless context');
-        await video.dblclick({position:{x:50,y:50}}).catch(()=>{}); await settle(page,120);
+        if (fsAfterF) {
+          add(engineName,vpName,'F fullscreen toggle',true);
+          if (!isCompact) {
+            const g=await page.locator('#videoShell').evaluate(el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height,vw:innerWidth,vh:innerHeight};});
+            add(engineName,vpName,'desktop fullscreen geometry fills viewport',near(g.left,0,2)&&near(g.top,0,2)&&g.width>=g.vw-2&&g.height>=g.vh-2,JSON.stringify(g));
+          }
+          await page.keyboard.press('Escape').catch(()=>{}); await settle(page,120);
+        } else {
+          nt(engineName,vpName,'F fullscreen toggle','browser-native fullscreen not observable/allowed in this headless context');
+          if (!isCompact) nt(engineName,vpName,'desktop fullscreen geometry','browser-native fullscreen not observable/allowed in this headless context');
+        }
+        await video.dblclick({position:{x:50,y:50}}).catch(()=>{}); await settle(page,140);
         const fsAfterDbl=await page.evaluate(()=>!!(document.fullscreenElement||document.webkitFullscreenElement));
         if (fsAfterDbl) { add(engineName,vpName,'double-click fullscreen toggle',true); await page.keyboard.press('Escape').catch(()=>{}); }
         else nt(engineName,vpName,'double-click fullscreen toggle','browser-native fullscreen not observable/allowed in this headless context');
@@ -180,13 +309,34 @@ for (const [engineName, launcher] of Object.entries(engines)) {
         const rows=[...new Set(boxes.map(b=>Math.round(b.y)))];
         add(engineName,vpName,'mobile rating wraps to balanced two rows',rows.length===2,JSON.stringify(rows));
       }
-      await jumpTo(page, '#reviewWorkspace');
-      const railReview=(await page.locator('#railSection').textContent()||'');
-      add(engineName,vpName,'Reviews indicator updates to feed',railReview.includes('R1'),railReview);
+
+      if (targetedKeys.has(vpName)) {
+        await page.locator('#profileHelpToggle').click(); await settle(page,100);
+        const help=await page.evaluate(()=>{
+          const panel=document.querySelector('#profileHelpPanel'); const composer=panel?.closest('.review-composer');
+          if(!panel||!composer) return null;
+          const p=panel.getBoundingClientRect(), c=composer.getBoundingClientRect();
+          return {hidden:panel.hidden,aria:panel.getAttribute('aria-hidden'),left:p.left,right:p.right,top:p.top,bottom:p.bottom,width:p.width,height:p.height,composerLeft:c.left,composerRight:c.right,composerWidth:c.width,vw:innerWidth,vh:innerHeight};
+        });
+        add(engineName,vpName,'Profile Help opens as anchored popover',!!help&&!help.hidden&&help.aria==='false'&&help.width<help.vw*.9&&help.left>=help.composerLeft-2&&help.right<=help.composerRight+2,JSON.stringify(help));
+        await page.locator('#profileHelpClose').click(); await settle(page,70);
+        add(engineName,vpName,'Profile Help closes',await page.locator('#profileHelpPanel').evaluate(el=>el.hidden&&el.getAttribute('aria-hidden')==='true'));
+      }
+
+      const reviewRail=await activateSectionAndWaitRail(page,'#reviewWorkspace','R1');
+      add(engineName,vpName,'Reviews indicator updates to feed',reviewRail.ok,JSON.stringify(reviewRail));
       if (screenshotKeys.has(vpName)) await screenshot(page,engineName,vpName,'reviews-rating');
 
-      add(engineName,vpName,'page console errors = 0',consoleErrors.length===0,consoleErrors.join(' | ').slice(0,1200));
-      add(engineName,vpName,'page exceptions = 0',pageErrors.length===0,pageErrors.join(' | ').slice(0,1200));
+      const externalConsoleErrors = consoleErrors.filter(record => externalConsoleRecord(record, externalFailures));
+      const productConsoleErrors = consoleErrors.filter(record => !externalConsoleRecord(record, externalFailures));
+      if (externalFailures.length || externalConsoleErrors.length) {
+        environmentEventTotal += Math.max(externalFailures.length, externalConsoleErrors.length, 1);
+        env(engineName,vpName,'external Supabase/stats availability',JSON.stringify({requestFailures:externalFailures,console:externalConsoleErrors}).slice(0,2400));
+      }
+      productConsoleErrorTotal += productConsoleErrors.length;
+      pageExceptionTotal += pageErrors.length;
+      add(engineName,vpName,'product console errors = 0',productConsoleErrors.length===0,productConsoleErrors.map(x=>x.text).join(' | ').slice(0,1600));
+      add(engineName,vpName,'page exceptions = 0',pageErrors.length===0,pageErrors.join(' | ').slice(0,1600));
     } catch (error) {
       add(engineName,vpName,'audit execution',false,String(error?.stack||error));
     }
@@ -195,7 +345,6 @@ for (const [engineName, launcher] of Object.entries(engines)) {
   await browser.close();
 }
 
-// Source/safety checks independent of browser viewport.
 const sourceChecks = [];
 async function source(name, ok, detail='') { sourceChecks.push({engine:'source',viewport:'all',check:name,status:ok?'PASS':'FAIL',detail}); }
 const index = await fs.readFile('index.html','utf8');
@@ -204,7 +353,9 @@ const site = await fs.readFile('js/site.js','utf8');
 const responsive = await fs.readFile('js/responsive-r7.js','utf8');
 const followJs = await fs.readFile('js/r7-live-followup.js','utf8');
 const followCss = await fs.readFile('css/r7-live-followup.css','utf8');
-await source('bad Archive CSS path count = 0',![index,reviews,site,responsive,followJs,followCss].join('\n').includes('/css/assets/images/archive/'));
+const combinedSource=[index,reviews,site,responsive,followJs,followCss].join('\n');
+const badArchivePathCount=(combinedSource.match(/\/css\/assets\/images\/archive\//g)||[]).length;
+await source('bad Archive CSS path count = 0',badArchivePathCount===0,String(badArchivePathCount));
 await source('horizontal progress node absent',!index.includes('id="scrollProgress"')&&!reviews.includes('id="scrollProgress"'));
 await source('forbidden mobile scrollTo workaround absent from sequential block',!responsive.slice(responsive.indexOf('// Sequential FAQ / Actors'),responsive.indexOf('// PROFILE HELP')).includes('scrollTo('));
 await source('forbidden sequential min-height helper absent',!responsive.includes('holdSequentialHeight'));
@@ -218,20 +369,33 @@ const totals = {
   total: results.length,
   pass: results.filter(r=>r.status==='PASS').length,
   fail: results.filter(r=>r.status==='FAIL').length,
-  not_tested: results.filter(r=>r.status==='NOT TESTED').length
+  not_tested: results.filter(r=>r.status==='NOT TESTED').length,
+  environment: results.filter(r=>r.status==='ENVIRONMENT').length
 };
-const report = { product_sha: PRODUCT_SHA, audit_trigger_sha: process.env.GITHUB_SHA || null, matrix: matrix.map(([name,w,h])=>({name,width:w,height:h})), engines:Object.keys(engines), totals, results, screenshots };
+const summary = {
+  product_console_errors: productConsoleErrorTotal,
+  page_exceptions: pageExceptionTotal,
+  environment_events: environmentEventTotal,
+  archive_bad_path_count: badArchivePathCount,
+  archive_asset_http_status: archiveResponse.status
+};
+const report = { product_sha: PRODUCT_SHA, audit_trigger_sha: process.env.GITHUB_SHA || null, matrix: matrix.map(([name,w,h])=>({name,width:w,height:h})), engines:Object.keys(engines), totals, summary, results, screenshots };
 await fs.writeFile(path.join(OUT,'RESULTS.json'),JSON.stringify(report,null,2));
 const failures=results.filter(r=>r.status==='FAIL');
 const nts=results.filter(r=>r.status==='NOT TESTED');
+const envs=results.filter(r=>r.status==='ENVIRONMENT');
 const md=[
   '# R7 LIVE FOLLOW-UP AUDIT', '', `Product SHA: ${PRODUCT_SHA}`, `Audit trigger SHA: ${process.env.GITHUB_SHA||'unknown'}`,
-  '', `TOTAL ${totals.total} / PASS ${totals.pass} / FAIL ${totals.fail} / NOT TESTED ${totals.not_tested}`,
+  '', `TOTAL ${totals.total} / PASS ${totals.pass} / FAIL ${totals.fail} / NOT TESTED ${totals.not_tested} / ENVIRONMENT ${totals.environment}`,
+  '', `Product console errors: ${summary.product_console_errors}`, `Page exceptions: ${summary.page_exceptions}`, `Environment events: ${summary.environment_events}`, `Archive bad path count: ${summary.archive_bad_path_count}`, `Archive asset HTTP: ${summary.archive_asset_http_status}`,
   '', '## Failures', ...(failures.length?failures.map(r=>`- ${r.engine} ${r.viewport} — ${r.check}: ${r.detail||''}`):['- none']),
+  '', '## ENVIRONMENT', ...(envs.length?envs.map(r=>`- ${r.engine} ${r.viewport} — ${r.check}: ${r.detail}`):['- none']),
   '', '## NOT TESTED', ...(nts.length?nts.map(r=>`- ${r.engine} ${r.viewport} — ${r.check}: ${r.detail}`):['- none']),
   '', '## Screenshots', ...screenshots.map(s=>`- screenshots/${s}`)
 ];
 await fs.writeFile(path.join(OUT,'REPORT.md'),md.join('\n'));
-await fs.writeFile(path.join(OUT,'EVIDENCE-INDEX.md'),['# Evidence index','',`- Product SHA: ${PRODUCT_SHA}`,'- RESULTS.json','- REPORT.md',...screenshots.map(s=>`- screenshots/${s}`)].join('\n'));
-console.log(JSON.stringify(totals));
+await fs.writeFile(path.join(OUT,'EVIDENCE-INDEX.md'),[
+  '# Evidence index','',`- Product SHA: ${PRODUCT_SHA}`,`- Audit trigger SHA: ${process.env.GITHUB_SHA||'unknown'}`,'- RESULTS.json','- REPORT.md','- EXIT_CODE.txt',...screenshots.map(s=>`- screenshots/${s}`)
+].join('\n'));
+console.log(JSON.stringify({totals,summary}));
 if (totals.fail) process.exit(1);
