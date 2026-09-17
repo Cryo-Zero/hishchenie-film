@@ -16,6 +16,7 @@ const matrix = [
   ['1366x768',1366,768],['1440x900',1440,900],['1920x1080',1920,1080],
   ['1080x1920',1080,1920],['1280x600',1280,600]
 ];
+const touchKeys = new Set(['360x800','390x844','430x932','800x360','844x390','932x430','768x1024','1024x768']);
 const screenshotKeys = new Set(['390x844','844x390','1366x768','1440x900']);
 const targetedKeys = new Set(['390x844','430x932','844x390','1366x768','1440x900']);
 const results = [];
@@ -41,11 +42,26 @@ async function screenshot(page, engine, viewport, name) {
   screenshots.push(path.basename(file));
 }
 async function settle(page, ms=450) { await page.waitForTimeout(ms); }
+async function jumpTo(page, selector) {
+  await page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    const top = el.getBoundingClientRect().top + scrollY;
+    window.scrollTo(0, Math.max(0, Math.round(top)));
+    void root.offsetHeight;
+    root.style.scrollBehavior = previous;
+  }, selector);
+  await settle(page, 180);
+}
 
 for (const [engineName, launcher] of Object.entries(engines)) {
   const browser = await launcher.launch({ headless: true });
   for (const [vpName, width, height] of matrix) {
-    const context = await browser.newContext({ viewport: { width, height }, reducedMotion: 'no-preference' });
+    const touchLike = touchKeys.has(vpName);
+    const context = await browser.newContext({ viewport: { width, height }, reducedMotion: 'no-preference', hasTouch: touchLike });
     const page = await context.newPage();
     const consoleErrors = [];
     const pageErrors = [];
@@ -77,7 +93,7 @@ for (const [engineName, launcher] of Object.entries(engines)) {
       add(engineName,vpName,'no Playback Speed control',(await page.locator('.r7-player-speed').count())===0);
       add(engineName,vpName,'no CC control',(await page.locator('.r7-player-cc').count())===0);
       add(engineName,vpName,'no Download control',(await page.locator('[download],.r7-player-download').count())===0);
-      const isCompact = width<=820 || (width>height && width<=960 && height<=560);
+      const isCompact = width<=820 || (touchLike && width>height && width<=960 && height<=560);
       if (isCompact) add(engineName,vpName,'mobile PiP absent',!(await visible(page.locator('.r7-player-pip'))));
       else add(engineName,vpName,'desktop volume slider visible',await visible(page.locator('.r7-player-volume')));
 
@@ -88,8 +104,7 @@ for (const [engineName, launcher] of Object.entries(engines)) {
       add(engineName,vpName,'CONTACT linear uniform timing',contact.timing==='linear',JSON.stringify(contact));
       add(engineName,vpName,'CONTACT endpoint diamond hidden',contact.b==='none',JSON.stringify(contact));
 
-      await page.locator('#cast').scrollIntoViewIfNeeded(); await settle(page,100);
-      await page.evaluate(() => document.querySelector('#cast')?.scrollIntoView({block:'start'})); await settle(page,120);
+      await jumpTo(page, '#cast');
       const railCast = (await page.locator('#railSection').textContent()||'');
       add(engineName,vpName,'section indicator updates at ACTORS',railCast.includes('05'),railCast);
 
@@ -100,19 +115,21 @@ for (const [engineName, launcher] of Object.entries(engines)) {
         add(engineName,vpName,'Actors open selects dossier',await page.locator('#cast .cast-list-item').first().getAttribute('aria-selected')==='true');
         add(engineName,vpName,'Actors structure has no transform',await page.locator('#subjectDossier').evaluate(el=>getComputedStyle(el).transform==='none'));
         if (isCompact) add(engineName,vpName,'Actors mobile viewport stable on open',near(y0,y1,4),`${y0}→${y1}`);
-        await page.locator('#subjectDossierClose').click(); await settle(page,760);
+        const actorSequential = await page.locator('body').evaluate(el=>el.classList.contains('r7-sequential-ui'));
+        await page.locator(actorSequential ? '#cast .r7-subject-back' : '#subjectDossierClose').click(); await settle(page,760);
         const y2=await page.evaluate(()=>scrollY);
         add(engineName,vpName,'Actors close returns neutral',(await page.locator('#cast .cast-list-item[aria-selected="true"]').count())===0);
         if (isCompact) add(engineName,vpName,'Actors mobile viewport stable on close',near(y1,y2,4),`${y1}→${y2}`);
 
-        await page.locator('#faq').scrollIntoViewIfNeeded(); await page.evaluate(()=>document.querySelector('#faq')?.scrollIntoView({block:'start'})); await settle(page,120);
+        await jumpTo(page, '#faq');
         const fq0=await page.evaluate(()=>scrollY);
         await page.locator('#faq .faq-query-item').first().click(); await settle(page,760);
         const fq1=await page.evaluate(()=>scrollY);
         add(engineName,vpName,'FAQ open selects response',await page.locator('#faq .faq-query-item').first().getAttribute('aria-selected')==='true');
         add(engineName,vpName,'FAQ structure has no transform',await page.locator('#faqResponsePanel').evaluate(el=>getComputedStyle(el).transform==='none'));
         if (isCompact) add(engineName,vpName,'FAQ mobile viewport stable on open',near(fq0,fq1,4),`${fq0}→${fq1}`);
-        await page.locator('#faqResponseClose').click(); await settle(page,760);
+        const faqSequential = await page.locator('body').evaluate(el=>el.classList.contains('r7-sequential-ui'));
+        await page.locator(faqSequential ? '#faq .r7-query-back' : '#faqResponseClose').click(); await settle(page,760);
         const fq2=await page.evaluate(()=>scrollY);
         add(engineName,vpName,'FAQ close returns standby',(await page.locator('#faq .faq-query-item[aria-selected="true"]').count())===0);
         if (isCompact) add(engineName,vpName,'FAQ mobile viewport stable on close',near(fq1,fq2,4),`${fq1}→${fq2}`);
@@ -163,7 +180,7 @@ for (const [engineName, launcher] of Object.entries(engines)) {
         const rows=[...new Set(boxes.map(b=>Math.round(b.y)))];
         add(engineName,vpName,'mobile rating wraps to balanced two rows',rows.length===2,JSON.stringify(rows));
       }
-      await page.locator('#reviewWorkspace').scrollIntoViewIfNeeded(); await settle(page,120);
+      await jumpTo(page, '#reviewWorkspace');
       const railReview=(await page.locator('#railSection').textContent()||'');
       add(engineName,vpName,'Reviews indicator updates to feed',railReview.includes('R1'),railReview);
       if (screenshotKeys.has(vpName)) await screenshot(page,engineName,vpName,'reviews-rating');
