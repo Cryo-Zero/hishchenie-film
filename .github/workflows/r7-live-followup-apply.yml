@@ -18,21 +18,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply guarded product patch
+      - name: Apply source-aware bounded product patch
         shell: bash
         run: |
           set -euo pipefail
           python .github/r7-live-followup-apply.py
-      - name: Commit exact product
+      - name: Static product checks
         shell: bash
         run: |
           set -euo pipefail
           node --check js/site.js
           node --check js/responsive-r7.js
+          node --check js/r7-owner-corrections.js
           node --check js/r7-live-followup.js
+          test ! -e .github/r7-live-followup-apply.py
+          test ! -e .github/workflows/r7-live-followup-apply.yml
+          ! grep -R '/css/assets/images/archive/' index.html reviews.html css js
+          ! grep -R 'id="scrollProgress"' index.html reviews.html
+          grep -q 'r7-live-followup.css' index.html
+          grep -q 'r7-live-followup.css' reviews.html
+          grep -q 'r7-live-followup.js' index.html
+          grep -q 'r7-live-followup.js' reviews.html
+      - name: Commit exact product
+        shell: bash
+        run: |
+          set -euo pipefail
           git config user.name "Cryo-Zero"
           git config user.email "Bogdan.Vedrentsov@gmail.com"
-          git add index.html reviews.html css/r7-live-followup.css js/site.js js/responsive-r7.js js/r7-live-followup.js
+          git add -A
           git commit -m "feat: implement R7 live PC and mobile follow-up"
           git push origin HEAD:r7-live-followup-pc-mobile
           git rev-parse HEAD | tee /tmp/PRODUCT_SHA.txt
