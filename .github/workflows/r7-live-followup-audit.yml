@@ -5,6 +5,7 @@ on:
     branches:
       - r7-live-followup-pc-mobile
     paths:
+      - .github/r7-live-followup-audit.mjs
       - .github/workflows/r7-live-followup-audit.yml
 
 permissions:
