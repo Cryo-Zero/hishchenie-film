@@ -10,7 +10,8 @@ if (!PRODUCT_SHA) throw new Error('PRODUCT_SHA is required');
 await fs.mkdir(path.join(OUT, 'screenshots'), { recursive: true });
 
 const engines = { chromium, firefox, webkit };
-const AUDIT_MODE = process.env.AUDIT_MODE === 'sanity' ? 'sanity' : 'full';
+const requestedAuditMode = process.env.AUDIT_MODE || 'full';
+const AUDIT_MODE = ['sanity','rail-focus'].includes(requestedAuditMode) ? requestedAuditMode : 'full';
 const fullMatrix = [
   ['360x800',360,800],['390x844',390,844],['430x932',430,932],
   ['800x360',800,360],['844x390',844,390],['932x430',932,430],
@@ -23,7 +24,12 @@ const sanityMatrix = [
   ['844x390',844,390],['932x430',932,430],['1366x768',1366,768],
   ['1440x900',1440,900]
 ];
-const matrix = AUDIT_MODE === 'sanity' ? sanityMatrix : fullMatrix;
+const railFocusMatrix = [
+  ['360x800',360,800],['1080x1920',1080,1920]
+];
+const matrix = AUDIT_MODE === 'rail-focus' ? railFocusMatrix : AUDIT_MODE === 'sanity' ? sanityMatrix : fullMatrix;
+const railFocusCases = new Set(['firefox:1080x1920','webkit:360x800']);
+const activeEngines = AUDIT_MODE === 'rail-focus' ? { firefox, webkit } : engines;
 const touchKeys = new Set(['360x800','390x844','430x932','800x360','844x390','932x430','768x1024','1024x768']);
 const screenshotKeys = new Set(['390x844','844x390','1366x768','1440x900']);
 const fullTargetedKeys = new Set(['390x844','430x932','844x390','1366x768','1440x900']);
@@ -133,34 +139,56 @@ async function prepareVisualAnchor(page, sectionSelector, anchorSelector) {
 }
 async function activateSectionAndWaitRail(page, selector, expected) {
   const locator = page.locator(selector);
-  await locator.evaluate(el => {
-    const top = el.getBoundingClientRect().top + scrollY;
-    const previous = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-    window.scrollTo(0, Math.max(0, Math.round(top - innerHeight * .20)));
-    void document.documentElement.offsetHeight;
-    document.documentElement.style.scrollBehavior = previous;
-  });
-  await settle(page, 120);
-  let synced = false;
-  try {
-    await page.waitForFunction(({ sel, exp }) => {
-      const el = document.querySelector(sel);
-      const rail = document.querySelector('#railSection');
-      if (!el || !rail) return false;
+  const rail = page.locator('#railSection');
+  const samples = [];
+  for (let attempt=0; attempt<10; attempt += 1) {
+    const geometry = await locator.evaluate(el => {
       const r = el.getBoundingClientRect();
       const probe = innerHeight * .34;
-      return r.top <= probe && r.bottom > probe && (rail.textContent || '').includes(exp);
-    }, { sel: selector, exp: expected }, { timeout: 3000, polling: 50 });
-    synced = true;
-  } catch {}
+      return {
+        top:r.top, bottom:r.bottom, height:r.height,
+        viewportHeight:innerHeight, probe,
+        intersectsProbe:r.top<=probe&&r.bottom>probe,
+        scrollY,
+        maxScroll:Math.max(0,document.documentElement.scrollHeight-innerHeight)
+      };
+    });
+    const text = ((await rail.textContent()) || '').trim();
+    samples.push({ attempt, geometry, text });
+    if (geometry.intersectsProbe && text.includes(expected)) {
+      return { ok:true, geometryActive:true, geometry, text, expected, samples };
+    }
+
+    if (!geometry.intersectsProbe) {
+      const rawDelta = geometry.top > geometry.probe
+        ? geometry.top - geometry.probe + Math.max(8, geometry.viewportHeight * .02)
+        : geometry.bottom - geometry.probe - Math.max(8, geometry.viewportHeight * .02);
+      const cap = Math.max(120, geometry.viewportHeight * .72);
+      const delta = Math.sign(rawDelta) * Math.min(Math.abs(rawDelta), cap);
+      await page.mouse.wheel(0, delta);
+      await settle(page, 180);
+      continue;
+    }
+
+    try {
+      await page.waitForFunction(exp => (document.querySelector('#railSection')?.textContent || '').includes(exp), expected, { timeout: 700, polling: 40 });
+    } catch {}
+    await settle(page, 80);
+  }
+
   const geometry = await locator.evaluate(el => {
     const r = el.getBoundingClientRect();
     const probe = innerHeight * .34;
-    return { top:r.top, bottom:r.bottom, height:r.height, viewportHeight:innerHeight, probe, intersectsProbe:r.top<=probe&&r.bottom>probe };
+    return {
+      top:r.top, bottom:r.bottom, height:r.height,
+      viewportHeight:innerHeight, probe,
+      intersectsProbe:r.top<=probe&&r.bottom>probe,
+      scrollY,
+      maxScroll:Math.max(0,document.documentElement.scrollHeight-innerHeight)
+    };
   });
-  const text = (await page.locator('#railSection').textContent() || '').trim();
-  return { ok: geometry.intersectsProbe && synced && text.includes(expected), geometryActive: geometry.intersectsProbe, geometry, text, expected };
+  const text = ((await rail.textContent()) || '').trim();
+  return { ok:geometry.intersectsProbe&&text.includes(expected), geometryActive:geometry.intersectsProbe, geometry, text, expected, samples };
 }
 const KNOWN_EXTERNAL_RPC_PATHS = new Set([
   '/rest/v1/rpc/get_public_channel_state_v2',
@@ -188,9 +216,10 @@ function externalConsoleRecord(record, externalFailures) {
   return /^\[P17\/stats\]\s+/.test(text);
 }
 
-for (const [engineName, launcher] of Object.entries(engines)) {
+for (const [engineName, launcher] of Object.entries(activeEngines)) {
   const browser = await launcher.launch({ headless: true });
   for (const [vpName, width, height] of matrix) {
+    if (AUDIT_MODE === 'rail-focus' && !railFocusCases.has(`${engineName}:${vpName}`)) continue;
     const touchLike = touchKeys.has(vpName);
     const isCompact = width<=820 || (touchLike && width>height && width<=960 && height<=560);
     const context = await browser.newContext({ viewport: { width, height }, reducedMotion: 'no-preference', hasTouch: touchLike });
