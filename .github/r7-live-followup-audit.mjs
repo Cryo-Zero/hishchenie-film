@@ -1,6 +1,7 @@
 import { chromium, firefox, webkit } from 'playwright';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import http from 'node:http';
 
 const PRODUCT_SHA = process.env.PRODUCT_SHA;
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:4173';
@@ -46,6 +47,17 @@ const near = (a,b,t=2) => Math.abs(a-b) <= t;
 
 async function visible(locator) {
   try { return await locator.isVisible(); } catch { return false; }
+}
+async function localHttpStatus(url, timeoutMs=5000) {
+  return await new Promise((resolve, reject) => {
+    const req = http.get(url, response => {
+      const status = response.statusCode || 0;
+      response.resume();
+      response.on('end', () => resolve(status));
+    });
+    req.setTimeout(timeoutMs, () => req.destroy(new Error(`HTTP probe timeout: ${url}`)));
+    req.on('error', reject);
+  });
 }
 async function noOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2);
@@ -454,8 +466,8 @@ await source('forbidden sequential min-height helper absent',!responsive.include
 await source('follow-up does not touch Supabase',!followJs.toLowerCase().includes('supabase')&&!followCss.toLowerCase().includes('supabase'));
 results.push(...sourceChecks);
 
-const archiveResponse = await fetch(`${BASE}/assets/images/archive/archive-01.jpg`);
-add('network','all','correct Archive asset HTTP 200',archiveResponse.status===200,String(archiveResponse.status));
+const archiveStatus = await localHttpStatus(`${BASE}/assets/images/archive/archive-01.jpg`);
+add('network','all','correct Archive asset HTTP 200',archiveStatus===200,String(archiveStatus));
 
 const totals = {
   total: results.length,
@@ -471,7 +483,7 @@ const summary = {
   page_exceptions: pageExceptionTotal,
   environment_events: environmentEventTotal,
   archive_bad_path_count: badArchivePathCount,
-  archive_asset_http_status: archiveResponse.status
+  archive_asset_http_status: archiveStatus
 };
 const report = { audit_mode: AUDIT_MODE, product_sha: PRODUCT_SHA, audit_trigger_sha: process.env.GITHUB_SHA || null, matrix: matrix.map(([name,w,h])=>({name,width:w,height:h})), engines:Object.keys(engines), totals, summary, results, screenshots };
 await fs.writeFile(path.join(OUT,'RESULTS.json'),JSON.stringify(report,null,2));
