@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 45
     env:
       PRODUCT_SHA: 1e4ea710be8a72224cd0f3f6ef314b87977f140d
-      AUDIT_MODE: sanity
+      AUDIT_MODE: full
       EVIDENCE_DIR: /tmp/r7-evidence
       BASE_URL: http://127.0.0.1:4173
     steps:
