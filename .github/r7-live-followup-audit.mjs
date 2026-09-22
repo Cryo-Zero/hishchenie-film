@@ -395,7 +395,11 @@ for (const [engineName, launcher] of Object.entries(engines)) {
           const p=panel.getBoundingClientRect(), c=composer.getBoundingClientRect();
           return {hidden:panel.hidden,aria:panel.getAttribute('aria-hidden'),left:p.left,right:p.right,top:p.top,bottom:p.bottom,width:p.width,height:p.height,composerLeft:c.left,composerRight:c.right,composerWidth:c.width,vw:innerWidth,vh:innerHeight};
         });
-        add(engineName,vpName,'Profile Help opens as anchored popover',!!help&&!help.hidden&&help.aria==='false'&&Math.abs(help.width-help.composerWidth)<=4&&help.left>=help.composerLeft-2&&help.right<=help.composerRight+2,JSON.stringify(help));
+        const helpInset = width>=981 ? 20 : 0;
+        const helpAligned = !!help &&
+          Math.abs((help.left-help.composerLeft)-helpInset)<=3 &&
+          Math.abs((help.composerRight-help.right)-helpInset)<=3;
+        add(engineName,vpName,'Profile Help opens as anchored popover',!!help&&!help.hidden&&help.aria==='false'&&helpAligned,JSON.stringify({...help,expectedInset:helpInset}));
         await page.locator('#profileHelpClose').click(); await settle(page,70);
         add(engineName,vpName,'Profile Help closes',await page.locator('#profileHelpPanel').evaluate(el=>el.hidden&&el.getAttribute('aria-hidden')==='true'));
       }
