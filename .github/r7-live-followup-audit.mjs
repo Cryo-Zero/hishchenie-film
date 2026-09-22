@@ -90,12 +90,31 @@ async function anchorGeometry(page, selector) {
   });
 }
 async function prepareVisualAnchor(page, sectionSelector, anchorSelector) {
-  await page.locator(sectionSelector).evaluate(el => el.scrollIntoView({ behavior:'instant', block:'center' }));
-  await settle(page, 90);
+  const section = page.locator(sectionSelector);
+  const anchor = page.locator(anchorSelector);
+  if (!(await section.count()) || !(await anchor.count())) throw new Error(`Missing visual anchor: ${sectionSelector} / ${anchorSelector}`);
+  await anchor.evaluate(el => {
+    const docTop = el.getBoundingClientRect().top + scrollY;
+    const targetTop = Math.max(56, Math.min(140, innerHeight * .22));
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    window.scrollTo(0, Math.max(0, Math.round(docTop - targetTop)));
+    void root.offsetHeight;
+    root.style.scrollBehavior = previous;
+  });
+  await settle(page, 120);
   let geometry = await anchorGeometry(page, anchorSelector);
-  for (let i=0; i<2 && geometry.bottomGap < 160; i += 1) {
-    await page.mouse.wheel(0, -260);
-    await settle(page, 90);
+  if (geometry.bottomGap < 160) {
+    await page.evaluate(delta => {
+      const root = document.documentElement;
+      const previous = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      window.scrollBy(0, -delta);
+      void root.offsetHeight;
+      root.style.scrollBehavior = previous;
+    }, Math.ceil(160 - geometry.bottomGap + 40));
+    await settle(page, 120);
     geometry = await anchorGeometry(page, anchorSelector);
   }
   return geometry;
@@ -149,7 +168,12 @@ function externalConsoleRecord(record, externalFailures) {
     const endpoint = new URL(locationUrl).pathname;
     return correlated.some(failure => new URL(failure.url).pathname === endpoint);
   }
-  return /^\[P17\/stats\]\s+/.test(record.text || '');
+  const text = record.text || '';
+  for (const failure of correlated) {
+    const endpoint = new URL(failure.url).pathname;
+    if (text.includes(failure.url) || text.includes(endpoint)) return true;
+  }
+  return /^\[P17\/stats\]\s+/.test(text);
 }
 
 for (const [engineName, launcher] of Object.entries(engines)) {
@@ -371,7 +395,7 @@ for (const [engineName, launcher] of Object.entries(engines)) {
           const p=panel.getBoundingClientRect(), c=composer.getBoundingClientRect();
           return {hidden:panel.hidden,aria:panel.getAttribute('aria-hidden'),left:p.left,right:p.right,top:p.top,bottom:p.bottom,width:p.width,height:p.height,composerLeft:c.left,composerRight:c.right,composerWidth:c.width,vw:innerWidth,vh:innerHeight};
         });
-        add(engineName,vpName,'Profile Help opens as anchored popover',!!help&&!help.hidden&&help.aria==='false'&&help.width<help.vw*.9&&help.left>=help.composerLeft-2&&help.right<=help.composerRight+2,JSON.stringify(help));
+        add(engineName,vpName,'Profile Help opens as anchored popover',!!help&&!help.hidden&&help.aria==='false'&&Math.abs(help.width-help.composerWidth)<=4&&help.left>=help.composerLeft-2&&help.right<=help.composerRight+2,JSON.stringify(help));
         await page.locator('#profileHelpClose').click(); await settle(page,70);
         add(engineName,vpName,'Profile Help closes',await page.locator('#profileHelpPanel').evaluate(el=>el.hidden&&el.getAttribute('aria-hidden')==='true'));
       }
@@ -403,11 +427,14 @@ async function source(name, ok, detail='') { sourceChecks.push({engine:'source',
 const classifierKnown=[{url:'https://xltwwvutqkpmtmlavngi.supabase.co/rest/v1/rpc/get_public_stats_v2'}];
 const classifierUnrelated=[{url:'https://xltwwvutqkpmtmlavngi.supabase.co/rest/v1/rpc/unrelated_rpc'}];
 const classifierRecord={text:'[P17/stats] Error',location:{url:'http://127.0.0.1:4173/js/public-response.js'}};
+const classifierCors={text:'Cross-Origin Request Blocked https://xltwwvutqkpmtmlavngi.supabase.co/rest/v1/rpc/get_public_stats_v2',location:{}};
 add('harness','classifier','Supabase environment classification requires correlated known RPC failure',
   externalConsoleRecord(classifierRecord,classifierKnown) &&
+  externalConsoleRecord(classifierCors,classifierKnown) &&
   !externalConsoleRecord(classifierRecord,[]) &&
-  !externalConsoleRecord(classifierRecord,classifierUnrelated),
-  'known correlated=true; none/unrelated=false','HARNESS');
+  !externalConsoleRecord(classifierRecord,classifierUnrelated) &&
+  !externalConsoleRecord(classifierCors,classifierUnrelated),
+  'known P17/CORS correlated=true; none/unrelated=false','HARNESS');
 const index = await fs.readFile('index.html','utf8');
 const reviews = await fs.readFile('reviews.html','utf8');
 const site = await fs.readFile('js/site.js','utf8');
